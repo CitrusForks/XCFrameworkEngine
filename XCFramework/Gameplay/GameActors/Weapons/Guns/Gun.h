@@ -1,0 +1,62 @@
+/* XCFrameworkEngine
+ * Copyright (C) Abhishek Porwal, 2016
+ * Any queries? Contact author <https://github.com/abhishekp314>
+ * This program is complaint with GNU General Public License, version 3.
+ * For complete license, read License.txt in source root directory. */
+
+#pragma once
+
+#include "Engine/Input/Directinput.h"
+#include "Engine/Graphics/XC_Shaders/XC_VertexFormat.h"
+#include "Gameplay/GameActors/SimpleMeshActor.h"
+#include "Engine/Graphics/XC_GraphicsDx11.h"
+
+#include "Engine/Graphics/XC_Materials/MaterialTypes.h"
+#include "Gameplay/GameActors/SubActor.h"
+#include "Gameplay/GameActors/Weapons/Bullets/Bullet.h"
+
+class Gun : public SimpleMeshActor, public SubActor
+{
+public:
+    DECLARE_OBJECT_CREATION(Gun)
+
+    Gun(void);
+    virtual ~Gun(void);
+
+    virtual void                 PreLoad(IActor* parentActor, XCVec3 initialPosition, XCMesh* pMesh);
+    virtual void                 Load();
+    virtual void                 BuildMeshBuffer();
+    virtual void                 Update(float dt);
+    virtual void                 UpdateOffsets(float dt);
+    virtual void                 Draw(RenderContext& renderContext);
+    virtual void                 Destroy();
+    virtual void                 ApplyOffsetRotation();
+    virtual void                 CheckInput();
+    virtual void                 UpdateGunRecoil(float dt);
+
+    void                         ShootBullet(std::string bulletActorType, XCVec3 startPosition, XCVec3 target);
+    SubActor*                    GetSubActor() { return (SubActor*)this; }
+
+protected:
+    SHADERTYPE                 m_useShaderType;
+
+    BasicMaterial                m_material;
+
+    XCVecIntrinsic4              m_secondaryLookAxis;
+    XCVecIntrinsic4              m_secondaryUpAxis;
+    XCVecIntrinsic4              m_secondaryRightAxis;
+
+    XCMatrix4                    m_MInitialRotation;
+
+    unsigned int                 m_noOfBullets;
+    float                        m_recoilDelta;
+
+    float                        m_recoilMaxTime;
+    bool                         m_canShootBullet;
+
+    DirectInput*                 m_directInput;
+
+#if defined(XCGRAPHICS_DX12)
+    D3DConstantBuffer*           m_pCBPerObject;
+#endif
+};

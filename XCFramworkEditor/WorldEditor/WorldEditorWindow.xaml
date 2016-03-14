@@ -1,0 +1,18 @@
+﻿<Window x:Class="XC_FramworkEditor.WorldEditor.WorldEditor"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="WorldEditor" Height="488" Width="929"
+        xmlns:customCmds="clr-namespace:XC_FramworkEditor.Commands.Toolbar">
+    <Window.CommandBindings>
+        <CommandBinding Command="{x:Static customCmds:ToolbarCommands.ResourceViewer}" CanExecute="OnResourceViewerExecute" Executed="OnResourceViewerExecuted"/>
+    </Window.CommandBindings>
+    <Grid Name="grid">
+        <Label Content="Actor : " HorizontalAlignment="Left" Margin="51,41,0,0" VerticalAlignment="Top" Foreground="Black" Height="17" RenderTransformOrigin="0.868,1.423"/>
+        <ComboBox Name="ActorTypesComboBox" HorizontalAlignment="Left" Margin="115,32,0,0" VerticalAlignment="Top" Width="153" Height="26"/>
+        <Label Content="Texture :" HorizontalAlignment="Left" Margin="51,300,0,0" VerticalAlignment="Top" Foreground="Black"/>
+        <TextBox Name="ResourceSelectorTextBox" HorizontalAlignment="Left" Height="23" Margin="115,300,0,0" TextWrapping="Wrap" Text="IResource" VerticalAlignment="Top" Width="208"/>
+        <Button Content="Select Resource" HorizontalAlignment="Left" Height="23" Margin="340,300,0,0" VerticalAlignment="Top" Width="101" Command="customCmds:ToolbarCommands.ResourceViewer"/>
+        <Label Content="RasterType :" HorizontalAlignment="Left" Margin="51,339,0,0" VerticalAlignment="Top" Foreground="Black"/>
+        <ComboBox x:Name="RasterTypesComboBox" HorizontalAlignment="Left" Margin="170,339,0,0" VerticalAlignment="Top" Width="153" Height="26"/>
+    </Grid>
+</Window>

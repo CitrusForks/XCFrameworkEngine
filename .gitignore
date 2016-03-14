@@ -1,0 +1,13 @@
+*.pssl
+*.obj
+*.sln
+*.cso
+*Orbis.cpp
+*Orbis.h
+*orbis.cpp
+*orbis.h
+*Durango.cpp
+*Durango.h
+*durango.cpp
+*durango.h
+XCFramework/Engine/Graphics/XC_Shaders/src/*
