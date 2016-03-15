@@ -1,0 +1,42 @@
+{
+    FBTexture2DS:
+    [
+		{ ResourceName:"Placeholder", ResourcePath:"Assets\\Textures\\Common\\placeholder.dds"},
+        { ResourceName:"SimpleTerrain1Bitmap", ResourcePath:"Assets\\Textures\\Environment\\Terrain\\SimpleTerrain1.dds"},
+        { ResourceName:"Terrain1Bitmap", ResourcePath:"Assets\\Textures\\Environment\\Terrain\\terrain1.dds"},
+        { ResourceName:"Grass1", ResourcePath:"Assets\\Textures\\Environment\\Terrain\\grass1.dds"},
+        { ResourceName:"Sand", ResourcePath:"Assets\\Textures\\Environment\\Terrain\\sand.dds"},
+        { ResourceName:"multi_grass", ResourcePath:"Assets\\Textures\\Environment\\TerrainMultiTex\\grass0argb.dds"},
+        { ResourceName:"multi_ground", ResourcePath:"Assets\\Textures\\Environment\\TerrainMultiTex\\ground0argb.dds"},
+        { ResourceName:"multi_stone", ResourcePath:"Assets\\Textures\\Environment\\TerrainMultiTex\\stone0argb.dds"},
+        { ResourceName:"multi_blend", ResourcePath:"Assets\\Textures\\Environment\\TerrainMultiTex\\blendmap.dds"},
+
+        { ResourceName:"car_mat_red", ResourcePath:"Assets\\Textures\\Vehicles\\Car\\car_mat_red.dds"},
+        { ResourceName:"grey_mat", ResourcePath:"Assets\\Textures\\Common\\grey_mat.dds"},
+
+        
+        { ResourceName:"soldier_mesh_tex", ResourcePath:"Assets\\Textures\\Soldiers\\soldier.dds"},
+        { ResourceName:"armypilot_body_mesh_tex", ResourcePath:"Assets\\Textures\\Soldiers\\body01.dds"},
+
+        { ResourceName:"pistol_bullet_mesh_tex", ResourcePath:"Assets\\Meshes\\Weapons\\Bullets\\PistolBullet\\Bullet_Texture.dds"}
+    ],
+
+    FBXCMeshes:
+    [
+        { MeshName:"WoodenDoor", MeshPath:"Assets\\Meshes\\Door\\door.3ds", TextureRes:"grey_mat", InitialScaling:0.1, InitialRotation:{x:0.0, y:0.0, z:0.0} },
+        { MeshName:"PorcheCar", MeshPath:"Assets\\Meshes\\Vehicles\\Cars\\car.3ds", TextureRes:"car_mat_red", InitialScaling:0.001, InitialRotation:{x:0.0, y:0.0, z:0.0} },
+        { MeshName:"Soldier", MeshPath:"Assets\\Meshes\\Soldiers\\Soldier3ds\\soldier.3ds", TextureRes:"soldier_mesh_tex", InitialScaling:0.04, InitialRotation:{x:-1.57, y:-1.57, z:0.0} },
+        { MeshName:"Gun", MeshPath:"Assets\\Meshes\\Weapons\\Guns\\gun.3ds", TextureRes:"Placeholder", InitialScaling:0.01, InitialRotation:{x:0.0, y:0.0, z:0.0} },
+        { MeshName:"PistolBullet", MeshPath:"Assets\\Meshes\\Weapons\\Bullets\\PistolBullet\\Bullet.3ds", TextureRes:"pistol_bullet_mesh_tex", InitialScaling:0.06, InitialRotation:{x:0.0, y:0.0, z:0.0} }
+    ],
+
+    FBMeshCustoms:
+    [
+        { MeshName:"ArmyPilot", MeshPath:"Assets\\Meshes\\Soldiers\\ArmyPilot\\ArmyPilot.ms3d", TextureRes:"armypilot_body_mesh_tex", InitialScaling:0.05, InitialRotation:{x:0.0, y:0.0, z:0.0} }
+    ],
+
+	FBCubeTexture3DS:
+	[
+		{ ResourceName:"cubemap_bright", ResourcePath:"Assets\\Textures\\Environment\\CubeMaps\\sanf.dds" }
+	]
+}

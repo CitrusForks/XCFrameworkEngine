@@ -1,0 +1,111 @@
+include "BasicTypes.schema";
+
+table child
+{
+	name:string;
+	transformation:[float];
+	children:[child];
+}
+
+table bone
+{
+	name:string;
+	offsetmatrix:[float];
+	weights:[int];
+}
+
+table texturecoord
+{
+	texcoords:[float];
+}
+
+table mesh
+{
+	name:string;
+	materialindex:int;
+	primitivetypes:int;
+	vertices:[float];
+	normals:[float];
+	tangents:[float];
+	bitangents:[float];
+	numuvcomponents:[int];
+	texturecoords:[texturecoord];
+	bones:[bone];
+	faces:[int];	
+}
+
+table materialproperty
+{
+	key:string;
+	semantic:int;
+	index:int;
+	type:int;
+	value:string;
+}
+
+table material
+{
+	properties:[materialproperty];
+}
+
+///Animations
+
+table positionkey
+{
+	frame:float;
+	vec3:[float];
+}
+table rotationkey
+{
+	frame:float;
+	vec4:[float];
+}
+table scalingkey
+{
+	frame:float;
+	vec3:[float];
+}
+
+table channel
+{
+	name:string;
+	prestate:int;
+	poststate:int;
+	positionkeys:[positionkey];
+	rotationkeys:[rotationkey];
+	scalingkeys:[scalingkey];
+}
+
+table animation
+{
+	name:string;
+	tickspersecond:float;
+	duration:float;
+	channels:[channel];
+}
+
+table rn
+{
+	name:string;
+	transformation:[float];
+	meshesId:[int];
+	children:[child];
+}
+
+table header
+{
+	format:string;
+	version:int;
+}
+
+table FBMesh
+{
+	metadata:header;
+	rootnode:rn;
+	flags:int;
+	meshes:[mesh];
+	materials:[material];
+	animations:[animation];
+}
+
+root_type FBMesh;

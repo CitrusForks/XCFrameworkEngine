@@ -1,0 +1,34 @@
+//IResource structs
+include "BasicTypes.schema";
+
+table FBTexture2D
+{
+    ResourceName:string;
+    ResourcePath:string;
+}
+
+table FBCubeTexture3D
+{
+	ResourceName:string;
+    ResourcePath:string;
+}
+
+table FBXCMesh
+{
+    MeshName:string;
+    MeshPath:string;
+    TextureRes:string;
+    InitialScaling:float;
+    InitialRotation:Vec3;
+}
+
+//Main Table schemas
+table FBResources
+{
+    FBTexture2DS:[FBTexture2D];
+    FBXCMeshes:[FBXCMesh];
+    FBMeshCustoms:[FBXCMesh];
+	FBCubeTexture3DS:[FBCubeTexture3D];
+}
+
+root_type FBResources;

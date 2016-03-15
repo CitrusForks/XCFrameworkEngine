@@ -1,0 +1,73 @@
+include "BasicTypes.schema";
+
+table FBSimpleSkyBox
+{
+	Position:Vec4;
+	Rotation:Vec4;
+	Scaling:Vec4;
+	Material:FBBasicMaterial;
+	CubeTexture3DResourceName:string;
+	RasterizerType:FBERasterizer_Type;
+}
+
+table FBTexturePlane
+{
+	Position:Vec4;
+	Rotation:Vec4;
+	Scaling:Vec4;
+	Material:FBBasicMaterial;
+	ResourceName:string;
+	RasterizerType:FBERasterizer_Type;
+}
+
+table FBLiveDriveTexturePlane
+{
+	Position:Vec4;
+	Rotation:Vec4;
+	Scaling:Vec4;
+	Material:FBBasicMaterial;
+	RasterizerType:FBERasterizer_Type;
+}
+
+table FBWaves
+{
+	Position:Vec3;
+	Rows:int;
+	Column:int;
+	RowSpacing:int;
+	ColSpacing:int;
+}
+
+table FBMultiTexturedTerrain
+{
+	BitmapFileName:string;
+	Texture2DResourceName:string;
+	Texture2DResourceName1:string;
+	Texture2DResourceName2:string;
+	Texture2DBlendResourceName3:string;
+	Position:Vec3;
+	Rows:int;
+	Column:int;
+	RowSpacing:int;
+	ColSpacing:int;
+}
+
+table FBCar
+{
+	CarObjectType:string; //PCCar or NPCCar
+	Position:Vec3;
+	XCMeshResourceName:string;
+}
+
+table FBDoor
+{
+	Position:Vec4;
+	XCMeshResourceName:string;
+}
+
+table FBSoldier
+{
+	SoldierObjectType:string; //PCSoldier or NPCSoldier
+	Position:Vec3;
+	XCMeshResourceName:string;
+}

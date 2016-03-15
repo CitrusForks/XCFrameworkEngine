@@ -1,0 +1,2 @@
+XCShaderCompiler.exe "%cd%"
+pause

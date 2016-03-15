@@ -1,0 +1,4 @@
+Texture2D SimpleTerrain1Bitmap Assets\Textures\Environment\Terrain\SimpleTerrain1.bmp
+Texture2D Terrain1Bitmap Assets\Textures\Environment\Terrain\terrain1.bmp
+Texture2D Grass1 Assets\Textures\Environment\Terrain\grass1.jpg
+Texture2D Sand Assets\Textures\Environment\Terrain\sand.jpg

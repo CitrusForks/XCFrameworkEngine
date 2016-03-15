@@ -1,0 +1,34 @@
+
+enum SHADERTYPE : byte
+{
+    DEFAULT = 0,
+
+    COLORTECH,
+
+    LIGHTTEXTURE,
+    
+    TERRIANMULTITEXTURE,
+
+    SIMPLECUBEMAP,
+
+    SKINNEDCHARACTER,
+
+    REFELECTED_LIGHTTEXTURE,
+
+    MAX
+}
+
+table FBShader
+{
+	ShaderType:SHADERTYPE;
+	VsPath:string;
+	PsPath:string;
+    EnableDepth:bool;
+}
+
+table FBRootShader
+{
+	FBShaders:[FBShader];
+}
+
+root_type FBRootShader; 

@@ -1,0 +1,75 @@
+{
+    FBSoldiers:
+    [
+        { "SoldierObjectType":"PCSoldier",  Position:{ x:10, y:2, z:10}, XCMeshResourceName:"Soldier" },
+        { "SoldierObjectType":"NPCSoldier", Position:{x:-30, y:2, z:50}, XCMeshResourceName:"Soldier" },
+		{ "SoldierObjectType":"NPCSoldier", Position:{x:-30, y:2, z:60}, XCMeshResourceName:"Soldier" },
+		{ SoldierObjectType:"NPCSoldier", Position:{x:-30, y:2, z:70}, XCMeshResourceName:"Soldier" },
+		{ SoldierObjectType:"NPCSoldier", Position:{x:-30, y:2, z:80}, XCMeshResourceName:"Soldier" },
+		{ SoldierObjectType:"NPCSoldier", Position:{x:-30, y:2, z:90}, XCMeshResourceName:"Soldier" },
+		{ SoldierObjectType:"NPCSoldier", Position:{x:-30, y:2, z:100}, XCMeshResourceName:"Soldier" },
+		{ SoldierObjectType:"NPCSoldier", Position:{x:-30, y:2, z:100}, XCMeshResourceName:"Soldier" }
+    ],
+
+    FBCars:
+    [
+       { CarObjectType:"PCCar",  Position:{x:0,  y:2, z:0}, XCMeshResourceName:"PorcheCar" },
+	   { CarObjectType:"NPCCar", Position:{x:10, y:2, z:30}, XCMeshResourceName:"PorcheCar" }
+    ],
+
+	FBLiveDriveTexturePlanes:
+    [
+       { 
+	     Position:{x:0.0, y:5.0, z:10.0, w:1.0}, 
+	     Rotation:{x:0.0, y:0.0, z:0.0,  w:1.0}, 
+		 Scaling: {x:5.0, y:5.0, z:0.0, w:1.0}, 
+		 Material:{ Ambient:{x:1, y:1, z:1, w:1}, Diffuse:{x:0.5, y:0.8, z:0, w:1}, Specular:{x:0.5, y:0.5, z:0.5, w:20} }, 
+		 RasterizerType:FBRASTERIZERTYPE_FILL_SOLID 
+	   }
+    ],
+
+	FBMultiTexturedTerrains:
+    [
+       { 
+		 BitmapFileName:"Assets\\Textures\\Environment\\Terrain\\SimpleTerrain1.bmp", 
+	     Texture2DResourceName:"multi_grass", 
+		 Texture2DResourceName1:"multi_ground", 
+		 Texture2DResourceName2:"Sand", 
+		 Texture2DBlendResourceName3:"multi_blend",
+		 Position:{x:50.0, y:-20.0, z:-40.0},
+		 Rows:25,
+		 Column:25,
+		 RowSpacing:1,
+		 ColSpacing:1
+	   },
+	   { 
+		 BitmapFileName:"Assets\\Textures\\Environment\\Terrain\\terrain1.bmp", 
+	     Texture2DResourceName:"Sand", 
+		 Texture2DResourceName1:"multi_ground", 
+		 Texture2DResourceName2:"multi_grass", 
+		 Texture2DBlendResourceName3:"multi_blend",
+		 Position:{x:300.0, y:-20.0, z:-40.0},
+		 Rows:25,
+		 Column:25,
+		 RowSpacing:1,
+		 ColSpacing:1
+	   }
+    ],
+
+	FBWavess:
+    [
+        { Position:{x:100, y:0, z:0}, Rows:25, Column:25, RowSpacing:1, ColSpacing:1 }
+    ],
+
+	FBSimpleSkyBoxes:
+    [
+        { 
+			Position:{x:0, y:0, z:0, w:1}, 
+			Rotation:{x:0, y:0, z:0, w:1}, 
+			Scaling: {x:1000, y:1000, z:1000, w:1.0}, 
+			Material:{ Ambient:{x:1,y:1,z:1,w:1}, Diffuse:{x:0.5, y:0.8, z:0, w:1}, Specular:{x:0.5, y:0.5, z:0.5, w:20} }, 
+			CubeTexture3DResourceName:"cubemap_bright", 
+			RasterizerType:FBRASTERIZERTYPE_FILL_SOLID 
+		}
+    ],
+}

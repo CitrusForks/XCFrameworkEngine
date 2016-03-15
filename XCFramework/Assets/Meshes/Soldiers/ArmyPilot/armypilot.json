@@ -1,0 +1,232 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "definitions": {
+    "UnknownObject": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "transformation": {
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "UnknownObject_1": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "transformation": {
+          "type": "array"
+        },
+        "children": {
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "rootnode": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "transformation": {
+          "type": "array"
+        },
+        "meshes": {
+          "type": "array"
+        },
+        "children": {
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "UnknownObject_2": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "offsetmatrix": {
+          "type": "array"
+        },
+        "weights": {
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "UnknownObject_3": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "materialindex": {
+          "type": "number"
+        },
+        "primitivetypes": {
+          "type": "number"
+        },
+        "vertices": {
+          "type": "array"
+        },
+        "normals": {
+          "type": "array"
+        },
+        "tangents": {
+          "type": "array"
+        },
+        "bitangents": {
+          "type": "array"
+        },
+        "numuvcomponents": {
+          "type": "array"
+        },
+        "texturecoords": {
+          "type": "array"
+        },
+        "bones": {
+          "type": "array"
+        },
+        "faces": {
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "UnknownObject_4": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "materialindex": {
+          "type": "number"
+        },
+        "primitivetypes": {
+          "type": "number"
+        },
+        "vertices": {
+          "type": "array"
+        },
+        "normals": {
+          "type": "array"
+        },
+        "bones": {
+          "type": "array"
+        },
+        "faces": {
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "UnknownObject_5": {
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "semantic": {
+          "type": "number"
+        },
+        "index": {
+          "type": "number"
+        },
+        "type": {
+          "type": "number"
+        },
+        "value": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            {
+              "type": "number"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "UnknownObject_6": {
+      "properties": {
+        "properties": {
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "UnknownObject_7": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "prestate": {
+          "type": "number"
+        },
+        "poststate": {
+          "type": "number"
+        },
+        "positionkeys": {
+          "type": "array"
+        },
+        "rotationkeys": {
+          "type": "array"
+        },
+        "scalingkeys": {
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "UnknownObject_8": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "tickspersecond": {
+          "type": "number"
+        },
+        "duration": {
+          "type": "number"
+        },
+        "channels": {
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "UnknownObject_9": {
+      "properties": {
+        "rootnode": {
+          "$ref": "#/definitions/rootnode"
+        },
+        "flags": {
+          "type": "number"
+        },
+        "meshes": {
+          "type": "array"
+        },
+        "materials": {
+          "type": "array"
+        },
+        "animations": {
+          "type": "array"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "allOf": [
+    {
+      "$ref": "#/definitions/UnknownObject_9"
+    }
+  ],
+  "type": "object"
+}

@@ -1,0 +1,1 @@
+flatc.exe -c %1

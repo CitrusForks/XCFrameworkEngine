@@ -1,0 +1,15 @@
+include "GameplayActors.schema";
+
+//Main schemas
+table FBOpenWorldScene
+{
+	FBSoldiers:[FBSoldier];
+	FBCars:[FBCar];
+	FBTexturePlanes:[FBTexturePlane];
+	FBLiveDriveTexturePlanes:[FBLiveDriveTexturePlane];
+	FBMultiTexturedTerrains:[FBMultiTexturedTerrain];
+	FBWavess:[FBWaves];
+	FBSimpleSkyBoxes:[FBSimpleSkyBox];
+}
+
+root_type FBOpenWorldScene;

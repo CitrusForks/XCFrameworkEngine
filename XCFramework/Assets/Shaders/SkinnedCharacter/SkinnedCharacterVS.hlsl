@@ -1,0 +1,93 @@
+/* XCFrameworkEngine
+ * Copyright (C) Abhishek Porwal, 2016
+ * Any queries? Contact author <https://github.com/abhishekp314>
+ * This program is complaint with GNU General Public License, version 3.
+ * For complete license, read License.txt in source root directory. */
+
+#include "..\LightingShaders\DirectionalLight.hlsl"
+#include "..\LightingShaders\PointLight.hlsl"
+#include "..\LightingShaders\SpotLight.hlsl"
+
+cbuffer cbSkinnedCharacterBuffer : register(b0)
+{
+    float4x4    gWorld;
+    float4x4    gWVP;
+    float4x4    gWorldInvTranspose;
+    float4x4    gTexTransform;
+    Material    gMaterial;
+};
+
+cbuffer cbLightsPerFrame : register(b1)
+{
+    DirectionalLight gDirLight;
+    PointLight       gPointLight;
+    SpotLight        gSpotLight;
+    float3           gEyePosW;
+};
+
+cbuffer cbBoneBuffer : register(b2)
+{
+    float4x4    gBoneMatrix[60];
+};
+
+
+Texture2D       gDiffuseMap : register(t0);    //Mapped with ShaderResource Variable
+SamplerState	samLinear : register( s0 );
+
+SamplerState samAnisotropic
+{
+    Filter = ANISOTROPIC;
+    MaxAnisotropy = 4;
+
+    AddressU = WRAP;
+    AddressV = WRAP;
+};
+
+struct VertexIn
+{
+    float3 PosL         : POSITION;
+    float3 NormalL      : NORMAL;
+    float2 Tex          : TEXCOORD;
+    float4 BlendIndices : BLENDINDICES;
+    float4 BlendWeights : BLENDWEIGHT;
+};
+
+struct VertexOut
+{
+    float4 PosH     : SV_POSITION;
+    float3 PosW     : POSITION;
+    float3 NormalW  : NORMAL;
+    float2 Tex      : TEXCOORD;
+};
+
+VertexOut VSMain(VertexIn vin)
+{
+    VertexOut vout;
+
+    //Calculate the position of vertex by applying animation
+    float4 weight = float4(gEyePosW, 1.0f);
+    weight = vin.BlendWeights;
+
+    weight.w = 1.0f - dot(weight.xyz, float3(1, 1, 1));
+    
+    float4 localPos = float4(vin.PosL, 1.0f);
+    float3 objPos = localPos.xyz;
+    weight.x = 1.0f;
+    //weight.y = 1.0f;
+    //weight.z = 1.0f;
+    //weight.w = 1.0f;
+
+    objPos          += mul(localPos, gBoneMatrix[vin.BlendIndices.x]) * weight.x;
+    objPos          += mul(localPos, gBoneMatrix[vin.BlendIndices.y]) * weight.y;
+    objPos          += mul(localPos, gBoneMatrix[vin.BlendIndices.z]) * weight.z;
+    objPos          += mul(localPos, gBoneMatrix[vin.BlendIndices.w]) * weight.w;
+
+    // Transform to world space.
+    vout.PosW = mul(float4(objPos, 1.0), gWorld).xyz;
+    vout.PosH = mul(float4(objPos, 1.0), gWVP);
+    vout.NormalW = normalize(mul(float4(vin.NormalL, 0.0f), gWorldInvTranspose)).xyz;
+    vout.Tex = mul(float4(vin.Tex, 0.0f, 1.0f), gTexTransform).xy;
+    
+
+    return vout;
+}

@@ -1,0 +1,19 @@
+Texture2D SimpleTerrain1Bitmap Assets\Textures\Environment\Terrain\SimpleTerrain1.dds
+Texture2D Terrain1Bitmap Assets\Textures\Environment\Terrain\terrain1.dds
+Texture2D Grass1 Assets\Textures\Environment\Terrain\grass1.dds
+Texture2D Sand Assets\Textures\Environment\Terrain\sand.dds
+Texture2D car_mat_red Assets\Textures\Vehicles\Car\car_mat_red.dds
+Texture2D grey_mat Assets\Textures\Common\grey_mat.dds
+Texture2D multi_grass Assets\Textures\Environment\TerrainMultiTex\grass0argb.dds
+Texture2D multi_ground Assets\Textures\Environment\TerrainMultiTex\ground0argb.dds
+Texture2D multi_stone Assets\Textures\Environment\TerrainMultiTex\stone0argb.dds
+Texture2D multi_blend Assets\Textures\Environment\TerrainMultiTex\blendmap.dds
+CubeTexture3D cubemap_ambient Assets\Textures\Environment\CubeMaps\cubeMap_ambient.dds
+Texture2D cubemap_bright Assets\Textures\Environment\CubeMaps\cubeMap_bright.dds
+XCMesh WoodenDoor Assets\Meshes\Door\door.3ds 0.1
+XCMesh PorcheCar Assets\Meshes\Vehicles\Cars\car.3ds 0.001
+XCMesh Soldier Assets\Meshes\Soldiers\Soldier3ds\soldier.3ds 0.04
+Texture2D soldier_mesh_tex Assets\Textures\Soldiers\soldier.dds
+XCMesh Gun Assets\Meshes\Weapons\Guns\gun.3ds 0.01
+XCMesh PistolBullet Assets\Meshes\Weapons\Bullets\PistolBullet\Bullet.3ds 0.04
+Texture2D pistol_bullet_mesh_tex Assets\Meshes\Weapons\Bullets\PistolBullet\Bullet_Texture.dds
