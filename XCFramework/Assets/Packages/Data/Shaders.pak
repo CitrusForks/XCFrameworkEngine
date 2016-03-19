@@ -6,5 +6,6 @@
 		{ ShaderType:LIGHTTEXTURE, 				VsPath:"Assets\\Shaders\\LightTexture\\LightTextureVS.cso", 			PsPath:"Assets\\Shaders\\LightTexture\\LightTexturePS.cso",			 EnableDepth:1 },
 		{ ShaderType:TERRIANMULTITEXTURE, 		VsPath:"Assets\\Shaders\\TerrainMultiTex\\TerrainMultiTexVS.cso", 		PsPath:"Assets\\Shaders\\TerrainMultiTex\\TerrainMultiTexPS.cso",	 EnableDepth:1 },
 		{ ShaderType:SKINNEDCHARACTER, 			VsPath:"Assets\\Shaders\\SkinnedCharacter\\SkinnedCharacterVS.cso", 	PsPath:"Assets\\Shaders\\SkinnedCharacter\\SkinnedCharacterPS.cso",  EnableDepth:1 },
+		{ ShaderType:VECTORFONT, 				VsPath:"Assets\\Shaders\\VectorFontShader\\VectorFontVS.cso", 	PsPath:"Assets\\Shaders\\VectorFontShader\\VectorFontPS.cso",  				 EnableDepth:1 },
 	]
 }

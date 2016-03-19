@@ -51,6 +51,14 @@ public:
         return *(VertexBuffer<T>*)m_vertexBuffer;
     }
 
+    template<class T>
+    VertexBuffer<T>&         getInstanceBuffer()
+    {
+        return *(VertexBuffer<T>*)m_instanceBuffer;
+    }
+
+    std::string getSubMeshName() { return m_objectName; }
+
     IndexBuffer<unsigned int>& getIndexBuffer() { return m_indexBuffer; }
 
     int     getNoOfVertices() { return m_noOfVertices; }
@@ -62,7 +70,9 @@ public:
     void    setNoOfBones(unsigned int noBones) { m_noOfBones = noBones; }
 
     void    addVertex(float x, float y, float z);
+    void    addVertex(Vertex& vert);
     void    addMapCoord(float u, float v);
+    void    addFace(Face& face);
     void    addFace(unsigned short a, unsigned short b, unsigned short c, unsigned short flag);
     void    addBoneInfo(XCVec4Unaligned boneIndex, XCVec4Unaligned boneWeight);
 
@@ -77,6 +87,12 @@ public:
         m_mapCoord.clear();
 
         createVertexBuffer();
+    }
+
+    void createConstantBuffers()
+    {
+        SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
+        m_constantBuffer = heap.CreateBufferView(D3DBufferDesc(BUFFERTYPE_CBV, sizeof(cbPerObjectInstanced)));
     }
 
     void    destroy()
@@ -100,6 +116,8 @@ public:
 #endif
 
     D3DConstantBuffer*                 m_boneBuffer;
+    D3DConstantBuffer*                 m_constantBuffer;
+
 protected:
 
     void                                createVertexBuffer()
@@ -114,15 +132,18 @@ protected:
             m_vertexBuffer = new VertexBuffer<VertexPosNormTexBIndexBWeight>();
             break;
 
+        case VertexFormat_PositionColorInstanceIndex:
+            m_vertexBuffer   = new VertexBuffer<VertexPosColorInstanceIndex>();
+            break;
+
         default:
             XCASSERT(false);
         }
     }
 
 private:
-
-
     void*                              m_vertexBuffer;
+    void*                              m_instanceBuffer;
     IndexBuffer<unsigned int>          m_indexBuffer;
 
     unsigned int                       m_noOfBones;

@@ -39,6 +39,15 @@ void WorldSceneLoader::Run()
 
     auto fbWorld = GetFBOpenWorldScene(fbSystem.GetBufferFromLoadedData());
 
+    //Fonts
+    if (fbWorld->FBFonts())
+    {
+        for (auto it = fbWorld->FBFonts()->begin(); it != fbWorld->FBFonts()->end(); ++it)
+        {
+            CreateLoadActor("FontActor", *it);
+        }
+    }
+
     //Soldiers
     for (auto it = fbWorld->FBSoldiers()->begin(); it != fbWorld->FBSoldiers()->end(); ++it)
     {

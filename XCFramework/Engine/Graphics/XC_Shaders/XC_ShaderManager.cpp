@@ -242,10 +242,10 @@ void XC_ShaderManager::DrawNonIndexed(ID3DDeviceContext& context, unsigned int v
 #endif
 }
 
-void XC_ShaderManager::DrawIndexed(ID3DDeviceContext& context, unsigned int _indexCount, void* indexGpuAddr)
+void XC_ShaderManager::DrawIndexedInstanced(ID3DDeviceContext& context, unsigned int _indexCount, void* indexGpuAddr, unsigned int instanceCount)
 {
 #if defined(XCGRAPHICS_DX12)
-    context.DrawIndexedInstanced(_indexCount, 1, 0, 0, 0);
+    context.DrawIndexedInstanced(_indexCount, instanceCount, 0, 0, 0);
 #elif defined(XCGRAPHICS_DX11)
     context.DrawIndexed(_indexCount, 0, 0);
 #endif

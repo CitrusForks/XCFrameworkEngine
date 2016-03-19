@@ -88,7 +88,7 @@ SubMesh* XCMesh::createAndGetSubMesh()
     return m_subMeshes.back();
 }
 
-void XCMesh::createBuffers(EVertexFormat formatType)
+void XCMesh::CreateBuffers(EVertexFormat formatType)
 {
     if (!m_areBuffersCreated)
     {
@@ -330,6 +330,56 @@ void XCMesh::createBuffers(EVertexFormat formatType)
                         break;
                     }
 
+                case VertexFormat_PositionColorInstanceIndex:
+                    {
+                        std::vector<VertexPosColorInstanceIndex>& vertices = m_subMeshes[objIndex]->getVertexBuffer<VertexPosColorInstanceIndex>().m_vertexData;
+                        //std::vector<VertexPosColorInstanceIndex::InstanceBuffer>& instanceData = m_subMeshes[objIndex]->getInstanceBuffer<VertexPosColorInstanceIndex::InstanceBuffer>().m_vertexData;
+                        //VertexPosColorInstanceIndex::InstanceBuffer sampleData = { XCVec4Unaligned(0.0f, 0.0f, 0.0f, 0.0f) };
+
+                        VertexPosColorInstanceIndex vertex;
+                        XCVec4Unaligned vertexPos = { 0.0f, 0.0f, 0.0f, 0.0f };
+
+                        //Calculate the initial rotation matrix
+                        XCMatrix4 initialRotationMat = XMMatrixRotationX(m_initialRotation.x) * XMMatrixRotationY(m_initialRotation.y) * XMMatrixRotationZ(m_initialRotation.z);
+                        XCVecIntrinsic4 transformedVertex;
+
+                        //Vertex Buffer
+                        for (unsigned int vertIndex = 0; vertIndex < m_subMeshes[objIndex]->m_vertices.size(); vertIndex++)
+                        {
+                            vertexPos = XCVec4Unaligned(m_subMeshes[objIndex]->m_vertices[vertIndex].x * m_initialScaling,
+                                m_subMeshes[objIndex]->m_vertices[vertIndex].y * m_initialScaling,
+                                m_subMeshes[objIndex]->m_vertices[vertIndex].z * m_initialScaling, 1.0f);
+
+                            transformedVertex = XMLoadFloat4(&vertexPos);
+                            transformedVertex = XMVector3TransformNormal(transformedVertex, initialRotationMat);
+                            XMStoreFloat4(&vertexPos, transformedVertex);
+
+                            vertex = VertexPosColorInstanceIndex(vertexPos, XCVec4Unaligned(1.0f, 1.0f, 1.0f, 1.0f));
+
+                            vertices.push_back(vertex);
+
+                            vMin = XMVectorMin(vMin, XMLoadFloat4(&ToXCVec4(vertexPos)));
+                            vMax = XMVectorMax(vMax, XMLoadFloat4(&ToXCVec4(vertexPos)));
+
+                            //sampleData.SamplePad.x = rand() % 4;
+                            //instanceData.push_back(sampleData);
+                        }
+
+                        std::vector<unsigned int>& indices = m_subMeshes[objIndex]->getIndexBuffer().m_indexData;
+
+                        for (unsigned int index = 0; index < m_subMeshes[objIndex]->m_faces.size(); index++)
+                        {
+                            indices.push_back(m_subMeshes[objIndex]->m_faces[index].a);
+                            indices.push_back(m_subMeshes[objIndex]->m_faces[index].b);
+                            indices.push_back(m_subMeshes[objIndex]->m_faces[index].c);
+                        }
+
+                        m_subMeshes[objIndex]->getVertexBuffer<VertexPosColorInstanceIndex>().BuildVertexBuffer();
+                        //m_subMeshes[objIndex]->getInstanceBuffer<VertexPosColorInstanceIndex::InstanceBuffer>().BuildVertexBuffer();
+                        m_subMeshes[objIndex]->getIndexBuffer().BuildIndexBuffer();
+                        break;
+                    }
+
                 default:
                     break;
             }
@@ -366,15 +416,23 @@ int XCMesh::getSizeFromVertexFormat(EVertexFormat format)
     case VertexFormat_PositionColor:
         return sizeof(VertexPosColor);
         break;
+
     case VertexFormat_PositionNormal:
         return sizeof(VertexPosNorm);
         break;
+
     case VertexFormat_PositionNormalTexture:
         return sizeof(VertexPosNormTex);
         break;
+
     case VertexFormat_PositionNormalTextureBlendIndexBlendWeight:
         return sizeof(VertexPosNormTexBIndexBWeight);
         break;
+
+    case VertexFormat_PositionColorInstanceIndex:
+        return sizeof(VertexPosColorInstanceIndex);
+        break;
+
     default:
         return 0;
     }
@@ -443,48 +501,63 @@ void XCMesh::Draw(RenderContext& context, SHADERTYPE shaderType)
     DrawSubMeshes(context, shaderType);
 }
 
-void XCMesh::DrawSubMeshes(RenderContext& renderContext, SHADERTYPE shaderType)
+void XCMesh::DrawSubMesh(RenderContext& renderContext, SHADERTYPE shaderType, unsigned int meshIndex, unsigned int instanceCount)
+{
+    unsigned int offset = 0;
+
+    switch (shaderType)
+    {
+    case SHADERTYPE_LIGHTTEXTURE:
+        m_subMeshes[meshIndex]->getVertexBuffer<VertexPosNormTex>().SetVertexBuffer(renderContext.GetDeviceContext());
+        break;
+
+    case SHADERTYPE_SKINNEDCHARACTER:
+    {
+        std::vector<XCMatrix4Unaligned> boneMatrix = m_sceneAnimator->GetBoneMatrices(m_scene->mRootNode, meshIndex);
+
+        cbBoneBuffer boneBuffer = {};
+        for (unsigned int index = 0; index < 60; ++index)
+        {
+            boneBuffer.gBoneMatrix[index] = boneMatrix[index];
+        }
+
+        memcpy(m_subMeshes[meshIndex]->m_boneBuffer->m_cbDataBegin, &boneBuffer, sizeof(boneBuffer));
+
+        XCShaderHandle* skinnedCharacterShader = (XCShaderHandle*)renderContext.GetShaderManagerSystem().GetShader(SHADERTYPE_SKINNEDCHARACTER);
+        skinnedCharacterShader->setConstantBuffer("cbBoneBuffer", renderContext.GetDeviceContext(), m_subMeshes[meshIndex]->m_boneBuffer->m_gpuHandle);
+
+        m_subMeshes[meshIndex]->getVertexBuffer<VertexPosNormTexBIndexBWeight>().SetVertexBuffer(renderContext.GetDeviceContext());
+        break;
+    }
+
+    case SHADERTYPE_VECTORFONT:
+    {
+        m_subMeshes[meshIndex]->getVertexBuffer<VertexPosColorInstanceIndex>().SetVertexBuffer(renderContext.GetDeviceContext());
+        //renderContext.GetDeviceContext().IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        //vertexBufferView[0] = m_subMeshes[meshIndex]->getVertexBuffer<VertexPosColorInstanceIndex>().GetVertexBufferView();
+        //vertexBufferView[1] = m_subMeshes[meshIndex]->getInstanceBuffer<VertexPosColorInstanceIndex::InstanceBuffer>().GetVertexBufferView();
+        //renderContext.GetDeviceContext().IASetVertexBuffers(0, 1, &vertexBufferView[0]);
+        break;
+    }
+
+    default:
+        XCASSERT(false);
+    }
+
+    m_subMeshes[meshIndex]->getIndexBuffer().SetIndexBuffer(renderContext.GetDeviceContext());
+
+    //Draw as per the faces listed for every material may be?
+    renderContext.GetShaderManagerSystem().DrawIndexedInstanced(renderContext.GetDeviceContext(), m_subMeshes[meshIndex]->getNoOfFaces() * 3, m_subMeshes[meshIndex]->getIndexBuffer().GetIndexBufferInGPUMem(), instanceCount);
+}
+
+void XCMesh::DrawSubMeshes(RenderContext& renderContext, SHADERTYPE shaderType, unsigned int instanceCount)
 {
     for(unsigned int index = 0; index < m_subMeshes.size(); index++)
     {
-        unsigned int offset = 0;
-
-        switch (shaderType)
-        {
-        case SHADERTYPE_LIGHTTEXTURE:
-            m_subMeshes[index]->getVertexBuffer<VertexPosNormTex>().SetVertexBuffer(renderContext.GetDeviceContext());
-            break;
-
-        case SHADERTYPE_SKINNEDCHARACTER:
-        {
-            std::vector<XCMatrix4Unaligned> boneMatrix = m_sceneAnimator->GetBoneMatrices(m_scene->mRootNode, index);
-
-            cbBoneBuffer boneBuffer = {};
-            for (unsigned int index = 0; index < 60; ++index)
-            {
-                boneBuffer.gBoneMatrix[index] = boneMatrix[index];
-            }
-
-            memcpy(m_subMeshes[index]->m_boneBuffer->m_cbDataBegin, &boneBuffer, sizeof(boneBuffer));
-
-            XCShaderHandle* skinnedCharacterShader = (XCShaderHandle*)renderContext.GetShaderManagerSystem().GetShader(SHADERTYPE_SKINNEDCHARACTER);
-            skinnedCharacterShader->setConstantBuffer("cbBoneBuffer", renderContext.GetDeviceContext(), m_subMeshes[index]->m_boneBuffer->m_gpuHandle);
-
-            m_subMeshes[index]->getVertexBuffer<VertexPosNormTexBIndexBWeight>().SetVertexBuffer(renderContext.GetDeviceContext());
-            break;
-        }
-
-        default:
-            XCASSERT(false);
-        }
-
-        m_subMeshes[index]->getIndexBuffer().SetIndexBuffer(renderContext.GetDeviceContext());
-
-        //Draw as per the faces listed for every material may be?
-        renderContext.GetShaderManagerSystem().DrawIndexed(renderContext.GetDeviceContext(), m_subMeshes[index]->getNoOfFaces() * 3, m_subMeshes[index]->getIndexBuffer().GetIndexBufferInGPUMem());
+        DrawSubMesh(renderContext, shaderType, index, instanceCount);
     }
 
-    //Need not draw. Draw the clone of this of every actor
+    //Need not draw. Draw the clone of this in every actor
     //m_computedBoundBox.Draw();
 }
 

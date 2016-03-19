@@ -66,7 +66,7 @@ void Door::SetInitialPhysicsProperties()
 
 void Door::BuildGeometryBuffer()
 {
-    m_pMesh->createBuffers(VertexFormat_PositionNormalTexture);
+    m_pMesh->CreateBuffers(VertexFormat_PositionNormalTexture);
 }
 
 

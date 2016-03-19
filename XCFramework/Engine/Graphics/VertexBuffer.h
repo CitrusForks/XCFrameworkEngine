@@ -118,7 +118,14 @@ public:
 #endif
     }
 
+
+
 #if defined(XCGRAPHICS_DX12) 
+    D3D12_VERTEX_BUFFER_VIEW& GetVertexBufferView()
+    {
+        return m_vertexBufferView;
+    }
+
     D3D12_VERTEX_BUFFER_VIEW            m_vertexBufferView;
 
     ID3DResource*                       m_pVertexBufferResource;

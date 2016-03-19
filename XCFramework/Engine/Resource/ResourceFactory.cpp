@@ -11,6 +11,8 @@
 #include "Engine/Graphics/XC_Textures/CubeTexture3D.h"
 #include "Engine/Graphics/XC_Mesh/XCMesh.h"
 #include "Engine/Graphics/XC_Mesh/XCMeshCustom.h"
+#include "Engine/Graphics/XC_Mesh/XCMeshFBX.h"
+#include "Engine/Graphics/XC_Mesh/VectorFontMesh.h"
 
 ResourceFactory::ResourceFactory()
 {
@@ -27,6 +29,8 @@ void ResourceFactory::InitFactory()
     RegisterObject<Texture2D>("Texture2D");
     RegisterObject<XCMesh>("XCMesh");
     RegisterObject<XCMeshCustom>("XCMeshCustom");
+    RegisterObject<XCMeshFBX>("XCMeshFBX");
+    RegisterObject<VectorFontMesh>("VectorFontMesh");
     RegisterObject<CubeTexture3D>("CubeTexture3D");
 }
 

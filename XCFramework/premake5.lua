@@ -20,12 +20,12 @@ print("Building C++ Win32 Project")
 	filter "configurations:Debug"
 		sysincludedirs {"$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir)" }
 		
-		includedirs { "$(ProjectDir)", "$(ProjectDir)Libs", "$(ProjectDir)Libs/flatbuffers", "$(ProjectDir)Libs/assimp/include/" }
-		libdirs { "$(ProjectDir)Libs", "$(ProjectDir)Libs/flatbuffers", "$(ProjectDir)Libs/Assimp" }
+		includedirs { "$(ProjectDir)", "$(ProjectDir)Libs", "$(ProjectDir)Libs/flatbuffers", "$(ProjectDir)Libs/assimp/include/", "$(ProjectDir)Libs/AdobeFBX/include/" }
+		libdirs { "$(ProjectDir)Libs", "$(ProjectDir)Libs/flatbuffers", "$(ProjectDir)Libs/Assimp", "$(ProjectDir)Libs/AdobeFBX/x86/Debug/" }
 
 		excludes { "**/Orbis/**", "**orbis.cpp", "**/Durango/**", "**durango.cpp", "**editor.cpp", "**/Editor/**", "**Editor.cpp", "**Editor**.*", "**/DDSTextureLoader_Legacy/**", "**.pssl", "**/XC_Shaders/src/**"}
 		
-		links { "d3d12", "d2d1", "dwrite", "d3dcompiler", "FlatBuffers", "ws2_32", "DirectXTex", "dxguid", "dinput8", "dxgi", "d3d11", "glut32", "glew32", "assimp.lib","zlibstaticd.lib" }
+		links { "d3d12", "d2d1", "dwrite", "d3dcompiler", "FlatBuffers", "ws2_32", "DirectXTex", "dxguid", "dinput8", "dxgi", "d3d11", "glut32", "glew32", "assimp.lib","zlibstaticd.lib", "libfbxsdk.lib" }
 		
 		entrypoint("")
 		
@@ -42,12 +42,12 @@ print("Building C++ Win32 Project")
 	filter "configurations:Release"
 		sysincludedirs {"$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir)" }
 		
-	    includedirs { "$(ProjectDir)", "$(ProjectDir)Libs", "$(ProjectDir)Libs/flatbuffers", "$(ProjectDir)Libs/assimp/include/" }
-	    libdirs { "$(ProjectDir)Libs", "$(ProjectDir)Libs/flatbuffers",  "$(ProjectDir)Libs/Assimp" }
+	    includedirs { "$(ProjectDir)", "$(ProjectDir)Libs", "$(ProjectDir)Libs/flatbuffers", "$(ProjectDir)Libs/assimp/include/", "$(ProjectDir)Libs/AdobeFBX/include/" }
+	    libdirs { "$(ProjectDir)Libs", "$(ProjectDir)Libs/flatbuffers",  "$(ProjectDir)Libs/Assimp", "$(ProjectDir)Libs/AdobeFBX/x86/Debug/" }
 	  
 	    excludes { "**/Orbis/**", "**orbis.cpp", "**/Durango/**", "**durango.cpp", "**editor.cpp", "**/Editor/**", "**Editor.cpp", "**Editor**.*", "**/DDSTextureLoader_Legacy/**", "**.pssl", "**/XC_Shaders/src/**"}
 				
-	  	links { "d3d12", "d2d1", "dwrite", "d3dcompiler", "FlatBuffers", "ws2_32", "DirectXTex", "dxguid", "dinput8", "dxgi", "d3d11", "glut32", "glew32", "assimp.lib","zlibstaticd.lib" }
+	  	links { "d3d12", "d2d1", "dwrite", "d3dcompiler", "FlatBuffers", "ws2_32", "DirectXTex", "dxguid", "dinput8", "dxgi", "d3d11", "glut32", "glew32", "assimp.lib","zlibstaticd.lib", "libfbxsdk.lib" }
 	  
 		entrypoint("")
 			

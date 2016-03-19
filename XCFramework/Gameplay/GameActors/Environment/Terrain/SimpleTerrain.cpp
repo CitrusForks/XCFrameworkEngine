@@ -192,7 +192,7 @@ void SimpleTerrain::Draw(RenderContext& context)
     //TODO
     XCShaderHandle* solidColorShader = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(m_useShaderType);
 
-    context.GetShaderManagerSystem().DrawIndexed(context.GetDeviceContext(), m_indexBuffer.m_indexData.size());
+    context.GetShaderManagerSystem().DrawIndexedInstanced(context.GetDeviceContext(), m_indexBuffer.m_indexData.size());
 }
 
 void SimpleTerrain::Destroy()

@@ -75,3 +75,8 @@ struct cbBoneBuffer
 {
     XCMatrix4Unaligned    gBoneMatrix[60];
 };
+
+struct cbPerObjectInstanced
+{
+    XCMatrix4Unaligned    gWVP[100];
+};

@@ -1,4 +1,9 @@
 {
+    FBFonts:
+    [
+        { FontResourceName:"VectorFontFBX" }
+    ],
+
     FBSoldiers:
     [
         { "SoldierObjectType":"PCSoldier",  Position:{ x:10, y:2, z:10}, XCMeshResourceName:"Soldier" },

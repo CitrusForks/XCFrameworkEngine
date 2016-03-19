@@ -46,7 +46,7 @@ protected:
 
     OrientedBoundingBox*                m_boundBox;
 
-    XCVecIntrinsic4                            m_secondaryLookAxis;
-    XCVecIntrinsic4                            m_secondaryUpAxis;
-    XCVecIntrinsic4                            m_secondaryRightAxis;
+    XCVecIntrinsic4                     m_secondaryLookAxis;
+    XCVecIntrinsic4                     m_secondaryUpAxis;
+    XCVecIntrinsic4                     m_secondaryRightAxis;
 };

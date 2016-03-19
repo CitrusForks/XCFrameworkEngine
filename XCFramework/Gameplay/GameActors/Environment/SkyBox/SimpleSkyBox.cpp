@@ -158,7 +158,7 @@ void SimpleSkyBox::Draw(RenderContext& context)
 #endif
         cubeMapShader->setResource("gCubeMap", context.GetDeviceContext(), m_cubeMapTexture->getTextureResource());
   
-        context.GetShaderManagerSystem().DrawIndexed(context.GetDeviceContext(), 36, m_indexBuffer.GetIndexBufferInGPUMem());
+        context.GetShaderManagerSystem().DrawIndexedInstanced(context.GetDeviceContext(), 36, m_indexBuffer.GetIndexBufferInGPUMem());
         graphicsSystem.SetLessEqualDepthStencilView(context.GetDeviceContext(), false);
 }
 

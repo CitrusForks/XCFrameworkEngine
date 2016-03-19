@@ -225,7 +225,7 @@ void XCMeshCustom::Load(const void * buffer)
 
 void XCMeshCustom::createBuffers(EVertexFormat formatType)
 {
-    XCMesh::createBuffers(VertexFormat_PositionNormalTextureBlendIndexBlendWeight);
+    XCMesh::CreateBuffers(VertexFormat_PositionNormalTextureBlendIndexBlendWeight);
 
     if (!m_areBuffersCreated)
     {

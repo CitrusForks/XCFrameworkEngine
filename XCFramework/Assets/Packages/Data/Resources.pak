@@ -35,6 +35,11 @@
         { MeshName:"ArmyPilot", MeshPath:"Assets\\Meshes\\Soldiers\\ArmyPilot\\ArmyPilot.ms3d", TextureRes:"armypilot_body_mesh_tex", InitialScaling:0.05, InitialRotation:{x:0.0, y:0.0, z:0.0} }
     ],
 
+    FBVectorFontMesh:
+    [
+        { MeshName:"VectorFontFBX", MeshPath:"Assets\\Meshes\\Fonts\\ABC.fbx", TextureRes:"Placeholder", InitialScaling:1.0, InitialRotation:{x:0.0, y:0.0, z:0.0} }
+    ],
+
 	FBCubeTexture3DS:
 	[
 		{ ResourceName:"cubemap_bright", ResourcePath:"Assets\\Textures\\Environment\\CubeMaps\\sanf.dds" }

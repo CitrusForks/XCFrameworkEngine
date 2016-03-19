@@ -24,7 +24,7 @@ public:
 
     void                                    ApplyShader(ID3DDeviceContext& context, SHADERTYPE _shaderType);
     void                                    DrawNonIndexed(ID3DDeviceContext& context, unsigned int vertexCount);
-    void                                    DrawIndexed(ID3DDeviceContext& context, unsigned int _indexCount, void* indexGpuAddr = nullptr);
+    void                                    DrawIndexedInstanced(ID3DDeviceContext& context, unsigned int _indexCount, void* indexGpuAddr = nullptr, unsigned int instanceCount = 1);
 
     void                                    ClearShaderAndRenderStates(ID3DDeviceContext& context);
 

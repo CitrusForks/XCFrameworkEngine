@@ -100,11 +100,11 @@ void Soldier::BuildMeshBuffer()
 {
     if(m_pMesh->IsSkinnedMesh())
     {
-        m_pMesh->createBuffers(VertexFormat_PositionNormalTextureBlendIndexBlendWeight);
+        m_pMesh->CreateBuffers(VertexFormat_PositionNormalTextureBlendIndexBlendWeight);
     }
     else
     {
-        m_pMesh->createBuffers(VertexFormat_PositionNormalTexture);
+        m_pMesh->CreateBuffers(VertexFormat_PositionNormalTexture);
     }
 }
 

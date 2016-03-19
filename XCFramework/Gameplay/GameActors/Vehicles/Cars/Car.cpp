@@ -62,7 +62,7 @@ void Car::SetInitialPhysicsProperties()
 
 void Car::BuildMeshBuffer()
 {
-    m_pMesh->createBuffers(VertexFormat_PositionNormalTexture);
+    m_pMesh->CreateBuffers(VertexFormat_PositionNormalTexture);
 }
 
 void Car::Update(float dt)

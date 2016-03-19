@@ -60,6 +60,11 @@ inline XCVec3 ToXCVec3(const XCVec3Unaligned& r)
     return XCVec3(r.x, r.y, r.z);
 }
 
+inline XCVec4 ToXCVec4(const XCVec4Unaligned& r)
+{
+    return XCVec4(r.x, r.y, r.z, r.w);
+}
+
 #endif
 
 using namespace DirectX;

@@ -3,6 +3,7 @@ include "GameplayActors.schema";
 //Main schemas
 table FBOpenWorldScene
 {
+	FBFonts:[FBFont];
 	FBSoldiers:[FBSoldier];
 	FBCars:[FBCar];
 	FBTexturePlanes:[FBTexturePlane];

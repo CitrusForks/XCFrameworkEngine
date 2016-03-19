@@ -14,6 +14,16 @@ void SubMesh::addVertex(float x, float y, float z)
     m_vertices.push_back(v);
 }
 
+void SubMesh::addVertex(Vertex& vert)
+{
+    m_vertices.push_back(vert);
+}
+
+void SubMesh::addFace(Face& face)
+{
+    m_faces.push_back(face);
+}
+
 void SubMesh::addMapCoord(float u, float v)
 {
     MapCoord mc = { u, v };

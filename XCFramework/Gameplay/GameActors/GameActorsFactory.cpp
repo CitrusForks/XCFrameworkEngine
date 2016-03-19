@@ -28,6 +28,7 @@ void GameActorsFactory::RegisterActors()
     RegisterObject<SimpleActor>("SimpleActor");
     RegisterObject<SimpleMeshActor>("SimpleMeshActor");
     RegisterObject<PhysicsActor>("Physics");
+    RegisterObject<FontActor>("FontActor");
     RegisterObject<AnimatedActor>("AnimatedActor");
     RegisterObject<Door>("Door");
     RegisterObject<Waves>("Waves");

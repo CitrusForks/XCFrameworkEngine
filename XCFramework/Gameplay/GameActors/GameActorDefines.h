@@ -15,6 +15,7 @@
 #include "SimpleActor.h"
 #include "SimpleMeshActor.h"
 #include "PhysicsActor.h"
+#include "FontActor.h"
 #include "AnimatedActor.h"
 
 #include "Environment/Door/Door.h"

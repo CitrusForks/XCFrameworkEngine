@@ -21,6 +21,7 @@ enum EVertexFormat
     VertexFormat_PositionNormal,
     VertexFormat_PositionNormalTexture,
     VertexFormat_PositionNormalTextureBlendIndexBlendWeight,
+    VertexFormat_PositionColorInstanceIndex,
 
     VertexFormat_Invalid
 };
@@ -41,7 +42,8 @@ static const SemanticVariable gs_sematicVariables[] = {
     SemanticVariable(VertexFormat_PositionColor,                              { "POSITION", "COLOR" }), 
     SemanticVariable(VertexFormat_PositionNormal,                             { "POSITION", "NORMAL" }),
     SemanticVariable(VertexFormat_PositionNormalTexture,                      { "POSITION", "NORMAL", "TEXCOORD" }),
-    SemanticVariable(VertexFormat_PositionNormalTextureBlendIndexBlendWeight, { "POSITION", "NORMAL", "TEXCOORD", "BLENDINDICES", "BLENDWEIGHT" })
+    SemanticVariable(VertexFormat_PositionNormalTextureBlendIndexBlendWeight, { "POSITION", "NORMAL", "TEXCOORD", "BLENDINDICES", "BLENDWEIGHT" }),
+    SemanticVariable(VertexFormat_PositionColorInstanceIndex,                 { "POSITION", "COLOR", "SV_InstanceID" })
 };
 
 static EVertexFormat getVertexFormatFromSematicNames(std::vector<std::string>& semanticNames)
@@ -87,6 +89,11 @@ static D3D12_INPUT_LAYOUT_DESC getInputLayoutFromSemantics(std::vector<std::stri
     case VertexFormat_PositionNormalTextureBlendIndexBlendWeight:
         layout.pInputElementDescs = VertexPosNormTexBIndexBWeightInputLayoutDesc;
         layout.NumElements = ARRAYSIZE(VertexPosNormTexBIndexBWeightInputLayoutDesc);
+        break;
+
+    case VertexFormat_PositionColorInstanceIndex:
+        layout.pInputElementDescs = VertexColorInstIdxInputLayoutDesc;
+        layout.NumElements = ARRAYSIZE(VertexColorInstIdxInputLayoutDesc);
         break;
 
     case VertexFormat_Invalid:
@@ -193,4 +200,28 @@ struct VertexPosNormTexBIndexBWeight
     {
     }
 };
+
+struct VertexPosColorInstanceIndex
+{
+    /*struct InstanceBuffer
+    {
+        XCVec4Unaligned SamplePad;
+    };*/
+
+    XCVec4Unaligned Pos;
+    XCVec4Unaligned Color;
+
+    VertexPosColorInstanceIndex() :
+        Pos(0, 0, 0, 0),
+        Color(0, 0, 0, 0)
+    {
+    }
+
+    VertexPosColorInstanceIndex(XCVec4Unaligned _pos, XCVec4Unaligned color) :
+        Pos(_pos),
+        Color(color)
+    {
+    }
+};
+
 #endif

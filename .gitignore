@@ -3,6 +3,8 @@
 *.obj
 *.sln
 *.cso
+*.vcxproj
+*.vcxproj.user
 *Orbis.cpp
 *Orbis.h
 *orbis.cpp

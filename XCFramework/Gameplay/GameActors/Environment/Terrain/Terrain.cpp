@@ -363,7 +363,7 @@ void Terrain::Draw(RenderContext& context)
         terrainMultiTex->setResource("gDiffuseMap2", context.GetDeviceContext(), m_texture2->getTextureResource());
         terrainMultiTex->setResource("gBlendMap",    context.GetDeviceContext(), m_textureBlend->getTextureResource());
     }
-    context.GetShaderManagerSystem().DrawIndexed(context.GetDeviceContext(), m_indexBuffer.m_indexData.size(), m_indexBuffer.GetIndexBufferInGPUMem());
+    context.GetShaderManagerSystem().DrawIndexedInstanced(context.GetDeviceContext(), m_indexBuffer.m_indexData.size(), m_indexBuffer.GetIndexBufferInGPUMem());
 
     m_OBBHierarchy->Draw(context);
 }

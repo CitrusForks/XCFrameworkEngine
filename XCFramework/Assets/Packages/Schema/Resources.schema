@@ -28,6 +28,8 @@ table FBResources
     FBTexture2DS:[FBTexture2D];
     FBXCMeshes:[FBXCMesh];
     FBMeshCustoms:[FBXCMesh];
+    FBMeshFBX:[FBXCMesh];
+    FBVectorFontMesh:[FBXCMesh];
 	FBCubeTexture3DS:[FBCubeTexture3D];
 }
 

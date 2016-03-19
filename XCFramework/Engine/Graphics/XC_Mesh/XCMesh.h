@@ -35,7 +35,7 @@ public:
     void                                 Draw(RenderContext& context, SHADERTYPE shaderType);
 
     void                                 setVertexFormat(EVertexFormat vertexFormat)                     { m_vertexFormat = vertexFormat;   }
-    virtual void                         createBuffers(EVertexFormat formatType);
+    virtual void                         CreateBuffers(EVertexFormat formatType);
 
     SubMesh*                             createAndGetSubMesh();
     OrientedBoundingBox*                 getComputedAABoundBox()                                         { return m_computedBoundBox.get(); }
@@ -51,7 +51,8 @@ public:
     const aiScene*                       GetSceneNode() { return m_scene; }
 
 protected:
-    virtual void                         DrawSubMeshes(RenderContext& renderContext, SHADERTYPE shaderType);
+    void                                 DrawSubMesh(RenderContext& renderContext, SHADERTYPE shaderType, unsigned int meshIndex, unsigned int instanceCount = 1);
+    virtual void                         DrawSubMeshes(RenderContext& renderContext, SHADERTYPE shaderType, unsigned int instanceCount = 1);
 
 #if defined(XCGRAPHICS_DX11)
     void                                 buildBuffer(unsigned int sizeOfType, void* ptrToBuffer, unsigned int length, ID3D11Buffer* buffer, D3D11_BUFFER_DESC desc);

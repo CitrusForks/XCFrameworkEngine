@@ -89,7 +89,7 @@ void Bullet::Shoot(float scalarForce)
 
 void Bullet::BuildMeshBuffer()
 {
-    m_pMesh->createBuffers(VertexFormat_PositionNormalTexture);
+    m_pMesh->CreateBuffers(VertexFormat_PositionNormalTexture);
 }
 
 void Bullet::Update(float dt)

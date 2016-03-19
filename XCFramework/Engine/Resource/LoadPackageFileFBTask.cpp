@@ -78,6 +78,33 @@ void LoadPackageFileFBTask::Run()
         }
     }
 
+    //Read all the XCMeshS
+    if (FBResourcesRoot->FBMeshFBX())
+    {
+        for (auto it = FBResourcesRoot->FBMeshFBX()->begin(); it != FBResourcesRoot->FBMeshFBX()->end(); ++it)
+        {
+            resource = resMgr.GetResourceFactory().createResource("XCMeshFBX");
+
+            if (resource)
+            {
+                resource->Load((void*)*it);
+                resMgr.AddResource(std::move(resource));
+            }
+        }
+    }
+
+    //Read all the Font resources
+    for (auto it = FBResourcesRoot->FBVectorFontMesh()->begin(); it != FBResourcesRoot->FBVectorFontMesh()->end(); ++it)
+    {
+        resource = resMgr.GetResourceFactory().createResource("VectorFontMesh");
+
+        if (resource)
+        {
+            resource->Load((void*)*it);
+            resMgr.AddResource(std::move(resource));
+        }
+    }
+
     //Read all the Texture3Ds
     for (auto it = FBResourcesRoot->FBCubeTexture3DS()->begin(); it != FBResourcesRoot->FBCubeTexture3DS()->end(); ++it)
     {

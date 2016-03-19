@@ -1,5 +1,10 @@
 include "BasicTypes.schema";
 
+table FBFont
+{
+	FontResourceName:string;
+}
+
 table FBSimpleSkyBox
 {
 	Position:Vec4;

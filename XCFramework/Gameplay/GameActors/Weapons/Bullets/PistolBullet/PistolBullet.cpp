@@ -68,7 +68,7 @@ void PistolBullet::Init(int actorId)
 
 void PistolBullet::BuildGeometryBuffer()
 {
-    m_pMesh->createBuffers(VertexFormat_PositionNormalTexture);
+    m_pMesh->CreateBuffers(VertexFormat_PositionNormalTexture);
 }
 
 
