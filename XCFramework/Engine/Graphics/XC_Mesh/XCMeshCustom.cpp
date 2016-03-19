@@ -34,8 +34,8 @@ void XCMeshCustom::Load(const void * buffer)
     m_userFriendlyName = fbXCMesh->MeshName()->c_str();
     m_resourcePath = getPlatformPath(fbXCMesh->MeshPath()->c_str());
     m_texture = (Texture2D*)m_resourceManager->GetResource(fbXCMesh->TextureRes()->c_str());
-    m_initialScaling = fbXCMesh->InitialScaling();
-    m_initialRotation = XCVec3Unaligned(fbXCMesh->InitialRotation()->x(), fbXCMesh->InitialRotation()->x(), fbXCMesh->InitialRotation()->x());
+    m_globalScaling = fbXCMesh->InitialScaling();
+    m_globalRotation = XCVec3Unaligned(fbXCMesh->InitialRotation()->x(), fbXCMesh->InitialRotation()->x(), fbXCMesh->InitialRotation()->x());
 
     const char* meshFilename = fbXCMesh->MeshPath()->c_str();
 

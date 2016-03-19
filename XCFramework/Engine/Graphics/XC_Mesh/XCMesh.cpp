@@ -51,7 +51,7 @@ void XCMesh::Load(std::string fileName, float initialScaling /* = 1.0f */)
 {
     IResource::Load(fileName);
 
-    m_initialScaling = initialScaling;
+    m_globalScaling = initialScaling;
 
     m_resourcePath = fileName;
 
@@ -70,8 +70,10 @@ void XCMesh::Load(const void* buffer)
     m_userFriendlyName = fbXCMesh->MeshName()->c_str();
     m_resourcePath = getPlatformPath(fbXCMesh->MeshPath()->c_str());
     m_texture = (Texture2D*) m_resourceManager->GetResource(fbXCMesh->TextureRes()->c_str());
-    m_initialScaling = fbXCMesh->InitialScaling();
-    m_initialRotation = XCVec3Unaligned(fbXCMesh->InitialRotation()->x(), fbXCMesh->InitialRotation()->y(), fbXCMesh->InitialRotation()->z());
+
+    //Transforms
+    m_globalScaling = fbXCMesh->InitialScaling();
+    m_globalRotation = XCVec3Unaligned(fbXCMesh->InitialRotation()->x(), fbXCMesh->InitialRotation()->y(), fbXCMesh->InitialRotation()->z());
 
     //Isolate this XC3DSMeshLoader... Make it static and not like this
     XC3DSMeshLoader loader;
@@ -111,9 +113,9 @@ void XCMesh::CreateBuffers(EVertexFormat formatType)
                 mesh = m_scene->mMeshes;
         }
 
-
         for (unsigned int objIndex = 0; objIndex < m_subMeshes.size(); objIndex++)
         {
+            SubMesh* submesh = m_subMeshes[objIndex];
             std::vector<std::vector<aiVertexWeight> > weightsPerVertex;
 
             if (IsSkinnedMesh())
@@ -143,9 +145,9 @@ void XCMesh::CreateBuffers(EVertexFormat formatType)
                         VertexPosColor vertex;
 
                         //Vertex Buffer
-                        for (int vertIndex = 0; vertIndex < m_subMeshes[objIndex]->getNoOfVertices(); vertIndex++)
+                        for (int vertIndex = 0; vertIndex < submesh->getNoOfVertices(); vertIndex++)
                         {
-                            vertex = VertexPosColor(XCVec3Unaligned(m_subMeshes[objIndex]->m_vertices[vertIndex].x, m_subMeshes[objIndex]->m_vertices[vertIndex].y, m_subMeshes[objIndex]->m_vertices[vertIndex].z),
+                            vertex = VertexPosColor(XCVec3Unaligned(submesh->m_vertices[vertIndex].x, submesh->m_vertices[vertIndex].y, submesh->m_vertices[vertIndex].z),
                                                     XCVec4Unaligned(0.0f, 0.0f, 0.0f, 0.0f));
                             vertices.push_back(vertex);
                         }
@@ -153,11 +155,11 @@ void XCMesh::CreateBuffers(EVertexFormat formatType)
                         //Index Buffer
                         std::vector<unsigned int> indices;
 
-                        for (int index = 0; index < m_subMeshes[objIndex]->getNoOfFaces(); index++)
+                        for (int index = 0; index < submesh->getNoOfFaces(); index++)
                         {
-                            indices.push_back(m_subMeshes[objIndex]->m_faces[index].a);
-                            indices.push_back(m_subMeshes[objIndex]->m_faces[index].b);
-                            indices.push_back(m_subMeshes[objIndex]->m_faces[index].c);
+                            indices.push_back(submesh->m_faces[index].a);
+                            indices.push_back(submesh->m_faces[index].b);
+                            indices.push_back(submesh->m_faces[index].c);
                         }
 
                         //buildBuffer(sizeof(VertexPosColor), &vertices[0], m_noOfVertices, m_pVB.Get());
@@ -170,28 +172,44 @@ void XCMesh::CreateBuffers(EVertexFormat formatType)
                     }
                 case VertexFormat_PositionNormalTexture:
                     {
-                            std::vector<VertexPosNormTex>& vertices = m_subMeshes[objIndex]->getVertexBuffer<VertexPosNormTex>().m_vertexData;
+                            std::vector<VertexPosNormTex>& vertices = submesh->getVertexBuffer<VertexPosNormTex>().m_vertexData;
                             VertexPosNormTex vertex;
                             XCVec2Unaligned mapCoord = { 0.0f, 0.0f };
                             XCVec3Unaligned vertexPos = { 0.0f, 0.0f, 0.0f };
 
-                            //Calculate the initial rotation matrix
-                            XCMatrix4 initialRotationMat = XMMatrixRotationX(m_initialRotation.x) * XMMatrixRotationY(m_initialRotation.y) * XMMatrixRotationZ(m_initialRotation.z);
+                            //Calculate the global translation matrix * this sub mesh trnaslation matrix
+                            const XCVec3Unaligned& localTrans = submesh->getGeometryTranslation();
+                            const XCMatrix4 globalTranslationMat = XMMatrixTranslation(localTrans.x, localTrans.y, localTrans.z);
+
+                            //Calculate the global rotation matrix * this sub mesh rotation matrix
+                            const XCVec3Unaligned& localRot = submesh->getGeometryRotation();
+                            const XCMatrix4 globalRotationMat = XMMatrixRotationX(m_globalRotation.x + localRot.x) * XMMatrixRotationY(m_globalRotation.y + localRot.y) * XMMatrixRotationZ(m_globalRotation.z + localRot.z);
+                            
+                            //Calculate the global scaling matrix * this sub mesh scaling matrix
+                            const XCVec3Unaligned& localScale = submesh->getGeometryScaling();
+                            const XCMatrix4 globalScalingMat = XMMatrixScaling(m_globalScaling + localScale.x, m_globalScaling + localScale.y, m_globalScaling + localScale.z);
+
+                            const XCMatrix4 transformMatrix = globalScalingMat * globalRotationMat * globalTranslationMat;
+
                             XCVecIntrinsic4 transformedVertex;
                             
                             //Vertex Buffer
-                            for (unsigned int vertIndex = 0; vertIndex < m_subMeshes[objIndex]->m_vertices.size(); vertIndex++)
+                            for (unsigned int vertIndex = 0; vertIndex < submesh->m_vertices.size(); vertIndex++)
                             {
-                                mapCoord = vertIndex < m_subMeshes[objIndex]->m_mapCoord.size() ?
-                                    XCVec2Unaligned(m_subMeshes[objIndex]->m_mapCoord[vertIndex].u, m_subMeshes[objIndex]->m_mapCoord[vertIndex].v)
+                                mapCoord = vertIndex < submesh->m_mapCoord.size() ?
+                                    XCVec2Unaligned(submesh->m_mapCoord[vertIndex].u, submesh->m_mapCoord[vertIndex].v)
                                     : XCVec2Unaligned(0.0f, 1.0f);
 
-                                vertexPos = XCVec3Unaligned(m_subMeshes[objIndex]->m_vertices[vertIndex].x * m_initialScaling,
-                                                     m_subMeshes[objIndex]->m_vertices[vertIndex].y * m_initialScaling,
-                                                     m_subMeshes[objIndex]->m_vertices[vertIndex].z * m_initialScaling);
+                                /*vertexPos = XCVec3Unaligned(submesh->m_vertices[vertIndex].x * m_initialScaling,
+                                                     submesh->m_vertices[vertIndex].y * m_initialScaling,
+                                                     submesh->m_vertices[vertIndex].z * m_initialScaling);*/
+
+                                vertexPos = XCVec3Unaligned(submesh->m_vertices[vertIndex].x,
+                                    submesh->m_vertices[vertIndex].y,
+                                    submesh->m_vertices[vertIndex].z);
                                 
                                 transformedVertex = XMLoadFloat3(&vertexPos);
-                                transformedVertex = XMVector3TransformNormal(transformedVertex, initialRotationMat);
+                                transformedVertex = XMVector3TransformNormal(transformedVertex, transformMatrix);
                                 XMStoreFloat3(&vertexPos, transformedVertex);
 
                                 vertex = VertexPosNormTex(vertexPos,
@@ -204,13 +222,13 @@ void XCMesh::CreateBuffers(EVertexFormat formatType)
                                 vMax = XMVectorMax(vMax, XMLoadFloat3(ToXCVec3(vertexPos)));
                             }
 
-                            std::vector<unsigned int>& indices = m_subMeshes[objIndex]->getIndexBuffer().m_indexData;
+                            std::vector<unsigned int>& indices = submesh->getIndexBuffer().m_indexData;
 
-                            for (unsigned int index = 0; index < m_subMeshes[objIndex]->m_faces.size(); index++)
+                            for (unsigned int index = 0; index < submesh->m_faces.size(); index++)
                             {
-                                indices.push_back(m_subMeshes[objIndex]->m_faces[index].a);
-                                indices.push_back(m_subMeshes[objIndex]->m_faces[index].b);
-                                indices.push_back(m_subMeshes[objIndex]->m_faces[index].c);
+                                indices.push_back(submesh->m_faces[index].a);
+                                indices.push_back(submesh->m_faces[index].b);
+                                indices.push_back(submesh->m_faces[index].c);
 
                                 //TODO : Calculate normal here
                             }
@@ -232,34 +250,44 @@ void XCMesh::CreateBuffers(EVertexFormat formatType)
                                 XMStoreFloat3(&vertices[indices[vertexIndex + 2]].Norm, vertexNormal);
                             }
 
-                            m_subMeshes[objIndex]->getVertexBuffer<VertexPosNormTex>().BuildVertexBuffer();
-                            m_subMeshes[objIndex]->getIndexBuffer().BuildIndexBuffer();
+                            submesh->getVertexBuffer<VertexPosNormTex>().BuildVertexBuffer();
+                            submesh->getIndexBuffer().BuildIndexBuffer();
                             break;
                     }
                 case VertexFormat_PositionNormalTextureBlendIndexBlendWeight:
                     {
-                        std::vector<VertexPosNormTexBIndexBWeight>& vertices = m_subMeshes[objIndex]->getVertexBuffer<VertexPosNormTexBIndexBWeight>().m_vertexData;
+                        std::vector<VertexPosNormTexBIndexBWeight>& vertices = submesh->getVertexBuffer<VertexPosNormTexBIndexBWeight>().m_vertexData;
                         VertexPosNormTexBIndexBWeight vertex;
                         XCVec2Unaligned mapCoord = { 0.0f, 0.0f };
                         XCVec3Unaligned vertexPos = { 0.0f, 0.0f, 0.0f };
                         XCVec4Unaligned blendIndices, vertexWeight;
 
-                        //Calculate the initial rotation matrix
-                        XCMatrix4 initialRotationMat = XMMatrixIdentity();// XMMatrixRotationX(m_initialRotation.x) * XMMatrixRotationY(m_initialRotation.y) * XMMatrixRotationZ(m_initialRotation.z);
+                        //Calculate the global translation matrix * this sub mesh trnaslation matrix
+                        const XCVec3Unaligned& localTrans = submesh->getGeometryTranslation();
+                        const XCMatrix4 globalTranslationMat = XMMatrixTranslation(localTrans.x, localTrans.y, localTrans.z);
+
+                        //Calculate the global rotation matrix * this sub mesh rotation matrix
+                        const XCVec3Unaligned& localRot = submesh->getGeometryRotation();
+                        const XCMatrix4 globalRotationMat = XMMatrixRotationX(m_globalRotation.x + localRot.x) * XMMatrixRotationY(m_globalRotation.y + localRot.y) * XMMatrixRotationZ(m_globalRotation.z + localRot.z);
+
+                        //Calculate the global scaling matrix * this sub mesh scaling matrix
+                        const XCVec3Unaligned& localScale = submesh->getGeometryScaling();
+                        const XCMatrix4 globalScalingMat = XMMatrixScaling(m_globalScaling + localScale.x, m_globalScaling + localScale.y, m_globalScaling + localScale.z);
+
+                        const XCMatrix4 transformMatrix = globalScalingMat * globalRotationMat * globalTranslationMat;
+
                         XCVecIntrinsic4 transformedVertex;
-                        m_initialScaling = 1.0f;
-                        XCMatrix4 initialScalingMat = XMMatrixScaling(m_initialScaling, m_initialScaling, m_initialScaling);
 
                         //Vertex Buffer
-                        for (unsigned int vertIndex = 0; vertIndex < m_subMeshes[objIndex]->m_vertices.size(); vertIndex++)
+                        for (unsigned int vertIndex = 0; vertIndex < submesh->m_vertices.size(); vertIndex++)
                         {
-                            mapCoord = vertIndex < m_subMeshes[objIndex]->m_mapCoord.size() ?
-                                XCVec2Unaligned(m_subMeshes[objIndex]->m_mapCoord[vertIndex].u, m_subMeshes[objIndex]->m_mapCoord[vertIndex].v)
+                            mapCoord = vertIndex < submesh->m_mapCoord.size() ?
+                                XCVec2Unaligned(submesh->m_mapCoord[vertIndex].u, submesh->m_mapCoord[vertIndex].v)
                                 : XCVec2Unaligned(0.0f, 1.0f);
 
-                            vertexPos = XCVec3Unaligned(m_subMeshes[objIndex]->m_vertices[vertIndex].x * m_initialScaling,
-                                m_subMeshes[objIndex]->m_vertices[vertIndex].y * m_initialScaling,
-                                m_subMeshes[objIndex]->m_vertices[vertIndex].z * m_initialScaling);
+                            vertexPos = XCVec3Unaligned(submesh->m_vertices[vertIndex].x,
+                                submesh->m_vertices[vertIndex].y,
+                                submesh->m_vertices[vertIndex].z);
 
                             //Add bone info
                             if (mesh[objIndex]->HasBones())
@@ -281,7 +309,7 @@ void XCMesh::CreateBuffers(EVertexFormat formatType)
                             }
 
                             transformedVertex = XMLoadFloat3(&vertexPos);
-                            transformedVertex = XMVector3TransformNormal(transformedVertex, initialRotationMat);
+                            transformedVertex = XMVector3TransformNormal(transformedVertex, transformMatrix);
                             XMStoreFloat3(&vertexPos, transformedVertex);
 
                             vertex = VertexPosNormTexBIndexBWeight(vertexPos,
@@ -296,13 +324,13 @@ void XCMesh::CreateBuffers(EVertexFormat formatType)
                             vMax = XMVectorMax(vMax, XMLoadFloat3(ToXCVec3(vertexPos)));
                         }
 
-                        std::vector<unsigned int>& indices = m_subMeshes[objIndex]->getIndexBuffer().m_indexData;
+                        std::vector<unsigned int>& indices = submesh->getIndexBuffer().m_indexData;
 
-                        for (unsigned int index = 0; index < m_subMeshes[objIndex]->m_faces.size(); index++)
+                        for (unsigned int index = 0; index < submesh->m_faces.size(); index++)
                         {
-                            indices.push_back(m_subMeshes[objIndex]->m_faces[index].a);
-                            indices.push_back(m_subMeshes[objIndex]->m_faces[index].b);
-                            indices.push_back(m_subMeshes[objIndex]->m_faces[index].c);
+                            indices.push_back(submesh->m_faces[index].a);
+                            indices.push_back(submesh->m_faces[index].b);
+                            indices.push_back(submesh->m_faces[index].c);
 
                             //TODO : Calculate normal here
                         }
@@ -324,34 +352,47 @@ void XCMesh::CreateBuffers(EVertexFormat formatType)
                             XMStoreFloat3(&vertices[indices[vertexIndex + 2]].Norm, vertexNormal);
                         }
 
-                        m_subMeshes[objIndex]->getVertexBuffer<VertexPosNormTexBIndexBWeight>().BuildVertexBuffer();
-                        m_subMeshes[objIndex]->getIndexBuffer().BuildIndexBuffer();
+                        submesh->getVertexBuffer<VertexPosNormTexBIndexBWeight>().BuildVertexBuffer();
+                        submesh->getIndexBuffer().BuildIndexBuffer();
 
                         break;
                     }
 
                 case VertexFormat_PositionColorInstanceIndex:
                     {
-                        std::vector<VertexPosColorInstanceIndex>& vertices = m_subMeshes[objIndex]->getVertexBuffer<VertexPosColorInstanceIndex>().m_vertexData;
+                        std::vector<VertexPosColorInstanceIndex>& vertices = submesh->getVertexBuffer<VertexPosColorInstanceIndex>().m_vertexData;
                         //std::vector<VertexPosColorInstanceIndex::InstanceBuffer>& instanceData = m_subMeshes[objIndex]->getInstanceBuffer<VertexPosColorInstanceIndex::InstanceBuffer>().m_vertexData;
                         //VertexPosColorInstanceIndex::InstanceBuffer sampleData = { XCVec4Unaligned(0.0f, 0.0f, 0.0f, 0.0f) };
 
                         VertexPosColorInstanceIndex vertex;
                         XCVec4Unaligned vertexPos = { 0.0f, 0.0f, 0.0f, 0.0f };
 
-                        //Calculate the initial rotation matrix
-                        XCMatrix4 initialRotationMat = XMMatrixRotationX(m_initialRotation.x) * XMMatrixRotationY(m_initialRotation.y) * XMMatrixRotationZ(m_initialRotation.z);
+                        //Calculate the global translation matrix * this sub mesh trnaslation matrix
+                        const XCVec3Unaligned& localTrans = submesh->getGeometryTranslation();
+                        const XCMatrix4 globalTranslationMat = XMMatrixTranslation(localTrans.x, localTrans.y, localTrans.z);
+
+                        //Calculate the global rotation matrix * this sub mesh rotation matrix
+                        const XCVec3Unaligned& localRot = submesh->getGeometryRotation();
+                        const XCMatrix4 globalRotationMat = XMMatrixRotationX(m_globalRotation.x + localRot.x) * XMMatrixRotationY(m_globalRotation.y + localRot.y) * XMMatrixRotationZ(m_globalRotation.z + localRot.z);
+
+                        //Calculate the global scaling matrix * this sub mesh scaling matrix
+                        const XCVec3Unaligned& localScale = submesh->getGeometryScaling();
+                        const XCMatrix4 globalScalingMat = XMMatrixScaling(m_globalScaling + localScale.x, m_globalScaling + localScale.y, m_globalScaling + localScale.z);
+
+                        const XCMatrix4 transformMatrix = globalScalingMat * globalRotationMat * globalTranslationMat;
+
                         XCVecIntrinsic4 transformedVertex;
 
                         //Vertex Buffer
-                        for (unsigned int vertIndex = 0; vertIndex < m_subMeshes[objIndex]->m_vertices.size(); vertIndex++)
+                        for (unsigned int vertIndex = 0; vertIndex < submesh->m_vertices.size(); vertIndex++)
                         {
-                            vertexPos = XCVec4Unaligned(m_subMeshes[objIndex]->m_vertices[vertIndex].x * m_initialScaling,
-                                m_subMeshes[objIndex]->m_vertices[vertIndex].y * m_initialScaling,
-                                m_subMeshes[objIndex]->m_vertices[vertIndex].z * m_initialScaling, 1.0f);
+                            vertexPos = XCVec4Unaligned(submesh->m_vertices[vertIndex].x,
+                                submesh->m_vertices[vertIndex].y,
+                                submesh->m_vertices[vertIndex].z,
+                                1.0f);
 
                             transformedVertex = XMLoadFloat4(&vertexPos);
-                            transformedVertex = XMVector3TransformNormal(transformedVertex, initialRotationMat);
+                            transformedVertex = XMVector3Transform(transformedVertex, transformMatrix);
                             XMStoreFloat4(&vertexPos, transformedVertex);
 
                             vertex = VertexPosColorInstanceIndex(vertexPos, XCVec4Unaligned(1.0f, 1.0f, 1.0f, 1.0f));
@@ -365,18 +406,18 @@ void XCMesh::CreateBuffers(EVertexFormat formatType)
                             //instanceData.push_back(sampleData);
                         }
 
-                        std::vector<unsigned int>& indices = m_subMeshes[objIndex]->getIndexBuffer().m_indexData;
+                        std::vector<unsigned int>& indices = submesh->getIndexBuffer().m_indexData;
 
-                        for (unsigned int index = 0; index < m_subMeshes[objIndex]->m_faces.size(); index++)
+                        for (unsigned int index = 0; index < submesh->m_faces.size(); index++)
                         {
-                            indices.push_back(m_subMeshes[objIndex]->m_faces[index].a);
-                            indices.push_back(m_subMeshes[objIndex]->m_faces[index].b);
-                            indices.push_back(m_subMeshes[objIndex]->m_faces[index].c);
+                            indices.push_back(submesh->m_faces[index].a);
+                            indices.push_back(submesh->m_faces[index].b);
+                            indices.push_back(submesh->m_faces[index].c);
                         }
 
-                        m_subMeshes[objIndex]->getVertexBuffer<VertexPosColorInstanceIndex>().BuildVertexBuffer();
+                        submesh->getVertexBuffer<VertexPosColorInstanceIndex>().BuildVertexBuffer();
                         //m_subMeshes[objIndex]->getInstanceBuffer<VertexPosColorInstanceIndex::InstanceBuffer>().BuildVertexBuffer();
-                        m_subMeshes[objIndex]->getIndexBuffer().BuildIndexBuffer();
+                        submesh->getIndexBuffer().BuildIndexBuffer();
                         break;
                     }
 

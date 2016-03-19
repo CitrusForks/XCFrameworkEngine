@@ -69,7 +69,7 @@ void VectorFontMesh::DrawText(std::string text, XCVec3Unaligned position, Render
                 return fontData.submeshId == subMeshId;
             });
 
-            XCMatrix4Unaligned world = XMMatrixScaling(0.1, 0.1, 0.1) * XMMatrixTranslation(position.x + (charPosition * CharacterSpacing), position.y, position.z);
+            XCMatrix4Unaligned world =  XMMatrixScaling(0.1, 0.1, 0.1) * XMMatrixTranslation(position.x + (charPosition * CharacterSpacing), position.y, position.z);
 
             if (subMeshExists != m_subMeshesIdBuffer.end())
             {

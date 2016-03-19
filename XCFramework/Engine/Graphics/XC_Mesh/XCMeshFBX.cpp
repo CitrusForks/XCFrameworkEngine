@@ -190,8 +190,8 @@ void XCMeshFBX::Load(const void * buffer)
     m_userFriendlyName = fbXCMesh->MeshName()->c_str();
     m_resourcePath = getPlatformPath(fbXCMesh->MeshPath()->c_str());
     m_texture = (Texture2D*)m_resourceManager->GetResource(fbXCMesh->TextureRes()->c_str());
-    m_initialScaling = fbXCMesh->InitialScaling();
-    m_initialRotation = XCVec3Unaligned(fbXCMesh->InitialRotation()->x(), fbXCMesh->InitialRotation()->x(), fbXCMesh->InitialRotation()->x());
+    m_globalScaling = fbXCMesh->InitialScaling();
+    m_globalRotation = XCVec3Unaligned(fbXCMesh->InitialRotation()->x(), fbXCMesh->InitialRotation()->x(), fbXCMesh->InitialRotation()->x());
 
     const char* meshFilename = fbXCMesh->MeshPath()->c_str();
 
@@ -532,6 +532,24 @@ void XCMeshFBX::DisplayMesh(FbxNode* pNode)
         submesh->setNoOfFaces(lMesh->GetPolygonCount());
 
         SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
+
+        //Get the geometry transform
+        FbxVector4 translation = pNode->GetGeometricTranslation(FbxNode::eSourcePivot);
+        XCVecIntrinsic4 trans = toXMVECTOR(translation[0], translation[1], translation[2], translation[3]);
+
+        Logger("[FONT] Located @ %f %f %f", trans.vector4_f32[0], trans.vector4_f32[1], trans.vector4_f32[2]);
+        
+        XCVecIntrinsic4 originTranslate = toXMVECTOR(0.0f, 0.0f, 0.0f, 1.0f) - trans;
+        originTranslate.vector4_f32[1] = 0.0f; originTranslate.vector4_f32[2] = 0.0f; originTranslate.vector4_f32[3] = 1.0f;
+
+        if(trans.vector4_f32[0] < 0)
+            originTranslate = -XMVector3Length(originTranslate);
+        else
+            originTranslate = XMVector3Length(originTranslate);
+
+        Logger("[FONT] Translating with a distance of : %f ", originTranslate.vector4_f32[0]);
+
+        submesh->setGeometryTranslation(XCVec3Unaligned((XMVectorGetX(originTranslate)), 0.0f, 0.0f));
 
         //fill the vertices & uv coords
         for (unsigned int polygonIndex = 0; polygonIndex < lMesh->GetPolygonCount(); ++polygonIndex)

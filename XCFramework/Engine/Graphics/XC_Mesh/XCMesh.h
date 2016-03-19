@@ -71,10 +71,6 @@ protected:
     EVertexFormat                           m_vertexFormat;
     std::unique_ptr<OrientedBoundingBox>    m_computedBoundBox; //This is computed in the object space. Every actor having this mesh should maintain a clone of this and update that and set this every frame
     
-    //These will be applied in model space of the mesh, that is transformation on vertex based to align with the world.
-    float                                   m_initialScaling;
-    XCVec3Unaligned                         m_initialRotation;
-    
     bool                                    m_areBuffersCreated;
     ResourceManager*                        m_resourceManager;
     Texture2D*                              m_texture;
@@ -85,4 +81,9 @@ protected:
     Assimp::Importer                        m_importer;
 
     float                                   m_lastPlayedAnimTime;
+
+    //Mesh root node transforms
+    XCVec3Unaligned                         m_globalTranslation;
+    XCVec3Unaligned                         m_globalRotation;
+    float                                   m_globalScaling;
 };

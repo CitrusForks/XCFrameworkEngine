@@ -56,7 +56,7 @@ void FontActor::Draw(RenderContext& context)
     context.SetRasterizerState(RASTERIZERTYPE_FILL_SOLID);
     context.ApplyShader(SHADERTYPE_VECTORFONT);
 
-    m_fontMesh->DrawText("EEEE AAAA BCA", XCVec3Unaligned(0.0f, 0.0f, 0.0f), context, SHADERTYPE_VECTORFONT);
+    m_fontMesh->DrawText("ABCDE AA BB CC DD CB DB EA", XCVec3Unaligned(0.0f, 10.0f, 0.0f), context, SHADERTYPE_VECTORFONT);
 }
 
 void FontActor::Destroy()

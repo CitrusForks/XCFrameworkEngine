@@ -7,7 +7,7 @@
 #pragma once
 #include "XCMesh.h"
 
-#define WRITE_DATA_TO_FILE 1
+//#define WRITE_DATA_TO_FILE 1
 
 class XC3DSMeshLoader
 {
