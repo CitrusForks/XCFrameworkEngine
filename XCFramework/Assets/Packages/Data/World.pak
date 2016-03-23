@@ -29,7 +29,7 @@
 	     Rotation:{x:0.0, y:0.0, z:0.0,  w:1.0}, 
 		 Scaling: {x:5.0, y:5.0, z:0.0, w:1.0}, 
 		 Material:{ Ambient:{x:1, y:1, z:1, w:1}, Diffuse:{x:0.5, y:0.8, z:0, w:1}, Specular:{x:0.5, y:0.5, z:0.5, w:20} }, 
-		 RasterizerType:FBRASTERIZERTYPE_FILL_SOLID 
+		 RasterizerType:FillSolid
 	   }
     ],
 
@@ -74,7 +74,7 @@
 			Scaling: {x:1000, y:1000, z:1000, w:1.0}, 
 			Material:{ Ambient:{x:1,y:1,z:1,w:1}, Diffuse:{x:0.5, y:0.8, z:0, w:1}, Specular:{x:0.5, y:0.5, z:0.5, w:20} }, 
 			CubeTexture3DResourceName:"cubemap_bright", 
-			RasterizerType:FBRASTERIZERTYPE_FILL_SOLID 
+			RasterizerType:FillSolid 
 		}
     ],
 }

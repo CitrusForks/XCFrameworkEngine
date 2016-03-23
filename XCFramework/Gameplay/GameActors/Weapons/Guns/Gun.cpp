@@ -40,7 +40,8 @@ void Gun::PreLoad(IActor* parentActor, XCVec3 initialPosition, XCMesh* pMesh)
     //Get initial position
     m_currentPosition = XMLoadFloat3(&initialPosition);
 
-    m_useShaderType = SHADERTYPE_LIGHTTEXTURE;
+    m_useShaderType = ShaderType_LightTexture;
+    m_useRenderWorkerType = WorkerType_XCMesh;
 
     m_secondaryLookAxis = XMVectorZero();
     m_secondaryUpAxis = XMVectorZero();
@@ -51,11 +52,6 @@ void Gun::PreLoad(IActor* parentActor, XCVec3 initialPosition, XCMesh* pMesh)
     m_recoilDelta = 0.0f;
     m_recoilMaxTime = 0.5f;
     m_canShootBullet = true;
-
-#if defined(XCGRAPHICS_DX12)
-    SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
-    m_pCBPerObject = heap.CreateBufferView(D3DBufferDesc(BUFFERTYPE_CBV, sizeof(cbPerObjectBuffer)));
-#endif
 }
 
 void Gun::Load()
@@ -75,15 +71,7 @@ void Gun::Load()
     m_secondaryLookAxis = m_look;
     m_secondaryUpAxis = m_up;
     m_secondaryRightAxis = m_right;
-
-    BuildMeshBuffer();
 }
-
-void Gun::BuildMeshBuffer()
-{
-    m_pMesh->CreateBuffers(VertexFormat_PositionNormalTexture);
-}
-
 
 void Gun::Update(float dt)
 {
@@ -140,19 +128,9 @@ void Gun::ApplyOffsetRotation()
 
 void Gun::Draw(RenderContext& context)
 {
-    context.SetRasterizerState(RASTERIZERTYPE_FILL_SOLID);
-    context.ApplyShader(m_useShaderType);
-
-#if defined(XCGRAPHICS_DX11)
-    context.GetDeviceContext().IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-#endif
-
-    UINT stride = sizeof(VertexPosNormTex);
-    UINT offset = 0;
-    
     // Set constants
     XC_CameraManager* cam = (XC_CameraManager*)&SystemLocator::GetInstance()->RequestSystem("CameraManager");
-    cbPerObjectBuffer perObject = {
+    PerObjectBuffer perObject = {
         ToXCMatrix4Unaligned(XMMatrixTranspose(m_World)),
         ToXCMatrix4Unaligned(XMMatrixTranspose(m_World * cam->GetViewMatrix() * cam->GetProjMatrix())),
         ToXCMatrix4Unaligned(InverseTranspose(m_World)),
@@ -160,15 +138,7 @@ void Gun::Draw(RenderContext& context)
         m_material
     };
 
-    XCShaderHandle* lightTexShader = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(SHADERTYPE_LIGHTTEXTURE);
-#if defined(XCGRAPHICS_DX12)
-    memcpy(m_pCBPerObject->m_cbDataBegin, &perObject, sizeof(cbPerObjectBuffer));
-    lightTexShader->setConstantBuffer("cbPerObjectBuffer", context.GetDeviceContext(), m_pCBPerObject->m_gpuHandle);
-#else
-    lightTexShader->setCBPerObject(context.GetDeviceContext(), perObject);
-#endif
-
-    m_pMesh->Draw(context, SHADERTYPE_LIGHTTEXTURE);
+    m_pMesh->DrawAllInstanced(perObject);
     SimpleMeshActor::Draw(context);
 }
 
@@ -206,9 +176,4 @@ void Gun::ShootBullet(std::string bulletActorType, XCVec3 startPosition, XCVec3 
 void Gun::Destroy()
 {
     SimpleMeshActor::Destroy();
-
-#if defined(XCGRAPHICS_DX12)
-    SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
-    heap.DestroyBuffer(m_pCBPerObject);
-#endif
 }

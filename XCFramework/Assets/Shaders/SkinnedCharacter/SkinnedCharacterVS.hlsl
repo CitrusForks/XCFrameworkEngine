@@ -8,13 +8,18 @@
 #include "..\LightingShaders\PointLight.hlsl"
 #include "..\LightingShaders\SpotLight.hlsl"
 
-cbuffer cbSkinnedCharacterBuffer : register(b0)
+struct PerObjectBuffer
 {
     float4x4    gWorld;
     float4x4    gWVP;
     float4x4    gWorldInvTranspose;
     float4x4    gTexTransform;
     Material    gMaterial;
+};
+
+cbuffer cbInstancedBuffer : register(b0)
+{
+    PerObjectBuffer gPerObject[100];
 };
 
 cbuffer cbLightsPerFrame : register(b1)
@@ -34,30 +39,22 @@ cbuffer cbBoneBuffer : register(b2)
 Texture2D       gDiffuseMap : register(t0);    //Mapped with ShaderResource Variable
 SamplerState	samLinear : register( s0 );
 
-SamplerState samAnisotropic
-{
-    Filter = ANISOTROPIC;
-    MaxAnisotropy = 4;
-
-    AddressU = WRAP;
-    AddressV = WRAP;
-};
-
 struct VertexIn
 {
-    float3 PosL         : POSITION;
-    float3 NormalL      : NORMAL;
-    float2 Tex          : TEXCOORD;
-    float4 BlendIndices : BLENDINDICES;
-    float4 BlendWeights : BLENDWEIGHT;
+    float3 PosL             : POSITION;
+    float3 NormalL          : NORMAL;
+    float2 Tex              : TEXCOORD;
+    float4 BlendIndices     : BLENDINDICES;
+    float4 BlendWeights     : BLENDWEIGHT;
+    uint   InstanceIndex    : SV_InstanceID;
 };
 
 struct VertexOut
 {
-    float4 PosH     : SV_POSITION;
-    float3 PosW     : POSITION;
-    float3 NormalW  : NORMAL;
-    float2 Tex      : TEXCOORD;
+    float4 PosH          : SV_POSITION;
+    float3 PosW          : POSITION;
+    float3 NormalW       : NORMAL;
+    float2 Tex           : TEXCOORD;
 };
 
 VertexOut VSMain(VertexIn vin)
@@ -83,11 +80,10 @@ VertexOut VSMain(VertexIn vin)
     objPos          += mul(localPos, gBoneMatrix[vin.BlendIndices.w]) * weight.w;
 
     // Transform to world space.
-    vout.PosW = mul(float4(objPos, 1.0), gWorld).xyz;
-    vout.PosH = mul(float4(objPos, 1.0), gWVP);
-    vout.NormalW = normalize(mul(float4(vin.NormalL, 0.0f), gWorldInvTranspose)).xyz;
-    vout.Tex = mul(float4(vin.Tex, 0.0f, 1.0f), gTexTransform).xy;
+    vout.PosW = mul(float4(objPos, 1.0), gPerObject[vin.InstanceIndex].gWorld).xyz;
+    vout.PosH = mul(float4(objPos, 1.0), gPerObject[vin.InstanceIndex].gWVP);
+    vout.NormalW = normalize(mul(float4(vin.NormalL, 0.0f), gPerObject[vin.InstanceIndex].gWorldInvTranspose)).xyz;
+    vout.Tex = mul(float4(vin.Tex, 0.0f, 1.0f), gPerObject[vin.InstanceIndex].gTexTransform).xy;
     
-
     return vout;
 }

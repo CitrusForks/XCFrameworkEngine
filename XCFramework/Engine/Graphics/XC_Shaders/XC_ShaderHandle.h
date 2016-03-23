@@ -7,17 +7,20 @@
 #pragma once
 
 #include "Engine/Graphics/XC_Shaders/IShader.h"
+#include "Engine/Graphics/XC_Shaders/XC_VertexFormat.h"
+#include "Engine/Graphics/VertexBuffer.h"
+#include "Engine/Graphics/IndexBuffer.h"
 
 //Add all the slots priority wise
-static std::vector<std::string> gs_slotPriority =
+static const std::vector<std::string> gs_slotPriority =
 {
     //Constant buffers per object
-    "cbPerObjectBuffer",
+    "cbLightsPerFrame",
+    "PerObjectBuffer",
+    "cbInstancedBuffer",
     "cbWVP",
-    "cbSkinnedCharacterBuffer",
 
     //Constant buffers per frame
-    "cbLightsPerFrame",
     "cbBoneBuffer",
 
     //Texture slots
@@ -65,6 +68,7 @@ struct ShaderSlot
 class XCShaderHandle : public IShader
 {
 public:
+
     XCShaderHandle(ID3DDevice& device);
     ~XCShaderHandle();
 
@@ -74,13 +78,108 @@ public:
     void            reset(ID3DDeviceContext& context) {}
     void            setConstantBuffer(std::string bufferName, ID3DDeviceContext& context, D3D12_GPU_DESCRIPTOR_HANDLE& gpuHandle);
     void            setResource(std::string bufferName, ID3DDeviceContext& context, D3DShaderResourceView* tex);
-    
+    VertexFormat    getVertexFormat() { return m_vertexFormat; }
+
+    void* createVertexBuffer()
+    {
+        void* buffer = nullptr;
+        switch (m_vertexFormat)
+        {
+        case VertexFormat_Position:
+            buffer = new VertexBuffer<VertexPos>();
+            break;
+
+        case VertexFormat_PositionColor:
+            buffer = new VertexBuffer<VertexPosColor>();
+            break;
+
+        case VertexFormat_PositionNormalTexture:
+            buffer = new VertexBuffer<VertexPosNormTex>();
+            break;
+
+        case VertexFormat_PositionNormalTextureBlendIndexBlendWeight:
+            buffer = new VertexBuffer<VertexPosNormTexBIndexBWeight>();
+            break;
+
+        case VertexFormat_PositionColorInstanceIndex:
+            buffer = new VertexBuffer<VertexPosColorInstanceIndex>();
+            break;
+
+        default:
+            XCASSERT(false);
+        }
+
+        return buffer;
+    }
+
+    D3DConstantBuffer*  createConstantBuffer(std::string constantBufferName)
+    {
+        SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
+        return heap.CreateBufferView(D3DBufferDesc(BUFFERTYPE_CBV, getSizeOfConstantBuffer(constantBufferName)));
+    }
+
+    void destroyConstantBuffer(D3DConstantBuffer* constantBuffer)
+    {
+        SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
+        heap.DestroyBuffer(constantBuffer);
+    }
+
+    void setVertexBuffer(ID3DDeviceContext& context, void* vertexBuffer)
+    {
+        D3D12_VERTEX_BUFFER_VIEW vertexBufferView = {};
+        switch (m_vertexFormat)
+        {
+        case VertexFormat_Position:
+            vertexBufferView = ((VertexBuffer<VertexPosColor>*)vertexBuffer)->GetVertexBufferView();
+            break;
+        case VertexFormat_PositionNormalTexture:
+            vertexBufferView = ((VertexBuffer<VertexPosNormTex>*)vertexBuffer)->GetVertexBufferView();
+            break;
+
+        case VertexFormat_PositionNormalTextureBlendIndexBlendWeight:
+            vertexBufferView = ((VertexBuffer<VertexPosNormTexBIndexBWeight>*)vertexBuffer)->GetVertexBufferView();
+            break;
+
+        case VertexFormat_PositionColorInstanceIndex:
+            vertexBufferView = ((VertexBuffer<VertexPosColorInstanceIndex>*)vertexBuffer)->GetVertexBufferView();
+            break;
+
+        default:
+            XCASSERT(false);
+        }
+
+#if defined(XCGRAPHICS_DX12)
+        context.IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        context.IASetVertexBuffers(0, 1, &vertexBufferView);
+#elif defined(XCGRAPHICS_DX11)
+        context.IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+        unsigned int stride = sizeof(T);
+        unsigned int offset = 0;
+        context.IASetVertexBuffers(0, 1, &m_pVB, &stride, &offset);
+#endif
+    }
+
+    void setIndexBuffer(ID3DDeviceContext& context, IndexBuffer<unsigned int>& indexBuffer)
+    {
+#if defined(XCGRAPHICS_DX12)
+        context.IASetIndexBuffer(&indexBuffer.GetIndexBufferView());
+#elif defined(XCGRAPHICS_DX11)
+        UINT32 offset = 0;
+        context.IASetIndexBuffer(m_pIB, DXGI_FORMAT_R32_UINT, offset);
+#elif defined(XCGRAPHICS_GNM)
+        //Specified while drawIndex() call. See below GetIndexBufferInGPUMem
+#endif
+    }
+
 protected:
+
     void            sortSlots();
     unsigned int    getSlotPriority(std::string bufferName);
     void            generateRootSignature();
-    void            readShaderDescription();
     void            generatePSO();
+    void            readShaderDescription();
+    unsigned int    getSizeOfConstantBuffer(std::string& cbName);
 
 private:
     std::vector<ShaderSlot>                     m_shaderSlots;
@@ -91,4 +190,5 @@ private:
     D3D12_INPUT_LAYOUT_DESC                     m_inputLayoutDesc;
 
     bool                                        m_enableDepth;
+    VertexFormat                                m_vertexFormat;
 };

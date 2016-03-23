@@ -37,18 +37,14 @@ void Bullet::PreLoad(XCVec3 initialPosition, XCVec3 target, XCMesh* pMesh)
     //Get initial position
     m_currentPosition = XMLoadFloat3(&initialPosition);
 
-    m_useShaderType = SHADERTYPE_LIGHTTEXTURE;
+    m_useShaderType = ShaderType_LightTexture;
+    m_useRenderWorkerType = WorkerType_XCMesh;
     m_collisionDetectionType = COLLISIONDETECTIONTYPE_BULLET;
 
     //Assign the look
     m_target = XMLoadFloat3(&target);
 
     Logger("[Bullet] Preload done");
-
-#if defined(XCGRAPHICS_DX12)
-    SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
-    m_pCBPerObject = heap.CreateBufferView(D3DBufferDesc(BUFFERTYPE_CBV, sizeof(cbPerObjectBuffer)));
-#endif
 }
 
 void Bullet::Load()
@@ -62,8 +58,6 @@ void Bullet::Load()
     m_MRotation = m_MInitialRotation * m_transformedRotation;
 
     m_World = m_MScaling * m_MRotation * m_MTranslation;
-
-    BuildMeshBuffer();
 
     //Trigger the bullet or add force to move
     m_look = m_target;
@@ -85,11 +79,6 @@ void Bullet::SetInitialPhysicsProperties()
 void Bullet::Shoot(float scalarForce)
 {
     AddForce(m_look * scalarForce);
-}
-
-void Bullet::BuildMeshBuffer()
-{
-    m_pMesh->CreateBuffers(VertexFormat_PositionNormalTexture);
 }
 
 void Bullet::Update(float dt)
@@ -125,9 +114,6 @@ void Bullet::Update(float dt)
 
 void Bullet::Draw(RenderContext& context)
 {
-    context.SetRasterizerState(RASTERIZERTYPE_FILL_SOLID);
-    
-    context.ApplyShader(m_useShaderType);
 #if defined(XCGRAPHICS_DX11)
     context.GetDeviceContext().IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 #endif
@@ -136,7 +122,7 @@ void Bullet::Draw(RenderContext& context)
     
     // Set constants
     XC_CameraManager* cam = (XC_CameraManager*)&SystemLocator::GetInstance()->RequestSystem("CameraManager");
-    cbPerObjectBuffer perObject = {
+    PerObjectBuffer perObject = {
         ToXCMatrix4Unaligned(XMMatrixTranspose(m_World)),
         ToXCMatrix4Unaligned(XMMatrixTranspose(m_World * cam->GetViewMatrix() * cam->GetProjMatrix())),
         ToXCMatrix4Unaligned(InverseTranspose(m_World)),
@@ -144,15 +130,7 @@ void Bullet::Draw(RenderContext& context)
         m_material
     };
 
-    XCShaderHandle* lightTexShader = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(m_useShaderType);
-#if defined(XCGRAPHICS_DX12)
-    memcpy(m_pCBPerObject->m_cbDataBegin, &perObject, sizeof(cbPerObjectBuffer));
-    lightTexShader->setConstantBuffer("cbPerObjectBuffer", context.GetDeviceContext(), m_pCBPerObject->m_gpuHandle);
-#else
-    lightTexShader->setCBPerObject(context.GetDeviceContext(), perObject);
-#endif
-
-    m_pMesh->Draw(context, m_useShaderType);
+    m_pMesh->DrawAllInstanced(perObject);
 
     PhysicsActor::Draw(context);
 }
@@ -160,9 +138,4 @@ void Bullet::Draw(RenderContext& context)
 void Bullet::Destroy()
 {
     PhysicsActor::Destroy();
-
-#if defined(XCGRAPHICS_DX12)
-    SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
-    heap.DestroyBuffer(m_pCBPerObject);
-#endif
 }

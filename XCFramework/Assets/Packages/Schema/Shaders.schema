@@ -1,26 +1,9 @@
-
-enum SHADERTYPE : byte
-{
-    DEFAULT = 0,
-
-    COLORTECH,
-
-    LIGHTTEXTURE,
-    
-    TERRIANMULTITEXTURE,
-
-    SIMPLECUBEMAP,
-
-    SKINNEDCHARACTER,
-
-    VECTORFONT,    
-
-    MAX
-}
+include "BasicTypes.schema";
+include "ShaderTypes.schema";
 
 table FBShader
 {
-	ShaderType:SHADERTYPE;
+	ShaderUsage:ShaderType;
 	VsPath:string;
 	PsPath:string;
     EnableDepth:bool;

@@ -28,6 +28,10 @@ public:
         m_loaded = true;
     }
 
+    virtual void            Update(float dt) {}
+    virtual void            Draw() {}
+    virtual void            Draw(RenderContext& context) {}
+
     virtual void            Destroy();
 
     void WaitResourceUpdate()

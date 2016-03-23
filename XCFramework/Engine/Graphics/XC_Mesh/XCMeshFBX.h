@@ -16,9 +16,6 @@ public:
 
     XCMeshFBX()
     {
-        m_resourceType = RESOURCETYPE_MESH;
-        m_areBuffersCreated = false;
-        m_vertexFormat = VertexFormat_PositionNormalTexture;
         m_isSkinnedMesh = false;
     }
 
@@ -29,23 +26,27 @@ public:
     }
 
     virtual void            Init(int resourceId, std::string userFriendlyName, bool loaded = false);
-    virtual void            Draw(RenderContext& context, SHADERTYPE shaderType);
+    virtual void            Draw(RenderContext& context, ShaderType shaderType);
     virtual void            Destroy();
-    virtual void            CreateBuffers(EVertexFormat formatType);
 
     void                    Load(const void* buffer);
-    void                    DrawSubMeshes(RenderContext& renderContext, SHADERTYPE shaderType);
+    void                    DrawSubMeshes(RenderContext& renderContext, ShaderType shaderType);
 
     bool                    LoadScene(FbxManager* pManager, FbxDocument* pScene, const char* pFilename);
 
 protected:
+    virtual void            DrawSubMesh(RenderContext& renderContext, ShaderType shaderType, unsigned int meshIndex, unsigned int instanceCount = 1)
+    {
+        XCMesh::DrawSubMesh(renderContext, shaderType, meshIndex, instanceCount);
+    }
+
     void                    DisplayMetaData(FbxScene* pScene);
     void                    DisplayHierarchy(FbxScene* pScene);
     void                    DisplayHierarchy(FbxNode* pNode, int pDepth);
     void                    DisplayContent(FbxScene* pScene);
     void                    DisplayContent(FbxNode* pNode);
     void                    DisplayMesh(FbxNode* pNode);
-    void                    DisplayAndGeneratePolygons(FbxMesh* pMesh, SubMesh* submesh);
+    void                    DisplayAndGeneratePolygons(FbxMesh* pMesh, MeshData* submesh);
 
 private:
     FbxManager*             m_fbxMgr;

@@ -29,7 +29,6 @@ public:
     virtual void                        PreLoad(Texture2D* tex, XCVec3 _initialPosition, XCMesh* pMesh);
     virtual void                        Load();
     virtual void                        SetInitialPhysicsProperties();
-    virtual void                        BuildGeometryBuffer();
     virtual void                        Update(float dt);
     virtual void                        Draw(RenderContext& context);
     virtual void                        Destroy();
@@ -37,13 +36,8 @@ public:
 protected:
     XCVec3                              m_initialPosition;
 
-    SHADERTYPE                        m_useShaderType;
+    ShaderType                          m_useShaderType;
 
     BasicMaterial                       m_material;
     DirectInput*                        m_directInput;
-
-
-#if defined(XCGRAPHICS_DX12)
-    D3DConstantBuffer*                  m_pCBPerObject;
-#endif
 };

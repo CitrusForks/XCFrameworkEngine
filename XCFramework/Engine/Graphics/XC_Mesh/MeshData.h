@@ -13,7 +13,7 @@
 #include "BoneHierarchy.h"
 #include "BoneInfo.h"
 
-class SubMesh
+class MeshData
 {
 public:
 
@@ -40,14 +40,13 @@ public:
     };
 
 
-    SubMesh(EVertexFormat format);
+    MeshData(ShaderType shaderType);
 
     void    init();
-    void    createConstantBuffers();
     void    destroy();
 
     std::string getSubMeshName() { return m_objectName; }
-
+    void        createConstantBuffers();
     void    addVertex(float x, float y, float z);
     void    addVertex(Vertex& vert);
     void    addMapCoord(float u, float v);
@@ -60,7 +59,7 @@ public:
 
     void    setNoOfVertices(unsigned int noVerts) { m_noOfVertices = noVerts; }
     void    setNoOfFaces(unsigned int noFaces) { m_noOfFaces = noFaces; }
-    void    setObjectName(const char* objName) { strcpy(m_objectName, objName); }
+    void    setObjectName(const char* objName) { m_objectName = objName; }
     void    setNoOfBones(unsigned int noBones) { m_noOfBones = noBones; }
 
     void    setGeometryTranslation(XCVec3Unaligned trans) { m_initialTranslation = trans; }
@@ -71,21 +70,10 @@ public:
     const XCVec3Unaligned& getGeometryRotation()        { return m_initialRotation; }
     const XCVec3Unaligned& getGeometryScaling()         { return m_initialScaling; }
 
-
     //Get Geometry buffers
-    template<class T>
-    VertexBuffer<T>&         getVertexBuffer()
-    {
-        return *(VertexBuffer<T>*)m_vertexBuffer;
-    }
-
-    template<class T>
-    VertexBuffer<T>&         getInstanceBuffer()
-    {
-        return *(VertexBuffer<T>*)m_instanceBuffer;
-    }
-
-    IndexBuffer<unsigned int>& getIndexBuffer() { return m_indexBuffer; }
+    void*                       getVertexBuffer()   { return m_vertexBuffer; }
+    void*                       getInstanceBuffer() { return m_instanceBuffer; }
+    IndexBuffer<unsigned int>&  getIndexBuffer()    { return m_indexBuffer; }
 
     //Raw Geometry containers. TODO : Clear them when buffers are created.
     std::vector<Vertex>                m_vertices;
@@ -99,13 +87,8 @@ public:
     MeshNode*                          m_meshNodeStructure;
 #endif
 
-    D3DConstantBuffer*                 m_boneBuffer;
-    D3DConstantBuffer*                 m_constantBuffer;
-
-protected:
-
-    void                                createVertexBuffer();
-
+    D3DConstantBuffer*                  m_boneBuffer;
+    D3DConstantBuffer*                  m_constantBuffer;
 private:
 
     void*                              m_vertexBuffer;
@@ -116,11 +99,14 @@ private:
     unsigned int                       m_noOfVertices;
     unsigned int                       m_noOfFaces;
 
-    char*                              m_objectName;
-    EVertexFormat                      m_vertexFormatType;
+    std::string                        m_objectName;
+    ShaderType                         m_shaderType;
 
     //These will be applied in model space of the mesh, that is transformation on vertex based to align with the world.
     XCVec3Unaligned                    m_initialScaling;
     XCVec3Unaligned                    m_initialRotation;
     XCVec3Unaligned                    m_initialTranslation;
+
+    //Instance count
+    unsigned int                       m_instanceCount;
 };

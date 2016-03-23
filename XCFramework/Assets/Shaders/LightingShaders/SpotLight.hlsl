@@ -22,7 +22,6 @@ struct SpotLight
     float3  Direction;
     float   Spot;
     float3  Att;
-    float   pad;
 };
 
 void ComputeSpotLight(Material mat, SpotLight L,

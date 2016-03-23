@@ -38,7 +38,7 @@ void LiveDriveTexturePlane::PreLoad(const void* fbBuffer)
     m_material.Diffuse  = XCVec4(texPlaneBuff->Material()->Diffuse()->x(), texPlaneBuff->Material()->Diffuse()->y(), texPlaneBuff->Material()->Diffuse()->z(), texPlaneBuff->Material()->Diffuse()->w());
     m_material.Specular = XCVec4(texPlaneBuff->Material()->Specular()->x(), texPlaneBuff->Material()->Specular()->y(), texPlaneBuff->Material()->Specular()->z(), texPlaneBuff->Material()->Specular()->w());
 
-    m_rasterType = (ERasterizer_Type) texPlaneBuff->RasterizerType();
+    m_rasterType = (RasterType) texPlaneBuff->RasterizerType();
 
     XC_Graphics& graphicsSystem = (XC_Graphics&)SystemLocator::GetInstance()->RequestSystem("GraphicsSystem");
 #if defined(XCGRAPHICS_DX11)

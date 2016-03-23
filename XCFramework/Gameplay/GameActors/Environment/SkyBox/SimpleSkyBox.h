@@ -25,7 +25,7 @@ public:
 
     void                            Init(int actorId);
     void                            PreLoad(const void* fbBuffer);
-    void                            PreLoad(XCVecIntrinsic4 initialPosition, XCVecIntrinsic4 initialRotation, XCVecIntrinsic4 initialScaling, BasicMaterial material, CubeTexture3D* texture, ERasterizer_Type rasterType);
+    void                            PreLoad(XCVecIntrinsic4 initialPosition, XCVecIntrinsic4 initialRotation, XCVecIntrinsic4 initialScaling, BasicMaterial material, CubeTexture3D* texture, RasterType rasterType);
     void                            Load();
     void                            Update(float dt);
     void                            Draw(RenderContext& renderContext);
@@ -38,13 +38,13 @@ protected:
 
     CubeTexture3D*                  m_cubeMapTexture;
 
-    SHADERTYPE                    m_useShaderType;
+    ShaderType                      m_useShaderType;
     BasicMaterial                   m_material;
     
-    VertexBuffer<VertexPosNormTex>  m_vertexBuffer;
+    VertexBuffer<VertexPos>         m_vertexBuffer;
     IndexBuffer<unsigned int>       m_indexBuffer;
 
-    ERasterizer_Type                m_rasterType;
+    RasterType                      m_rasterType;
 
 #if defined(XCGRAPHICS_DX12)
     D3DConstantBuffer*              m_CBwvp;

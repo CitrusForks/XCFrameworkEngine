@@ -1,4 +1,5 @@
 include "BasicTypes.schema";
+include "ShaderTypes.schema";
 
 table FBFont
 {
@@ -12,7 +13,7 @@ table FBSimpleSkyBox
 	Scaling:Vec4;
 	Material:FBBasicMaterial;
 	CubeTexture3DResourceName:string;
-	RasterizerType:FBERasterizer_Type;
+	RasterizerType:RasterType;
 }
 
 table FBTexturePlane
@@ -22,7 +23,7 @@ table FBTexturePlane
 	Scaling:Vec4;
 	Material:FBBasicMaterial;
 	ResourceName:string;
-	RasterizerType:FBERasterizer_Type;
+	RasterizerType:RasterType;
 }
 
 table FBLiveDriveTexturePlane
@@ -31,7 +32,7 @@ table FBLiveDriveTexturePlane
 	Rotation:Vec4;
 	Scaling:Vec4;
 	Material:FBBasicMaterial;
-	RasterizerType:FBERasterizer_Type;
+	RasterizerType:RasterType;
 }
 
 table FBWaves

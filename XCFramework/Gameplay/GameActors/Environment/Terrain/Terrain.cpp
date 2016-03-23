@@ -14,6 +14,7 @@
 #include "Engine/Graphics/XC_Shaders/XC_ShaderBufferConstants.h"
 #include "Engine/Graphics/XC_Shaders/XC_ShaderHandle.h"
 #include "Engine/Graphics/XC_Camera/XC_CameraManager.h"
+#include "Engine/Graphics/XC_Lighting/XC_LightManager.h"
 
 Terrain::Terrain()
 {
@@ -21,7 +22,7 @@ Terrain::Terrain()
     m_material.Diffuse = XCVec4(0.48f, 0.77f, 0.46f, 1.0f);
     m_material.Specular = XCVec4(0.2f, 0.2f, 0.2f, 16.0f);
 
-    m_useShaderType = SHADERTYPE_TERRIANMULTITEXTURE;
+    m_useShaderType = ShaderType_TerrainMultiTexture;
     m_collisionDetectionType = COLLISIONDETECTIONTYPE_TERRAIN;
 }
 
@@ -53,7 +54,7 @@ void Terrain::PreLoad(const void* fbBuffer)
 
 #if defined(XCGRAPHICS_DX12)
     SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
-    m_pCBPerObject = heap.CreateBufferView(D3DBufferDesc(BUFFERTYPE_CBV, sizeof(cbPerObjectBuffer)));
+    m_pCBPerObject = heap.CreateBufferView(D3DBufferDesc(BUFFERTYPE_CBV, sizeof(PerObjectBuffer)));
 #endif
 }
 
@@ -75,7 +76,7 @@ void Terrain::PreLoad(const char* _pHeightMapFileName, Texture2D* const terrainT
 
 #if defined(XCGRAPHICS_DX12)
     SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
-    m_pCBPerObject = heap.CreateBufferView(D3DBufferDesc(BUFFERTYPE_CBV, sizeof(cbPerObjectBuffer)));
+    m_pCBPerObject = heap.CreateBufferView(D3DBufferDesc(BUFFERTYPE_CBV, sizeof(PerObjectBuffer)));
 #endif
 }
 
@@ -164,8 +165,8 @@ void Terrain::GenerateVertices()
 
             switch(m_useShaderType)
             {
-                case SHADERTYPE_LIGHTTEXTURE:
-                case SHADERTYPE_TERRIANMULTITEXTURE:
+                case ShaderType_LightTexture:
+                case ShaderType_TerrainMultiTexture:
                     {
                         XCVec3 pos(x, y, z);
                         m_vertexPosNormTexBuffer.m_vertexData[verticesIndex++] = VertexPosNormTex(XCVec3Unaligned(x, y, z), XCVec3Unaligned(0.0f, 1.0f, 0.0f), XCVec2Unaligned(0.0f, 1.0f));
@@ -321,16 +322,15 @@ void Terrain::Update(float dt)
 
 void Terrain::Draw(RenderContext& context)
 {
-    context.SetRasterizerState(RASTERIZERTYPE_FILL_SOLID);
+    context.SetRasterizerState(RasterType_FillSolid);
 
     context.ApplyShader(m_useShaderType);
 
-    m_vertexPosNormTexBuffer.SetVertexBuffer(context.GetDeviceContext());
-    m_indexBuffer.SetIndexBuffer(context.GetDeviceContext());
+    XCShaderHandle* shaderHandle = nullptr;
 
     // Set constants
     XC_CameraManager* cam = (XC_CameraManager*)&SystemLocator::GetInstance()->RequestSystem("CameraManager");
-    cbPerObjectBuffer perObject = {
+    PerObjectBuffer perObject = {
         ToXCMatrix4Unaligned(XMMatrixTranspose(m_World)),
         ToXCMatrix4Unaligned(XMMatrixTranspose(m_World * cam->GetViewMatrix() * cam->GetProjMatrix())),
         ToXCMatrix4Unaligned(InverseTranspose(m_World)),
@@ -338,31 +338,39 @@ void Terrain::Draw(RenderContext& context)
         m_material
     };
 
-    if (m_useShaderType == SHADERTYPE_LIGHTTEXTURE)
+    if (m_useShaderType == ShaderType_LightTexture)
     {
-        XCShaderHandle* lightTexShader = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(SHADERTYPE_LIGHTTEXTURE);
+        shaderHandle = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(ShaderType_LightTexture);
 #if defined(XCGRAPHICS_DX12)
-        memcpy(m_pCBPerObject->m_cbDataBegin, &perObject, sizeof(cbPerObjectBuffer));
-        lightTexShader->setConstantBuffer("cbPerObjectBuffer", context.GetDeviceContext(), m_pCBPerObject->m_gpuHandle);
+        memcpy(m_pCBPerObject->m_cbDataBegin, &perObject, sizeof(PerObjectBuffer));
+        shaderHandle->setConstantBuffer("PerObjectBuffer", context.GetDeviceContext(), m_pCBPerObject->m_gpuHandle);
+
 #else
-        lightTexShader->setCBPerObject(context.GetDeviceContext(), perObject);
+        shaderHandle->setCBPerObject(context.GetDeviceContext(), perObject);
 #endif
-        lightTexShader->setResource("gDiffuseMap", context.GetDeviceContext(), m_texture->getTextureResource());
+        shaderHandle->setResource("gDiffuseMap", context.GetDeviceContext(), m_texture->getTextureResource());
     }
-    else if (m_useShaderType == SHADERTYPE_TERRIANMULTITEXTURE)
+    else if (m_useShaderType == ShaderType_TerrainMultiTexture)
     {
-        XCShaderHandle* terrainMultiTex = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(SHADERTYPE_TERRIANMULTITEXTURE);
+        shaderHandle = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(ShaderType_TerrainMultiTexture);
 #if defined(XCGRAPHICS_DX12)
-        memcpy(m_pCBPerObject->m_cbDataBegin, &perObject, sizeof(cbPerObjectBuffer));
-        terrainMultiTex->setConstantBuffer("cbPerObjectBuffer", context.GetDeviceContext(), m_pCBPerObject->m_gpuHandle);
+        memcpy(m_pCBPerObject->m_cbDataBegin, &perObject, sizeof(PerObjectBuffer));
+        shaderHandle->setConstantBuffer("PerObjectBuffer", context.GetDeviceContext(), m_pCBPerObject->m_gpuHandle);
 #else
-        terrainMultiTex->setCBPerObject(context.GetDeviceContext(), perObject);
+        shaderHandle->setCBPerObject(context.GetDeviceContext(), perObject);
 #endif
-        terrainMultiTex->setResource("gDiffuseMap",  context.GetDeviceContext(), m_texture->getTextureResource());
-        terrainMultiTex->setResource("gDiffuseMap1", context.GetDeviceContext(), m_texture1->getTextureResource());
-        terrainMultiTex->setResource("gDiffuseMap2", context.GetDeviceContext(), m_texture2->getTextureResource());
-        terrainMultiTex->setResource("gBlendMap",    context.GetDeviceContext(), m_textureBlend->getTextureResource());
+        shaderHandle->setResource("gDiffuseMap",  context.GetDeviceContext(), m_texture->getTextureResource());
+        shaderHandle->setResource("gDiffuseMap1", context.GetDeviceContext(), m_texture1->getTextureResource());
+        shaderHandle->setResource("gDiffuseMap2", context.GetDeviceContext(), m_texture2->getTextureResource());
+        shaderHandle->setResource("gBlendMap",    context.GetDeviceContext(), m_textureBlend->getTextureResource());
     }
+
+    XC_LightManager* lightMgr = (XC_LightManager*)&SystemLocator::GetInstance()->RequestSystem("LightsManager");
+    shaderHandle->setConstantBuffer("cbLightsPerFrame", context.GetDeviceContext(), lightMgr->getLightConstantBuffer()->m_gpuHandle);
+
+    shaderHandle->setVertexBuffer(context.GetDeviceContext(), &m_vertexPosNormTexBuffer);
+    shaderHandle->setIndexBuffer(context.GetDeviceContext(), m_indexBuffer);
+
     context.GetShaderManagerSystem().DrawIndexedInstanced(context.GetDeviceContext(), m_indexBuffer.m_indexData.size(), m_indexBuffer.GetIndexBufferInGPUMem());
 
     m_OBBHierarchy->Draw(context);

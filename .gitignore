@@ -22,3 +22,4 @@ XCFramework/.vs/*
 *.filters
 *.vcxproj
 *.suo
+*log.txt

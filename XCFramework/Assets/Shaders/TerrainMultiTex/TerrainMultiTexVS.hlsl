@@ -8,21 +8,21 @@
 #include "..\LightingShaders\PointLight.hlsl"
 #include "..\LightingShaders\SpotLight.hlsl"
 
-cbuffer cbPerObjectBuffer : register(b0)
+cbuffer cbLightsPerFrame : register(b0)
+{
+    DirectionalLight gDirLight;
+    PointLight       gPointLight;
+    SpotLight        gSpotLight;
+    float3           gEyePosW;
+};
+
+cbuffer PerObjectBuffer : register(b1)
 {
     float4x4    gWorld;
     float4x4    gWVP;
     float4x4    gWorldInvTranspose;
     float4x4    gTexTransform;
     Material    gMaterial;
-};
-
-cbuffer cbLightsPerFrame : register(b1)
-{
-    DirectionalLight gDirLight;
-    PointLight       gPointLight;
-    SpotLight        gSpotLight;
-    float3           gEyePosW;
 };
 
 Texture2D       gDiffuseMap : register(t0);    //Mapped with ShaderResource Variable

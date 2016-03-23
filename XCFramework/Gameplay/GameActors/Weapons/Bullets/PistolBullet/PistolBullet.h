@@ -27,7 +27,6 @@ public:
     virtual ~PistolBullet(void);
     
     virtual void                        Init(int actorId);
-    virtual void                        BuildGeometryBuffer();
     virtual void                        Update(float dt);
     virtual void                        UpdateOffsets(float dt);
     virtual void                        Draw(RenderContext& renderContext);
@@ -37,17 +36,11 @@ public:
     SubActor*                           GetSubActor()                       { return (SubActor*)this;  }
 
 protected:
-    SHADERTYPE                        m_useShaderType;
+    ShaderType                          m_useShaderType;
 
     BasicMaterial                       m_material;
 
     XCVecIntrinsic4                     m_secondaryLookAxis;
     XCVecIntrinsic4                     m_secondaryUpAxis;
     XCVecIntrinsic4                     m_secondaryRightAxis;
-
-    XCMatrix4                           m_MInitialRotation;
-
-#if defined(XCGRAPHICS_DX12)
-    D3DConstantBuffer*                  m_pCBPerObject;
-#endif
 };

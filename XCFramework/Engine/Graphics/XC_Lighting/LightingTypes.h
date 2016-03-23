@@ -44,7 +44,6 @@ struct DirectionalLight : public ILight
     XCVec4Unaligned            Diffuse;
     XCVec4Unaligned            Specular;
     XCVec3Unaligned            Direction;
-    float                      Pad;       //Padding if we are adding array of lights
 };
 
 struct PointLight : public ILight
@@ -62,9 +61,8 @@ struct PointLight : public ILight
     XCVec3Unaligned            Position;
     float                      Range;
 
-    //Packed into 4D vector: (A0, A1, A2, Pad)
+    //Packed into 4D vector: (A0, A1, A2)
     XCVec3Unaligned            Att;
-    float                      Pad; 
 };
 
 struct SpotLight : public ILight
@@ -86,7 +84,6 @@ struct SpotLight : public ILight
     XCVec3Unaligned            Direction;
     float                      Spot;
 
-    //Packed into 4D vector: (A0, A1, A2, Pad)
+    //Packed into 4D vector: (A0, A1, A2)
     XCVec3Unaligned            Att;
-    float                       Pad;
 };

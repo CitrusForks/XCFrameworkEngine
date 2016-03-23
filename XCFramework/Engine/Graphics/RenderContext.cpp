@@ -35,7 +35,7 @@ void RenderContext::Init(ID3DDevice* device, XC_ShaderManager& shaderMgr, bool c
         0,
         D3D12_COMMAND_LIST_TYPE_DIRECT,
         m_commandAllocator,
-        m_shaderManager->GetShader(SHADERTYPE_COLORTECH)->getPso().m_pPso,
+        m_shaderManager->GetShader(ShaderType_SolidColor)->getPso().m_pPso,
         IID_PPV_ARGS(&m_deviceContext)));
 
     ValidateResult(m_deviceContext->Close());
@@ -105,14 +105,14 @@ void RenderContext::ReleaseCommandList()
 #endif
 }
 
-void RenderContext::SetRasterizerState(ERasterizer_Type type)
+void RenderContext::SetRasterizerState(RasterType type)
 {
 #if defined(XCGRAPHICS_DX11)
     m_shaderManager->SetRasterizerState(*m_deviceContext, type);
 #endif
 }
 
-void RenderContext::ApplyShader(SHADERTYPE shaderType)
+void RenderContext::ApplyShader(ShaderType shaderType)
 {
     m_shaderManager->ApplyShader(*m_deviceContext, shaderType);
 }

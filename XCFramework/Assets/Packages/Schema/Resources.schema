@@ -1,5 +1,6 @@
 //IResource structs
 include "BasicTypes.schema";
+include "ShaderTypes.schema";
 
 table FBTexture2D
 {
@@ -18,8 +19,9 @@ table FBXCMesh
     MeshName:string;
     MeshPath:string;
     TextureRes:string;
-    InitialScaling:float;
+    InitialScaling:Vec3;
     InitialRotation:Vec3;
+    ShaderUsage:ShaderType;
 }
 
 //Main Table schemas

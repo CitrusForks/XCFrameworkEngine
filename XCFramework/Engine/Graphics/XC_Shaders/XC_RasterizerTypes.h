@@ -6,10 +6,15 @@
 
 #pragma once
 
-enum	ERasterizer_Type
+#include "Assets/Packages/PackageConsts.h"
+
+/*
+//Defined in data
+enum	RasterType
 {
-	RASTERIZERTYPE_FILL_WIREFRAME = 0,
-	RASTERIZERTYPE_FILL_SOLID,
+	RasterType_FillWireframe = 0,
+	RasterType_FillSolid,
 
 	RASTERIZERTYPE_MAX
 };
+*/

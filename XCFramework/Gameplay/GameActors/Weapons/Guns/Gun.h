@@ -25,7 +25,6 @@ public:
 
     virtual void                 PreLoad(IActor* parentActor, XCVec3 initialPosition, XCMesh* pMesh);
     virtual void                 Load();
-    virtual void                 BuildMeshBuffer();
     virtual void                 Update(float dt);
     virtual void                 UpdateOffsets(float dt);
     virtual void                 Draw(RenderContext& renderContext);
@@ -38,15 +37,13 @@ public:
     SubActor*                    GetSubActor() { return (SubActor*)this; }
 
 protected:
-    SHADERTYPE                 m_useShaderType;
+    ShaderType                  m_useShaderType;
 
     BasicMaterial                m_material;
 
     XCVecIntrinsic4              m_secondaryLookAxis;
     XCVecIntrinsic4              m_secondaryUpAxis;
     XCVecIntrinsic4              m_secondaryRightAxis;
-
-    XCMatrix4                    m_MInitialRotation;
 
     unsigned int                 m_noOfBullets;
     float                        m_recoilDelta;
@@ -55,8 +52,4 @@ protected:
     bool                         m_canShootBullet;
 
     DirectInput*                 m_directInput;
-
-#if defined(XCGRAPHICS_DX12)
-    D3DConstantBuffer*           m_pCBPerObject;
-#endif
 };

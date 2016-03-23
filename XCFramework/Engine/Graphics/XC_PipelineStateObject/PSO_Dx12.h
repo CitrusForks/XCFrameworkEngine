@@ -17,7 +17,7 @@ public:
     ~PSO_Dx12();
 
     ID3D12RootSignature&                    GetRootSignature() { return *m_rootSignature; }
-    static void                             GenerateDefaultPSO(PSO_Dx12* inPso, ERasterizer_Type rasterizerType, bool enableDepth);
+    static void                             GenerateDefaultPSO(PSO_Dx12* inPso, RasterType rasterizerType, bool enableDepth);
 
     //TODO : Make it private
     D3D12_GRAPHICS_PIPELINE_STATE_DESC      m_psoDesc;

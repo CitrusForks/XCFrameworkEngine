@@ -33,7 +33,8 @@ PistolBullet::PistolBullet(IActor* parentActor, XCVec3 initialPosition, XCMesh* 
     //Get initial position
     m_currentPosition = XMLoadFloat3(&initialPosition);
 
-    m_useShaderType = SHADERTYPE_LIGHTTEXTURE;
+    m_useShaderType = ShaderType_LightTexture;
+    m_useRenderWorkerType = WorkerType_XCMesh;
 
     m_secondaryLookAxis = XMVectorZero();
     m_secondaryUpAxis = XMVectorZero();
@@ -54,23 +55,10 @@ void PistolBullet::Init(int actorId)
 
     m_World = m_MScaling * m_MRotation * m_MTranslation;
 
-    BuildGeometryBuffer();
-
     m_secondaryLookAxis = m_look;
     m_secondaryUpAxis = m_up;
     m_secondaryRightAxis = m_right;
-
-#if defined(XCGRAPHICS_DX12)
-    SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
-    m_pCBPerObject = heap.CreateBufferView(D3DBufferDesc(BUFFERTYPE_CBV, sizeof(cbPerObjectBuffer)));
-#endif
 }
-
-void PistolBullet::BuildGeometryBuffer()
-{
-    m_pMesh->CreateBuffers(VertexFormat_PositionNormalTexture);
-}
-
 
 void PistolBullet::Update(float dt)
 {
@@ -113,7 +101,7 @@ void PistolBullet::ApplyOffsetRotation()
 
 void PistolBullet::Draw(RenderContext& context)
 {
-    context.SetRasterizerState(RASTERIZERTYPE_FILL_SOLID);
+    context.SetRasterizerState(RasterType_FillSolid);
     context.ApplyShader(m_useShaderType);
 #if defined(XCGRAPHICS_DX11)
     context.GetDeviceContext().IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -123,23 +111,15 @@ void PistolBullet::Draw(RenderContext& context)
     
     // Set constants
     XC_CameraManager* cam = (XC_CameraManager*)&SystemLocator::GetInstance()->RequestSystem("CameraManager");
-    cbPerObjectBuffer perObject = {
+    PerObjectBuffer perObject = {
         ToXCMatrix4Unaligned(XMMatrixTranspose(m_World)),
         ToXCMatrix4Unaligned(XMMatrixTranspose(m_World * cam->GetViewMatrix() * cam->GetProjMatrix())),
         ToXCMatrix4Unaligned(InverseTranspose(m_World)),
         ToXCMatrix4Unaligned(XMMatrixIdentity()),
         m_material
     };
-
-    XCShaderHandle* lightTexShader = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(m_useShaderType);
-#if defined(XCGRAPHICS_DX12)
-    memcpy(m_pCBPerObject->m_cbDataBegin, &perObject, sizeof(cbPerObjectBuffer));
-    lightTexShader->setConstantBuffer("cbPerObjectBuffer", context.GetDeviceContext(), m_pCBPerObject->m_gpuHandle);
-#else
-    lightTexShader->setCBPerObject(context.GetDeviceContext(), perObject);
-#endif
   
-    m_pMesh->Draw(context, m_useShaderType);
+    //m_pMesh->DrawAllInstanced(perObject);
 
     SimpleMeshActor::Draw(context);
 }

@@ -8,13 +8,18 @@
 #include "..\LightingShaders\PointLight.hlsl"
 #include "..\LightingShaders\SpotLight.hlsl"
 
-cbuffer cbSkinnedCharacterBuffer : register(b0)
+struct PerObjectBuffer
 {
     float4x4    gWorld;
     float4x4    gWVP;
     float4x4    gWorldInvTranspose;
     float4x4    gTexTransform;
     Material    gMaterial;
+};
+
+cbuffer cbInstancedBuffer : register(b0)
+{
+    PerObjectBuffer gPerObject[100];
 };
 
 cbuffer cbLightsPerFrame : register(b1)
@@ -36,19 +41,20 @@ SamplerState	samLinear : register(s0);
 
 struct VertexIn
 {
-    float3 PosL         : POSITION;
-    float3 NormalL      : NORMAL;
-    float2 Tex          : TEXCOORD;
-    float4 BlendIndices : BLENDINDICES;
-    float4 BlendWeights : BLENDWEIGHT;
+    float3 PosL             : POSITION;
+    float3 NormalL          : NORMAL;
+    float2 Tex              : TEXCOORD;
+    float4 BlendIndices     : BLENDINDICES;
+    float4 BlendWeights     : BLENDWEIGHT;
+    uint   InstanceIndex    : SV_InstanceID;
 };
 
 struct VertexOut
 {
-	float4 PosH     : SV_POSITION;
-    float3 PosW     : POSITION;
-    float3 NormalW  : NORMAL;
-    float2 Tex      : TEXCOORD;
+	float4 PosH          : SV_POSITION;
+    float3 PosW          : POSITION;
+    float3 NormalW       : NORMAL;
+    float2 Tex           : TEXCOORD;
 };
 
 
@@ -73,17 +79,17 @@ float4 PSMain(VertexOut pin) : SV_Target
     //Sum the light contribution from each light source.
     float4 A, D, S;
 
-    ComputeDirectionalLight(gMaterial, gDirLight, pin.NormalW, toEye, A, D, S);
+    ComputeDirectionalLight(gPerObject[0].gMaterial, gDirLight, pin.NormalW, toEye, A, D, S);
     ambient += A;
     diffuse += D;
     specular+= S;
 
-    ComputePointLight(gMaterial, gPointLight, pin.PosW, pin.NormalW, toEye, A, D, S);
+    ComputePointLight(gPerObject[0].gMaterial, gPointLight, pin.PosW, pin.NormalW, toEye, A, D, S);
     ambient += A;
     diffuse += D;
     specular+= S;
 
-    ComputeSpotLight(gMaterial, gSpotLight, pin.PosW, pin.NormalW, toEye, A, D, S);
+    ComputeSpotLight(gPerObject[0].gMaterial, gSpotLight, pin.PosW, pin.NormalW, toEye, A, D, S);
     ambient += A;
     diffuse += D;
     specular+= S;
@@ -91,7 +97,7 @@ float4 PSMain(VertexOut pin) : SV_Target
     litColor = texColor * (ambient + diffuse) + specular;
 
     //Common to take alpha from diffuse material
-    litColor.a = gMaterial.Diffuse.a * texColor.a;
+    litColor.a = gPerObject[0].gMaterial.Diffuse.a * texColor.a;
     
     return litColor;
 }

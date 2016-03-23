@@ -76,9 +76,50 @@ void RenderingPool::RemoveRenderableObject(IRenderableObject* obj, int baseObjId
     }
 }
 
+void RenderingPool::AddResourceDrawable(IResource* obj)
+{
+    switch (obj->getResourceType())
+    {
+    case RESOURCETYPE_MESH:
+        m_renderWorkers[WorkerType_XCMesh].m_resourceRefList.push_back(obj);
+    	break;
+
+    default:
+        Logger("Unkown resource draw request");
+        XCASSERT(false);
+    }
+}
+
+void RenderingPool::RemoveResourceDrawable(IResource* obj)
+{
+    switch (obj->getResourceType())
+    {
+    case RESOURCETYPE_MESH:
+    {
+        auto refList = m_renderWorkers[WorkerType_XCMesh].m_resourceRefList;
+        auto objRef = std::find_if(refList.begin(), refList.end(), [obj](IResource* resource) -> bool
+        {
+            return obj == resource;
+        });
+
+        if (objRef != refList.end())
+        {
+            m_renderWorkers[WorkerType_XCMesh].m_resourceRefList.erase(objRef);
+        }
+        break;
+    }
+
+    default:
+        Logger("Unkown resource draw request");
+        XCASSERT(false);
+    }
+
+}
+
+
 void RenderingPool::RequestResourceDeviceContext(IResource* graphicsBuffer)
 {
-    m_renderWorkers[WorkerType_ResourceLoader].m_graphicsBufferRefList.push_back(graphicsBuffer);
+    m_renderWorkers[WorkerType_ResourceLoader].m_resourceRefList.push_back(graphicsBuffer);
 }
 
 void RenderingPool::Begin(RenderTargetsType targetType)
@@ -115,10 +156,10 @@ void RenderingPool::Render()
         }
 
 #if defined(XCGRAPHICS_DX12)
-        while (workers.m_graphicsBufferRefList.size() > 0)
+        while (workers.m_resourceRefList.size() > 0)
         {
-            workers.m_graphicsBufferRefList.back()->RenderContextCallback(workers.m_renderContext);
-            workers.m_graphicsBufferRefList.pop_back();
+            workers.m_resourceRefList.back()->RenderContextCallback(workers.m_renderContext);
+            workers.m_resourceRefList.pop_back();
         }
 #endif
     }
@@ -200,10 +241,37 @@ void* RenderingPool::RenderWorker::WorkerThreadFunc(void* param)
             obj.second->Draw(worker->m_renderContext);
         }
 
-        while (worker->m_graphicsBufferRefList.size() > 0)
+        //In the case of instancing mesh rendering. The WorkerType_XCMesh renders all actors first which will accumulate all instance 
+        //data and then we render the actual mesh resource.
+        if (worker->m_workerId == WorkerType_XCMesh)
         {
-            worker->m_graphicsBufferRefList.back()->RenderContextCallback(worker->m_renderContext);
-            worker->m_graphicsBufferRefList.pop_back();
+            for (auto& obj : worker->m_resourceRefList)
+            {
+                obj->Draw(worker->m_renderContext);
+            }
+        }
+        else if (worker->m_workerId == WorkerType_ResourceLoader)
+        {
+            IResource* res = nullptr;
+            while (worker->m_resourceRefList.size() > 0)
+            {
+                res = worker->m_resourceRefList.back();
+                switch (res->getResourceType())
+                {
+                case RESOURCETYPE_VERTEXBUFFER:
+                case RESOURCETYPE_INDEXBUFFER:
+                case RESOURCETYPE_TEXTURE2D:
+                case RESOURCETYPE_CUBETEXTURE3D:
+                    res->RenderContextCallback(worker->m_renderContext);
+                    break;
+
+                default:
+                    XCASSERT(false);
+                    break;
+                }
+
+                worker->m_resourceRefList.pop_back();
+            }
         }
 
         //Increase the semaphore to indicate that this worker has done the work.

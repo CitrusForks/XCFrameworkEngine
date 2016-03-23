@@ -21,7 +21,6 @@ public:
 
     virtual void                        PreLoad(XCVec3 initialPosition, XCMesh* pMesh);
     virtual void                        Load();
-    virtual void                        BuildMeshBuffer();
     virtual void                        Update(float dt);
     virtual void                        Draw(RenderContext& context);
     virtual void                        Destroy();
@@ -31,12 +30,8 @@ public:
     void                                Steer(float angle, float scalarForce);
 
 protected:
-    SHADERTYPE                        m_useShaderType;
+    ShaderType                        m_useShaderType;
 
     BasicMaterial                       m_material;
     bool                                m_isMainCharacter;
-
-#if defined(XCGRAPHICS_DX12)
-    D3DConstantBuffer*                  m_pCBPerObject;
-#endif
 };

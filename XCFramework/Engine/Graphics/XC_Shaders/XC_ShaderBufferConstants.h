@@ -42,9 +42,7 @@ struct cbLightsPerFrame
     DirectionalLight gDirLight;
     PointLight       gPointLight;
     SpotLight        gSpotLight;
-
     XCVec3Unaligned  gEyePosW;
-    unsigned short   pad;
 };
 
 struct cbMatTexPerObject
@@ -53,7 +51,7 @@ struct cbMatTexPerObject
     BasicMaterial              gMaterial;
 };
 
-struct cbPerObjectBuffer
+struct PerObjectBuffer
 {
     XCMatrix4Unaligned    gWorld;
     XCMatrix4Unaligned    gWVP;
@@ -62,13 +60,9 @@ struct cbPerObjectBuffer
     BasicMaterial         gMaterial;
 };
 
-struct cbSkinnedCharacterBuffer
+struct cbInstancedBuffer
 {
-    XCMatrix4Unaligned    gWorld;
-    XCMatrix4Unaligned    gWVP;
-    XCMatrix4Unaligned    gWorldInvTranspose;
-    XCMatrix4Unaligned    gTexTransform;
-    BasicMaterial         gMaterial;
+    PerObjectBuffer       gPerObject[100];
 };
 
 struct cbBoneBuffer

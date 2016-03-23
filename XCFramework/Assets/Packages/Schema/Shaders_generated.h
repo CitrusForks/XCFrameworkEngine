@@ -7,35 +7,21 @@
 
 
 
+struct Vec2;
+struct Vec3;
+struct Vec4;
+struct FBBasicMaterial;
 struct FBShader;
 struct FBRootShader;
 
-enum SHADERTYPE {
-  SHADERTYPE_DEFAULT = 0,
-  SHADERTYPE_COLORTECH = 1,
-  SHADERTYPE_LIGHTTEXTURE = 2,
-  SHADERTYPE_TERRIANMULTITEXTURE = 3,
-  SHADERTYPE_SIMPLECUBEMAP = 4,
-  SHADERTYPE_SKINNEDCHARACTER = 5,
-  SHADERTYPE_VECTORFONT = 6,
-  SHADERTYPE_MAX = 7
-};
-
-inline const char **EnumNamesSHADERTYPE() {
-  static const char *names[] = { "DEFAULT", "COLORTECH", "LIGHTTEXTURE", "TERRIANMULTITEXTURE", "SIMPLECUBEMAP", "SKINNEDCHARACTER", "VECTORFONT", "MAX", nullptr };
-  return names;
-}
-
-inline const char *EnumNameSHADERTYPE(SHADERTYPE e) { return EnumNamesSHADERTYPE()[e]; }
-
 struct FBShader FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  SHADERTYPE ShaderType() const { return static_cast<SHADERTYPE>(GetField<int8_t>(4, 0)); }
+  ShaderType ShaderUsage() const { return static_cast<ShaderType>(GetField<int8_t>(4, 0)); }
   const flatbuffers::String *VsPath() const { return GetPointer<const flatbuffers::String *>(6); }
   const flatbuffers::String *PsPath() const { return GetPointer<const flatbuffers::String *>(8); }
   uint8_t EnableDepth() const { return GetField<uint8_t>(10, 0); }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<int8_t>(verifier, 4 /* ShaderType */) &&
+           VerifyField<int8_t>(verifier, 4 /* ShaderUsage */) &&
            VerifyField<flatbuffers::uoffset_t>(verifier, 6 /* VsPath */) &&
            verifier.Verify(VsPath()) &&
            VerifyField<flatbuffers::uoffset_t>(verifier, 8 /* PsPath */) &&
@@ -48,7 +34,7 @@ struct FBShader FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct FBShaderBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_ShaderType(SHADERTYPE ShaderType) { fbb_.AddElement<int8_t>(4, static_cast<int8_t>(ShaderType), 0); }
+  void add_ShaderUsage(ShaderType ShaderUsage) { fbb_.AddElement<int8_t>(4, static_cast<int8_t>(ShaderUsage), 0); }
   void add_VsPath(flatbuffers::Offset<flatbuffers::String> VsPath) { fbb_.AddOffset(6, VsPath); }
   void add_PsPath(flatbuffers::Offset<flatbuffers::String> PsPath) { fbb_.AddOffset(8, PsPath); }
   void add_EnableDepth(uint8_t EnableDepth) { fbb_.AddElement<uint8_t>(10, EnableDepth, 0); }
@@ -61,7 +47,7 @@ struct FBShaderBuilder {
 };
 
 inline flatbuffers::Offset<FBShader> CreateFBShader(flatbuffers::FlatBufferBuilder &_fbb,
-   SHADERTYPE ShaderType = SHADERTYPE_DEFAULT,
+   ShaderType ShaderUsage = ShaderType_Default,
    flatbuffers::Offset<flatbuffers::String> VsPath = 0,
    flatbuffers::Offset<flatbuffers::String> PsPath = 0,
    uint8_t EnableDepth = 0) {
@@ -69,7 +55,7 @@ inline flatbuffers::Offset<FBShader> CreateFBShader(flatbuffers::FlatBufferBuild
   builder_.add_PsPath(PsPath);
   builder_.add_VsPath(VsPath);
   builder_.add_EnableDepth(EnableDepth);
-  builder_.add_ShaderType(ShaderType);
+  builder_.add_ShaderUsage(ShaderUsage);
   return builder_.Finish();
 }
 

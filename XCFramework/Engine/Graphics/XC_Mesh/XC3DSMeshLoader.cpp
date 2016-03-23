@@ -57,7 +57,7 @@ bool XC3DSMeshLoader::loadMeshFromFile(std::string fileName, XCMesh* const outMe
     Chunk tempChunk = {0};
     int retValue = 0;
 
-    SubMesh* subMesh;
+    MeshData* subMesh;
 
 #if defined(XC_ORBIS)
     while(ftell(fp) < _filelength(fp))   //Till the file pointer reaches the EOF

@@ -25,7 +25,6 @@ public:
 
     virtual void                        PreLoad(XCVec3 initialPosition, XCVec3 target, XCMesh* pMesh);
     virtual void                        Load();
-    virtual void                        BuildMeshBuffer();
     virtual void                        SetInitialPhysicsProperties();
     virtual void                        Update(float dt);
     virtual void                        Draw(RenderContext& context);
@@ -34,15 +33,10 @@ public:
     virtual void                        Shoot(float scalarForce);
 
 protected:
-    SHADERTYPE                        m_useShaderType;
+    ShaderType                          m_useShaderType;
 
     Texture2D*                          m_texture;
     BasicMaterial                       m_material;
 
-    XCMatrix4                           m_MInitialRotation;
     XCVecIntrinsic4                     m_target;
-
-#if defined(XCGRAPHICS_DX12)
-    D3DConstantBuffer*                  m_pCBPerObject;
-#endif
 };

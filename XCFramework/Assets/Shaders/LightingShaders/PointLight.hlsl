@@ -20,7 +20,6 @@ struct PointLight
     float3  Position;
     float   Range;
     float3  Att;
-    float   pad;
 };
 
 void ComputePointLight(Material mat, PointLight L, float3 pos,

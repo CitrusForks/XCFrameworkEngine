@@ -47,5 +47,5 @@ protected:
     VertexBuffer<VertexPosNormTex>      m_vertexPosNormTexBuffer;
     IndexBuffer<unsigned int>                   m_indexBuffer;
 
-    SHADERTYPE                        m_useShaderType;
+    ShaderType                        m_useShaderType;
 };

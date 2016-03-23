@@ -35,8 +35,8 @@ void TexturedPlane::Init(int actorId)
 {
     SimpleActor::Init(actorId);
 
-    m_useShaderType = SHADERTYPE_LIGHTTEXTURE;
-    m_rasterType = RASTERIZERTYPE_FILL_SOLID;
+    m_useShaderType = ShaderType_LightTexture;
+    m_rasterType = RasterType_FillSolid;
 }
 
 void TexturedPlane::PreLoad(const void* fbBuffer)
@@ -53,17 +53,17 @@ void TexturedPlane::PreLoad(const void* fbBuffer)
     ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
     m_texture = (Texture2D*)resMgr.GetResource(texPlaneBuff->ResourceName()->c_str());
 
-    m_rasterType = (ERasterizer_Type) texPlaneBuff->RasterizerType();
+    m_rasterType = (RasterType) texPlaneBuff->RasterizerType();
 
 #if defined(XCGRAPHICS_DX12)
     SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
-    m_pCBPerObject = heap.CreateBufferView(D3DBufferDesc(BUFFERTYPE_CBV, sizeof(cbPerObjectBuffer)));
+    m_pCBPerObject = heap.CreateBufferView(D3DBufferDesc(BUFFERTYPE_CBV, sizeof(PerObjectBuffer)));
 #endif
 
     SimpleActor::PreLoad(fbBuffer);
 }
 
-void TexturedPlane::PreLoad(XCVecIntrinsic4 initialPosition, XCVecIntrinsic4 initialRotation, XCVecIntrinsic4 initialScaling, BasicMaterial material, Texture2D* texture, ERasterizer_Type rasterType)
+void TexturedPlane::PreLoad(XCVecIntrinsic4 initialPosition, XCVecIntrinsic4 initialRotation, XCVecIntrinsic4 initialScaling, BasicMaterial material, Texture2D* texture, RasterType rasterType)
 {
     m_currentPosition = initialPosition;
     m_initialRotation = initialRotation;
@@ -113,11 +113,9 @@ void TexturedPlane::Draw(RenderContext& context)
     context.SetRasterizerState(m_rasterType);
     context.ApplyShader(m_useShaderType);
 
-    m_vertexBuffer.SetVertexBuffer(context.GetDeviceContext());
-
     // Set constants
     XC_CameraManager* cam = (XC_CameraManager*)&SystemLocator::GetInstance()->RequestSystem("CameraManager");
-    cbPerObjectBuffer perObject = {
+    PerObjectBuffer perObject = {
         ToXCMatrix4Unaligned(XMMatrixTranspose(m_World)),
         ToXCMatrix4Unaligned(XMMatrixTranspose(m_World * cam->GetViewMatrix() * cam->GetProjMatrix())),
         ToXCMatrix4Unaligned(InverseTranspose(m_World)),
@@ -125,10 +123,12 @@ void TexturedPlane::Draw(RenderContext& context)
         m_material
     };
 
-    XCShaderHandle* lightTexShader = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(SHADERTYPE_LIGHTTEXTURE);
+    XCShaderHandle* lightTexShader = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(ShaderType_LightTexture);
+    lightTexShader->setVertexBuffer(context.GetDeviceContext(), &m_vertexBuffer);
+
 #if defined(XCGRAPHICS_DX12)
-    memcpy(m_pCBPerObject->m_cbDataBegin, &perObject, sizeof(cbPerObjectBuffer));
-    lightTexShader->setConstantBuffer("cbPerObjectBuffer", context.GetDeviceContext(), m_pCBPerObject->m_gpuHandle);
+    memcpy(m_pCBPerObject->m_cbDataBegin, &perObject, sizeof(PerObjectBuffer));
+    lightTexShader->setConstantBuffer("PerObjectBuffer", context.GetDeviceContext(), m_pCBPerObject->m_gpuHandle);
 #else
     lightTexShader->setCBPerObject(context.GetDeviceContext(), perObject);
 #endif

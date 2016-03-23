@@ -34,8 +34,12 @@ void XCMeshCustom::Load(const void * buffer)
     m_userFriendlyName = fbXCMesh->MeshName()->c_str();
     m_resourcePath = getPlatformPath(fbXCMesh->MeshPath()->c_str());
     m_texture = (Texture2D*)m_resourceManager->GetResource(fbXCMesh->TextureRes()->c_str());
-    m_globalScaling = fbXCMesh->InitialScaling();
+    m_globalScaling = XCVec3Unaligned(fbXCMesh->InitialScaling()->x(), fbXCMesh->InitialScaling()->y(), fbXCMesh->InitialScaling()->z());
     m_globalRotation = XCVec3Unaligned(fbXCMesh->InitialRotation()->x(), fbXCMesh->InitialRotation()->x(), fbXCMesh->InitialRotation()->x());
+    m_shaderType = fbXCMesh->ShaderUsage();
+
+    XC_Graphics& graphicsSystem = (XC_Graphics&)SystemLocator::GetInstance()->RequestSystem<XC_Graphics>("GraphicsSystem");
+    m_shaderHandler = (XCShaderHandle*)graphicsSystem.GetShaderManagerSystem().GetShader(m_shaderType);
 
     const char* meshFilename = fbXCMesh->MeshPath()->c_str();
 
@@ -48,7 +52,7 @@ void XCMeshCustom::Load(const void * buffer)
 
     for (unsigned int meshIndex = 0; meshIndex < FBXCMeshRoot->meshes()->size(); ++meshIndex)
     {
-        SubMesh* submesh = XCNEW(SubMesh);
+        MeshData* submesh = XCNEW(MeshData);
 
         submesh->setObjectName(fbXCMesh->MeshName()->c_str());
 
@@ -133,7 +137,7 @@ void XCMeshCustom::Load(const void * buffer)
 
     for (unsigned int meshIndex = 0; meshIndex < m_scene->mNumMeshes; ++meshIndex)
     {
-        SubMesh* submesh = createAndGetSubMesh();
+        MeshData* submesh = createAndGetSubMesh();
         {
             submesh->setObjectName(fbXCMesh->MeshName()->c_str());
             submesh->setNoOfVertices(mesh[meshIndex]->mNumVertices);
@@ -202,7 +206,6 @@ void XCMeshCustom::Load(const void * buffer)
 #endif
             }
 
-
             //fill the faces
             aiFace* face = mesh[meshIndex]->mFaces;
             unsigned int* indices = nullptr;
@@ -221,19 +224,12 @@ void XCMeshCustom::Load(const void * buffer)
 #endif
 
     //filterSubMeshes();
+
+    //Create the buffers
+    CreateBuffers();
 }
 
-void XCMeshCustom::createBuffers(EVertexFormat formatType)
-{
-    XCMesh::CreateBuffers(VertexFormat_PositionNormalTextureBlendIndexBlendWeight);
-
-    if (!m_areBuffersCreated)
-    {
-
-    }
-}
-
-void XCMeshCustom::DrawSubMeshes(RenderContext& renderContext, SHADERTYPE shaderType)
+void XCMeshCustom::DrawSubMeshes(RenderContext& renderContext, ShaderType shaderType)
 {
     XCMesh::DrawSubMeshes(renderContext, shaderType);
 }

@@ -36,7 +36,7 @@ XC_ShaderManager::~XC_ShaderManager(void)
 
 void XC_ShaderManager::Init()
 {
-    m_Shaders.resize(SHADERTYPE_MAX);
+    m_Shaders.resize(ShaderType_Max);
 
 #if defined(XCGRAPHICS_DX12) || defined(XCGRAPHICS_DX11)
     ZeroMemory(&m_rasterizerDesc, sizeof(D3D_RASTERIZER_DESC));
@@ -84,84 +84,84 @@ void XC_ShaderManager::LoadShaders()
     {
         binShader = new XCShaderHandle(m_device);
         binShader->load((void*) *it);
-        m_Shaders[it->ShaderType()] = binShader;
+        m_Shaders[it->ShaderUsage()] = binShader;
     }
 #else
-    for (unsigned int shaderIndex = 0; shaderIndex < SHADERTYPE_MAX; shaderIndex++)
+    for (unsigned int shaderIndex = 0; shaderIndex < ShaderType_Max; shaderIndex++)
     {
         switch (shaderIndex)
         {
-            case SHADERTYPE_DEFAULT:
+            case ShaderType_DEFAULT:
                 {
                     binShader = new DefaultShader(m_device);
 
                     binShader->loadShader();
                     binShader->createBufferConstants();
-                    m_Shaders[SHADERTYPE_DEFAULT] = binShader;
+                    m_Shaders[ShaderType_DEFAULT] = binShader;
 
                     break;
                 }
 
-            case SHADERTYPE_COLORTECH:
+            case ShaderType_SolidColor:
                 {
                     binShader = new SolidColorShader(m_device);
 
                     binShader->loadShader();
                     binShader->createBufferConstants();
-                    m_Shaders[SHADERTYPE_COLORTECH] = binShader;
+                    m_Shaders[ShaderType_SolidColor] = binShader;
 
                     break;
                 }
-            case SHADERTYPE_LIGHTTEXTURE:
+            case ShaderType_LightTexture:
                 {
                     binShader = new LightTextureShader(m_device);
 
                     binShader->loadShader();
                     binShader->createBufferConstants();
-                    m_Shaders[SHADERTYPE_LIGHTTEXTURE] = binShader;
+                    m_Shaders[ShaderType_LightTexture] = binShader;
                     break;
                 }
 
-            case SHADERTYPE_REFELECTED_LIGHTTEXTURE:
+            case ShaderType_REFELECTED_LIGHTTEXTURE:
                 {
                     binShader = new XCShaderHandle(m_device);
                     binShader->loadShader();
                     binShader->createBufferConstants();
-                    m_Shaders[SHADERTYPE_REFELECTED_LIGHTTEXTURE] = binShader;
+                    m_Shaders[ShaderType_REFELECTED_LIGHTTEXTURE] = binShader;
                     break;
                 }
 
-            case SHADERTYPE_TERRIANMULTITEXTURE:
+            case ShaderType_TerrainMultiTexture:
                 {
                     binShader = new TerrainMultiTex(m_device);
 
                     binShader->loadShader();
                     binShader->createBufferConstants();
-                    m_Shaders[SHADERTYPE_TERRIANMULTITEXTURE] = binShader;
+                    m_Shaders[ShaderType_TerrainMultiTexture] = binShader;
                     break;
                 }
 
-            case SHADERTYPE_SIMPLECUBEMAP:
+            case ShaderType_SimpleCubeMap:
                 {
                     binShader = new CubeMapShader(m_device);
 
                     binShader->loadShader();
                     binShader->createBufferConstants();
-                    m_Shaders[SHADERTYPE_SIMPLECUBEMAP] = binShader;
+                    m_Shaders[ShaderType_SimpleCubeMap] = binShader;
                     break;
                 }
 
-            case SHADERTYPE_SKINNEDCHARACTER:
+            case ShaderType_SkinnedCharacter:
                 {
                     binShader = new SkinnedCharacterShader(m_device);
 
                     binShader->loadShader();
                     binShader->createBufferConstants();
-                    m_Shaders[SHADERTYPE_SKINNEDCHARACTER] = binShader;
+                    m_Shaders[ShaderType_SkinnedCharacter] = binShader;
                     break;
                 }
 
-            case SHADERTYPE_MAX:
+            case ShaderType_Max:
                 break;
 
             default: 
@@ -178,12 +178,12 @@ void XC_ShaderManager::LoadRasterizers()
     m_rasterizerDesc.FillMode = D3D11_FILL_WIREFRAME;
     m_rasterizerDesc.CullMode = D3D11_CULL_BACK;
 
-    m_device.CreateRasterizerState(&m_rasterizerDesc, &m_rasterizerStates[RASTERIZERTYPE_FILL_WIREFRAME]);
+    m_device.CreateRasterizerState(&m_rasterizerDesc, &m_rasterizerStates[RasterType_FillWireframe]);
 
     m_rasterizerDesc.FillMode = D3D11_FILL_SOLID;
     m_rasterizerDesc.CullMode = D3D11_CULL_BACK;
 
-    m_device.CreateRasterizerState(&m_rasterizerDesc, &m_rasterizerStates[RASTERIZERTYPE_FILL_SOLID]);
+    m_device.CreateRasterizerState(&m_rasterizerDesc, &m_rasterizerStates[RasterType_FillSolid]);
 
     m_samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
     m_samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -196,7 +196,7 @@ void XC_ShaderManager::LoadRasterizers()
     ValidateResult(m_device.CreateSamplerState(&m_samplerDesc, &m_SamplerLinear));
 }
 
-void XC_ShaderManager::SetRasterizerState(ID3DDeviceContext& context, ERasterizer_Type type)
+void XC_ShaderManager::SetRasterizerState(ID3DDeviceContext& context, RasterType type)
 {
     context.RSSetState(m_rasterizerStates[type]);
 }
@@ -204,11 +204,11 @@ void XC_ShaderManager::SetRasterizerState(ID3DDeviceContext& context, ERasterize
 
 void XC_ShaderManager::Destroy()
 {
-    for (unsigned int shaderIndex = 0; shaderIndex < SHADERTYPE_MAX; shaderIndex++)
+    for (unsigned int shaderIndex = 0; shaderIndex < ShaderType_Max; shaderIndex++)
     {
-        if (m_Shaders[(SHADERTYPE)shaderIndex] != nullptr)
+        if (m_Shaders[(ShaderType)shaderIndex] != nullptr)
         {
-            m_Shaders[(SHADERTYPE)shaderIndex]->destroy();
+            m_Shaders[(ShaderType)shaderIndex]->destroy();
         }
     }
     m_Shaders.clear();
@@ -220,15 +220,15 @@ void XC_ShaderManager::Destroy()
 #endif
 }
 
-void XC_ShaderManager::ApplyShader(ID3DDeviceContext& context, SHADERTYPE _shaderType)
+void XC_ShaderManager::ApplyShader(ID3DDeviceContext& context, ShaderType _ShaderType)
 {
-    m_Shaders[_shaderType]->applyShader(context);
+    m_Shaders[_ShaderType]->applyShader(context);
 #if defined(XCGRAPHICS_DX11)
     context.PSSetSamplers(0, 1, &m_SamplerLinear);
 #endif
 }
 
-IShader* XC_ShaderManager::GetShader(SHADERTYPE _type)
+IShader* XC_ShaderManager::GetShader(ShaderType _type)
 {
     return m_Shaders[_type];
 }
@@ -253,11 +253,11 @@ void XC_ShaderManager::DrawIndexedInstanced(ID3DDeviceContext& context, unsigned
 
 void XC_ShaderManager::ClearShaderAndRenderStates(ID3DDeviceContext& context)
 {
-    for (unsigned int shaderIndex = 0; shaderIndex < SHADERTYPE_MAX; shaderIndex++)
+    for (unsigned int shaderIndex = 0; shaderIndex < ShaderType_Max; shaderIndex++)
     {
-        if (m_Shaders[(SHADERTYPE)shaderIndex] != nullptr)
+        if (m_Shaders[(ShaderType)shaderIndex] != nullptr)
         {
-            m_Shaders[(SHADERTYPE)shaderIndex]->reset(context);
+            m_Shaders[(ShaderType)shaderIndex]->reset(context);
         }
     }
 }

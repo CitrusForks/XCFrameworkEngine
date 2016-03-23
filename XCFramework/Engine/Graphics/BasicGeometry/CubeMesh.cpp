@@ -30,14 +30,14 @@ void CubeMesh::Init()
     ResourceManager& resMgr = (ResourceManager&)SystemLocator::GetInstance()->RequestSystem("ResourceManager");
     m_texture = (Texture2D*)resMgr.GetResource("Sand");
 
-    m_useShaderType = SHADERTYPE_LIGHTTEXTURE;
+    m_useShaderType = ShaderType_LightTexture;
 
-    m_rasterType = RASTERIZERTYPE_FILL_SOLID;
+    m_rasterType = RasterType_FillSolid;
 
     Logger("[CubeMesh] Init done");
 }
 
-void CubeMesh::PreLoad(XCVecIntrinsic4 initialPosition, XCVecIntrinsic4 initialRotation, XCVecIntrinsic4 initialScaling, BasicMaterial material, Texture2D* texture, ERasterizer_Type rasterType)
+void CubeMesh::PreLoad(XCVecIntrinsic4 initialPosition, XCVecIntrinsic4 initialRotation, XCVecIntrinsic4 initialScaling, BasicMaterial material, Texture2D* texture, RasterType rasterType)
 {
     m_currentPosition = initialPosition;
     m_MTranslation = XMMatrixTranslation(XMVectorGetX(initialPosition), XMVectorGetY(initialPosition), XMVectorGetZ(initialPosition));
@@ -152,9 +152,9 @@ void CubeMesh::Draw(RenderContext& context)
     cbInvTransposeWorld invTransWorld = { InverseTranspose(m_World) };
     cbMatTexPerObject matTexPerObject = { *m_texture->getTextureCoordinateMatrix(), m_material };
 
-    if (m_useShaderType == SHADERTYPE_LIGHTTEXTURE)
+    if (m_useShaderType == ShaderType_LightTexture)
     {
-        LightTextureShader* lightTexShader = (LightTextureShader*)context.GetShaderManagerSystem().GetShader(SHADERTYPE_LIGHTTEXTURE);
+        LightTextureShader* lightTexShader = (LightTextureShader*)context.GetShaderManagerSystem().GetShader(ShaderType_LightTexture);
         lightTexShader->setCBWorld(context.GetDeviceContext(), &wbuffer);
         lightTexShader->setCBInvTransposeMatrix(context.GetDeviceContext(), &invTransWorld);
         lightTexShader->setCBMatTexPerObject(context.GetDeviceContext(), &matTexPerObject);
@@ -163,7 +163,7 @@ void CubeMesh::Draw(RenderContext& context)
     else
     {
         //Solid Shader
-        SolidColorShader* solidColorShader = (SolidColorShader*)context.GetShaderManagerSystem().GetShader(SHADERTYPE_COLORTECH);
+        SolidColorShader* solidColorShader = (SolidColorShader*)context.GetShaderManagerSystem().GetShader(ShaderType_SolidColor);
         solidColorShader->setCBWorld(context.GetDeviceContext(), wbuffer);
     }
 

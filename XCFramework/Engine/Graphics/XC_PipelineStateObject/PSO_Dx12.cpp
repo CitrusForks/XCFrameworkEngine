@@ -26,16 +26,16 @@ PSO_Dx12::~PSO_Dx12()
     m_rootSignature = nullptr;
 }
 
-void PSO_Dx12::GenerateDefaultPSO(PSO_Dx12* inPso, ERasterizer_Type rasterizerType, bool enableDepth)
+void PSO_Dx12::GenerateDefaultPSO(PSO_Dx12* inPso, RasterType rasterizerType, bool enableDepth)
 {
     CD3DX12_RASTERIZER_DESC rasterizerDesc = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 
     switch (rasterizerType)
     {
-    case RASTERIZERTYPE_FILL_SOLID:
+    case RasterType_FillSolid:
         rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
         break;
-    case RASTERIZERTYPE_FILL_WIREFRAME:
+    case RasterType_FillWireframe:
         rasterizerDesc.FillMode = D3D12_FILL_MODE_WIREFRAME;
         break;
 

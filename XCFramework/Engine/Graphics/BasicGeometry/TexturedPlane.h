@@ -27,7 +27,7 @@ public:
 
     virtual void                     Init(int actorId);
     virtual void                     PreLoad(const void* fbBuffer);
-    virtual void                     PreLoad(XCVecIntrinsic4 initialPosition, XCVecIntrinsic4 initialRotation, XCVecIntrinsic4 initialScaling, BasicMaterial material, Texture2D* texture, ERasterizer_Type rasterType);
+    virtual void                     PreLoad(XCVecIntrinsic4 initialPosition, XCVecIntrinsic4 initialRotation, XCVecIntrinsic4 initialScaling, BasicMaterial material, Texture2D* texture, RasterType rasterType);
     virtual void                     Load();
     virtual void                     Update(float dt);
     virtual void                     Draw(RenderContext& renderContext);
@@ -35,11 +35,11 @@ public:
     virtual void                     BuildGeometryBuffers();
 
 protected:
-    SHADERTYPE                      m_useShaderType;
+    ShaderType                        m_useShaderType;
     BasicMaterial                     m_material;
     Texture2D*                        m_texture;
     VertexBuffer<VertexPosNormTex>    m_vertexBuffer;
-    ERasterizer_Type                  m_rasterType;
+    RasterType                        m_rasterType;
 
 #if defined(XCGRAPHICS_DX12)
     D3DConstantBuffer*                m_pCBPerObject;

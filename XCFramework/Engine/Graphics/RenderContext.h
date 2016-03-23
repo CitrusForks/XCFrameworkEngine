@@ -29,8 +29,8 @@ public:
     ID3DCommandList&            GetCommandList() { return *m_commandList; }
 #endif
 
-    void                        SetRasterizerState(ERasterizer_Type type);
-    void                        ApplyShader(SHADERTYPE shaderType);
+    void                        SetRasterizerState(RasterType type);
+    void                        ApplyShader(ShaderType shaderType);
     XC_ShaderManager&           GetShaderManagerSystem() { return *m_shaderManager; }
 
 private:

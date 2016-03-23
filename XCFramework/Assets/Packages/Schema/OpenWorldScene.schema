@@ -1,3 +1,4 @@
+include "ShaderTypes.schema";
 include "GameplayActors.schema";
 
 //Main schemas

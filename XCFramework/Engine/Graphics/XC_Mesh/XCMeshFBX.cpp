@@ -7,6 +7,8 @@
 #include "stdafx.h"
 
 #include "XCMeshFBX.h"
+#include "Engine/Graphics/XC_Graphics.h"
+#include "Engine/Graphics/XC_Shaders/XC_ShaderHandle.h"
 #include "Engine/FlatBuffersInterface/FlatBuffersSystem.h"
 
 
@@ -180,7 +182,6 @@ void DisplayColor(const char* pHeader, FbxColor pValue, const char* pSuffix = ""
 }
 
 
-
 void XCMeshFBX::Load(const void * buffer)
 {
     Logger("Loading FBX mesh");
@@ -190,8 +191,12 @@ void XCMeshFBX::Load(const void * buffer)
     m_userFriendlyName = fbXCMesh->MeshName()->c_str();
     m_resourcePath = getPlatformPath(fbXCMesh->MeshPath()->c_str());
     m_texture = (Texture2D*)m_resourceManager->GetResource(fbXCMesh->TextureRes()->c_str());
-    m_globalScaling = fbXCMesh->InitialScaling();
+    m_globalScaling = XCVec3Unaligned(fbXCMesh->InitialScaling()->x(), fbXCMesh->InitialScaling()->y(), fbXCMesh->InitialScaling()->z());
     m_globalRotation = XCVec3Unaligned(fbXCMesh->InitialRotation()->x(), fbXCMesh->InitialRotation()->x(), fbXCMesh->InitialRotation()->x());
+    m_shaderType = fbXCMesh->ShaderUsage();
+
+    XC_Graphics& graphicsSystem = (XC_Graphics&)SystemLocator::GetInstance()->RequestSystem<XC_Graphics>("GraphicsSystem");
+    m_shaderHandler = (XCShaderHandle*)graphicsSystem.GetShaderManagerSystem().GetShader(m_shaderType);
 
     const char* meshFilename = fbXCMesh->MeshPath()->c_str();
 
@@ -280,6 +285,8 @@ void XCMeshFBX::Load(const void * buffer)
 
 
     //filterSubMeshes();
+    CreateBuffers();
+    CreateConstantBuffer();
 }
 
 bool XCMeshFBX::LoadScene(FbxManager* pManager, FbxDocument* pScene, const char* pFilename)
@@ -525,7 +532,7 @@ void XCMeshFBX::DisplayMesh(FbxNode* pNode)
 
     DisplayString("Mesh Name: ", (char *)pNode->GetName());
 
-    SubMesh* submesh = createAndGetSubMesh();
+    MeshData* submesh = createAndGetSubMesh();
     {
         submesh->setObjectName(pNode->GetName());
         submesh->setNoOfVertices(lMesh->GetPolygonCount() * 3);
@@ -552,21 +559,21 @@ void XCMeshFBX::DisplayMesh(FbxNode* pNode)
         submesh->setGeometryTranslation(XCVec3Unaligned((XMVectorGetX(originTranslate)), 0.0f, 0.0f));
 
         //fill the vertices & uv coords
-        for (unsigned int polygonIndex = 0; polygonIndex < lMesh->GetPolygonCount(); ++polygonIndex)
+        for (int polygonIndex = 0; polygonIndex < lMesh->GetPolygonCount(); ++polygonIndex)
         {
             int faceValue[] = { -1, -1, -1, -1 };
 
-            for (unsigned int faceVertexIndex = 0; faceVertexIndex < lMesh->GetPolygonSize(polygonIndex); ++faceVertexIndex)
+            for (int faceVertexIndex = 0; faceVertexIndex < lMesh->GetPolygonSize(polygonIndex); ++faceVertexIndex)
             {
                 int vIndex = lMesh->GetPolygonVertex(polygonIndex, faceVertexIndex);
 
                 FbxVector4 v1Data = lControlPoints[vIndex];
-                SubMesh::Vertex vertex = { v1Data[0], v1Data[1], v1Data[2] };
+                MeshData::Vertex vertex = { v1Data[0], v1Data[1], v1Data[2] };
 
                 //Logger("Polygon : %f %f %f ", vertex.x, vertex.y, vertex.z);
 
                 //Find if the vertex is present in our vertices.
-                auto foundVertex = std::find_if(submesh->m_vertices.begin(), submesh->m_vertices.end(), [&vertex](SubMesh::Vertex v) -> bool
+                auto foundVertex = std::find_if(submesh->m_vertices.begin(), submesh->m_vertices.end(), [&vertex](MeshData::Vertex v) -> bool
                 {
                     return fabs(v.x) == fabs(vertex.x) && fabs(v.y) == fabs(vertex.y) && fabs(v.z) == fabs(vertex.z);
                 });
@@ -589,7 +596,7 @@ void XCMeshFBX::DisplayMesh(FbxNode* pNode)
             XCASSERT(faceValue[0] != -1);
 
             //Add the face to our submesh
-            SubMesh::Face face = { faceValue[0], faceValue[1], faceValue[2], faceValue[3] };
+            MeshData::Face face = { faceValue[0], faceValue[1], faceValue[2], faceValue[3] };
             submesh->addFace(face);
             //Logger("Face : %d %d %d", face.a, face.b, face.c);
         }
@@ -598,7 +605,7 @@ void XCMeshFBX::DisplayMesh(FbxNode* pNode)
     //DisplayAndGeneratePolygons(lMesh, submesh);
 }
 
-void XCMeshFBX::DisplayAndGeneratePolygons(FbxMesh* pMesh, SubMesh* submesh)
+void XCMeshFBX::DisplayAndGeneratePolygons(FbxMesh* pMesh, MeshData* submesh)
 {
     int i, j, lPolygonCount = pMesh->GetPolygonCount();
     FbxVector4* lControlPoints = pMesh->GetControlPoints();
@@ -842,22 +849,12 @@ void XCMeshFBX::DisplayAndGeneratePolygons(FbxMesh* pMesh, SubMesh* submesh)
     DisplayString("");
 }
 
-void XCMeshFBX::CreateBuffers(EVertexFormat formatType)
-{
-    XCMesh::CreateBuffers(formatType);
-
-    if (!m_areBuffersCreated)
-    {
-
-    }
-}
-
 void XCMeshFBX::Init(int resourceId, std::string userFriendlyName, bool loaded)
 {
     XCMesh::Init(resourceId, userFriendlyName, loaded);
 }
 
-void XCMeshFBX::Draw(RenderContext& context, SHADERTYPE shaderType)
+void XCMeshFBX::Draw(RenderContext& context, ShaderType shaderType)
 {
     XCMesh::Draw(context, shaderType);
 }
@@ -867,7 +864,7 @@ void XCMeshFBX::Destroy()
     XCMesh::Destroy();
 }
 
-void XCMeshFBX::DrawSubMeshes(RenderContext& renderContext, SHADERTYPE shaderType)
+void XCMeshFBX::DrawSubMeshes(RenderContext& renderContext, ShaderType shaderType)
 {
     XCMesh::DrawSubMeshes(renderContext, shaderType);
 }

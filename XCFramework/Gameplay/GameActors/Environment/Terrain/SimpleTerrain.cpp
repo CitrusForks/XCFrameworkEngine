@@ -15,7 +15,7 @@
 
 SimpleTerrain::SimpleTerrain(void)
 {
-    m_useShaderType = SHADERTYPE_COLORTECH;
+    m_useShaderType = ShaderType_SolidColor;
     m_collisionDetectionType = COLLISIONDETECTIONTYPE_TRIANGLE;
     m_useRenderWorkerType = WorkerType_Terrain;
 }
@@ -133,7 +133,7 @@ void SimpleTerrain::GenerateIndicesWithTextureMapping()
             m_indexBuffer.m_indexData[indicesIndex + 4] = (rowIndex + 1) * m_cols + (colIndex + 1);
             m_indexBuffer.m_indexData[indicesIndex + 5] = (rowIndex + 1) * m_cols + colIndex;
 
-            if (m_useShaderType == SHADERTYPE_LIGHTTEXTURE || m_useShaderType == SHADERTYPE_TERRIANMULTITEXTURE)
+            if (m_useShaderType == ShaderType_LightTexture || m_useShaderType == ShaderType_TerrainMultiTexture)
             {
                 //Set Texture mapping
                 //Vertex 1
@@ -152,12 +152,12 @@ void SimpleTerrain::BuildGeometryBuffer()
     XC_Graphics& graphicsSystem = (XC_Graphics&)SystemLocator::GetInstance()->RequestSystem("GraphicsSystem");
 
     //Allocate resource for vb and ib
-    if (m_useShaderType == SHADERTYPE_COLORTECH)
+    if (m_useShaderType == ShaderType_SolidColor)
     {
         m_vertexPosColorBuffer.BuildVertexBuffer();
         m_indexBuffer.BuildIndexBuffer();
     }
-    else if (m_useShaderType == SHADERTYPE_LIGHTTEXTURE || m_useShaderType == SHADERTYPE_TERRIANMULTITEXTURE)
+    else if (m_useShaderType == ShaderType_LightTexture || m_useShaderType == ShaderType_TerrainMultiTexture)
     {
         m_vertexPosNormTexBuffer.BuildVertexBuffer();
         m_indexBuffer.BuildIndexBuffer();
@@ -175,13 +175,10 @@ void SimpleTerrain::Update(float dt)
 
 void SimpleTerrain::Draw(RenderContext& context)
 {
-    context.SetRasterizerState(RASTERIZERTYPE_FILL_SOLID);
+    context.SetRasterizerState(RasterType_FillSolid);
 
     context.ApplyShader(m_useShaderType);
     
-    m_vertexPosColorBuffer.SetVertexBuffer(context.GetDeviceContext());
-    m_indexBuffer.SetIndexBuffer(context.GetDeviceContext());
-
     // Set constants
     cbWorld wbuffer = { ToXCMatrix4Unaligned(XMMatrixTranspose(m_World)) };
     XC_CameraManager* cam = (XC_CameraManager*)&SystemLocator::GetInstance()->RequestSystem("CameraManager");
@@ -191,6 +188,9 @@ void SimpleTerrain::Draw(RenderContext& context)
 
     //TODO
     XCShaderHandle* solidColorShader = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(m_useShaderType);
+    solidColorShader->setConstantBuffer("cbWVP", context.GetDeviceContext(), D3D12_GPU_DESCRIPTOR_HANDLE());
+    solidColorShader->setVertexBuffer(context.GetDeviceContext(), &m_vertexPosColorBuffer);
+    solidColorShader->setIndexBuffer(context.GetDeviceContext(), m_indexBuffer);
 
     context.GetShaderManagerSystem().DrawIndexedInstanced(context.GetDeviceContext(), m_indexBuffer.m_indexData.size());
 }

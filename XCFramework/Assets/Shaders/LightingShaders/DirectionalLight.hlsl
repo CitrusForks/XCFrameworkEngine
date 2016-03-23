@@ -18,7 +18,6 @@ struct DirectionalLight
     float4  Diffuse;
     float4  Specular;
     float3  Direction;
-    float   pad;
 };
 
 

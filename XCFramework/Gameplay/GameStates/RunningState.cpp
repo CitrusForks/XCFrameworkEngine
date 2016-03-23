@@ -37,10 +37,13 @@ void GameState::RunningState::Init(GameFiniteStateMachine& gameFSM)
     m_worldSystem = &SystemLocator::GetInstance()->RequestSystem<World>("World");
 
     ResourceManager& resMgr         = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
-    XC_Graphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XC_Graphics>("GraphicsSystem");
+    XC_Graphics& graphicsSystem     = SystemLocator::GetInstance()->RequestSystem<XC_Graphics>("GraphicsSystem");
 
     //Initialize the lights
-    m_lightManagerSystem = new XC_LightManager(*m_cameraSystem);
+    SystemContainer& container = (SystemContainer&)SystemLocator::GetInstance()->GetSystemContainer();
+    container.RegisterSystem<XC_LightManager>("LightsManager");
+
+    m_lightManagerSystem = (XC_LightManager*)&container.CreateNewSystem("LightsManager");
     m_lightManagerSystem->InitializeLights();
 
     //Set the camera to FPS mode
@@ -56,11 +59,11 @@ void GameState::RunningState::Init(GameFiniteStateMachine& gameFSM)
 #endif
 
     std::unique_ptr<SimpleSkyBox> pSkyBox = (std::unique_ptr<SimpleSkyBox>)(SimpleSkyBox*)actorFactory.CreateActor("SimpleSkyBox");
-    pSkyBox->PreLoad(toXMVECTOR(0.0f, 0.0f, 0.0f, 1.0f), toXMVECTOR(0.0f, 0.0f, 0.0f, 1.0f), toXMVECTOR(1000.0f, 1000.0f, 1000.0f, 1.0f), BasicMaterial(), (CubeTexture3D*)resMgr.GetResource("cubemap_bright"), RASTERIZERTYPE_FILL_SOLID);
+    pSkyBox->PreLoad(toXMVECTOR(0.0f, 0.0f, 0.0f, 1.0f), toXMVECTOR(0.0f, 0.0f, 0.0f, 1.0f), toXMVECTOR(1000.0f, 1000.0f, 1000.0f, 1.0f), BasicMaterial(), (CubeTexture3D*)resMgr.GetResource("cubemap_bright"), RasterType_FillSolid);
     m_worldSystem->RequestAddActor(std::move(pSkyBox));
 
     std::unique_ptr<TexturedPlane> pTexturedPlane = (std::unique_ptr<TexturedPlane>)(TexturedPlane*)actorFactory.CreateActor("TexturedPlane");
-    pTexturedPlane->PreLoad(toXMVECTOR(0.0f, 5.0f, 10.0f, 1.0f), toXMVECTOR(0.0f, 0.0f, 0.0f, 1.0f), toXMVECTOR(5.0f, 5.0f, 0.0f, 1.0f), BasicMaterial(), graphicsSystem.GetRenderTexture(RENDERTARGET_LIVEDRIVE), RASTERIZERTYPE_FILL_SOLID);
+    pTexturedPlane->PreLoad(toXMVECTOR(0.0f, 5.0f, 10.0f, 1.0f), toXMVECTOR(0.0f, 0.0f, 0.0f, 1.0f), toXMVECTOR(5.0f, 5.0f, 0.0f, 1.0f), BasicMaterial(), graphicsSystem.GetRenderTexture(RENDERTARGET_LIVEDRIVE), RasterType_FillSolid);
     m_worldSystem->RequestAddActor(std::move(pTexturedPlane));
 
     std::unique_ptr<Waves> pWave = (std::unique_ptr<Waves>)(Waves*)actorFactory.CreateActor("Waves");
@@ -223,7 +226,9 @@ void GameState::RunningState::Draw(XC_Graphics& graphicsSystem)
 void RunningState::Destroy()
 {
     m_lightManagerSystem->Destroy();
-    delete(m_lightManagerSystem);
+
+    SystemContainer& container = SystemLocator::GetInstance()->GetSystemContainer();
+    container.RemoveSystem("LightsManager");
 
     m_worldSystem->SetWorldReady(false);
     m_worldSystem->Destroy();

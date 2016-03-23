@@ -56,7 +56,7 @@ struct FBSimpleSkyBox FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const Vec4 *Scaling() const { return GetStruct<const Vec4 *>(8); }
   const FBBasicMaterial *Material() const { return GetPointer<const FBBasicMaterial *>(10); }
   const flatbuffers::String *CubeTexture3DResourceName() const { return GetPointer<const flatbuffers::String *>(12); }
-  FBERasterizer_Type RasterizerType() const { return static_cast<FBERasterizer_Type>(GetField<int16_t>(14, 0)); }
+  RasterType RasterizerType() const { return static_cast<RasterType>(GetField<int16_t>(14, 0)); }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<Vec4>(verifier, 4 /* Position */) &&
@@ -79,7 +79,7 @@ struct FBSimpleSkyBoxBuilder {
   void add_Scaling(const Vec4 *Scaling) { fbb_.AddStruct(8, Scaling); }
   void add_Material(flatbuffers::Offset<FBBasicMaterial> Material) { fbb_.AddOffset(10, Material); }
   void add_CubeTexture3DResourceName(flatbuffers::Offset<flatbuffers::String> CubeTexture3DResourceName) { fbb_.AddOffset(12, CubeTexture3DResourceName); }
-  void add_RasterizerType(FBERasterizer_Type RasterizerType) { fbb_.AddElement<int16_t>(14, static_cast<int16_t>(RasterizerType), 0); }
+  void add_RasterizerType(RasterType RasterizerType) { fbb_.AddElement<int16_t>(14, static_cast<int16_t>(RasterizerType), 0); }
   FBSimpleSkyBoxBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
   FBSimpleSkyBoxBuilder &operator=(const FBSimpleSkyBoxBuilder &);
   flatbuffers::Offset<FBSimpleSkyBox> Finish() {
@@ -94,7 +94,7 @@ inline flatbuffers::Offset<FBSimpleSkyBox> CreateFBSimpleSkyBox(flatbuffers::Fla
    const Vec4 *Scaling = 0,
    flatbuffers::Offset<FBBasicMaterial> Material = 0,
    flatbuffers::Offset<flatbuffers::String> CubeTexture3DResourceName = 0,
-   FBERasterizer_Type RasterizerType = FBERasterizer_Type_FBRASTERIZERTYPE_FILL_WIREFRAME) {
+   RasterType RasterizerType = RasterType_FillWireframe) {
   FBSimpleSkyBoxBuilder builder_(_fbb);
   builder_.add_CubeTexture3DResourceName(CubeTexture3DResourceName);
   builder_.add_Material(Material);
@@ -111,7 +111,7 @@ struct FBTexturePlane FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const Vec4 *Scaling() const { return GetStruct<const Vec4 *>(8); }
   const FBBasicMaterial *Material() const { return GetPointer<const FBBasicMaterial *>(10); }
   const flatbuffers::String *ResourceName() const { return GetPointer<const flatbuffers::String *>(12); }
-  FBERasterizer_Type RasterizerType() const { return static_cast<FBERasterizer_Type>(GetField<int16_t>(14, 0)); }
+  RasterType RasterizerType() const { return static_cast<RasterType>(GetField<int16_t>(14, 0)); }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<Vec4>(verifier, 4 /* Position */) &&
@@ -134,7 +134,7 @@ struct FBTexturePlaneBuilder {
   void add_Scaling(const Vec4 *Scaling) { fbb_.AddStruct(8, Scaling); }
   void add_Material(flatbuffers::Offset<FBBasicMaterial> Material) { fbb_.AddOffset(10, Material); }
   void add_ResourceName(flatbuffers::Offset<flatbuffers::String> ResourceName) { fbb_.AddOffset(12, ResourceName); }
-  void add_RasterizerType(FBERasterizer_Type RasterizerType) { fbb_.AddElement<int16_t>(14, static_cast<int16_t>(RasterizerType), 0); }
+  void add_RasterizerType(RasterType RasterizerType) { fbb_.AddElement<int16_t>(14, static_cast<int16_t>(RasterizerType), 0); }
   FBTexturePlaneBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
   FBTexturePlaneBuilder &operator=(const FBTexturePlaneBuilder &);
   flatbuffers::Offset<FBTexturePlane> Finish() {
@@ -149,7 +149,7 @@ inline flatbuffers::Offset<FBTexturePlane> CreateFBTexturePlane(flatbuffers::Fla
    const Vec4 *Scaling = 0,
    flatbuffers::Offset<FBBasicMaterial> Material = 0,
    flatbuffers::Offset<flatbuffers::String> ResourceName = 0,
-   FBERasterizer_Type RasterizerType = FBERasterizer_Type_FBRASTERIZERTYPE_FILL_WIREFRAME) {
+   RasterType RasterizerType = RasterType_FillWireframe) {
   FBTexturePlaneBuilder builder_(_fbb);
   builder_.add_ResourceName(ResourceName);
   builder_.add_Material(Material);
@@ -165,7 +165,7 @@ struct FBLiveDriveTexturePlane FLATBUFFERS_FINAL_CLASS : private flatbuffers::Ta
   const Vec4 *Rotation() const { return GetStruct<const Vec4 *>(6); }
   const Vec4 *Scaling() const { return GetStruct<const Vec4 *>(8); }
   const FBBasicMaterial *Material() const { return GetPointer<const FBBasicMaterial *>(10); }
-  FBERasterizer_Type RasterizerType() const { return static_cast<FBERasterizer_Type>(GetField<int16_t>(12, 0)); }
+  RasterType RasterizerType() const { return static_cast<RasterType>(GetField<int16_t>(12, 0)); }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<Vec4>(verifier, 4 /* Position */) &&
@@ -185,7 +185,7 @@ struct FBLiveDriveTexturePlaneBuilder {
   void add_Rotation(const Vec4 *Rotation) { fbb_.AddStruct(6, Rotation); }
   void add_Scaling(const Vec4 *Scaling) { fbb_.AddStruct(8, Scaling); }
   void add_Material(flatbuffers::Offset<FBBasicMaterial> Material) { fbb_.AddOffset(10, Material); }
-  void add_RasterizerType(FBERasterizer_Type RasterizerType) { fbb_.AddElement<int16_t>(12, static_cast<int16_t>(RasterizerType), 0); }
+  void add_RasterizerType(RasterType RasterizerType) { fbb_.AddElement<int16_t>(12, static_cast<int16_t>(RasterizerType), 0); }
   FBLiveDriveTexturePlaneBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
   FBLiveDriveTexturePlaneBuilder &operator=(const FBLiveDriveTexturePlaneBuilder &);
   flatbuffers::Offset<FBLiveDriveTexturePlane> Finish() {
@@ -199,7 +199,7 @@ inline flatbuffers::Offset<FBLiveDriveTexturePlane> CreateFBLiveDriveTexturePlan
    const Vec4 *Rotation = 0,
    const Vec4 *Scaling = 0,
    flatbuffers::Offset<FBBasicMaterial> Material = 0,
-   FBERasterizer_Type RasterizerType = FBERasterizer_Type_FBRASTERIZERTYPE_FILL_WIREFRAME) {
+   RasterType RasterizerType = RasterType_FillWireframe) {
   FBLiveDriveTexturePlaneBuilder builder_(_fbb);
   builder_.add_Material(Material);
   builder_.add_Scaling(Scaling);

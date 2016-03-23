@@ -90,8 +90,9 @@ struct FBXCMesh FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const flatbuffers::String *MeshName() const { return GetPointer<const flatbuffers::String *>(4); }
   const flatbuffers::String *MeshPath() const { return GetPointer<const flatbuffers::String *>(6); }
   const flatbuffers::String *TextureRes() const { return GetPointer<const flatbuffers::String *>(8); }
-  float InitialScaling() const { return GetField<float>(10, 0); }
+  const Vec3 *InitialScaling() const { return GetStruct<const Vec3 *>(10); }
   const Vec3 *InitialRotation() const { return GetStruct<const Vec3 *>(12); }
+  ShaderType ShaderUsage() const { return static_cast<ShaderType>(GetField<int8_t>(14, 0)); }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<flatbuffers::uoffset_t>(verifier, 4 /* MeshName */) &&
@@ -100,8 +101,9 @@ struct FBXCMesh FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.Verify(MeshPath()) &&
            VerifyField<flatbuffers::uoffset_t>(verifier, 8 /* TextureRes */) &&
            verifier.Verify(TextureRes()) &&
-           VerifyField<float>(verifier, 10 /* InitialScaling */) &&
+           VerifyField<Vec3>(verifier, 10 /* InitialScaling */) &&
            VerifyField<Vec3>(verifier, 12 /* InitialRotation */) &&
+           VerifyField<int8_t>(verifier, 14 /* ShaderUsage */) &&
            verifier.EndTable();
   }
 };
@@ -112,12 +114,13 @@ struct FBXCMeshBuilder {
   void add_MeshName(flatbuffers::Offset<flatbuffers::String> MeshName) { fbb_.AddOffset(4, MeshName); }
   void add_MeshPath(flatbuffers::Offset<flatbuffers::String> MeshPath) { fbb_.AddOffset(6, MeshPath); }
   void add_TextureRes(flatbuffers::Offset<flatbuffers::String> TextureRes) { fbb_.AddOffset(8, TextureRes); }
-  void add_InitialScaling(float InitialScaling) { fbb_.AddElement<float>(10, InitialScaling, 0); }
+  void add_InitialScaling(const Vec3 *InitialScaling) { fbb_.AddStruct(10, InitialScaling); }
   void add_InitialRotation(const Vec3 *InitialRotation) { fbb_.AddStruct(12, InitialRotation); }
+  void add_ShaderUsage(ShaderType ShaderUsage) { fbb_.AddElement<int8_t>(14, static_cast<int8_t>(ShaderUsage), 0); }
   FBXCMeshBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
   FBXCMeshBuilder &operator=(const FBXCMeshBuilder &);
   flatbuffers::Offset<FBXCMesh> Finish() {
-    auto o = flatbuffers::Offset<FBXCMesh>(fbb_.EndTable(start_, 5));
+    auto o = flatbuffers::Offset<FBXCMesh>(fbb_.EndTable(start_, 6));
     return o;
   }
 };
@@ -126,14 +129,16 @@ inline flatbuffers::Offset<FBXCMesh> CreateFBXCMesh(flatbuffers::FlatBufferBuild
    flatbuffers::Offset<flatbuffers::String> MeshName = 0,
    flatbuffers::Offset<flatbuffers::String> MeshPath = 0,
    flatbuffers::Offset<flatbuffers::String> TextureRes = 0,
-   float InitialScaling = 0,
-   const Vec3 *InitialRotation = 0) {
+   const Vec3 *InitialScaling = 0,
+   const Vec3 *InitialRotation = 0,
+   ShaderType ShaderUsage = ShaderType_Default) {
   FBXCMeshBuilder builder_(_fbb);
   builder_.add_InitialRotation(InitialRotation);
   builder_.add_InitialScaling(InitialScaling);
   builder_.add_TextureRes(TextureRes);
   builder_.add_MeshPath(MeshPath);
   builder_.add_MeshName(MeshName);
+  builder_.add_ShaderUsage(ShaderUsage);
   return builder_.Finish();
 }
 

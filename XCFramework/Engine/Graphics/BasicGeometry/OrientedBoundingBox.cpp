@@ -47,7 +47,7 @@ void OrientedBoundingBox::CreateBoundBox(OrientedBoundingBox* const boundBox)
 
 void OrientedBoundingBox::Load()
 {
-    m_rasterType = RASTERIZERTYPE_FILL_WIREFRAME;
+    m_rasterType = RasterType_FillWireframe;
     CubeMesh::Load();
 }
 
@@ -113,6 +113,6 @@ void OrientedBoundingBox::Update(float dt)
 
 void OrientedBoundingBox::Draw(RenderContext& context)
 {
-    context.SetRasterizerState(RASTERIZERTYPE_FILL_WIREFRAME);
+    context.SetRasterizerState(RasterType_FillWireframe);
     CubeMesh::Draw(context);
 }

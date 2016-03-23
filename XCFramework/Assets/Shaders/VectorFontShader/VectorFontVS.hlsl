@@ -11,9 +11,9 @@ cbuffer cbPerObjectInstanced : register(b0)
 
 struct VertexIn
 {
-    float4          PosL  : POSITION;
-    float4          Color : COLOR;
-    uint            InstanceIndex : SV_InstanceID;
+    float4 PosL          : POSITION;
+    float4 Color         : COLOR;
+    uint   InstanceIndex : SV_InstanceID;
 };
 
 struct VertexOut

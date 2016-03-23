@@ -32,7 +32,7 @@ public:
         bool                                m_running;
         RenderContext                       m_renderContext;
         std::map<int, IRenderableObject*>   m_renderableObjectRefList;
-        std::vector<IResource*>             m_graphicsBufferRefList;
+        std::vector<IResource*>             m_resourceRefList;
 
         Thread                              m_workerThread;
 
@@ -51,8 +51,14 @@ public:
     RenderingPool();
 
     void                Init();
+
+    //Gameplay Actors request
     void                AddRenderableObject(IRenderableObject* obj, int baseObjId);      //Objects/Actors to be drawn
     void                RemoveRenderableObject(IRenderableObject* obj, int baseObjId);
+
+    //Resources related request
+    void                AddResourceDrawable(IResource* obj);
+    void                RemoveResourceDrawable(IResource* obj);
     void                RequestResourceDeviceContext(IResource* graphicsBuffer);
 
     void                Update(float dt);                                               //Use it to push and pop renderable objects, since in update we remove the actors.

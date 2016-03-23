@@ -19,7 +19,6 @@
 #include <fbxsdk/fbxsdk_nsbegin.h>
 
 #if defined(FBXSDK_ENV_WIN)
-	#define FBXSDK_fprintf							printf_s
 	#define FBXSDK_fprintf							fprintf_s
 	inline int FBXSDK_sprintf(char* dst, size_t dstsize, const char* format, ...){ va_list vl; va_start(vl, format); int ret = vsprintf_s(dst, dstsize, format, vl); va_end(vl); return ret; }
 	inline int FBXSDK_snprintf(char* dst, size_t dstsize, const char* format, ...){ va_list vl; va_start(vl, format); int ret = vsnprintf_s(dst, dstsize, _TRUNCATE, format, vl); va_end(vl); return ret; }

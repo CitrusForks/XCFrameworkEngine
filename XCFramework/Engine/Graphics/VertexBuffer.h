@@ -17,6 +17,7 @@ public:
 
     VertexBuffer() 
     {
+        m_resourceType = RESOURCETYPE_VERTEXBUFFER;
     }
 
     VertexBuffer(const VertexBuffer& vertexBuffer)
@@ -103,22 +104,6 @@ public:
 
         IResource::RenderContextCallback(renderContext);
     }
-
-    void SetVertexBuffer(ID3DDeviceContext& context)
-    {
-#if defined(XCGRAPHICS_DX12)
-        context.IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        context.IASetVertexBuffers(0, 1, &m_vertexBufferView);
-#elif defined(XCGRAPHICS_DX11)
-        context.IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-        unsigned int stride = sizeof(T);
-        unsigned int offset = 0;
-        context.IASetVertexBuffers(0, 1, &m_pVB, &stride, &offset);
-#endif
-    }
-
-
 
 #if defined(XCGRAPHICS_DX12) 
     D3D12_VERTEX_BUFFER_VIEW& GetVertexBufferView()

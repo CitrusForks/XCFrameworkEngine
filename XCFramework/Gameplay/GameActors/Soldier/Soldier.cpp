@@ -39,7 +39,8 @@ void Soldier::PreLoad(XCVec3 initialPosition, XCMesh* pMesh)
     //Get initial position
     m_currentPosition = XMLoadFloat3(&initialPosition);
 
-    m_useShaderType = pMesh->IsSkinnedMesh()? SHADERTYPE_SKINNEDCHARACTER : SHADERTYPE_LIGHTTEXTURE;
+    m_useShaderType = pMesh->IsSkinnedMesh()? ShaderType_SkinnedCharacter : ShaderType_LightTexture;
+    m_useRenderWorkerType = WorkerType_XCMesh;
     m_collisionDetectionType = COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX;
 
     m_secondaryLookAxis = XMVectorZero();
@@ -51,18 +52,6 @@ void Soldier::PreLoad(XCVec3 initialPosition, XCMesh* pMesh)
     //Gun mesh
     m_gun = ((Gun*) actorFactory.CreateActor("Gun"));
     m_gun->PreLoad(this, initialPosition, (XCMesh*) resMgr.GetResource("Gun"));
-
-#if defined(XCGRAPHICS_DX12)
-    SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
-    if (m_useShaderType == SHADERTYPE_LIGHTTEXTURE)
-    {
-        m_pCBPerObject = heap.CreateBufferView(D3DBufferDesc(BUFFERTYPE_CBV, sizeof(cbPerObjectBuffer)));
-    }
-    else
-    {
-        m_pCBPerObject = heap.CreateBufferView(D3DBufferDesc(BUFFERTYPE_CBV, sizeof(cbSkinnedCharacterBuffer)));
-    }
-#endif
 }
 
 
@@ -83,8 +72,6 @@ void Soldier::Load()
     XCVec3 pos = XCVec3(1.0f, 3.0f, 2.0f);
     m_gun->GetSubActor()->InitOffsets(XMLoadFloat3(&pos), m_secondaryLookAxis, m_secondaryRightAxis, m_secondaryUpAxis);
 
-    BuildMeshBuffer();
-
     PhysicsActor::Load();
 }
 
@@ -94,20 +81,6 @@ void Soldier::SetInitialPhysicsProperties()
     XCVec3 vec = XCVec3(0, 0, 0);
     InitXPhysics(m_currentPosition, XMLoadFloat3(&vec), XMLoadFloat3(&vec), 10, (float)0.8);
 }
-
-
-void Soldier::BuildMeshBuffer()
-{
-    if(m_pMesh->IsSkinnedMesh())
-    {
-        m_pMesh->CreateBuffers(VertexFormat_PositionNormalTextureBlendIndexBlendWeight);
-    }
-    else
-    {
-        m_pMesh->CreateBuffers(VertexFormat_PositionNormalTexture);
-    }
-}
-
 
 void Soldier::Update(float dt)
 {
@@ -208,31 +181,21 @@ void Soldier::ApplyRotation(XCMatrix4 rotation)
 
 void Soldier::Draw(RenderContext& context)
 {
-    context.SetRasterizerState(RASTERIZERTYPE_FILL_SOLID);
-    context.ApplyShader(m_useShaderType);
-    
     // Set constants
     XC_CameraManager* cam = (XC_CameraManager*)&SystemLocator::GetInstance()->RequestSystem("CameraManager");
-    
-    if (m_useShaderType == SHADERTYPE_LIGHTTEXTURE)
+    PerObjectBuffer perObject = {};
+
+    if (m_useShaderType == ShaderType_LightTexture)
     {
-        cbPerObjectBuffer perObject = {
+        perObject = {
             ToXCMatrix4Unaligned(XMMatrixTranspose(m_World)),
             ToXCMatrix4Unaligned(XMMatrixTranspose(m_World * cam->GetViewMatrix() * cam->GetProjMatrix())),
             ToXCMatrix4Unaligned(InverseTranspose(m_World)),
             ToXCMatrix4Unaligned(XMMatrixTranspose(XMMatrixIdentity())),
             m_material
         };
-
-        XCShaderHandle* lightTexShader = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(m_useShaderType);
-#if defined(XCGRAPHICS_DX12)
-        memcpy(m_pCBPerObject->m_cbDataBegin, &perObject, sizeof(cbPerObjectBuffer));
-        lightTexShader->setConstantBuffer("cbPerObjectBuffer", context.GetDeviceContext(), m_pCBPerObject->m_gpuHandle);
-#else
-        lightTexShader->setCBPerObject(context.GetDeviceContext(), perObject);
-#endif
     }
-    else
+    else if(m_useShaderType == ShaderType_SkinnedCharacter)
     {
         static XCMatrix4Unaligned scaling = XMMatrixScaling(0.01f, 0.01f, 0.01f);
         static XCMatrix4Unaligned rotation = XMMatrixRotationX(XM_PI);
@@ -240,22 +203,16 @@ void Soldier::Draw(RenderContext& context)
         XCMatrix4Unaligned transform = aiMatrixToMatrix4Unaligned(m_pMesh->GetSceneAnimator()->GetGlobalTransform(m_pMesh->GetSceneNode()->mRootNode));
         transform = scaling * transform;
 
-        cbSkinnedCharacterBuffer perObject = {
+        perObject = {
             ToXCMatrix4Unaligned(XMMatrixTranspose(transform)),
             ToXCMatrix4Unaligned(XMMatrixTranspose(transform * cam->GetViewMatrix() * cam->GetProjMatrix())),
             ToXCMatrix4Unaligned(InverseTranspose(transform)),
             ToXCMatrix4Unaligned(XMMatrixTranspose(XMMatrixIdentity())),
             m_material
         };
-
-        XCShaderHandle* skinnedCharacterShader = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(m_useShaderType);
-#if defined(XCGRAPHICS_DX12)
-        memcpy(m_pCBPerObject->m_cbDataBegin, &perObject, sizeof(cbSkinnedCharacterBuffer));
-        skinnedCharacterShader->setConstantBuffer("cbSkinnedCharacterBuffer", context.GetDeviceContext(), m_pCBPerObject->m_gpuHandle);
-#endif
     }
 
-    m_pMesh->Draw(context, m_useShaderType);
+    m_pMesh->DrawAllInstanced(perObject);
 
     PhysicsActor::Draw(context);
 
@@ -266,9 +223,4 @@ void Soldier::Destroy()
 {
     PhysicsActor::Destroy();
     m_gun->Destroy();
-
-#if defined(XCGRAPHICS_DX12)
-    SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
-    heap.DestroyBuffer(m_pCBPerObject);
-#endif
 }

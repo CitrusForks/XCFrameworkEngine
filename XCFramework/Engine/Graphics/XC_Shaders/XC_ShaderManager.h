@@ -20,9 +20,9 @@ public:
     void                                    Init();
     void                                    LoadShaders();
     void                                    Destroy();
-    IShader*                                GetShader(SHADERTYPE);
+    IShader*                                GetShader(ShaderType shaderType);
 
-    void                                    ApplyShader(ID3DDeviceContext& context, SHADERTYPE _shaderType);
+    void                                    ApplyShader(ID3DDeviceContext& context, ShaderType _ShaderType);
     void                                    DrawNonIndexed(ID3DDeviceContext& context, unsigned int vertexCount);
     void                                    DrawIndexedInstanced(ID3DDeviceContext& context, unsigned int _indexCount, void* indexGpuAddr = nullptr, unsigned int instanceCount = 1);
 
@@ -30,7 +30,7 @@ public:
 
 #if defined(XCGRAPHICS_DX11)
     void                                    LoadRasterizers();
-    void                                    SetRasterizerState(ID3DDeviceContext& context, ERasterizer_Type type);
+    void                                    SetRasterizerState(ID3DDeviceContext& context, RasterType type);
 #endif
 
 private:
@@ -43,7 +43,7 @@ private:
     SharedDescriptorHeap*                                 m_sharedDescriptorHeap;
 #elif defined(XCGRAPHICS_DX11)
     D3D11_RASTERIZER_DESC                                 m_rasterizerDesc;
-    std::map<ERasterizer_Type, ID3D11RasterizerState*>    m_rasterizerStates;
+    std::map<RasterType, ID3D11RasterizerState*>    m_rasterizerStates;
 
     D3D11_SAMPLER_DESC                                    m_samplerDesc;
     ID3D11SamplerState*                                   m_SamplerLinear;

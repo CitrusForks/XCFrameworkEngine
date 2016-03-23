@@ -23,11 +23,6 @@ void IShader::createBufferConstants()
 
 void IShader::applyShader(ID3DDeviceContext& context)
 {
-#if defined(XCGRAPHICS_GNM)
-    context.setActiveShaderStages(sce::Gnm::kActiveShaderStagesVsPs);
-    context.setVsShader(m_pVS, m_shaderModifier, m_fetchVSShader);
-    context.setPsShader(m_pPS);
-#endif
 }
 
 void IShader::MemCpyConstants(ID3DDeviceContext& context, void* dest, void* src, unsigned int size)

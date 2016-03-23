@@ -6,14 +6,17 @@
 
 #pragma once
 
+#include "Engine/System/ISystem.h"
 #include "Engine/Graphics/XC_Lighting/LightingTypes.h"
 #include "Engine/Graphics/XC_Camera/XC_CameraManager.h"
-#include "Engine/Graphics/XC_GraphicsDx11.h"
+#include "Engine/Graphics/XC_Graphics.h"
 
-class XC_LightManager
+class XC_LightManager : public ISystem
 {
 public:
-    XC_LightManager(XC_CameraManager& cameraMgr);
+    DECLARE_SYSTEMOBJECT_CREATION(XC_LightManager)
+
+    XC_LightManager();
     ~XC_LightManager();
 
     void                            InitializeLights();
@@ -21,11 +24,13 @@ public:
     void                            Draw(XC_Graphics& graphicsSystem);
     void                            Destroy();
 
+    D3DConstantBuffer*              getLightConstantBuffer() { return m_pCBLightsPerFrame; }
+
 private:
 
     std::map<ELightType, ILight*>   m_Lights;
     XCVec3                          m_eyePos;
 
-    XC_CameraManager&               m_cameraManagerSystem;
+    XC_CameraManager*               m_cameraManagerSystem;
     D3DConstantBuffer*              m_pCBLightsPerFrame;
 };

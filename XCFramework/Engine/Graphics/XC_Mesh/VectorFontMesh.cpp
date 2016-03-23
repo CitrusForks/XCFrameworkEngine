@@ -11,7 +11,6 @@
 
 VectorFontMesh::VectorFontMesh()
 {
-    m_vertexFormat = VertexFormat_PositionColorInstanceIndex;
 }
 
 VectorFontMesh::~VectorFontMesh()
@@ -27,20 +26,18 @@ void VectorFontMesh::Init(int resourceId, std::string userFriendlyName, bool loa
     m_material.Specular = XCVec4(0.2f, 0.2f, 0.2f, 16.0f);
 }
 
-void VectorFontMesh::CreateBuffers(EVertexFormat formatType)
+void VectorFontMesh::Load(const void * buffer)
 {
-    XCMeshFBX::CreateBuffers(VertexFormat_PositionColorInstanceIndex);
+    XCMeshFBX::Load(buffer);
+    
     for (unsigned int subIndex = 0; subIndex < m_subMeshes.size(); ++subIndex)
     {
         m_subMeshes[subIndex]->createConstantBuffers();
     }
 }
 
-void VectorFontMesh::DrawText(std::string text, XCVec3Unaligned position, RenderContext& context, SHADERTYPE shaderType)
+void VectorFontMesh::DrawText(std::string text, XCVec3Unaligned position, RenderContext& context, ShaderType shaderType)
 {
-    //First clear the existing buffer
-    m_subMeshesIdBuffer.clear();
-
     //Decrypt the text and fill up the FontData Buffer to draw
     //Calculate start world for every character
 
@@ -54,7 +51,7 @@ void VectorFontMesh::DrawText(std::string text, XCVec3Unaligned position, Render
     for (unsigned int charIndex = 0; charIndex < text.size(); ++charIndex)
     {
         std::string textchar = { text.at(charIndex) };
-        auto findSubMesh = std::find_if(m_subMeshes.begin(), m_subMeshes.end(), [&textchar](SubMesh* submesh)
+        auto findSubMesh = std::find_if(m_subMeshes.begin(), m_subMeshes.end(), [&textchar](MeshData* submesh)
         {
             return strcmp(submesh->getSubMeshName().c_str(), textchar.c_str()) == 0;
         });
@@ -105,7 +102,7 @@ void VectorFontMesh::Destroy()
     XCMeshFBX::Destroy();
 }
 
-void VectorFontMesh::Draw(RenderContext& context, SHADERTYPE shaderType)
+void VectorFontMesh::Draw(RenderContext& context, ShaderType shaderType)
 {
     XCShaderHandle* shader = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(shaderType);
 
@@ -115,4 +112,18 @@ void VectorFontMesh::Draw(RenderContext& context, SHADERTYPE shaderType)
         shader->setConstantBuffer("cbPerObjectInstanced", context.GetDeviceContext(), m_subMeshes[subMesh.submeshId]->m_constantBuffer->m_gpuHandle);
         DrawSubMesh(context, shaderType, subMesh.submeshId, subMesh.instanceCount);
     }
+
+    //Clear the existing buffer
+    m_subMeshesIdBuffer.clear();
+}
+
+void VectorFontMesh::DrawSubMesh(RenderContext & renderContext, ShaderType shaderType, unsigned int meshIndex, unsigned int instanceCount)
+{
+    m_shaderHandler->setVertexBuffer(renderContext.GetDeviceContext(), m_subMeshes[meshIndex]->getVertexBuffer());
+    m_shaderHandler->setIndexBuffer(renderContext.GetDeviceContext(), m_subMeshes[meshIndex]->getIndexBuffer());
+
+    renderContext.GetShaderManagerSystem().DrawIndexedInstanced(renderContext.GetDeviceContext(),
+        m_subMeshes[meshIndex]->getNoOfFaces() * 3,
+        m_subMeshes[meshIndex]->getIndexBuffer().GetIndexBufferInGPUMem(),
+        instanceCount);
 }

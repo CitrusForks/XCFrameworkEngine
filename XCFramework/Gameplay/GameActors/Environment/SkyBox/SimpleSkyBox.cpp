@@ -30,9 +30,9 @@ void SimpleSkyBox::Init(int actorId)
     m_material.Diffuse = XCVec4(0.5f, 0.8f, 0.0f, 1.0f);
     m_material.Specular = XCVec4(0.2f, 0.2f, 0.2f, 16.0f);
 
-    m_useShaderType = SHADERTYPE_SIMPLECUBEMAP;
+    m_useShaderType = ShaderType_SimpleCubeMap;
 
-    m_rasterType = RASTERIZERTYPE_FILL_SOLID;
+    m_rasterType = RasterType_FillSolid;
 }
 
 void SimpleSkyBox::PreLoad(const void* fbBuffer)
@@ -49,7 +49,7 @@ void SimpleSkyBox::PreLoad(const void* fbBuffer)
     ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
     m_cubeMapTexture = (CubeTexture3D*) resMgr.GetResource(skyBoxBuff->CubeTexture3DResourceName()->c_str());
 
-    m_rasterType = (ERasterizer_Type) skyBoxBuff->RasterizerType();
+    m_rasterType = (RasterType) skyBoxBuff->RasterizerType();
 
 #if defined(XCGRAPHICS_DX12)
     SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
@@ -59,7 +59,7 @@ void SimpleSkyBox::PreLoad(const void* fbBuffer)
     SimpleActor::PreLoad(fbBuffer);
 }
 
-void SimpleSkyBox::PreLoad(XCVecIntrinsic4 initialPosition, XCVecIntrinsic4 initialRotation, XCVecIntrinsic4 initialScaling, BasicMaterial material, CubeTexture3D* texture, ERasterizer_Type rasterType)
+void SimpleSkyBox::PreLoad(XCVecIntrinsic4 initialPosition, XCVecIntrinsic4 initialRotation, XCVecIntrinsic4 initialScaling, BasicMaterial material, CubeTexture3D* texture, RasterType rasterType)
 {
     m_currentPosition = initialPosition;
     m_initialRotation = initialRotation;
@@ -85,18 +85,18 @@ void SimpleSkyBox::BuildBuffers()
     XC_Graphics& graphicsSystem = (XC_Graphics&) SystemLocator::GetInstance()->RequestSystem("GraphicsSystem");
     
     //Set up vertices
-    m_vertexBuffer.m_vertexData.push_back(VertexPosNormTex(XCVec3Unaligned(-1.0f, -1.0f, -1.0f), XCVec3Unaligned(-0.33f, -0.33f, -0.33f), XCVec2Unaligned(0.0f, 1.0f)));
-    m_vertexBuffer.m_vertexData.push_back(VertexPosNormTex(XCVec3Unaligned(-1.0f, 1.0f, -1.0f),  XCVec3Unaligned(-0.33f, 0.33f, -0.33f),  XCVec2Unaligned(0.0f, 0.0f)));
-    m_vertexBuffer.m_vertexData.push_back(VertexPosNormTex(XCVec3Unaligned(1.0f, 1.0f, -1.0f),   XCVec3Unaligned(0.33f, 0.33f, -0.33f),   XCVec2Unaligned(1.0f, 0.0f)));
-    m_vertexBuffer.m_vertexData.push_back(VertexPosNormTex(XCVec3Unaligned(1.0f, -1.0f, -1.0f),  XCVec3Unaligned(0.33f, -0.33f, -0.33f),  XCVec2Unaligned(1.0f, 1.0f)));
-    m_vertexBuffer.m_vertexData.push_back(VertexPosNormTex(XCVec3Unaligned(-1.0f, -1.0f, 1.0f),  XCVec3Unaligned(-0.33f, -0.33f, 0.33f),  XCVec2Unaligned(0.0f, 1.0f)));
-    m_vertexBuffer.m_vertexData.push_back(VertexPosNormTex(XCVec3Unaligned(-1.0f, 1.0f, 1.0f),   XCVec3Unaligned(-0.33f, 0.33f, 0.33f),   XCVec2Unaligned(0.0f, 0.0f)));
-    m_vertexBuffer.m_vertexData.push_back(VertexPosNormTex(XCVec3Unaligned(1.0f, 1.0f, 1.0f),    XCVec3Unaligned(0.33f, 0.33f, 0.33f),    XCVec2Unaligned(1.0f, 0.0f)));
-    m_vertexBuffer.m_vertexData.push_back(VertexPosNormTex(XCVec3Unaligned(1.0f, -1.0f, 1.0f),   XCVec3Unaligned(0.33f, -0.33f, 0.33f),   XCVec2Unaligned(1.0f, 1.0f)));
+    m_vertexBuffer.m_vertexData.push_back(VertexPos(XCVec3Unaligned(-1.0f, -1.0f, -1.0f)));
+    m_vertexBuffer.m_vertexData.push_back(VertexPos(XCVec3Unaligned(-1.0f, 1.0f, -1.0f)));
+    m_vertexBuffer.m_vertexData.push_back(VertexPos(XCVec3Unaligned(1.0f, 1.0f, -1.0f)));
+    m_vertexBuffer.m_vertexData.push_back(VertexPos(XCVec3Unaligned(1.0f, -1.0f, -1.0f)));
+    m_vertexBuffer.m_vertexData.push_back(VertexPos(XCVec3Unaligned(-1.0f, -1.0f, 1.0f)));
+    m_vertexBuffer.m_vertexData.push_back(VertexPos(XCVec3Unaligned(-1.0f, 1.0f, 1.0f)));
+    m_vertexBuffer.m_vertexData.push_back(VertexPos(XCVec3Unaligned(1.0f, 1.0f, 1.0f)));
+    m_vertexBuffer.m_vertexData.push_back(VertexPos(XCVec3Unaligned(1.0f, -1.0f, 1.0f)));
 
     m_vertexBuffer.BuildVertexBuffer();
 
-    m_Stride = sizeof(VertexPosNormTex);
+    m_Stride = sizeof(VertexPos);
     m_Offset = 0;
 
         //Set up index buffer
@@ -132,34 +132,34 @@ void SimpleSkyBox::Update(float dt)
 void SimpleSkyBox::Draw(RenderContext& context)
 {
     IActor::Draw(context);
+    
+    context.SetRasterizerState(m_rasterType);
+    context.ApplyShader(m_useShaderType);
 
-        context.SetRasterizerState(m_rasterType);
-        context.ApplyShader(m_useShaderType);
-        
-        XC_Graphics& graphicsSystem = (XC_Graphics&)SystemLocator::GetInstance()->RequestSystem("GraphicsSystem");
-        graphicsSystem.SetLessEqualDepthStencilView(context.GetDeviceContext(), true);
-      
-        m_vertexBuffer.SetVertexBuffer(context.GetDeviceContext());
-        m_indexBuffer.SetIndexBuffer(context.GetDeviceContext());
-        
-        // Set constants
-        //Calculate wvp and set it to the constant.
-        XC_CameraManager* cam = (XC_CameraManager*) &SystemLocator::GetInstance()->RequestSystem<XC_CameraManager>("CameraManager");
+    XC_Graphics& graphicsSystem = (XC_Graphics&)SystemLocator::GetInstance()->RequestSystem("GraphicsSystem");
+    graphicsSystem.SetLessEqualDepthStencilView(context.GetDeviceContext(), true);
 
-        cbWVP wbuffer = { ToXCMatrix4Unaligned(XMMatrixTranspose(m_World * cam->GetViewMatrix() * cam->GetProjMatrix())) };
+    // Set constants
+    //Calculate wvp and set it to the constant.
+    XC_CameraManager* cam = (XC_CameraManager*)&SystemLocator::GetInstance()->RequestSystem<XC_CameraManager>("CameraManager");
 
-        // Set constants
-        XCShaderHandle* cubeMapShader = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(SHADERTYPE_SIMPLECUBEMAP);
+    cbWVP wbuffer = { ToXCMatrix4Unaligned(XMMatrixTranspose(m_World * cam->GetViewMatrix() * cam->GetProjMatrix())) };
+
+    // Set constants
+    XCShaderHandle* cubeMapShader = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(ShaderType_SimpleCubeMap);
+
+    cubeMapShader->setVertexBuffer(context.GetDeviceContext(), &m_vertexBuffer);
+    cubeMapShader->setIndexBuffer(context.GetDeviceContext(), m_indexBuffer);
+
 #if defined(XCGRAPHICS_DX12)
-        memcpy(m_CBwvp->m_cbDataBegin, &wbuffer, sizeof(cbWVP));
-        cubeMapShader->setConstantBuffer("cbWVP", context.GetDeviceContext(), m_CBwvp->m_gpuHandle);
+    memcpy(m_CBwvp->m_cbDataBegin, &wbuffer, sizeof(cbWVP));
+    cubeMapShader->setConstantBuffer("cbWVP", context.GetDeviceContext(), m_CBwvp->m_gpuHandle);
 #else
-        cubeMapShader->setWVP(context.GetDeviceContext(), wbuffer);
+    cubeMapShader->setWVP(context.GetDeviceContext(), wbuffer);
 #endif
-        cubeMapShader->setResource("gCubeMap", context.GetDeviceContext(), m_cubeMapTexture->getTextureResource());
-  
-        context.GetShaderManagerSystem().DrawIndexedInstanced(context.GetDeviceContext(), 36, m_indexBuffer.GetIndexBufferInGPUMem());
-        graphicsSystem.SetLessEqualDepthStencilView(context.GetDeviceContext(), false);
+    cubeMapShader->setResource("gCubeMap", context.GetDeviceContext(), m_cubeMapTexture->getTextureResource());
+    context.GetShaderManagerSystem().DrawIndexedInstanced(context.GetDeviceContext(), 36, m_indexBuffer.GetIndexBufferInGPUMem());
+    graphicsSystem.SetLessEqualDepthStencilView(context.GetDeviceContext(), false);
 }
 
 void SimpleSkyBox::Destroy()

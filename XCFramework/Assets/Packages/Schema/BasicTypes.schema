@@ -20,18 +20,3 @@ struct Vec4
 	z:float;
 	w:float;
 }
-
-table FBBasicMaterial
-{
-	Ambient:Vec4;
-	Diffuse:Vec4;
-	Specular:Vec4;
-}
-
-enum FBERasterizer_Type:short
-{
-	FBRASTERIZERTYPE_FILL_WIREFRAME = 0,
-	FBRASTERIZERTYPE_FILL_SOLID,
-
-	FBRASTERIZERTYPE_MAX
-}

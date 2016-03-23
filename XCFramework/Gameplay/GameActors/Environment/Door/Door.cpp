@@ -22,7 +22,8 @@ Door::Door(void)
     m_material.Diffuse = XCVec4(0.5f, 0.8f, 0.0f, 1.0f);
     m_material.Specular = XCVec4(0.2f, 0.2f, 0.2f, 16.0f);
 
-    m_useShaderType = SHADERTYPE_LIGHTTEXTURE;
+    m_useShaderType = ShaderType_LightTexture;
+    m_useRenderWorkerType = WorkerType_XCMesh;
     m_collisionDetectionType = COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX;
 }
 
@@ -36,11 +37,6 @@ void Door::PreLoad(const void* fbBuffer)
     ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
     m_pMesh = (XCMesh*)resMgr.GetResource(doorBuff->XCMeshResourceName()->c_str());
 
-#if defined(XCGRAPHICS_DX12)
-    SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
-    m_pCBPerObject = heap.CreateBufferView(D3DBufferDesc(BUFFERTYPE_CBV, sizeof(cbPerObjectBuffer)));
-#endif
-
     PhysicsActor::PreLoad(fbBuffer);
 }
 
@@ -52,7 +48,6 @@ void Door::PreLoad(Texture2D* tex, XCVec3 _initialPosition, XCMesh* pMesh)
 
 void Door::Load()
 {
-    BuildGeometryBuffer();
     PhysicsActor::Load();
 }
 
@@ -62,13 +57,6 @@ void Door::SetInitialPhysicsProperties()
     XCVec3 vec = XCVec3(0, 0, 0);
     InitXPhysics(XMLoadFloat3(&m_initialPosition), XMLoadFloat3(&vec), XMLoadFloat3(&vec), 1000, (float)0.2);
 }
-
-
-void Door::BuildGeometryBuffer()
-{
-    m_pMesh->CreateBuffers(VertexFormat_PositionNormalTexture);
-}
-
 
 void Door::Update(float dt)
 {
@@ -99,13 +87,9 @@ void Door::Update(float dt)
 
 void Door::Draw(RenderContext& context)
 {
-    context.SetRasterizerState(RASTERIZERTYPE_FILL_WIREFRAME);
-
-    context.ApplyShader(m_useShaderType);
-
     // Set constants
     XC_CameraManager* cam = (XC_CameraManager*)&SystemLocator::GetInstance()->RequestSystem("CameraManager");
-    cbPerObjectBuffer perObject = {
+    PerObjectBuffer perObject = {
         ToXCMatrix4Unaligned(XMMatrixTranspose(m_World)),
         ToXCMatrix4Unaligned(XMMatrixTranspose(m_World * cam->GetViewMatrix() * cam->GetProjMatrix())),
         ToXCMatrix4Unaligned(InverseTranspose(m_World)),
@@ -113,15 +97,7 @@ void Door::Draw(RenderContext& context)
         m_material
     };
 
-    XCShaderHandle* lightTexShader = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(SHADERTYPE_LIGHTTEXTURE);
-#if defined(XCGRAPHICS_DX12)
-    memcpy(m_pCBPerObject->m_cbDataBegin, &perObject, sizeof(cbPerObjectBuffer));
-    lightTexShader->setConstantBuffer("cbPerObjectBuffer", context.GetDeviceContext(), m_pCBPerObject->m_gpuHandle);
-#else
-    lightTexShader->setCBPerObject(context.GetDeviceContext(), perObject);
-#endif
-
-    m_pMesh->Draw(context, SHADERTYPE_LIGHTTEXTURE);
+    m_pMesh->DrawAllInstanced(perObject);
     PhysicsActor::Draw(context);
 }
 

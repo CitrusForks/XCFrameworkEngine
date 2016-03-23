@@ -29,12 +29,13 @@ public:
     ~VectorFontMesh();
 
     void            Init(int resourceId, std::string userFriendlyName, bool loaded = false);
-    void            CreateBuffers(EVertexFormat formatType);
-    void            DrawText(std::string text, XCVec3Unaligned position, RenderContext& context, SHADERTYPE shaderType);
+    void            Load(const void* buffer);
+    void            DrawText(std::string text, XCVec3Unaligned position, RenderContext& context, ShaderType shaderType);
     void            Destroy();
 
 protected:
-    void            Draw(RenderContext& context, SHADERTYPE shaderType);
+    void            Draw(RenderContext& context, ShaderType shaderType);
+    void            DrawSubMesh(RenderContext& renderContext, ShaderType shaderType, unsigned int meshIndex, unsigned int instanceCount = 1);
 
 private:
     //This buffer is actual text to be drawn

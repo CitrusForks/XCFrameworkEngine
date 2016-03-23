@@ -33,7 +33,7 @@ void Waves::PreLoad(XCVec3 _initialPosition, int _rows, int _column, float _rowS
 {
     SimpleTerrain::PreLoad(_initialPosition, _rows, _column, _rowSpacing, _colSpacing);
 
-    m_useShaderType = SHADERTYPE_COLORTECH;
+    m_useShaderType = ShaderType_SolidColor;
     m_collisionDetectionType = COLLISIONDETECTIONTYPE_TRIANGLE;
 
     ComputeVertices();

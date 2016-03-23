@@ -11,13 +11,15 @@
 #include "Engine/Graphics/XC_Shaders/XC_ShaderBufferConstants.h"
 
 
-XC_LightManager::XC_LightManager(XC_CameraManager& cameraMgr)
-    : m_cameraManagerSystem(cameraMgr)
+XC_LightManager::XC_LightManager()
 {
+    m_cameraManagerSystem = (XC_CameraManager*)&SystemLocator::GetInstance()->RequestSystem("CameraManager");
+
+#if defined(XCGRAPHICS_DX12)
     SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
     m_pCBLightsPerFrame = heap.CreateBufferView(D3DBufferDesc(BUFFERTYPE_CBV, sizeof(cbLightsPerFrame)));
+#endif
 }
-
 
 XC_LightManager::~XC_LightManager()
 {
@@ -65,11 +67,11 @@ void XC_LightManager::InitializeLights()
 void XC_LightManager::Update(float dt)
 {
     // Build the view matrix.
-    XCVecIntrinsic4 camPos = m_cameraManagerSystem.GetCameraPosition();
+    XCVecIntrinsic4 camPos = m_cameraManagerSystem->GetCameraPosition();
     m_eyePos = XCVec3(XMVectorGetX(camPos), XMVectorGetY(camPos), XMVectorGetZ(camPos));
 
     XCVecIntrinsic4 pos = XMVectorSet(XMVectorGetX(camPos), XMVectorGetY(camPos), XMVectorGetZ(camPos), 1.0f);
-    XCVecIntrinsic4 target = m_cameraManagerSystem.GetCameraTarget();
+    XCVecIntrinsic4 target = m_cameraManagerSystem->GetCameraTarget();
     XCVecIntrinsic4 up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 
     // Circle light over the land surface.
@@ -94,30 +96,30 @@ void XC_LightManager::Draw(XC_Graphics& graphicsSystem)
                                         *(PointLight*)m_Lights[LIGHTTYPE_POINT], 
                                         *(SpotLight*)m_Lights[LIGHTTYPE_SPOT], 
                                         ToXCVec3Unaligned(m_eyePos), 
-                                        0 
                                       };
 
     memcpy(m_pCBLightsPerFrame->m_cbDataBegin, &lightsPerFrame, sizeof(cbLightsPerFrame));
     
-    XCShaderHandle* shaderRef = nullptr;
+    //Wherever required, request for this light system and get the buffer and apply the constant buffer
+    /*XCShaderHandle* shaderRef = nullptr;
 
     RenderingPool::RenderWorker* renderWorkers = graphicsSystem.GetRenderingPool().GetRenderWorkers();
     for (unsigned int workerIndex = 0; workerIndex < RenderingPool::NbRenderWorkerThreads; ++workerIndex)
     {
         RenderContext& context = renderWorkers[workerIndex].m_renderContext;
      
-        context.ApplyShader(SHADERTYPE_SKINNEDCHARACTER);
-        shaderRef = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(SHADERTYPE_SKINNEDCHARACTER);
+        context.ApplyShader(ShaderType_SkinnedCharacter);
+        shaderRef = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(ShaderType_SkinnedCharacter);
         shaderRef->setConstantBuffer("cbLightsPerFrame", context.GetDeviceContext(), m_pCBLightsPerFrame->m_gpuHandle);
 
-        context.ApplyShader(SHADERTYPE_LIGHTTEXTURE);
-        shaderRef = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(SHADERTYPE_LIGHTTEXTURE);
+        context.ApplyShader(ShaderType_LightTexture);
+        shaderRef = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(ShaderType_LightTexture);
         shaderRef->setConstantBuffer("cbLightsPerFrame", context.GetDeviceContext(), m_pCBLightsPerFrame->m_gpuHandle);
 
-        context.ApplyShader(SHADERTYPE_TERRIANMULTITEXTURE);
-        shaderRef = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(SHADERTYPE_TERRIANMULTITEXTURE);
+        context.ApplyShader(ShaderType_TerrainMultiTexture);
+        shaderRef = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(ShaderType_TerrainMultiTexture);
         shaderRef->setConstantBuffer("cbLightsPerFrame", context.GetDeviceContext(), m_pCBLightsPerFrame->m_gpuHandle);
-    }
+    }*/
 }
 
 void XC_LightManager::Destroy()

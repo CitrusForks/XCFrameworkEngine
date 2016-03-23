@@ -23,21 +23,21 @@
 
     FBXCMeshes:
     [
-        { MeshName:"WoodenDoor", MeshPath:"Assets\\Meshes\\Door\\door.3ds", TextureRes:"grey_mat", InitialScaling:0.1, InitialRotation:{x:0.0, y:0.0, z:0.0} },
-        { MeshName:"PorcheCar", MeshPath:"Assets\\Meshes\\Vehicles\\Cars\\car.3ds", TextureRes:"car_mat_red", InitialScaling:0.001, InitialRotation:{x:0.0, y:0.0, z:0.0} },
-        { MeshName:"Soldier", MeshPath:"Assets\\Meshes\\Soldiers\\Soldier3ds\\soldier.3ds", TextureRes:"soldier_mesh_tex", InitialScaling:0.04, InitialRotation:{x:-1.57, y:-1.57, z:0.0} },
-        { MeshName:"Gun", MeshPath:"Assets\\Meshes\\Weapons\\Guns\\gun.3ds", TextureRes:"Placeholder", InitialScaling:0.01, InitialRotation:{x:0.0, y:0.0, z:0.0} },
-        { MeshName:"PistolBullet", MeshPath:"Assets\\Meshes\\Weapons\\Bullets\\PistolBullet\\Bullet.3ds", TextureRes:"pistol_bullet_mesh_tex", InitialScaling:0.06, InitialRotation:{x:0.0, y:0.0, z:0.0} }
+        { MeshName:"WoodenDoor", MeshPath:"Assets\\Meshes\\Door\\door.3ds", TextureRes:"grey_mat", InitialScaling:{x:0.1, y:0.1, z:0.1}, InitialRotation:{x:0.0, y:0.0, z:0.0}, ShaderUsage:LightTexture },
+        { MeshName:"PorcheCar", MeshPath:"Assets\\Meshes\\Vehicles\\Cars\\car.3ds", TextureRes:"car_mat_red", InitialScaling:{x:0.001, y:0.001, z:0.001}, InitialRotation:{x:0.0, y:0.0, z:0.0}, ShaderUsage:LightTexture },
+        { MeshName:"Soldier", MeshPath:"Assets\\Meshes\\Soldiers\\Soldier3ds\\soldier.3ds", TextureRes:"soldier_mesh_tex", InitialScaling:{x:0.04, y:0.04, z:0.04}, InitialRotation:{x:-1.57, y:-1.57, z:0.0}, ShaderUsage:LightTexture },
+        { MeshName:"Gun", MeshPath:"Assets\\Meshes\\Weapons\\Guns\\gun.3ds", TextureRes:"Placeholder", InitialScaling:{x:0.01, y:0.01, z:0.01}, InitialRotation:{x:0.0, y:0.0, z:0.0}, ShaderUsage:LightTexture },
+        { MeshName:"PistolBullet", MeshPath:"Assets\\Meshes\\Weapons\\Bullets\\PistolBullet\\Bullet.3ds", TextureRes:"pistol_bullet_mesh_tex", InitialScaling:{x:0.06, y:0.06, z:0.06}, InitialRotation:{x:0.0, y:0.0, z:0.0}, ShaderUsage:LightTexture }
     ],
 
     FBMeshCustoms:
     [
-        { MeshName:"ArmyPilot", MeshPath:"Assets\\Meshes\\Soldiers\\ArmyPilot\\ArmyPilot.ms3d", TextureRes:"armypilot_body_mesh_tex", InitialScaling:0.05, InitialRotation:{x:0.0, y:0.0, z:0.0} }
+        { MeshName:"ArmyPilot", MeshPath:"Assets\\Meshes\\Soldiers\\ArmyPilot\\ArmyPilot.ms3d", TextureRes:"armypilot_body_mesh_tex", InitialScaling:{x:0.05, y:0.05, z:0.05}, InitialRotation:{x:0.0, y:0.0, z:0.0}, ShaderUsage:SkinnedCharacter }
     ],
 
     FBVectorFontMesh:
     [
-        { MeshName:"VectorFontFBX", MeshPath:"Assets\\Meshes\\Fonts\\ABC.fbx", TextureRes:"Placeholder", InitialScaling:1.0, InitialRotation:{x:0.0, y:0.0, z:0.0} }
+        { MeshName:"VectorFontFBX", MeshPath:"Assets\\Meshes\\Fonts\\ABC.fbx", TextureRes:"Placeholder", InitialScaling:{x:1.0, y:1.0, z:1.0}, InitialRotation:{x:0.0, y:0.0, z:0.0}, ShaderUsage:VectorFont }
     ],
 
 	FBCubeTexture3DS:

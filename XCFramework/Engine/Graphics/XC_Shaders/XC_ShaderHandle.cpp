@@ -17,6 +17,7 @@ XCShaderHandle::XCShaderHandle(ID3DDevice& device)
     : IShader(device)
 {
     m_pso = XCNEW(PSO_Dx12);
+    m_vertexFormat = VertexFormat_Invalid;
 }
 
 XCShaderHandle::~XCShaderHandle()
@@ -177,7 +178,22 @@ void XCShaderHandle::readShaderDescription()
         semanticNames.push_back(desc.SemanticName);
     }
 
-    m_inputLayoutDesc = getInputLayoutFromSemantics(semanticNames);
+    m_vertexFormat = getVertexFormatFromSematicNames(semanticNames);
+    m_inputLayoutDesc = getInputLayoutFromVertexFormat(m_vertexFormat);
+}
+
+unsigned int XCShaderHandle::getSizeOfConstantBuffer(std::string& cbName)
+{
+    unsigned int cbSize = 0;
+    auto shaderSlot = std::find_if(m_shaderSlots.begin(), m_shaderSlots.end(), [&cbName](ShaderSlot it) -> bool { return strcmp(it.getBufferName().c_str(), cbName.c_str()) == 0; });
+        
+    if (shaderSlot != m_shaderSlots.end())
+    {
+        cbSize = (*shaderSlot).m_bufferDesc.constantBufferDesc.Size;
+    }
+
+    XCASSERT(cbSize != 0);
+    return cbSize;
 }
 
 void XCShaderHandle::generateRootSignature()
@@ -260,7 +276,7 @@ void XCShaderHandle::generatePSO()
 {
     //Generate PSO
 
-    PSO_Dx12::GenerateDefaultPSO(m_pso, RASTERIZERTYPE_FILL_SOLID, m_enableDepth);
+    PSO_Dx12::GenerateDefaultPSO(m_pso, RasterType_FillSolid, m_enableDepth);
 
     m_pso->m_psoDesc.InputLayout    = m_inputLayoutDesc;
     m_pso->m_psoDesc.pRootSignature = m_pso->m_rootSignature;

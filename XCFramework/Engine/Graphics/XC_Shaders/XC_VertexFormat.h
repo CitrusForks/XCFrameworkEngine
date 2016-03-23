@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "Assets/Packages/PackageConsts.h"
 #include "Engine/Graphics/XC_Shaders/XC_VertexShaderLayout.h"
 
 #if defined(XC_ORBIS)
@@ -14,7 +15,9 @@
 
 #else
 
-enum EVertexFormat
+/*
+//Defined in data
+enum VertexFormat
 {
     VertexFormat_Position,
     VertexFormat_PositionColor,
@@ -25,15 +28,16 @@ enum EVertexFormat
 
     VertexFormat_Invalid
 };
+*/
 
 struct SemanticVariable
 {
-    SemanticVariable(EVertexFormat format, std::vector<std::string> semanticName)
+    SemanticVariable(VertexFormat format, std::vector<std::string> semanticName)
         : m_formatType(format),
           m_semanticPattern(semanticName)
     {}
 
-    EVertexFormat              m_formatType;
+    VertexFormat               m_formatType;
     std::vector<std::string>   m_semanticPattern;
 };
 
@@ -42,11 +46,12 @@ static const SemanticVariable gs_sematicVariables[] = {
     SemanticVariable(VertexFormat_PositionColor,                              { "POSITION", "COLOR" }), 
     SemanticVariable(VertexFormat_PositionNormal,                             { "POSITION", "NORMAL" }),
     SemanticVariable(VertexFormat_PositionNormalTexture,                      { "POSITION", "NORMAL", "TEXCOORD" }),
-    SemanticVariable(VertexFormat_PositionNormalTextureBlendIndexBlendWeight, { "POSITION", "NORMAL", "TEXCOORD", "BLENDINDICES", "BLENDWEIGHT" }),
+    SemanticVariable(VertexFormat_PositionNormalTexture,                      { "POSITION", "NORMAL", "TEXCOORD", "SV_InstanceID" }),
+    SemanticVariable(VertexFormat_PositionNormalTextureBlendIndexBlendWeight, { "POSITION", "NORMAL", "TEXCOORD", "BLENDINDICES", "BLENDWEIGHT", "SV_InstanceID" }),
     SemanticVariable(VertexFormat_PositionColorInstanceIndex,                 { "POSITION", "COLOR", "SV_InstanceID" })
 };
 
-static EVertexFormat getVertexFormatFromSematicNames(std::vector<std::string>& semanticNames)
+static VertexFormat getVertexFormatFromSematicNames(std::vector<std::string>& semanticNames)
 {
     for(auto semantic : gs_sematicVariables)
     {
@@ -59,11 +64,9 @@ static EVertexFormat getVertexFormatFromSematicNames(std::vector<std::string>& s
     return VertexFormat_Invalid;
 }
 
-static D3D12_INPUT_LAYOUT_DESC getInputLayoutFromSemantics(std::vector<std::string>& semanticNames)
+static D3D12_INPUT_LAYOUT_DESC getInputLayoutFromVertexFormat(VertexFormat format)
 {
     D3D12_INPUT_LAYOUT_DESC layout = {};
-
-    EVertexFormat format = getVertexFormatFromSematicNames(semanticNames);
 
     switch (format)
     {
@@ -104,7 +107,32 @@ static D3D12_INPUT_LAYOUT_DESC getInputLayoutFromSemantics(std::vector<std::stri
 
     return layout;
 }
+
+static D3D12_INPUT_LAYOUT_DESC getInputLayoutFromSemantics(std::vector<std::string>& semanticNames)
+{
+    D3D12_INPUT_LAYOUT_DESC layout = {};
+
+    VertexFormat format = getVertexFormatFromSematicNames(semanticNames);
+    layout = getInputLayoutFromVertexFormat(format);
+
+    return layout;
+}
  
+struct VertexPos
+{
+    XCVec3Unaligned  Pos;
+
+    VertexPos() :
+        Pos(0, 0, 0)
+    {
+    }
+
+    VertexPos(XCVec3Unaligned pos) :
+        Pos(pos)
+    {
+    }
+};
+
 typedef struct VertexPosColorTex
 {
     float x, y, z;	// Position

@@ -15,9 +15,6 @@ public:
 
     XCMeshCustom()
     {
-        m_resourceType = RESOURCETYPE_MESH;
-        m_areBuffersCreated = false;
-        m_vertexFormat = VertexFormat_PositionNormalTextureBlendIndexBlendWeight;
         m_isSkinnedMesh = true;
     }
 
@@ -26,8 +23,7 @@ public:
     }
 
     void                    Load(const void* buffer);
-    void                    createBuffers(EVertexFormat formatType);
-    void                    DrawSubMeshes(RenderContext& renderContext, SHADERTYPE shaderType);
+    void                    DrawSubMeshes(RenderContext& renderContext, ShaderType shaderType);
 
 private:
 };

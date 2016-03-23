@@ -108,6 +108,7 @@ void XC_CameraManager::Update(float dt)
 
 void XC_CameraManager::Draw()
 {
+/*
 #if defined(XC_ORBIS1)
     XCMatrix4 view = XMMatrixLookAtLH(XCVecIntrinsic4(0, 50, 100, 0), XCVecIntrinsic4(0, 0, 0, 0), XCVecIntrinsic4(0, 1, 0, 0));
     XCMatrix4 proj = XMMatrixPerspectiveFovLH(55.0f * M_PI/180.0f, 16.0f / 9.0f, 1.0f, 1000.0f);
@@ -120,25 +121,25 @@ void XC_CameraManager::Draw()
 #endif
 
     //Get all rendercontext
-    /*RenderingPool::RenderWorker* renderWorkers = m_graphicsSystem->GetRenderingPool().GetRenderWorkers();
+    RenderingPool::RenderWorker* renderWorkers = m_graphicsSystem->GetRenderingPool().GetRenderWorkers();
     if(renderWorkers)
     {
         for (unsigned int workerIndex = 0; workerIndex < RenderingPool::NbRenderWorkerThreads; ++workerIndex)
         {
             RenderContext& context = renderWorkers[workerIndex].m_renderContext;
 
-            context.ApplyShader(SHADERTYPE_COLORTECH);
-            SolidColorShader* solidColorShader = (SolidColorShader*)context.GetShaderManagerSystem().GetShader(SHADERTYPE_COLORTECH);
+            context.ApplyShader(ShaderType_SolidColor);
+            SolidColorShader* solidColorShader = (SolidColorShader*)context.GetShaderManagerSystem().GetShader(ShaderType_SolidColor);
             solidColorShader->setCBView(context.GetDeviceContext(), vbuffer);
             solidColorShader->setCBProj(context.GetDeviceContext(), pbuffer);
 
-            context.ApplyShader(SHADERTYPE_LIGHTTEXTURE);
-            LightTextureShader* lightTexShader = (LightTextureShader*)context.GetShaderManagerSystem().GetShader(SHADERTYPE_LIGHTTEXTURE);
+            context.ApplyShader(ShaderType_LightTexture);
+            LightTextureShader* lightTexShader = (LightTextureShader*)context.GetShaderManagerSystem().GetShader(ShaderType_LightTexture);
             lightTexShader->setCBView(context.GetDeviceContext(), vbuffer);
             lightTexShader->setCBProj(context.GetDeviceContext(), pbuffer);
 
-            context.ApplyShader(SHADERTYPE_TERRIANMULTITEXTURE);
-            TerrainMultiTex* terrainTexShader = (TerrainMultiTex*)context.GetShaderManagerSystem().GetShader(SHADERTYPE_TERRIANMULTITEXTURE);
+            context.ApplyShader(ShaderType_TerrainMultiTexture);
+            TerrainMultiTex* terrainTexShader = (TerrainMultiTex*)context.GetShaderManagerSystem().GetShader(ShaderType_TerrainMultiTexture);
             terrainTexShader->setCBView(context.GetDeviceContext(), vbuffer);
             terrainTexShader->setCBProj(context.GetDeviceContext(), pbuffer);
         }

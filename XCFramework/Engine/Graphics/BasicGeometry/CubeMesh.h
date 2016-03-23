@@ -30,7 +30,7 @@ public:
     virtual void                    Destroy();
     virtual void                    BuildBuffers();
 
-    void                            PreLoad(XCVecIntrinsic4 initialPosition, XCVecIntrinsic4 initialRotation, XCVecIntrinsic4 initialScaling, BasicMaterial material, Texture2D* texture, ERasterizer_Type rasterType);
+    void                            PreLoad(XCVecIntrinsic4 initialPosition, XCVecIntrinsic4 initialRotation, XCVecIntrinsic4 initialScaling, BasicMaterial material, Texture2D* texture, RasterType rasterType);
     void                            CreateMeshBuffer();
 
 protected:
@@ -40,12 +40,12 @@ protected:
     unsigned int                    m_Stride;
     unsigned int                    m_Offset;
 
-    SHADERTYPE                    m_useShaderType;
+    ShaderType                    m_useShaderType;
     BasicMaterial                   m_material;
     Texture2D*                      m_texture;
 
     VertexBuffer<VertexPosNormTex>  m_vertexBuffer;
     IndexBuffer<unsigned int>       m_indexBuffer;
 
-    ERasterizer_Type                m_rasterType;
+    RasterType                m_rasterType;
 };

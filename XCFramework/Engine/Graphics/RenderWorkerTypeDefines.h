@@ -6,11 +6,14 @@
 
 #pragma once
 
+//Basically, the way they are ordered also defines the rendering order of that worker.
 enum RenderWorkerType
 {
     WorkerType_SkyBox,
-    WorkerType_Terrain,
+
     WorkerType_Misc,
+    WorkerType_XCMesh,
+    WorkerType_Terrain,
     WorkerType_ResourceLoader,
 
     WorkerType_Max

@@ -12,6 +12,7 @@ FontActor::FontActor()
 {
     m_actorType = GAMEACTOR_FONT;
     m_useRenderWorkerType = WorkerType_Misc;
+    m_useRenderWorkerType = WorkerType_XCMesh;
 }
 
 FontActor::~FontActor(void)
@@ -41,7 +42,6 @@ void FontActor::PreLoad(const void* fbBuffer)
 void FontActor::Load()
 {
     IActor::Load();
-    m_fontMesh->CreateBuffers(VertexFormat_PositionColorInstanceIndex);
 }
 
 void FontActor::Update(float dt)
@@ -53,10 +53,11 @@ void FontActor::Draw(RenderContext& context)
 {
     IActor::Draw(context);
 
-    context.SetRasterizerState(RASTERIZERTYPE_FILL_SOLID);
-    context.ApplyShader(SHADERTYPE_VECTORFONT);
+    context.SetRasterizerState(RasterType_FillSolid);
+    context.ApplyShader(ShaderType_VectorFont);
 
-    m_fontMesh->DrawText("ABCDE AA BB CC DD CB DB EA", XCVec3Unaligned(0.0f, 10.0f, 0.0f), context, SHADERTYPE_VECTORFONT);
+    m_fontMesh->DrawText("ABCDE AA BB CC DD CB DB EA", XCVec3Unaligned(0.0f, 10.0f, 0.0f), context, ShaderType_VectorFont);
+    m_fontMesh->DrawText("AA BB CC DD CB DB EA AD", XCVec3Unaligned(10.0f, 0.0f, 0.0f), context, ShaderType_VectorFont);
 }
 
 void FontActor::Destroy()

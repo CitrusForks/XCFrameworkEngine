@@ -6,29 +6,29 @@
 
 #pragma once
 
-#include "Assets/Packages/Schema/Shaders_generated.h"
+#include "Assets/Packages/PackageConsts.h"
 
 /*
 //NOTE : Defined in data
 
-enum	SHADERTYPE
+enum	ShaderType
 {
-    SHADERTYPE_DEFAULT = 0,
+    ShaderType_DEFAULT = 0,
 
-    SHADERTYPE_COLORTECH,
+    ShaderType_SolidColor,
 
-    SHADERTYPE_LIGHTTEXTURE,
+    ShaderType_LightTexture,
     
     //Terrain
-    SHADERTYPE_TERRIANMULTITEXTURE,
+    ShaderType_TerrainMultiTexture,
 
-    SHADERTYPE_SIMPLECUBEMAP,
+    ShaderType_SimpleCubeMap,
 
-    SHADERTYPE_SKINNEDCHARACTER,
+    ShaderType_SkinnedCharacter,
 
-    SHADERTYPE_REFELECTED_LIGHTTEXTURE,
+    ShaderType_REFELECTED_LIGHTTEXTURE,
 
-    SHADERTYPE_MAX
+    ShaderType_Max
 };
 
 */

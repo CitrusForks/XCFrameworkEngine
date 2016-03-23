@@ -7,11 +7,13 @@
 #pragma once
 
 #include "Engine/Resource/IResource.h"
+
 #include "Engine/Resource/ResourceManager.h"
 #include "Engine/Graphics/XC_Shaders/XC_VertexFormat.h"
 #include "Engine/Graphics/BasicGeometry/OrientedBoundingBox.h"
+#include "Engine/Graphics/XC_Shaders/XC_ShaderHandle.h"
 
-#include "SubMesh.h"
+#include "MeshData.h"
 #include "SceneAnimator.h"
 
 #if CUSTOM_ANIMATION
@@ -30,18 +32,17 @@ public:
     virtual void                         Init(int resourceId, std::string userFriendlyName, bool loaded = false);
     virtual void                         Load(const void* buffer);
     virtual void                         Load(std::string fileName, float intialScaling = 1.0f);
+    virtual void                         Update(float dt);
+    virtual void                         Draw(RenderContext& context);
+    virtual void                         Draw(RenderContext& context, ShaderType shaderType);
     virtual void                         Destroy();
-    void                                 Update(float dt);
-    void                                 Draw(RenderContext& context, SHADERTYPE shaderType);
 
-    void                                 setVertexFormat(EVertexFormat vertexFormat)                     { m_vertexFormat = vertexFormat;   }
-    virtual void                         CreateBuffers(EVertexFormat formatType);
+    void                                 DrawAllInstanced(PerObjectBuffer& objectBuffer);
 
-    SubMesh*                             createAndGetSubMesh();
-    OrientedBoundingBox*                 getComputedAABoundBox()                                         { return m_computedBoundBox.get(); }
+    MeshData*                            createAndGetSubMesh();
+    OrientedBoundingBox*                 getComputedAABoundBox() { return m_computedBoundBox.get(); }
 
     bool                                 IsSkinnedMesh() { return m_isSkinnedMesh; }
-
 
 #if CUSTOM_ANIMATION
     MeshAnimator*                        GetMeshAnimator() { return m_meshAnimator; }
@@ -51,27 +52,31 @@ public:
     const aiScene*                       GetSceneNode() { return m_scene; }
 
 protected:
-    void                                 DrawSubMesh(RenderContext& renderContext, SHADERTYPE shaderType, unsigned int meshIndex, unsigned int instanceCount = 1);
-    virtual void                         DrawSubMeshes(RenderContext& renderContext, SHADERTYPE shaderType, unsigned int instanceCount = 1);
+    virtual void                         CreateBuffers();
+    void                                 CreateConstantBuffer();
+
+    virtual void                         DrawSubMesh(RenderContext& renderContext, ShaderType shaderType, unsigned int meshIndex, unsigned int instanceCount = 1);
+    virtual void                         DrawSubMeshes(RenderContext& renderContext, ShaderType shaderType, unsigned int instanceCount = 1);
 
 #if defined(XCGRAPHICS_DX11)
     void                                 buildBuffer(unsigned int sizeOfType, void* ptrToBuffer, unsigned int length, ID3D11Buffer* buffer, D3D11_BUFFER_DESC desc);
 #endif
 
-    int                                  getSizeFromVertexFormat(EVertexFormat format);
+    int                                  getSizeFromVertexFormat(VertexFormat format);
     void                                 filterSubMeshes();
 
-    std::vector<SubMesh*>                   m_subMeshes;
+    std::vector<MeshData*>                  m_subMeshes;
 
 #if CUSTOM_ANIMATION
     MeshNode*                               m_meshRootNode; //Root node of the mesh.
     MeshAnimator*                           m_meshAnimator;
 #endif
 
-    EVertexFormat                           m_vertexFormat;
+    ShaderType                              m_shaderType;
+    XCShaderHandle*                         m_shaderHandler;
+
     std::unique_ptr<OrientedBoundingBox>    m_computedBoundBox; //This is computed in the object space. Every actor having this mesh should maintain a clone of this and update that and set this every frame
     
-    bool                                    m_areBuffersCreated;
     ResourceManager*                        m_resourceManager;
     Texture2D*                              m_texture;
     
@@ -85,5 +90,11 @@ protected:
     //Mesh root node transforms
     XCVec3Unaligned                         m_globalTranslation;
     XCVec3Unaligned                         m_globalRotation;
-    float                                   m_globalScaling;
+    XCVec3Unaligned                         m_globalScaling;
+
+    unsigned int                            m_instanceCount;
+
+    //This buffer is created based on the shader type
+    D3DConstantBuffer*                      m_instancedConstantBuffer;
+    cbInstancedBuffer                       m_cbInstancedBuffer;
 };

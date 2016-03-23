@@ -1,0 +1,42 @@
+//Shader typess
+include "BasicTypes.schema";
+
+enum ShaderType : byte
+{
+    Default = 0,
+    SolidColor,
+    LightTexture,
+    TerrainMultiTexture,
+    SimpleCubeMap,
+    SkinnedCharacter,
+    VectorFont,    
+
+    Max
+}
+
+enum VertexFormat : byte
+{
+    Position,
+    PositionColor,
+    PositionNormal,
+    PositionNormalTexture,
+    PositionNormalTextureBlendIndexBlendWeight,
+    PositionColorInstanceIndex,
+
+    Invalid
+}
+
+table FBBasicMaterial
+{
+	Ambient:Vec4;
+	Diffuse:Vec4;
+	Specular:Vec4;
+}
+
+enum RasterType : short
+{
+	FillWireframe = 0,
+	FillSolid,
+
+	Max
+}

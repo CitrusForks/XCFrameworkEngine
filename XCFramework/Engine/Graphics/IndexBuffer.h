@@ -17,6 +17,7 @@ public:
 
     IndexBuffer() 
     {
+        m_resourceType = RESOURCETYPE_INDEXBUFFER;
     }
 
     ~IndexBuffer()
@@ -97,17 +98,7 @@ public:
         IResource::RenderContextCallback(renderContext);
     }
 
-    void SetIndexBuffer(ID3DDeviceContext& context)
-    {
-#if defined(XCGRAPHICS_DX12)
-        context.IASetIndexBuffer(&m_indexBufferView);
-#elif defined(XCGRAPHICS_DX11)
-        UINT32 offset = 0;
-        context.IASetIndexBuffer(m_pIB, DXGI_FORMAT_R32_UINT, offset);
-#elif defined(XCGRAPHICS_GNM)
-        //Specified while drawIndex() call. See below GetIndexBufferInGPUMem
-#endif
-    }
+    D3D12_INDEX_BUFFER_VIEW& GetIndexBufferView() { return m_indexBufferView; }
 
     void* GetIndexBufferInGPUMem()      
     {
