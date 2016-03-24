@@ -26,6 +26,7 @@ public:
     }
 
     virtual void            Init(int resourceId, std::string userFriendlyName, bool loaded = false);
+    virtual void            Draw(RenderContext& context);
     virtual void            Draw(RenderContext& context, ShaderType shaderType);
     virtual void            Destroy();
 

@@ -24,6 +24,10 @@ void VectorFontMesh::Init(int resourceId, std::string userFriendlyName, bool loa
     m_material.Ambient = XCVec4(1.0f, 1.0f, 1.0f, 1.0f);
     m_material.Diffuse = XCVec4(0.5f, 0.8f, 0.0f, 1.0f);
     m_material.Specular = XCVec4(0.2f, 0.2f, 0.2f, 16.0f);
+
+    //Register with the rendering pool that this is drawable
+    XC_Graphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XC_Graphics>("GraphicsSystem");
+    graphicsSystem.GetRenderingPool().AddResourceDrawable((IResource*) this);
 }
 
 void VectorFontMesh::Load(const void * buffer)
@@ -40,7 +44,6 @@ void VectorFontMesh::DrawText(std::string text, XCVec3Unaligned position, Render
 {
     //Decrypt the text and fill up the FontData Buffer to draw
     //Calculate start world for every character
-
     XC_CameraManager* cam = (XC_CameraManager*)&SystemLocator::GetInstance()->RequestSystem("CameraManager");
     
     unsigned int CharacterSpacing = 10;
@@ -94,7 +97,7 @@ void VectorFontMesh::DrawText(std::string text, XCVec3Unaligned position, Render
     }
 
     //Now draw what is buffered
-    Draw(context, shaderType);
+    //Draw(context, shaderType);
 }
 
 void VectorFontMesh::Destroy()
@@ -102,8 +105,16 @@ void VectorFontMesh::Destroy()
     XCMeshFBX::Destroy();
 }
 
+void VectorFontMesh::Draw(RenderContext& context)
+{
+    Draw(context, ShaderType_VectorFont);
+}
+
 void VectorFontMesh::Draw(RenderContext& context, ShaderType shaderType)
 {
+    context.SetRasterizerState(RasterType_FillSolid);
+    context.ApplyShader(shaderType);
+
     XCShaderHandle* shader = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(shaderType);
 
     for (auto subMesh : m_subMeshesIdBuffer)

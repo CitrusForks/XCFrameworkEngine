@@ -34,6 +34,7 @@ public:
     void            Destroy();
 
 protected:
+    void            Draw(RenderContext& context);
     void            Draw(RenderContext& context, ShaderType shaderType);
     void            DrawSubMesh(RenderContext& renderContext, ShaderType shaderType, unsigned int meshIndex, unsigned int instanceCount = 1);
 

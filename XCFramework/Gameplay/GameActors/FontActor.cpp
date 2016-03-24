@@ -53,8 +53,7 @@ void FontActor::Draw(RenderContext& context)
 {
     IActor::Draw(context);
 
-    context.SetRasterizerState(RasterType_FillSolid);
-    context.ApplyShader(ShaderType_VectorFont);
+
 
     m_fontMesh->DrawText("ABCDE AA BB CC DD CB DB EA", XCVec3Unaligned(0.0f, 10.0f, 0.0f), context, ShaderType_VectorFont);
     m_fontMesh->DrawText("AA BB CC DD CB DB EA AD", XCVec3Unaligned(10.0f, 0.0f, 0.0f), context, ShaderType_VectorFont);

@@ -854,6 +854,11 @@ void XCMeshFBX::Init(int resourceId, std::string userFriendlyName, bool loaded)
     XCMesh::Init(resourceId, userFriendlyName, loaded);
 }
 
+void XCMeshFBX::Draw(RenderContext& context)
+{
+    XCMesh::Draw(context);
+}
+
 void XCMeshFBX::Draw(RenderContext& context, ShaderType shaderType)
 {
     XCMesh::Draw(context, shaderType);
