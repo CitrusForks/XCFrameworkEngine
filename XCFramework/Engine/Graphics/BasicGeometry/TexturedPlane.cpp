@@ -124,16 +124,16 @@ void TexturedPlane::Draw(RenderContext& context)
     };
 
     XCShaderHandle* lightTexShader = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(ShaderType_LightTexture);
-    lightTexShader->setVertexBuffer(context.GetDeviceContext(), &m_vertexBuffer);
+    lightTexShader->SetVertexBuffer(context.GetDeviceContext(), &m_vertexBuffer);
 
 #if defined(XCGRAPHICS_DX12)
     memcpy(m_pCBPerObject->m_cbDataBegin, &perObject, sizeof(PerObjectBuffer));
-    lightTexShader->setConstantBuffer("PerObjectBuffer", context.GetDeviceContext(), m_pCBPerObject->m_gpuHandle);
+    lightTexShader->SetConstantBuffer("PerObjectBuffer", context.GetDeviceContext(), m_pCBPerObject->m_gpuHandle);
 #else
     lightTexShader->setCBPerObject(context.GetDeviceContext(), perObject);
 #endif
 
-    lightTexShader->setResource("gDiffuseMap", context.GetDeviceContext(), m_texture->getTextureResource());
+    lightTexShader->SetResource("gDiffuseMap", context.GetDeviceContext(), m_texture->getTextureResource());
 
     context.GetShaderManagerSystem().DrawNonIndexed(context.GetDeviceContext(), 6);
 }

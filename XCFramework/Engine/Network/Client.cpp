@@ -47,7 +47,6 @@ void Client::init(const char *ip, int port)
     m_pTimeOut = new TIMEVAL();
 
     createSocket();
-
     connectToServer();
 #endif
 }

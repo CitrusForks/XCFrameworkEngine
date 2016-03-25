@@ -132,8 +132,8 @@ void AppFramework_Win32::Run()
 
         float dt = (currTimeStamp - m_prevTimeStamp) * m_secsPerCnt;
 
-        UpdateScene(dt);
-        DrawScene();
+        Update(dt);
+        Draw();
 
         m_prevTimeStamp = currTimeStamp;
     }
@@ -162,8 +162,8 @@ void AppFramework_Win32::Run()
 
                 float dt = (currTimeStamp- m_prevTimeStamp) * m_secsPerCnt;
 
-                UpdateScene(dt);
-                DrawScene();
+                Update(dt);
+                Draw();
 
                 m_prevTimeStamp = currTimeStamp;
             }

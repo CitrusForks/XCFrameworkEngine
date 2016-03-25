@@ -188,9 +188,9 @@ void SimpleTerrain::Draw(RenderContext& context)
 
     //TODO
     XCShaderHandle* solidColorShader = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(m_useShaderType);
-    solidColorShader->setConstantBuffer("cbWVP", context.GetDeviceContext(), D3D12_GPU_DESCRIPTOR_HANDLE());
-    solidColorShader->setVertexBuffer(context.GetDeviceContext(), &m_vertexPosColorBuffer);
-    solidColorShader->setIndexBuffer(context.GetDeviceContext(), m_indexBuffer);
+    solidColorShader->SetConstantBuffer("cbWVP", context.GetDeviceContext(), D3D12_GPU_DESCRIPTOR_HANDLE());
+    solidColorShader->SetVertexBuffer(context.GetDeviceContext(), &m_vertexPosColorBuffer);
+    solidColorShader->SetIndexBuffer(context.GetDeviceContext(), m_indexBuffer);
 
     context.GetShaderManagerSystem().DrawIndexedInstanced(context.GetDeviceContext(), m_indexBuffer.m_indexData.size());
 }

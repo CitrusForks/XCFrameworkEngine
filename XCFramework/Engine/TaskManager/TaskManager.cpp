@@ -118,7 +118,7 @@ void TaskManager::UnregisterAllTasks()
 }
 
 
-void TaskManager::DoWork()
+void TaskManager::Update()
 {
         for(unsigned int i=0; i < m_taskQueue.size(); i++)
         {

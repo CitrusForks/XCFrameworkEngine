@@ -20,8 +20,8 @@ public:
     virtual int             Init();
     virtual void            OnResize() = 0;
     virtual void            Run();
-    virtual void            UpdateScene(float dt) = 0;
-    virtual void            DrawScene()           = 0;
+    virtual void            Update(float dt) = 0;
+    virtual void            Draw()           = 0;
     virtual void            EnableFullScreenMode(bool enable) {}
     virtual void            Destroy();
 

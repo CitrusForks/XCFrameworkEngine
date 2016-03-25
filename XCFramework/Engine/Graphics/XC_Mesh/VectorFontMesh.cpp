@@ -69,13 +69,12 @@ void VectorFontMesh::DrawText(std::string text, XCVec3Unaligned position, Render
                 return fontData.submeshId == subMeshId;
             });
 
-            XCMatrix4Unaligned world =  XMMatrixScaling(0.1, 0.1, 0.1) * XMMatrixTranslation(position.x + (charPosition * CharacterSpacing), position.y, position.z);
+            XCMatrix4Unaligned world =  XMMatrixScaling(0.1f, 0.1f, 0.1f) * XMMatrixTranslation(position.x + (charPosition * CharacterSpacing), position.y, position.z);
 
             if (subMeshExists != m_subMeshesIdBuffer.end())
             {
                 FontData& existingFontData = (*subMeshExists);
                 existingFontData.orientation.gWVP[existingFontData.instanceCount++] = XCMatrix4Unaligned(ToXCMatrix4Unaligned(XMMatrixTranspose(world * cam->GetViewMatrix() * cam->GetProjMatrix())));
-                Logger("Submesh Exists Instancing it : %s %d", (*findSubMesh)->getSubMeshName().c_str(), existingFontData.instanceCount);
             }
             else
             {
@@ -83,14 +82,13 @@ void VectorFontMesh::DrawText(std::string text, XCVec3Unaligned position, Render
                 newFontData.orientation.gWVP[newFontData.instanceCount++] = XCMatrix4Unaligned(ToXCMatrix4Unaligned(XMMatrixTranspose(world * cam->GetViewMatrix() * cam->GetProjMatrix())));
                 newFontData.submeshId = subMeshId;
                 m_subMeshesIdBuffer.push_back(newFontData);
-                Logger("Pushing to buffer : %s", (*findSubMesh)->getSubMeshName().c_str());
             }
 
         }
         else
         {
             //Just skip this character or place some null char or just add the character spacing
-            Logger("SubMesh not mapped with the character");
+            Logger("[VECTOR FONT] SubMesh not mapped with the character %s", textchar.c_str());
         }
 
         charPosition++;
@@ -112,7 +110,7 @@ void VectorFontMesh::Draw(RenderContext& context)
     for (auto subMesh : m_subMeshesIdBuffer)
     {
         memcpy(m_subMeshes[subMesh.submeshId]->m_constantBuffer->m_cbDataBegin, &subMesh.orientation.gWVP[0], sizeof(XCMatrix4Unaligned) * subMesh.instanceCount);
-        shader->setConstantBuffer("cbPerObjectInstanced", context.GetDeviceContext(), m_subMeshes[subMesh.submeshId]->m_constantBuffer->m_gpuHandle);
+        shader->SetConstantBuffer("cbPerObjectInstanced", context.GetDeviceContext(), m_subMeshes[subMesh.submeshId]->m_constantBuffer->m_gpuHandle);
         DrawSubMesh(context, subMesh.submeshId, subMesh.instanceCount);
     }
 
@@ -122,8 +120,8 @@ void VectorFontMesh::Draw(RenderContext& context)
 
 void VectorFontMesh::DrawSubMesh(RenderContext & renderContext, unsigned int meshIndex, unsigned int instanceCount)
 {
-    m_shaderHandler->setVertexBuffer(renderContext.GetDeviceContext(), m_subMeshes[meshIndex]->getVertexBuffer());
-    m_shaderHandler->setIndexBuffer(renderContext.GetDeviceContext(), m_subMeshes[meshIndex]->getIndexBuffer());
+    m_shaderHandler->SetVertexBuffer(renderContext.GetDeviceContext(), m_subMeshes[meshIndex]->getVertexBuffer());
+    m_shaderHandler->SetIndexBuffer(renderContext.GetDeviceContext(), m_subMeshes[meshIndex]->getIndexBuffer());
 
     renderContext.GetShaderManagerSystem().DrawIndexedInstanced(renderContext.GetDeviceContext(),
         m_subMeshes[meshIndex]->getNoOfFaces() * 3,

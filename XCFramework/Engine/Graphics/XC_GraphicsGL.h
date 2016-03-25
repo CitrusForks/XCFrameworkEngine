@@ -47,15 +47,15 @@ public:
 
     virtual void                GoFullscreen(bool go);
 
-    bool                        isSecondaryDrawCall() { return m_secondaryDrawCall; }
-    void                        setSecondaryDrawCall(bool isSecondary) { m_secondaryDrawCall = isSecondary; }
+    bool                        IsSecondaryDrawCall() { return m_secondaryDrawCall; }
+    void                        SetSecondaryDrawCall(bool isSecondary) { m_secondaryDrawCall = isSecondary; }
     
     virtual void                OnResize(int _width, int _height);
     virtual void                SetClearColor(XCVec4 color)           { m_clearColor = color; }
 
     virtual void                TurnOffZ();
     virtual void                TurnOnZ();
-    unsigned int                getMsaaQuality() { return m_4xMsaaQuality; }
+    unsigned int                GetMsaaQuality() { return m_4xMsaaQuality; }
 
     virtual ID3D12PipelineState* GetPipelineState() { return nullptr; }
 

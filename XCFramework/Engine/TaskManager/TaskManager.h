@@ -22,7 +22,7 @@ public:
     bool                    UnregisterTask(unsigned long threadId);
     void                    UnregisterAllTasks();
 
-    void                    DoWork();
+    void                    Update();
     bool                    CreateAsyncThread();
 
     ETaskState              GetTaskState(unsigned long threadId);

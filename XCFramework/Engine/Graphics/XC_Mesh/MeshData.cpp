@@ -39,7 +39,7 @@ void MeshData::init()
 
     XC_Graphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XC_Graphics>("GraphicsSystem");
     XCShaderHandle* shaderHandle = (XCShaderHandle*)graphicsSystem.GetShaderManagerSystem().GetShader(m_shaderType);
-    m_vertexBuffer = shaderHandle->createVertexBuffer();
+    m_vertexBuffer = shaderHandle->CreateVertexBuffer();
 }
 
 void MeshData::createConstantBuffers()

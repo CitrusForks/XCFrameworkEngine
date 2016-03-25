@@ -27,8 +27,8 @@ public:
 
     int                     Init();
     void                    OnResize();
-    void                    UpdateScene(float dt);
-    void                    DrawScene();
+    void                    Update(float dt);
+    void                    Draw();
     void                    EnableFullScreenMode(bool enable);
     void                    Destroy();
 

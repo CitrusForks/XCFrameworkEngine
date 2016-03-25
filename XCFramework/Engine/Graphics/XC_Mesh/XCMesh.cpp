@@ -144,7 +144,7 @@ void XCMesh::CreateBuffers()
         XCVecIntrinsic4 transformedVertex;
         XCVec3Unaligned vertexPos = { 0.0f, 0.0f, 0.0f };
 
-        switch (m_shaderHandler->getVertexFormat())
+        switch (m_shaderHandler->GetVertexFormat())
         {
         case VertexFormat_PositionColor:
         {
@@ -428,7 +428,7 @@ void XCMesh::CreateConstantBuffer()
     {
     case ShaderType_LightTexture:
     case ShaderType_SkinnedCharacter:
-        m_cbInstancedBufferGPU = m_shaderHandler->createConstantBuffer("cbInstancedBuffer");
+        m_cbInstancedBufferGPU = m_shaderHandler->CreateConstantBuffer("cbInstancedBuffer");
         break;
 
     case ShaderType_VectorFont:
@@ -543,8 +543,8 @@ void XCMesh::Draw(RenderContext& context)
         context.ApplyShader(m_shaderType);
 
         XC_LightManager* lightMgr = (XC_LightManager*)&SystemLocator::GetInstance()->RequestSystem("LightsManager");
-        m_shaderHandler->setConstantBuffer("cbLightsPerFrame", context.GetDeviceContext(), lightMgr->getLightConstantBuffer()->m_gpuHandle);
-        m_shaderHandler->setResource("gDiffuseMap", context.GetDeviceContext(), m_texture->getTextureResource());
+        m_shaderHandler->SetConstantBuffer("cbLightsPerFrame", context.GetDeviceContext(), lightMgr->getLightConstantBuffer()->m_gpuHandle);
+        m_shaderHandler->SetResource("gDiffuseMap", context.GetDeviceContext(), m_texture->getTextureResource());
 
         DrawSubMeshes(context);
 
@@ -560,7 +560,7 @@ void XCMesh::DrawSubMesh(RenderContext& renderContext, unsigned int meshIndex)
     case ShaderType_LightTexture:
     {
         memcpy(m_cbInstancedBufferGPU->m_cbDataBegin, &m_cbInstancedBuffer, sizeof(cbInstancedBuffer));
-        m_shaderHandler->setConstantBuffer("cbInstancedBuffer", renderContext.GetDeviceContext(), m_cbInstancedBufferGPU->m_gpuHandle);
+        m_shaderHandler->SetConstantBuffer("cbInstancedBuffer", renderContext.GetDeviceContext(), m_cbInstancedBufferGPU->m_gpuHandle);
         break;
     }
 
@@ -575,7 +575,7 @@ void XCMesh::DrawSubMesh(RenderContext& renderContext, unsigned int meshIndex)
         }
 
         memcpy(m_subMeshes[meshIndex]->m_boneBuffer->m_cbDataBegin, &boneBuffer, sizeof(boneBuffer));
-        m_shaderHandler->setConstantBuffer("cbBoneBuffer", renderContext.GetDeviceContext(), m_subMeshes[meshIndex]->m_boneBuffer->m_gpuHandle);
+        m_shaderHandler->SetConstantBuffer("cbBoneBuffer", renderContext.GetDeviceContext(), m_subMeshes[meshIndex]->m_boneBuffer->m_gpuHandle);
         break;
     }
 
@@ -583,8 +583,8 @@ void XCMesh::DrawSubMesh(RenderContext& renderContext, unsigned int meshIndex)
         XCASSERT(false);
     }
 
-    m_shaderHandler->setVertexBuffer(renderContext.GetDeviceContext(), m_subMeshes[meshIndex]->getVertexBuffer());
-    m_shaderHandler->setIndexBuffer(renderContext.GetDeviceContext(), m_subMeshes[meshIndex]->getIndexBuffer());
+    m_shaderHandler->SetVertexBuffer(renderContext.GetDeviceContext(), m_subMeshes[meshIndex]->getVertexBuffer());
+    m_shaderHandler->SetIndexBuffer(renderContext.GetDeviceContext(), m_subMeshes[meshIndex]->getIndexBuffer());
 
     renderContext.GetShaderManagerSystem().DrawIndexedInstanced(renderContext.GetDeviceContext(),
         m_subMeshes[meshIndex]->getNoOfFaces() * 3,

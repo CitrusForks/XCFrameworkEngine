@@ -29,32 +29,24 @@ public:
         Logger("ISHADER] Destructed shader");
     }
 
-    virtual void load(const void* fbBuffer);
-    virtual void loadShader() = 0;
-    virtual void createBufferConstants();
-    virtual void applyShader(ID3DDeviceContext& context);
-    virtual void destroy();
-    virtual void reset(ID3DDeviceContext& context) = 0;
+    virtual void                     Load(const void* fbBuffer);
+    virtual void                     LoadShader() = 0;
+    virtual void                     CreateConstantBuffers();
+    virtual void                     ApplyShader(ID3DDeviceContext& context);
+    virtual void                     destroy();
+    virtual void                     Reset(ID3DDeviceContext& context) = 0;
                                      
-    ID3DVertexShader*                getVertexShader() { return m_pVS; }
-    ID3DPixelShader*                 getPixelShader() { return m_pPS; }
+    ID3DVertexShader*                GetVertexShader() { return m_pVS; }
+    ID3DPixelShader*                 GetPixelShader() { return m_pPS; }
 
 #if defined(XCGRAPHICS_DX12)          
-    PSO_Dx12&                        getPso() { return *m_pso; }
-    D3DConstantBuffer*               createBuffer(BufferType bufferType, int sizeOfType = 0);
+    PSO_Dx12&                        GetPso() { return *m_pso; }
+    D3DConstantBuffer*               CreateBuffer(BufferType bufferType, int sizeOfType = 0);
 #elif defined(XCGRAPHICS_DX11)
-    ID3D11InputLayout*               getInputLayout() { return m_pInputLayout; }
-    ID3D11Buffer*                    createBuffer(int sizeOfType);
-#elif defined(XCGRAPHICS_GNM)
-    template<class T>
-    void                             createBuffer(ID3DDeviceContext& context, T** inBuffer, sce::Gnm::Buffer& outBuffer)
-    {
-        T* buffer = static_cast<T*>(context.allocateFromCommandBuffer(sizeof(T), sce::Gnm::kEmbeddedDataAlignment4));
-        (*inBuffer) = buffer;
-        outBuffer.initAsConstantBuffer((*inBuffer), sizeof(T));
-    }
+    ID3D11InputLayout*               GetInputLayout() { return m_pInputLayout; }
+    ID3D11Buffer*                    CreateBuffer(int sizeOfType);
 #elif defined(XCGRAPHICS_GL)
-    D3DConstantBuffer*               createBuffer(int sizeOfType) { return nullptr; }
+    D3DConstantBuffer*               CreateBuffer(int sizeOfType) { return nullptr; }
 #endif                               
                                      
 protected:                           
@@ -71,9 +63,6 @@ protected:
     PSO_Dx12*                        m_pso;
 #elif defined(XCGRAPHICS_DX11)
     ID3D11InputLayout*               m_pInputLayout;
-#elif defined(XCGRAPHICS_GNM)
-    void*                            m_fetchVSShader;
-    uint32_t                         m_shaderModifier;
 #endif
 
     std::string                      m_vertexShaderPath;

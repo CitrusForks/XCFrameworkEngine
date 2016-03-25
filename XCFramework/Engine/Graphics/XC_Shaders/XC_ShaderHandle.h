@@ -47,7 +47,7 @@ struct ShaderSlot
     BufferDesc   m_bufferDesc;
     BufferType   m_bufferType;
 
-    std::string getBufferName()
+    std::string GetBufferName()
     {
         return m_bufferType == BUFFERTYPE_CBV ? m_bufferDesc.constantBufferDesc.Name : m_bufferDesc.resourceBufferDesc.Name;
     }
@@ -72,15 +72,15 @@ public:
     XCShaderHandle(ID3DDevice& device);
     ~XCShaderHandle();
 
-    void            load(const void* fbBuffer);
-    void            loadShader();
-    void            applyShader(ID3DDeviceContext& context);
-    void            reset(ID3DDeviceContext& context) {}
-    void            setConstantBuffer(std::string bufferName, ID3DDeviceContext& context, D3D12_GPU_DESCRIPTOR_HANDLE& gpuHandle);
-    void            setResource(std::string bufferName, ID3DDeviceContext& context, D3DShaderResourceView* tex);
-    VertexFormat    getVertexFormat() { return m_vertexFormat; }
+    void            Load(const void* fbBuffer);
+    void            ApplyShader(ID3DDeviceContext& context);
+    void            Reset(ID3DDeviceContext& context) {}
+    void            SetConstantBuffer(std::string bufferName, ID3DDeviceContext& context, D3D12_GPU_DESCRIPTOR_HANDLE& gpuHandle);
+    void            SetSampler(std::string bufferName, ID3DDeviceContext& context, D3D12_GPU_DESCRIPTOR_HANDLE& gpuHandle);
+    void            SetResource(std::string bufferName, ID3DDeviceContext& context, D3DShaderResourceView* tex);
+    VertexFormat    GetVertexFormat() { return m_vertexFormat; }
 
-    void* createVertexBuffer()
+    void* CreateVertexBuffer()
     {
         void* buffer = nullptr;
         switch (m_vertexFormat)
@@ -112,19 +112,19 @@ public:
         return buffer;
     }
 
-    D3DConstantBuffer*  createConstantBuffer(std::string constantBufferName)
+    D3DConstantBuffer*  CreateConstantBuffer(std::string constantBufferName)
     {
         SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
-        return heap.CreateBufferView(D3DBufferDesc(BUFFERTYPE_CBV, getSizeOfConstantBuffer(constantBufferName)));
+        return heap.CreateBufferView(D3DBufferDesc(BUFFERTYPE_CBV, GetSizeOfConstantBuffer(constantBufferName)));
     }
 
-    void destroyConstantBuffer(D3DConstantBuffer* constantBuffer)
+    void DestroyConstantBuffer(D3DConstantBuffer* constantBuffer)
     {
         SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
         heap.DestroyBuffer(constantBuffer);
     }
 
-    void setVertexBuffer(ID3DDeviceContext& context, void* vertexBuffer)
+    void SetVertexBuffer(ID3DDeviceContext& context, void* vertexBuffer)
     {
         D3D12_VERTEX_BUFFER_VIEW vertexBufferView = {};
         switch (m_vertexFormat)
@@ -160,7 +160,7 @@ public:
 #endif
     }
 
-    void setIndexBuffer(ID3DDeviceContext& context, IndexBuffer<unsigned int>& indexBuffer)
+    void SetIndexBuffer(ID3DDeviceContext& context, IndexBuffer<unsigned int>& indexBuffer)
     {
 #if defined(XCGRAPHICS_DX12)
         context.IASetIndexBuffer(&indexBuffer.GetIndexBufferView());
@@ -173,13 +173,13 @@ public:
     }
 
 protected:
-
-    void            sortSlots();
-    unsigned int    getSlotPriority(std::string bufferName);
-    void            generateRootSignature();
-    void            generatePSO();
-    void            readShaderDescription();
-    unsigned int    getSizeOfConstantBuffer(std::string& cbName);
+    void                    LoadShader();
+    void                    SortSlots();
+    unsigned int            GetSlotPriority(std::string bufferName);
+    void                    GenerateRootSignature();
+    void                    GeneratePSO();
+    void                    ReadShaderDescription();
+    unsigned int            GetSizeOfConstantBuffer(std::string& cbName);
 
 private:
     std::vector<ShaderSlot>                     m_shaderSlots;

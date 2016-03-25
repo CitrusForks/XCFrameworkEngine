@@ -136,15 +136,19 @@ void XC_Graphics::OnResize(int _width, int _height)
 {
 }
 
-#if defined(DURANGO)
-void XC_Graphics::Resume()
+std::string XC_Graphics::GetDefaultWindowTitle()
 {
-    m_d3dXboxPerfContext->Resume();
-}
-
-void XC_Graphics::Suspend()
-{
-    m_d3dXboxPerfContext->Suspend(0);
-}
+#if defined(XCGRAPHICS_DX11)
+    return "XCFramework DirectX 11";
+#elif defined(XCGRAPHICS_DX12)
+    return "XCFramework DirectX 12";
+#elif defined(XCGRAPHICS_GNM)
+    return "XCFramework OpenGL";
 #endif
 
+}
+
+void XC_Graphics::SetWindowTitle(std::string value)
+{
+    SetWindowText(m_hMainWnd, value.c_str());
+}

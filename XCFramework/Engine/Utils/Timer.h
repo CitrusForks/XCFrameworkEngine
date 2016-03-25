@@ -4,19 +4,10 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
-//
-// BasicTimer.h - A simple timer that provides elapsed time information
-//
-
 #pragma once
 
-#if defined(WIN32)
-#include <wrl.h>
-#elif defined(XC_ORBIS)
-typedef unsigned long long LARGE_INTEGER;
-#endif
-
 #include "Engine/System/ISystem.h"
+#include "Engine/Graphics/XC_Graphics.h"
 
 class Timer : ISystem
 {
@@ -35,11 +26,6 @@ public:
         }
 #endif
         Reset();
-    }
-
-    void SetWindowHandle(HWND hWnd)
-    {
-        m_wHnd = hWnd;
     }
 
     void Reset()
@@ -89,8 +75,10 @@ public:
         {
 #if defined(WIN32)
             char fpsStr[256];
-            sprintf_s(fpsStr, "FPS : %d", m_fps);
-            SetWindowText(m_wHnd, fpsStr);
+            sprintf_s(fpsStr, "\t FPS : %d", m_fps);
+
+            XC_Graphics& graphics = SystemLocator::GetInstance()->RequestSystem<XC_Graphics>("GraphicsSystem");
+            graphics.SetWindowTitle(graphics.GetDefaultWindowTitle() + fpsStr);
 
             m_fps = 0;
             m_perFrameTime = 0.0f;
@@ -98,7 +86,7 @@ public:
         }
     }
 
-    float getTotalTimeSpent() { return m_total; }
+    float GetTotalTimeSpent() { return m_total; }
 
     float getDeltaTime() { return m_delta; }
 
@@ -113,6 +101,4 @@ private:
     float         m_delta;
     float         m_perFrameTime;
     int           m_fps;
-
-    HWND          m_wHnd;
 };

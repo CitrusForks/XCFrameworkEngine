@@ -311,7 +311,7 @@ void XC_GraphicsDx11::BeginScene()
 
 void XC_GraphicsDx11::BeginSecondaryScene()
 {
-    setSecondaryDrawCall(true);
+    SetSecondaryDrawCall(true);
 
     m_pD3DDeviceContext->RSSetViewports(1, &m_ScreenViewPort[RENDERTARGET_LIVEDRIVE]);
 
@@ -325,7 +325,7 @@ void XC_GraphicsDx11::BeginSecondaryScene()
 void XC_GraphicsDx11::EndSecondaryScene()
 {
     //TurnOnZ();
-    setSecondaryDrawCall(false);
+    SetSecondaryDrawCall(false);
 }
 
 void XC_GraphicsDx11::EndScene()

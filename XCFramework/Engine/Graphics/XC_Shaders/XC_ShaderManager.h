@@ -17,30 +17,36 @@ public:
     XC_ShaderManager(ID3DDevice& device);
     ~XC_ShaderManager(void);
 
-    void                                    Init();
-    void                                    LoadShaders();
-    void                                    Destroy();
-    IShader*                                GetShader(ShaderType shaderType);
+    void                  Init();
+    void                  LoadShaders();
+    void                  Destroy();
 
-    void                                    ApplyShader(ID3DDeviceContext& context, ShaderType _ShaderType);
-    void                                    DrawNonIndexed(ID3DDeviceContext& context, unsigned int vertexCount);
-    void                                    DrawIndexedInstanced(ID3DDeviceContext& context, unsigned int _indexCount, void* indexGpuAddr = nullptr, unsigned int instanceCount = 1);
+    void                  SetRasterizerState(ID3DDeviceContext& context, RasterType type);
+    IShader*              GetShader(ShaderType shaderType);
+    ID3D12DescriptorHeap* GetSamplerDescriptorHeap() { return m_samplerHeap; }
 
-    void                                    ClearShaderAndRenderStates(ID3DDeviceContext& context);
+    void                  ApplyShader(ID3DDeviceContext& context, ShaderType _ShaderType);
 
-#if defined(XCGRAPHICS_DX11)
-    void                                    LoadRasterizers();
-    void                                    SetRasterizerState(ID3DDeviceContext& context, RasterType type);
-#endif
+    void                  DrawNonIndexed(ID3DDeviceContext& context, unsigned int vertexCount);
+    void                  DrawIndexedInstanced(ID3DDeviceContext& context, unsigned int _indexCount, void* indexGpuAddr = nullptr, unsigned int instanceCount = 1);
+                          
+    void                  ClearShaderAndRenderStates(ID3DDeviceContext& context);
+                          
+    void                  LoadRasterizers();
+    void                  LoadSamplers();
 
 private:
 
-    std::vector<IShader*>                                 m_Shaders;
+    std::vector<IShader*>       m_Shaders;
 
 #if defined(XCGRAPHICS_DX12)
-    D3D12_RASTERIZER_DESC                                 m_rasterizerDesc;
-    D3D12_SAMPLER_DESC                                    m_samplerDesc;
-    SharedDescriptorHeap*                                 m_sharedDescriptorHeap;
+    D3D12_RASTERIZER_DESC       m_rasterizerDesc;
+    
+    //Samplers
+    D3D12_SAMPLER_DESC          m_samplerDesc;
+    ID3D12DescriptorHeap*       m_samplerHeap;
+
+    SharedDescriptorHeap*       m_sharedDescriptorHeap;
 #elif defined(XCGRAPHICS_DX11)
     D3D11_RASTERIZER_DESC                                 m_rasterizerDesc;
     std::map<RasterType, ID3D11RasterizerState*>    m_rasterizerStates;
@@ -49,5 +55,5 @@ private:
     ID3D11SamplerState*                                   m_SamplerLinear;
 #endif
 
-    ID3DDevice&                                           m_device;
+    ID3DDevice&                 m_device;
 };

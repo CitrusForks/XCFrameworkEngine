@@ -148,16 +148,16 @@ void SimpleSkyBox::Draw(RenderContext& context)
     // Set constants
     XCShaderHandle* cubeMapShader = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(ShaderType_SimpleCubeMap);
 
-    cubeMapShader->setVertexBuffer(context.GetDeviceContext(), &m_vertexBuffer);
-    cubeMapShader->setIndexBuffer(context.GetDeviceContext(), m_indexBuffer);
+    cubeMapShader->SetVertexBuffer(context.GetDeviceContext(), &m_vertexBuffer);
+    cubeMapShader->SetIndexBuffer(context.GetDeviceContext(), m_indexBuffer);
 
 #if defined(XCGRAPHICS_DX12)
     memcpy(m_CBwvp->m_cbDataBegin, &wbuffer, sizeof(cbWVP));
-    cubeMapShader->setConstantBuffer("cbWVP", context.GetDeviceContext(), m_CBwvp->m_gpuHandle);
+    cubeMapShader->SetConstantBuffer("cbWVP", context.GetDeviceContext(), m_CBwvp->m_gpuHandle);
 #else
     cubeMapShader->setWVP(context.GetDeviceContext(), wbuffer);
 #endif
-    cubeMapShader->setResource("gCubeMap", context.GetDeviceContext(), m_cubeMapTexture->getTextureResource());
+    cubeMapShader->SetResource("gCubeMap", context.GetDeviceContext(), m_cubeMapTexture->getTextureResource());
     context.GetShaderManagerSystem().DrawIndexedInstanced(context.GetDeviceContext(), 36, m_indexBuffer.GetIndexBufferInGPUMem());
     graphicsSystem.SetLessEqualDepthStencilView(context.GetDeviceContext(), false);
 }

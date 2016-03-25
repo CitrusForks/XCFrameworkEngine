@@ -56,7 +56,7 @@ void LiveDriveTexturePlane::Update(float dt)
 void LiveDriveTexturePlane::Draw(RenderContext& renderContext)
 {
     XC_Graphics& graphicsSystem = (XC_Graphics&)SystemLocator::GetInstance()->RequestSystem("GraphicsSystem");
-    if (!graphicsSystem.isSecondaryDrawCall())
+    if (!graphicsSystem.IsSecondaryDrawCall())
     {
         TexturedPlane::Draw(renderContext);
     }

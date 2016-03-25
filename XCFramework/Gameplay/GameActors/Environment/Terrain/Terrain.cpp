@@ -343,33 +343,33 @@ void Terrain::Draw(RenderContext& context)
         shaderHandle = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(ShaderType_LightTexture);
 #if defined(XCGRAPHICS_DX12)
         memcpy(m_pCBPerObject->m_cbDataBegin, &perObject, sizeof(PerObjectBuffer));
-        shaderHandle->setConstantBuffer("PerObjectBuffer", context.GetDeviceContext(), m_pCBPerObject->m_gpuHandle);
+        shaderHandle->SetConstantBuffer("PerObjectBuffer", context.GetDeviceContext(), m_pCBPerObject->m_gpuHandle);
 
 #else
         shaderHandle->setCBPerObject(context.GetDeviceContext(), perObject);
 #endif
-        shaderHandle->setResource("gDiffuseMap", context.GetDeviceContext(), m_texture->getTextureResource());
+        shaderHandle->SetResource("gDiffuseMap", context.GetDeviceContext(), m_texture->getTextureResource());
     }
     else if (m_useShaderType == ShaderType_TerrainMultiTexture)
     {
         shaderHandle = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(ShaderType_TerrainMultiTexture);
 #if defined(XCGRAPHICS_DX12)
         memcpy(m_pCBPerObject->m_cbDataBegin, &perObject, sizeof(PerObjectBuffer));
-        shaderHandle->setConstantBuffer("PerObjectBuffer", context.GetDeviceContext(), m_pCBPerObject->m_gpuHandle);
+        shaderHandle->SetConstantBuffer("PerObjectBuffer", context.GetDeviceContext(), m_pCBPerObject->m_gpuHandle);
 #else
         shaderHandle->setCBPerObject(context.GetDeviceContext(), perObject);
 #endif
-        shaderHandle->setResource("gDiffuseMap",  context.GetDeviceContext(), m_texture->getTextureResource());
-        shaderHandle->setResource("gDiffuseMap1", context.GetDeviceContext(), m_texture1->getTextureResource());
-        shaderHandle->setResource("gDiffuseMap2", context.GetDeviceContext(), m_texture2->getTextureResource());
-        shaderHandle->setResource("gBlendMap",    context.GetDeviceContext(), m_textureBlend->getTextureResource());
+        shaderHandle->SetResource("gDiffuseMap",  context.GetDeviceContext(), m_texture->getTextureResource());
+        shaderHandle->SetResource("gDiffuseMap1", context.GetDeviceContext(), m_texture1->getTextureResource());
+        shaderHandle->SetResource("gDiffuseMap2", context.GetDeviceContext(), m_texture2->getTextureResource());
+        shaderHandle->SetResource("gBlendMap",    context.GetDeviceContext(), m_textureBlend->getTextureResource());
     }
 
     XC_LightManager* lightMgr = (XC_LightManager*)&SystemLocator::GetInstance()->RequestSystem("LightsManager");
-    shaderHandle->setConstantBuffer("cbLightsPerFrame", context.GetDeviceContext(), lightMgr->getLightConstantBuffer()->m_gpuHandle);
+    shaderHandle->SetConstantBuffer("cbLightsPerFrame", context.GetDeviceContext(), lightMgr->getLightConstantBuffer()->m_gpuHandle);
 
-    shaderHandle->setVertexBuffer(context.GetDeviceContext(), &m_vertexPosNormTexBuffer);
-    shaderHandle->setIndexBuffer(context.GetDeviceContext(), m_indexBuffer);
+    shaderHandle->SetVertexBuffer(context.GetDeviceContext(), &m_vertexPosNormTexBuffer);
+    shaderHandle->SetIndexBuffer(context.GetDeviceContext(), m_indexBuffer);
 
     context.GetShaderManagerSystem().DrawIndexedInstanced(context.GetDeviceContext(), m_indexBuffer.m_indexData.size(), m_indexBuffer.GetIndexBufferInGPUMem());
 

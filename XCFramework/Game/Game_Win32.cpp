@@ -42,7 +42,6 @@ int Game_Win32::Init()
 
     //Timer
     m_timer = (Timer*)&m_systemContainer->CreateNewSystem("Timer");
-    m_timer->SetWindowHandle(GetMainWnd());
 
     //TaskManager
     m_taskManagingSystem = (TaskManager*) &m_systemContainer->CreateNewSystem("TaskManager");
@@ -52,13 +51,11 @@ int Game_Win32::Init()
 
     //Graphics Dx11
     m_graphicsSystem = (XC_Graphics*)&m_systemContainer->CreateNewSystem("GraphicsSystem");
-    m_graphicsSystem->InitGraphicsWindow(GetMainWnd(), m_clientWidth, m_clientHeight, true);
+    m_graphicsSystem->InitGraphicsWindow(m_hMainWnd, m_clientWidth, m_clientHeight, true);
 
     //Init Input Handlers which depend on above window created.
     m_directInputSystem = (DirectInput*)&m_systemContainer->CreateNewSystem("InputSystem");
-    m_directInputSystem->Init(GetAppInst(), GetMainWnd(), DISCL_NONEXCLUSIVE | DISCL_FOREGROUND, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND);
-
-
+    m_directInputSystem->Init(GetAppInst(), m_hMainWnd, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND);
 
     //Resource Manager
     m_resourceManagingSystem = (ResourceManager*) &m_systemContainer->CreateNewSystem("ResourceManager");
@@ -74,18 +71,21 @@ int Game_Win32::Init()
     m_gameFSM->Init();
     m_gameFSM->SetState("IntroState", STATE_NONE);
 
+    //Network Manger
+    m_networkManagingSystem = (NetworkManager*)&m_systemContainer->CreateNewSystem("NetworkManager");
+
+#if defined(LIVE_DRIVE_ENABLED)
     //Initalize the network clients
     m_liveDriveClient = new LiveDriveVRClient();
     m_liveDriveClient->init(IP_ADDRESS, DEFAULT_PORT);
 
-    //Network Manger
-    m_networkManagingSystem = (NetworkManager*) &m_systemContainer->CreateNewSystem("NetworkManager");
     m_networkManagingSystem->AddNetPeer(m_liveDriveClient);
-
-    m_appInitialized = true;
+#endif
 
     //Show the window.
     InitMainWindow();
+
+    m_appInitialized = true;
 
     return true;
 }
@@ -119,7 +119,7 @@ void Game_Win32::OnResize()
     m_cameraManagingSystem->onResize(m_clientWidth, m_clientHeight);
 }
 
-void Game_Win32::UpdateScene(float dt)
+void Game_Win32::Update(float dt)
 {
     m_timer->Update();
 
@@ -136,10 +136,10 @@ void Game_Win32::UpdateScene(float dt)
     m_cameraManagingSystem->Update(dt);
 
     //Do the tasks if any
-    m_taskManagingSystem->DoWork();
+    m_taskManagingSystem->Update();
 }
 
-void Game_Win32::DrawScene()
+void Game_Win32::Draw()
 {
 #if defined(LIVE_DRIVE_ENABLED)
     //Live drive capture
@@ -154,9 +154,11 @@ void Game_Win32::DrawScene()
 
     //draw every other object
     m_graphicsSystem->BeginScene();
+
     m_cameraManagingSystem->Draw();
     m_gameFSM->Draw(*m_graphicsSystem);
     m_graphicsSystem->GetRenderingPool().Render();
+    
     m_graphicsSystem->EndScene();
 
     m_graphicsSystem->GetShaderManagerSystem().ClearShaderAndRenderStates(*m_graphicsSystem->GetDeviceContext());

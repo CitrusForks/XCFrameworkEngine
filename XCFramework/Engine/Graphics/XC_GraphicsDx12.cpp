@@ -387,7 +387,7 @@ void XC_GraphicsDx12::BeginScene()
 
     //Set descriptor heaps
     SharedDescriptorHeap& heap = SystemLocator::GetInstance()->RequestSystem<SharedDescriptorHeap>("SharedDescriptorHeap");
-    ID3D12DescriptorHeap* ppHeaps[] = { heap.GetDescriptorHeap() };
+    ID3D12DescriptorHeap* ppHeaps[] = { heap.GetDescriptorHeap(), m_XCShaderSystem->GetSamplerDescriptorHeap() };
     m_graphicsCommandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 
 #if defined(DEBUG_GRAPHICS_PIPELINE)
@@ -402,7 +402,7 @@ void XC_GraphicsDx12::BeginScene()
 
 void XC_GraphicsDx12::EndScene()
 {
-    //PIXSetMarker(m_pCommandQueue, 0, L"Scene End.");
+    PIXSetMarker(m_pCommandQueue, 0, L"Scene End.");
 
     m_renderingPool->End();
 
@@ -416,9 +416,9 @@ void XC_GraphicsDx12::EndScene()
     ID3D12CommandList* ppCmdList[] = { m_graphicsCommandList };
     m_pCommandQueue->ExecuteCommandLists(_countof(ppCmdList), ppCmdList);
 
-    //PIXBeginEvent(m_pCommandQueue, 0, L"Presenting to screen");
+    PIXBeginEvent(m_pCommandQueue, 0, L"Presenting to screen");
     ValidateResult(m_pSwapChain->Present(0, 0));
-    //PIXEndEvent(m_pCommandQueue);
+    PIXEndEvent(m_pCommandQueue);
 
     WaitForPreviousFrameCompletion();
 }

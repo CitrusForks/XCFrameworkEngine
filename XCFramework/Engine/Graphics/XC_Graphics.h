@@ -47,23 +47,23 @@ public:
 
     virtual void                GoFullscreen(bool go);
 
-    bool                        isSecondaryDrawCall() { return m_secondaryDrawCall; }
-    void                        setSecondaryDrawCall(bool isSecondary) { m_secondaryDrawCall = isSecondary; }
+    bool                        IsSecondaryDrawCall() { return m_secondaryDrawCall; }
+    void                        SetSecondaryDrawCall(bool isSecondary) { m_secondaryDrawCall = isSecondary; }
     
     virtual void                OnResize(int _width, int _height);
     virtual void                SetClearColor(XCVec4 color)           { m_clearColor = color; }
 
     virtual void                TurnOffZ();
     virtual void                TurnOnZ();
-    unsigned int                getMsaaQuality() { return m_4xMsaaQuality; }
+    unsigned int                GetMsaaQuality() { return m_4xMsaaQuality; }
 
-    virtual ID3D12PipelineState* GetPipelineState() { return nullptr; }
+    virtual ID3D12PipelineState*    GetPipelineState() { return nullptr; }
 
-    XC_ShaderManager&           GetShaderManagerSystem() { return *m_XCShaderSystem; }
-    RenderingPool&              GetRenderingPool() { return *m_renderingPool; }
+    XC_ShaderManager&               GetShaderManagerSystem() { return *m_XCShaderSystem; }
+    RenderingPool&                  GetRenderingPool() { return *m_renderingPool; }
 
 #if defined(XCGRAPHICS_DX11) || defined(XCGRAPHICS_GNM)
-    RenderableTexture&          GetRenderTexture(RenderTargetsType type) { return *m_renderTargets[type]; }
+    RenderableTexture&              GetRenderTexture(RenderTargetsType type) { return *m_renderTargets[type]; }
 #endif
 
 #if defined(XCGRAPHICS_DX11) 
@@ -80,6 +80,9 @@ public:
     virtual sce::Gnm::Sampler&  GetDefaultSampler() = 0;
 #endif
     virtual int                 GetUserId() { return 0; }
+
+    std::string                 GetDefaultWindowTitle();
+    void                        SetWindowTitle(std::string value);
 
 protected:
     ID3DDevice*                 m_pD3DDevice;

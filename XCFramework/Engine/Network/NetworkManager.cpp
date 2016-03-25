@@ -9,6 +9,7 @@
 
 NetworkManager::NetworkManager()
 {
+    m_pNetPeers.clear();
 }
 
 NetworkManager::~NetworkManager(void)

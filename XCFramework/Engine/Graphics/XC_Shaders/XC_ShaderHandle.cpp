@@ -41,18 +41,17 @@ XCShaderHandle::~XCShaderHandle()
     }
 }
 
-void XCShaderHandle::load(const void* fbBuffer)
+void XCShaderHandle::Load(const void* fbBuffer)
 {
-    IShader::load(fbBuffer);
+    IShader::Load(fbBuffer);
 
     const FBShader* fbShader = (FBShader*)fbBuffer;
     m_enableDepth = fbShader->EnableDepth();
 
-    loadShader();
-    createBufferConstants();
+    LoadShader();
 }
 
-void XCShaderHandle::loadShader()
+void XCShaderHandle::LoadShader()
 {
     //Compile and reflect the shader
 #if defined(USE_D3D_COMPILER)
@@ -78,14 +77,14 @@ void XCShaderHandle::loadShader()
     ValidateResult(D3DReflect(m_pVS, m_vsSize, IID_ID3D11ShaderReflection, (void**)& m_vsShaderReflection));
     ValidateResult(D3DReflect(m_pPS, m_psSize, IID_ID3D11ShaderReflection, (void**)& m_psShaderReflection));
 
-    readShaderDescription();
-    generateRootSignature();
-    generatePSO();
+    ReadShaderDescription();
+    GenerateRootSignature();
+    GeneratePSO();
     
     Logger("Shader %s Created", m_vertexShaderPath.c_str());
 }
 
-void XCShaderHandle::readShaderDescription()
+void XCShaderHandle::ReadShaderDescription()
 {
     //Read the shader descriptions
     D3D12_SHADER_DESC vsShaderDesc = {};
@@ -99,7 +98,7 @@ void XCShaderHandle::readShaderDescription()
         D3D12_SHADER_BUFFER_DESC desc = {};
         m_vsShaderReflection->GetConstantBufferByIndex(cbIndex)->GetDesc(&desc);
 
-        if (std::find_if(m_shaderSlots.begin(), m_shaderSlots.end(), [desc](ShaderSlot it) -> bool { return strcmp(it.getBufferName().c_str(), desc.Name) == 0; }) == m_shaderSlots.end())
+        if (std::find_if(m_shaderSlots.begin(), m_shaderSlots.end(), [desc](ShaderSlot it) -> bool { return strcmp(it.GetBufferName().c_str(), desc.Name) == 0; }) == m_shaderSlots.end())
         {
             //Push the cb desc to our map with its name
             m_shaderSlots.push_back(ShaderSlot(desc));
@@ -115,7 +114,7 @@ void XCShaderHandle::readShaderDescription()
         D3D12_SHADER_BUFFER_DESC desc = {};
         m_psShaderReflection->GetConstantBufferByIndex(cbIndex)->GetDesc(&desc);
 
-        if (std::find_if(m_shaderSlots.begin(), m_shaderSlots.end(), [&desc](ShaderSlot it) -> bool { return strcmp(it.getBufferName().c_str(), desc.Name) == 0; }) == m_shaderSlots.end())
+        if (std::find_if(m_shaderSlots.begin(), m_shaderSlots.end(), [&desc](ShaderSlot it) -> bool { return strcmp(it.GetBufferName().c_str(), desc.Name) == 0; }) == m_shaderSlots.end())
         {
             //Push the cb desc to our map with its name
             m_shaderSlots.push_back(ShaderSlot(desc));
@@ -132,7 +131,7 @@ void XCShaderHandle::readShaderDescription()
         D3D12_SHADER_INPUT_BIND_DESC inputDesc = {};
         m_vsShaderReflection->GetResourceBindingDesc(resBoundIndex, &inputDesc);
 
-        if (std::find_if(m_shaderSlots.begin(), m_shaderSlots.end(), [&inputDesc](ShaderSlot it) -> bool { return strcmp(it.getBufferName().c_str(), inputDesc.Name) == 0; }) == m_shaderSlots.end())
+        if (std::find_if(m_shaderSlots.begin(), m_shaderSlots.end(), [&inputDesc](ShaderSlot it) -> bool { return strcmp(it.GetBufferName().c_str(), inputDesc.Name) == 0; }) == m_shaderSlots.end())
         {
 #if defined(LOG_SHADER_SLOTS)
             Logger("[Resource Bound] Name : %s, Type : %d, Dimensions : %d", inputDesc.Name, inputDesc.Type, inputDesc.Dimension);
@@ -148,7 +147,7 @@ void XCShaderHandle::readShaderDescription()
         D3D12_SHADER_INPUT_BIND_DESC inputDesc = {};
         m_psShaderReflection->GetResourceBindingDesc(resBoundIndex, &inputDesc);
 
-        if (std::find_if(m_shaderSlots.begin(), m_shaderSlots.end(), [&inputDesc](ShaderSlot it) -> bool { return strcmp(it.getBufferName().c_str(), inputDesc.Name) == 0; }) == m_shaderSlots.end())
+        if (std::find_if(m_shaderSlots.begin(), m_shaderSlots.end(), [&inputDesc](ShaderSlot it) -> bool { return strcmp(it.GetBufferName().c_str(), inputDesc.Name) == 0; }) == m_shaderSlots.end())
         {
 #if defined(LOG_SHADER_SLOTS)
             Logger("[Resource Bound] Name : %s, Type : %d, Dimensions : %d", inputDesc.Name, inputDesc.Type, inputDesc.Dimension);
@@ -158,11 +157,11 @@ void XCShaderHandle::readShaderDescription()
     }
 
     //Sort the slots according to a priority
-    sortSlots();
+    SortSlots();
 
     for (unsigned int slotIndex = 0; slotIndex < m_shaderSlots.size(); ++slotIndex)
     {
-        Logger("Slot [ %d ]  : Variable : %s", slotIndex, m_shaderSlots[slotIndex].getBufferName().c_str());
+        Logger("Slot [ %d ]  : Variable : %s", slotIndex, m_shaderSlots[slotIndex].GetBufferName().c_str());
     }
 
     //-----------------------------------------------------------------------------------------------------------
@@ -182,10 +181,10 @@ void XCShaderHandle::readShaderDescription()
     m_inputLayoutDesc = getInputLayoutFromVertexFormat(m_vertexFormat);
 }
 
-unsigned int XCShaderHandle::getSizeOfConstantBuffer(std::string& cbName)
+unsigned int XCShaderHandle::GetSizeOfConstantBuffer(std::string& cbName)
 {
     unsigned int cbSize = 0;
-    auto shaderSlot = std::find_if(m_shaderSlots.begin(), m_shaderSlots.end(), [&cbName](ShaderSlot it) -> bool { return strcmp(it.getBufferName().c_str(), cbName.c_str()) == 0; });
+    auto shaderSlot = std::find_if(m_shaderSlots.begin(), m_shaderSlots.end(), [&cbName](ShaderSlot it) -> bool { return strcmp(it.GetBufferName().c_str(), cbName.c_str()) == 0; });
         
     if (shaderSlot != m_shaderSlots.end())
     {
@@ -196,7 +195,7 @@ unsigned int XCShaderHandle::getSizeOfConstantBuffer(std::string& cbName)
     return cbSize;
 }
 
-void XCShaderHandle::generateRootSignature()
+void XCShaderHandle::GenerateRootSignature()
 {
     //Create no of desc ranges and root params
     std::vector<CD3DX12_DESCRIPTOR_RANGE> descRanges(m_shaderSlots.size(), CD3DX12_DESCRIPTOR_RANGE());
@@ -272,7 +271,7 @@ void XCShaderHandle::generateRootSignature()
     ReleaseCOM(errors);
 }
 
-void XCShaderHandle::generatePSO()
+void XCShaderHandle::GeneratePSO()
 {
     //Generate PSO
 
@@ -292,21 +291,21 @@ void XCShaderHandle::generatePSO()
     ValidateResult(m_device.CreateGraphicsPipelineState(&m_pso->m_psoDesc, IID_PPV_ARGS(&m_pso->m_pPso)));
 }
 
-void XCShaderHandle::sortSlots()
+void XCShaderHandle::SortSlots()
 {
     for (unsigned int slotIndex = 0; slotIndex < m_shaderSlots.size() - 1; ++slotIndex)
     {
-        std::string bufferName = m_shaderSlots[slotIndex].getBufferName();
+        std::string bufferName = m_shaderSlots[slotIndex].GetBufferName();
 
-        unsigned int priorityValue = getSlotPriority(bufferName);
+        unsigned int priorityValue = GetSlotPriority(bufferName);
         int swapIndex = -1;
 
         for (unsigned int cmpSlotIndex = slotIndex + 1; cmpSlotIndex < m_shaderSlots.size(); ++cmpSlotIndex)
         {
             //Find priority of the current compare slot.
-            std::string bufferName = m_shaderSlots[cmpSlotIndex].getBufferName();
+            std::string bufferName = m_shaderSlots[cmpSlotIndex].GetBufferName();
 
-            unsigned int comparePrioritySlot = getSlotPriority(bufferName);
+            unsigned int comparePrioritySlot = GetSlotPriority(bufferName);
 
             if (priorityValue > comparePrioritySlot)
             {
@@ -325,7 +324,7 @@ void XCShaderHandle::sortSlots()
     }
 }
 
-unsigned int XCShaderHandle::getSlotPriority(std::string bufferName)
+unsigned int XCShaderHandle::GetSlotPriority(std::string bufferName)
 {
     for (unsigned int bufferIndex = 0; bufferIndex < gs_slotPriority.size(); ++bufferIndex)
     {
@@ -341,7 +340,7 @@ unsigned int XCShaderHandle::getSlotPriority(std::string bufferName)
     return gs_slotPriority.size();
 }
 
-void XCShaderHandle::applyShader(ID3DDeviceContext& context)
+void XCShaderHandle::ApplyShader(ID3DDeviceContext& context)
 {
 #if defined(XCGRAPHICS_DX12)
 
@@ -359,17 +358,17 @@ void XCShaderHandle::applyShader(ID3DDeviceContext& context)
     context.VSSetShader(m_pVS, nullptr, 0);
     context.PSSetShader(m_pPS, nullptr, 0);
 #elif defined(XCGRAPHICS_GNM)
-    IShader::applyShader(context);
+    IShader::ApplyShader(context);
 #endif
 }
 
 
-void XCShaderHandle::setConstantBuffer(std::string bufferName, ID3DDeviceContext& context, D3D12_GPU_DESCRIPTOR_HANDLE& gpuHandle)
+void XCShaderHandle::SetConstantBuffer(std::string bufferName, ID3DDeviceContext& context, D3D12_GPU_DESCRIPTOR_HANDLE& gpuHandle)
 {
     auto bufferRes = std::find_if(m_shaderSlots.begin(), m_shaderSlots.end(), 
         [&bufferName](ShaderSlot slot) -> bool 
     { 
-        return strcmp(bufferName.c_str(), slot.getBufferName().c_str()) == 0;
+        return strcmp(bufferName.c_str(), slot.GetBufferName().c_str()) == 0;
     });
 
     if (bufferRes != m_shaderSlots.end())
@@ -386,12 +385,35 @@ void XCShaderHandle::setConstantBuffer(std::string bufferName, ID3DDeviceContext
     XCASSERT(false);
 }
 
-void XCShaderHandle::setResource(std::string bufferName, ID3DDeviceContext& context, D3DShaderResourceView* tex)
+void XCShaderHandle::SetSampler(std::string bufferName, ID3DDeviceContext& context, D3D12_GPU_DESCRIPTOR_HANDLE& gpuHandle)
 {
     auto bufferRes = std::find_if(m_shaderSlots.begin(), m_shaderSlots.end(),
         [&bufferName](ShaderSlot slot) -> bool
     {
-        return strcmp(bufferName.c_str(), slot.getBufferName().c_str()) == 0;
+        return strcmp(bufferName.c_str(), slot.GetBufferName().c_str()) == 0;
+    });
+
+    if (bufferRes != m_shaderSlots.end())
+    {
+        unsigned int slotNb = bufferRes - m_shaderSlots.begin();
+        context.SetGraphicsRootDescriptorTable(slotNb, gpuHandle);
+
+#if defined(LOG_SHADER_SLOTS)
+        Logger("[SLOT] Set %s @ slot %d", bufferName.c_str(), slotNb);
+#endif
+        return;
+    }
+
+    //Do not assert as some shaders do not contain samplers.
+    //XCASSERT(false);
+}
+
+void XCShaderHandle::SetResource(std::string bufferName, ID3DDeviceContext& context, D3DShaderResourceView* tex)
+{
+    auto bufferRes = std::find_if(m_shaderSlots.begin(), m_shaderSlots.end(),
+        [&bufferName](ShaderSlot slot) -> bool
+    {
+        return strcmp(bufferName.c_str(), slot.GetBufferName().c_str()) == 0;
     });
 
     if (tex && bufferRes != m_shaderSlots.end())

@@ -10,18 +10,18 @@
 #include "Engine/Graphics/SharedDescriptorHeap.h"
 #include "Assets/Packages/PackageConsts.h"
 
-void IShader::load(const void* fbBuffer)
+void IShader::Load(const void* fbBuffer)
 {
     const FBShader* fbShader = (FBShader*)fbBuffer;
     m_vertexShaderPath = fbShader->VsPath()->c_str();
     m_pixelShaderPath  = fbShader->PsPath()->c_str();
 }
 
-void IShader::createBufferConstants()
+void IShader::CreateConstantBuffers()
 {
 }
 
-void IShader::applyShader(ID3DDeviceContext& context)
+void IShader::ApplyShader(ID3DDeviceContext& context)
 {
 }
 
@@ -36,7 +36,7 @@ void IShader::MemCpyConstants(ID3DDeviceContext& context, void* dest, void* src,
 }
 
 #if defined(XCGRAPHICS_DX12)
-D3DConstantBuffer* IShader::createBuffer(BufferType bufferType, int sizeOfType)
+D3DConstantBuffer* IShader::CreateBuffer(BufferType bufferType, int sizeOfType)
 {
     D3DConstantBuffer* constantBuff = nullptr;
     if (bufferType == BUFFERTYPE_CBV)
@@ -55,7 +55,7 @@ D3DConstantBuffer* IShader::createBuffer(BufferType bufferType, int sizeOfType)
 }
 
 #elif defined(XCGRAPHICS_DX11)
-ID3D11Buffer* IShader::createBuffer(int sizeOfType)
+ID3D11Buffer* IShader::CreateBuffer(int sizeOfType)
 {
     ID3D11Buffer* buffer;
     D3D11_BUFFER_DESC bd;

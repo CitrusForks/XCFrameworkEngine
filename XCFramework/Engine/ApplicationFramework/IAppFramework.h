@@ -22,8 +22,8 @@ public:
     
     virtual void            OnResize()                  = 0;
     virtual void            Run()                       = 0;
-    virtual void            UpdateScene(float dt)       = 0;
-    virtual void            DrawScene( )                = 0;
+    virtual void            Update(float dt)       = 0;
+    virtual void            Draw( )                = 0;
 
     virtual void            Destroy()                   = 0;
     

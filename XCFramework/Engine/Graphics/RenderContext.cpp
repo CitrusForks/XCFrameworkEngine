@@ -35,7 +35,7 @@ void RenderContext::Init(ID3DDevice* device, XC_ShaderManager& shaderMgr, bool c
         0,
         D3D12_COMMAND_LIST_TYPE_DIRECT,
         m_commandAllocator,
-        m_shaderManager->GetShader(ShaderType_SolidColor)->getPso().m_pPso,
+        m_shaderManager->GetShader(ShaderType_SolidColor)->GetPso().m_pPso,
         IID_PPV_ARGS(&m_deviceContext)));
 
     ValidateResult(m_deviceContext->Close());
@@ -73,7 +73,7 @@ void RenderContext::BeginRender()
 
     //Set descriptor heaps
     SharedDescriptorHeap& heap = SystemLocator::GetInstance()->RequestSystem<SharedDescriptorHeap>("SharedDescriptorHeap");
-    ID3D12DescriptorHeap* ppHeaps[] = { heap.GetDescriptorHeap() };
+    ID3D12DescriptorHeap* ppHeaps[] = { heap.GetDescriptorHeap(), m_shaderManager->GetSamplerDescriptorHeap() };
     m_deviceContext->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 #elif defined(XCGRAPHICS_DX11)
     if (m_clearStateOnBegin)
