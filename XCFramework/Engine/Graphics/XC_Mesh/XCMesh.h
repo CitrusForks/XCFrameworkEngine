@@ -29,42 +29,44 @@ public:
     XCMesh();
     virtual ~XCMesh(void);
 
-    virtual void                         Init(int resourceId, std::string userFriendlyName, bool loaded = false);
-    virtual void                         Load(const void* buffer);
-    virtual void                         Load(std::string fileName, float intialScaling = 1.0f);
-    virtual void                         Update(float dt);
-    virtual void                         Draw(RenderContext& context);
-    virtual void                         Draw(RenderContext& context, ShaderType shaderType);
-    virtual void                         Destroy();
+    virtual void                            Init(int resourceId, std::string userFriendlyName, bool loaded = false);
+    virtual void                            Load(const void* buffer);
+    virtual void                            Load(std::string fileName, float intialScaling = 1.0f);
+    virtual void                            Update(float dt);
+    virtual void                            Destroy();
 
-    void                                 DrawAllInstanced(PerObjectBuffer& objectBuffer);
+    void                                    DrawInstanced(PerObjectBuffer& objectBuffer);
 
-    MeshData*                            createAndGetSubMesh();
-    OrientedBoundingBox*                 getComputedAABoundBox() { return m_computedBoundBox.get(); }
+    MeshData*                               CreateAndGetSubMesh();
+    OrientedBoundingBox*                    GetComputedAABoundBox() { return m_computedBoundBox.get(); }
 
-    bool                                 IsSkinnedMesh() { return m_isSkinnedMesh; }
+    bool                                    IsSkinnedMesh() { return m_isSkinnedMesh; }
 
 #if CUSTOM_ANIMATION
-    MeshAnimator*                        GetMeshAnimator() { return m_meshAnimator; }
+    MeshAnimator*                           GetMeshAnimator() { return m_meshAnimator; }
 #endif
 
-    SceneAnimator*                       GetSceneAnimator() { return m_sceneAnimator; }
-    const aiScene*                       GetSceneNode() { return m_scene; }
+    SceneAnimator*                          GetSceneAnimator() { return m_sceneAnimator; }
+    const aiScene*                          GetSceneNode() { return m_scene; }
 
 protected:
-    virtual void                         CreateBuffers();
-    void                                 CreateConstantBuffer();
 
-    virtual void                         DrawSubMesh(RenderContext& renderContext, ShaderType shaderType, unsigned int meshIndex, unsigned int instanceCount = 1);
-    virtual void                         DrawSubMeshes(RenderContext& renderContext, ShaderType shaderType, unsigned int instanceCount = 1);
-
+    virtual void                            CreateBuffers();
+    void                                    CreateConstantBuffer();
 #if defined(XCGRAPHICS_DX11)
-    void                                 buildBuffer(unsigned int sizeOfType, void* ptrToBuffer, unsigned int length, ID3D11Buffer* buffer, D3D11_BUFFER_DESC desc);
+    void                                    BuildBuffer(unsigned int sizeOfType, void* ptrToBuffer, unsigned int length, ID3D11Buffer* buffer, D3D11_BUFFER_DESC desc);
 #endif
 
-    int                                  getSizeFromVertexFormat(VertexFormat format);
-    void                                 filterSubMeshes();
+    virtual void                            Draw(RenderContext& context);
+    virtual void                            DrawSubMesh(RenderContext& renderContext, unsigned int meshIndex);
+    virtual void                            DrawSubMeshes(RenderContext& renderContext);
 
+
+
+    int                                     GetSizeFromVertexFormat(VertexFormat format);
+    void                                    FilterSubMeshes();
+
+    //Member Variables
     std::vector<MeshData*>                  m_subMeshes;
 
 #if CUSTOM_ANIMATION
@@ -95,6 +97,6 @@ protected:
     unsigned int                            m_instanceCount;
 
     //This buffer is created based on the shader type
-    D3DConstantBuffer*                      m_instancedConstantBuffer;
+    D3DConstantBuffer*                      m_cbInstancedBufferGPU;
     cbInstancedBuffer                       m_cbInstancedBuffer;
 };

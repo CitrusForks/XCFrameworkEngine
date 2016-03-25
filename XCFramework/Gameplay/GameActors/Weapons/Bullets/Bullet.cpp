@@ -130,7 +130,7 @@ void Bullet::Draw(RenderContext& context)
         m_material
     };
 
-    m_pMesh->DrawAllInstanced(perObject);
+    m_pMesh->DrawInstanced(perObject);
 
     PhysicsActor::Draw(context);
 }

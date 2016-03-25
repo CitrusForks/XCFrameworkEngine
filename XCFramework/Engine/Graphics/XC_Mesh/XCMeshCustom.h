@@ -15,7 +15,7 @@ public:
 
     XCMeshCustom()
     {
-        m_isSkinnedMesh = true;
+        m_isSkinnedMesh = false;
     }
 
     ~XCMeshCustom()
@@ -23,7 +23,7 @@ public:
     }
 
     void                    Load(const void* buffer);
-    void                    DrawSubMeshes(RenderContext& renderContext, ShaderType shaderType);
+    void                    DrawSubMeshes(RenderContext& renderContext);
 
 private:
 };

@@ -137,15 +137,20 @@ void XCMeshCustom::Load(const void * buffer)
 
     for (unsigned int meshIndex = 0; meshIndex < m_scene->mNumMeshes; ++meshIndex)
     {
-        MeshData* submesh = createAndGetSubMesh();
+        MeshData* submesh = CreateAndGetSubMesh();
         {
             submesh->setObjectName(fbXCMesh->MeshName()->c_str());
             submesh->setNoOfVertices(mesh[meshIndex]->mNumVertices);
             submesh->setNoOfFaces(mesh[meshIndex]->mNumFaces);
             submesh->setNoOfBones(mesh[meshIndex]->mNumBones);
 
-            SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
-            submesh->m_boneBuffer = heap.CreateBufferView(D3DBufferDesc(BUFFERTYPE_CBV, sizeof(cbBoneBuffer)));
+            if (mesh[meshIndex]->HasBones())
+            {
+                SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
+                submesh->m_boneBuffer = heap.CreateBufferView(D3DBufferDesc(BUFFERTYPE_CBV, sizeof(cbBoneBuffer)));
+
+                m_isSkinnedMesh = true;
+            }
 
 #if CUSTOM_ANIMATION
             // collect weights on all vertices. 
@@ -229,7 +234,7 @@ void XCMeshCustom::Load(const void * buffer)
     CreateBuffers();
 }
 
-void XCMeshCustom::DrawSubMeshes(RenderContext& renderContext, ShaderType shaderType)
+void XCMeshCustom::DrawSubMeshes(RenderContext& renderContext)
 {
-    XCMesh::DrawSubMeshes(renderContext, shaderType);
+    XCMesh::DrawSubMeshes(renderContext);
 }

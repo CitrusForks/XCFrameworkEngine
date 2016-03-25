@@ -30,13 +30,12 @@ public:
 
     void            Init(int resourceId, std::string userFriendlyName, bool loaded = false);
     void            Load(const void* buffer);
-    void            DrawText(std::string text, XCVec3Unaligned position, RenderContext& context, ShaderType shaderType);
+    void            DrawText(std::string text, XCVec3Unaligned position, RenderContext& context);
     void            Destroy();
 
 protected:
     void            Draw(RenderContext& context);
-    void            Draw(RenderContext& context, ShaderType shaderType);
-    void            DrawSubMesh(RenderContext& renderContext, ShaderType shaderType, unsigned int meshIndex, unsigned int instanceCount = 1);
+    void            DrawSubMesh(RenderContext& renderContext, unsigned int meshIndex, unsigned int instanceCount = 1);
 
 private:
     //This buffer is actual text to be drawn

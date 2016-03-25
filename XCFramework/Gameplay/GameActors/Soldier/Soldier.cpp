@@ -212,7 +212,7 @@ void Soldier::Draw(RenderContext& context)
         };
     }
 
-    m_pMesh->DrawAllInstanced(perObject);
+    m_pMesh->DrawInstanced(perObject);
 
     PhysicsActor::Draw(context);
 

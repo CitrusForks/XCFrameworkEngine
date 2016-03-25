@@ -40,7 +40,7 @@ void VectorFontMesh::Load(const void * buffer)
     }
 }
 
-void VectorFontMesh::DrawText(std::string text, XCVec3Unaligned position, RenderContext& context, ShaderType shaderType)
+void VectorFontMesh::DrawText(std::string text, XCVec3Unaligned position, RenderContext& context)
 {
     //Decrypt the text and fill up the FontData Buffer to draw
     //Calculate start world for every character
@@ -95,9 +95,6 @@ void VectorFontMesh::DrawText(std::string text, XCVec3Unaligned position, Render
 
         charPosition++;
     }
-
-    //Now draw what is buffered
-    //Draw(context, shaderType);
 }
 
 void VectorFontMesh::Destroy()
@@ -107,28 +104,23 @@ void VectorFontMesh::Destroy()
 
 void VectorFontMesh::Draw(RenderContext& context)
 {
-    Draw(context, ShaderType_VectorFont);
-}
-
-void VectorFontMesh::Draw(RenderContext& context, ShaderType shaderType)
-{
     context.SetRasterizerState(RasterType_FillSolid);
-    context.ApplyShader(shaderType);
+    context.ApplyShader(m_shaderType);
 
-    XCShaderHandle* shader = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(shaderType);
+    XCShaderHandle* shader = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(m_shaderType);
 
     for (auto subMesh : m_subMeshesIdBuffer)
     {
         memcpy(m_subMeshes[subMesh.submeshId]->m_constantBuffer->m_cbDataBegin, &subMesh.orientation.gWVP[0], sizeof(XCMatrix4Unaligned) * subMesh.instanceCount);
         shader->setConstantBuffer("cbPerObjectInstanced", context.GetDeviceContext(), m_subMeshes[subMesh.submeshId]->m_constantBuffer->m_gpuHandle);
-        DrawSubMesh(context, shaderType, subMesh.submeshId, subMesh.instanceCount);
+        DrawSubMesh(context, subMesh.submeshId, subMesh.instanceCount);
     }
 
     //Clear the existing buffer
     m_subMeshesIdBuffer.clear();
 }
 
-void VectorFontMesh::DrawSubMesh(RenderContext & renderContext, ShaderType shaderType, unsigned int meshIndex, unsigned int instanceCount)
+void VectorFontMesh::DrawSubMesh(RenderContext & renderContext, unsigned int meshIndex, unsigned int instanceCount)
 {
     m_shaderHandler->setVertexBuffer(renderContext.GetDeviceContext(), m_subMeshes[meshIndex]->getVertexBuffer());
     m_shaderHandler->setIndexBuffer(renderContext.GetDeviceContext(), m_subMeshes[meshIndex]->getIndexBuffer());

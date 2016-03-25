@@ -26,21 +26,16 @@ public:
     }
 
     virtual void            Init(int resourceId, std::string userFriendlyName, bool loaded = false);
-    virtual void            Draw(RenderContext& context);
-    virtual void            Draw(RenderContext& context, ShaderType shaderType);
     virtual void            Destroy();
 
     void                    Load(const void* buffer);
-    void                    DrawSubMeshes(RenderContext& renderContext, ShaderType shaderType);
-
-    bool                    LoadScene(FbxManager* pManager, FbxDocument* pScene, const char* pFilename);
 
 protected:
-    virtual void            DrawSubMesh(RenderContext& renderContext, ShaderType shaderType, unsigned int meshIndex, unsigned int instanceCount = 1)
-    {
-        XCMesh::DrawSubMesh(renderContext, shaderType, meshIndex, instanceCount);
-    }
+    virtual void            Draw(RenderContext& context);
+    virtual void            DrawSubMesh(RenderContext& renderContext, unsigned int meshIndex);
+    virtual void            DrawSubMeshes(RenderContext& renderContext);
 
+    bool                    LoadScene(FbxManager* pManager, FbxDocument* pScene, const char* pFilename);
     void                    DisplayMetaData(FbxScene* pScene);
     void                    DisplayHierarchy(FbxScene* pScene);
     void                    DisplayHierarchy(FbxNode* pNode, int pDepth);

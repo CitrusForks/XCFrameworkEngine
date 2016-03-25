@@ -65,7 +65,7 @@ void XCMesh::Load(std::string fileName, float initialScaling /* = 1.0f */)
     loader.loadMeshFromFile(fileName, this);
 
     //Filter out objects with zero vertices
-    filterSubMeshes();
+    FilterSubMeshes();
 
     //Create the buffers
     CreateBuffers();
@@ -95,7 +95,7 @@ void XCMesh::Load(const void* buffer)
     loader.loadMeshFromFile(m_resourcePath, this);
 
     //Filter out objects with zero vertices
-    filterSubMeshes();
+    FilterSubMeshes();
 
     //Create the buffers
     CreateBuffers();
@@ -104,7 +104,7 @@ void XCMesh::Load(const void* buffer)
     CreateConstantBuffer();
 }
 
-MeshData* XCMesh::createAndGetSubMesh()
+MeshData* XCMesh::CreateAndGetSubMesh()
 {
     MeshData* subMesh = new MeshData(m_shaderType);
     m_subMeshes.push_back(subMesh);
@@ -428,7 +428,7 @@ void XCMesh::CreateConstantBuffer()
     {
     case ShaderType_LightTexture:
     case ShaderType_SkinnedCharacter:
-        m_instancedConstantBuffer = m_shaderHandler->createConstantBuffer("cbInstancedBuffer");
+        m_cbInstancedBufferGPU = m_shaderHandler->createConstantBuffer("cbInstancedBuffer");
         break;
 
     case ShaderType_VectorFont:
@@ -442,7 +442,7 @@ void XCMesh::CreateConstantBuffer()
 }
 
 #if defined(XCGRAPHICS_DX11)
-void XCMesh::buildBuffer(unsigned int sizeOfType, void* ptrToBuffer, unsigned int length, ID3D11Buffer* buffer, D3D11_BUFFER_DESC desc)
+void XCMesh::BuildBuffer(unsigned int sizeOfType, void* ptrToBuffer, unsigned int length, ID3D11Buffer* buffer, D3D11_BUFFER_DESC desc)
 {
     D3D11_SUBRESOURCE_DATA vInitData;
     vInitData.pSysMem = ptrToBuffer;
@@ -451,7 +451,7 @@ void XCMesh::buildBuffer(unsigned int sizeOfType, void* ptrToBuffer, unsigned in
 }
 #endif
 
-int XCMesh::getSizeFromVertexFormat(VertexFormat format)
+int XCMesh::GetSizeFromVertexFormat(VertexFormat format)
 {
     switch (format)
     {
@@ -480,7 +480,7 @@ int XCMesh::getSizeFromVertexFormat(VertexFormat format)
     }
 }
 
-void XCMesh::filterSubMeshes()
+void XCMesh::FilterSubMeshes()
 {
     unsigned int index = 0;
 
@@ -535,47 +535,37 @@ void XCMesh::Update(float dt)
     }
 }
 
-void XCMesh::Draw(RenderContext & context)
+void XCMesh::Draw(RenderContext& context)
 {
     if (m_instanceCount > 0)
     {
-        Draw(context, m_shaderType);
+        context.SetRasterizerState(RasterType_FillSolid);
+        context.ApplyShader(m_shaderType);
+
+        XC_LightManager* lightMgr = (XC_LightManager*)&SystemLocator::GetInstance()->RequestSystem("LightsManager");
+        m_shaderHandler->setConstantBuffer("cbLightsPerFrame", context.GetDeviceContext(), lightMgr->getLightConstantBuffer()->m_gpuHandle);
+        m_shaderHandler->setResource("gDiffuseMap", context.GetDeviceContext(), m_texture->getTextureResource());
+
+        DrawSubMeshes(context);
+
+        m_instanceCount = 0;
     }
 }
 
-void XCMesh::Draw(RenderContext& context, ShaderType shaderType)
-{
-    context.SetRasterizerState(RasterType_FillSolid);
-    context.ApplyShader(shaderType);
-
-    XC_LightManager* lightMgr = (XC_LightManager*)&SystemLocator::GetInstance()->RequestSystem("LightsManager");
-    m_shaderHandler->setConstantBuffer("cbLightsPerFrame", context.GetDeviceContext(), lightMgr->getLightConstantBuffer()->m_gpuHandle);
-    m_shaderHandler->setResource("gDiffuseMap", context.GetDeviceContext(), m_texture->getTextureResource());
-
-    DrawSubMeshes(context, shaderType);
-
-    m_instanceCount = 0;
-}
-
-void XCMesh::DrawSubMesh(RenderContext& renderContext, ShaderType shaderType, unsigned int meshIndex, unsigned int instanceCount)
+void XCMesh::DrawSubMesh(RenderContext& renderContext, unsigned int meshIndex)
 {
     //For instance based
-    switch (shaderType)
+    switch (m_shaderType)
     {
     case ShaderType_LightTexture:
     {
-        memcpy(m_instancedConstantBuffer->m_cbDataBegin, &m_cbInstancedBuffer, sizeof(cbInstancedBuffer));
-
-        XCShaderHandle* lightTexture = (XCShaderHandle*)renderContext.GetShaderManagerSystem().GetShader(ShaderType_LightTexture);
-        lightTexture->setConstantBuffer("cbInstancedBuffer", renderContext.GetDeviceContext(), m_instancedConstantBuffer->m_gpuHandle);
+        memcpy(m_cbInstancedBufferGPU->m_cbDataBegin, &m_cbInstancedBuffer, sizeof(cbInstancedBuffer));
+        m_shaderHandler->setConstantBuffer("cbInstancedBuffer", renderContext.GetDeviceContext(), m_cbInstancedBufferGPU->m_gpuHandle);
         break;
     }
 
     case ShaderType_SkinnedCharacter:
     {
-        renderContext.SetRasterizerState(RasterType_FillSolid);
-        renderContext.ApplyShader(shaderType);
-
         std::vector<XCMatrix4Unaligned> boneMatrix = m_sceneAnimator->GetBoneMatrices(m_scene->mRootNode, meshIndex);
 
         cbBoneBuffer boneBuffer = {};
@@ -585,9 +575,7 @@ void XCMesh::DrawSubMesh(RenderContext& renderContext, ShaderType shaderType, un
         }
 
         memcpy(m_subMeshes[meshIndex]->m_boneBuffer->m_cbDataBegin, &boneBuffer, sizeof(boneBuffer));
-
-        XCShaderHandle* skinnedCharacterShader = (XCShaderHandle*)renderContext.GetShaderManagerSystem().GetShader(ShaderType_SkinnedCharacter);
-        skinnedCharacterShader->setConstantBuffer("cbBoneBuffer", renderContext.GetDeviceContext(), m_subMeshes[meshIndex]->m_boneBuffer->m_gpuHandle);
+        m_shaderHandler->setConstantBuffer("cbBoneBuffer", renderContext.GetDeviceContext(), m_subMeshes[meshIndex]->m_boneBuffer->m_gpuHandle);
         break;
     }
 
@@ -604,11 +592,11 @@ void XCMesh::DrawSubMesh(RenderContext& renderContext, ShaderType shaderType, un
         m_instanceCount);
 }
 
-void XCMesh::DrawSubMeshes(RenderContext& renderContext, ShaderType shaderType, unsigned int instanceCount)
+void XCMesh::DrawSubMeshes(RenderContext& renderContext)
 {
     for (unsigned int index = 0; index < m_subMeshes.size(); index++)
     {
-        DrawSubMesh(renderContext, shaderType, index, instanceCount);
+        DrawSubMesh(renderContext, index);
     }
 
     //Need not draw. Draw the clone of this in every actor
@@ -632,7 +620,7 @@ void XCMesh::Destroy()
 }
 
 //
-void XCMesh::DrawAllInstanced(PerObjectBuffer & objectBuffer)
+void XCMesh::DrawInstanced(PerObjectBuffer& objectBuffer)
 {
     m_cbInstancedBuffer.gPerObject[m_instanceCount++] = objectBuffer;
 }

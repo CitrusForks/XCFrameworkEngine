@@ -532,7 +532,7 @@ void XCMeshFBX::DisplayMesh(FbxNode* pNode)
 
     DisplayString("Mesh Name: ", (char *)pNode->GetName());
 
-    MeshData* submesh = createAndGetSubMesh();
+    MeshData* submesh = CreateAndGetSubMesh();
     {
         submesh->setObjectName(pNode->GetName());
         submesh->setNoOfVertices(lMesh->GetPolygonCount() * 3);
@@ -859,17 +859,17 @@ void XCMeshFBX::Draw(RenderContext& context)
     XCMesh::Draw(context);
 }
 
-void XCMeshFBX::Draw(RenderContext& context, ShaderType shaderType)
+void XCMeshFBX::DrawSubMesh(RenderContext& renderContext, unsigned int meshIndex)
 {
-    XCMesh::Draw(context, shaderType);
+    XCMesh::DrawSubMesh(renderContext, meshIndex);
+}
+
+void XCMeshFBX::DrawSubMeshes(RenderContext& renderContext)
+{
+    XCMesh::DrawSubMeshes(renderContext);
 }
 
 void XCMeshFBX::Destroy()
 {
     XCMesh::Destroy();
-}
-
-void XCMeshFBX::DrawSubMeshes(RenderContext& renderContext, ShaderType shaderType)
-{
-    XCMesh::DrawSubMeshes(renderContext, shaderType);
 }

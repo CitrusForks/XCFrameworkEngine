@@ -3,8 +3,11 @@ XCFramework is a cross platform Game engine written in C++ with DirectX12, Direc
 
 ![alt tag](http://3.bp.blogspot.com/-iq8T8NVzv94/VNOlfA7k64I/AAAAAAAAFyg/cvNiCBVb-kc/s1600/xcframework_terrain.PNG)
 ![alt tag](http://3.bp.blogspot.com/-vQwAOfaZ4E4/VPH5n7pWfxI/AAAAAAAAF2I/73GkEw2gHW0/s1600/XCFramework_Editor.PNG)
+![alt tag](https://3.bp.blogspot.com/-689TitxiBwE/VvUpM6OY8dI/AAAAAAAAITg/06f0I7Dai-EYMg0gdI_QJFRrjCxF0VBDw/s640/Capture.PNG)
+
 
 # Features
+- Vector Font Instance Rendering.
 - Offline Shader tools to build the shader binaries.
 - Engine supports Reflection API, to fetch description of shaders and create respective layouts and slots. 
 - VR support - Realtime rendering of frames from engine to a smartphone through network protocols (using socks) and provides Virtual Reality in a split screen that requires a Google Cardboard. Accelerometer inputs allows the user to move the objects in the engine. (Working with Dx11 enabled. With Dx12 to come soon.)

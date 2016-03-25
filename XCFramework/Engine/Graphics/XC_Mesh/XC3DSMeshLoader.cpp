@@ -80,7 +80,7 @@ bool XC3DSMeshLoader::loadMeshFromFile(std::string fileName, XCMesh* const outMe
 
         case CHUNK_OBJECT:
             {
-                subMesh = outMesh->createAndGetSubMesh();
+                subMesh = outMesh->CreateAndGetSubMesh();
 
                 //OBJECT CHUNK
                 int i = 0;
