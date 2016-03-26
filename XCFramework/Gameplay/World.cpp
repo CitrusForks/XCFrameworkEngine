@@ -349,9 +349,9 @@ void World::CheckAllCollisions()
 
 bool World::CheckCollision(PhysicsActor* obj1, PhysicsActor* obj2)
 {
-    switch (obj1->getCollisionDetectionType() + obj2->getCollisionDetectionType())
+    switch (obj1->getCollisionDetectionType() | obj2->getCollisionDetectionType())
     {
-        case COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX + COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX:
+        case COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX | COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX:
             if (obj1->getBoundBox()->m_TransformedBox.Intersects(obj2->getBoundBox()->m_TransformedBox))
             {
                 //Before resolving know which corner point was hit
@@ -368,11 +368,11 @@ bool World::CheckCollision(PhysicsActor* obj1, PhysicsActor* obj2)
             }
             break;
 
-        case COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX + COLLISIONDETECTIONTYPE_TRIANGLE:
+        case COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX | COLLISIONDETECTIONTYPE_TRIANGLE:
 
             break;
 
-        case COLLISIONDETECTIONTYPE_TERRAIN + COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX:
+        case COLLISIONDETECTIONTYPE_TERRAIN | COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX:
             {
                 //Handle terrain and boundbox collision
                 PhysicsActor* bboxActor = obj1->getCollisionDetectionType() == COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX ? obj1 : obj2;
@@ -400,7 +400,7 @@ bool World::CheckCollision(PhysicsActor* obj1, PhysicsActor* obj2)
                 break;
             }
 
-        case COLLISIONDETECTIONTYPE_BULLET + COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX:
+        case COLLISIONDETECTIONTYPE_BULLET | COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX:
             {
                 PhysicsActor* objectActor = obj1->getCollisionDetectionType() == COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX ? obj1 : obj2;
                 PhysicsActor* bulletActor = obj1->getCollisionDetectionType() == COLLISIONDETECTIONTYPE_BULLET ? obj1 : obj2;

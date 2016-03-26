@@ -4,22 +4,30 @@
         { FontResourceName:"VectorFontFBX" }
     ],
 
-    FBSoldiers:
+    FBPCSoldiers:
     [
-        { "SoldierObjectType":"PCSoldier",  Position:{ x:10, y:2, z:10}, XCMeshResourceName:"Soldier" },
-        { "SoldierObjectType":"NPCSoldier", Position:{x:-30, y:2, z:50}, XCMeshResourceName:"Soldier" },
-		{ "SoldierObjectType":"NPCSoldier", Position:{x:-30, y:2, z:60}, XCMeshResourceName:"Soldier" },
-		{ SoldierObjectType:"NPCSoldier", Position:{x:-30, y:2, z:70}, XCMeshResourceName:"Soldier" },
-		{ SoldierObjectType:"NPCSoldier", Position:{x:-30, y:2, z:80}, XCMeshResourceName:"Soldier" },
-		{ SoldierObjectType:"NPCSoldier", Position:{x:-30, y:2, z:90}, XCMeshResourceName:"Soldier" },
-		{ SoldierObjectType:"NPCSoldier", Position:{x:-30, y:2, z:100}, XCMeshResourceName:"Soldier" },
-		{ SoldierObjectType:"NPCSoldier", Position:{x:-30, y:2, z:100}, XCMeshResourceName:"Soldier" }
+        { Position:{ x:10, y:2, z:10}, XCMeshResourceName:"Soldier" },
     ],
 
-    FBCars:
+    FBNPCSoldiers:
     [
-       { CarObjectType:"PCCar",  Position:{x:0,  y:2, z:0}, XCMeshResourceName:"PorcheCar" },
-	   { CarObjectType:"NPCCar", Position:{x:10, y:2, z:30}, XCMeshResourceName:"PorcheCar" }
+        { Position:{x:-30, y:2, z:50}, XCMeshResourceName:"Soldier" },
+		{ Position:{x:-30, y:2, z:60}, XCMeshResourceName:"Soldier" },
+		{ Position:{x:-30, y:2, z:70}, XCMeshResourceName:"Soldier" },
+		{ Position:{x:-30, y:2, z:80}, XCMeshResourceName:"Soldier" },
+		{ Position:{x:-30, y:2, z:90}, XCMeshResourceName:"Soldier" },
+		{ Position:{x:-30, y:2, z:100}, XCMeshResourceName:"Soldier" },
+		{ Position:{x:-30, y:2, z:100}, XCMeshResourceName:"Soldier" }
+    ],
+
+    FBPCCars:
+    [
+       { Position:{x:0,  y:2, z:0}, XCMeshResourceName:"PorcheCar" },
+    ],
+
+    FBNPCCars:
+    [
+	   { Position:{x:10, y:2, z:30}, XCMeshResourceName:"PorcheCar" }
     ],
 
 	FBLiveDriveTexturePlanes:
@@ -59,11 +67,6 @@
 		 RowSpacing:1,
 		 ColSpacing:1
 	   }
-    ],
-
-	FBWavess:
-    [
-        { Position:{x:100, y:0, z:0}, Rows:25, Column:25, RowSpacing:1, ColSpacing:1 }
     ],
 
 	FBSimpleSkyBoxes:

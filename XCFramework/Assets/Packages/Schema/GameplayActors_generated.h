@@ -336,15 +336,12 @@ inline flatbuffers::Offset<FBMultiTexturedTerrain> CreateFBMultiTexturedTerrain(
 }
 
 struct FBCar FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  const flatbuffers::String *CarObjectType() const { return GetPointer<const flatbuffers::String *>(4); }
-  const Vec3 *Position() const { return GetStruct<const Vec3 *>(6); }
-  const flatbuffers::String *XCMeshResourceName() const { return GetPointer<const flatbuffers::String *>(8); }
+  const Vec3 *Position() const { return GetStruct<const Vec3 *>(4); }
+  const flatbuffers::String *XCMeshResourceName() const { return GetPointer<const flatbuffers::String *>(6); }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 4 /* CarObjectType */) &&
-           verifier.Verify(CarObjectType()) &&
-           VerifyField<Vec3>(verifier, 6 /* Position */) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 8 /* XCMeshResourceName */) &&
+           VerifyField<Vec3>(verifier, 4 /* Position */) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, 6 /* XCMeshResourceName */) &&
            verifier.Verify(XCMeshResourceName()) &&
            verifier.EndTable();
   }
@@ -353,25 +350,22 @@ struct FBCar FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct FBCarBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_CarObjectType(flatbuffers::Offset<flatbuffers::String> CarObjectType) { fbb_.AddOffset(4, CarObjectType); }
-  void add_Position(const Vec3 *Position) { fbb_.AddStruct(6, Position); }
-  void add_XCMeshResourceName(flatbuffers::Offset<flatbuffers::String> XCMeshResourceName) { fbb_.AddOffset(8, XCMeshResourceName); }
+  void add_Position(const Vec3 *Position) { fbb_.AddStruct(4, Position); }
+  void add_XCMeshResourceName(flatbuffers::Offset<flatbuffers::String> XCMeshResourceName) { fbb_.AddOffset(6, XCMeshResourceName); }
   FBCarBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
   FBCarBuilder &operator=(const FBCarBuilder &);
   flatbuffers::Offset<FBCar> Finish() {
-    auto o = flatbuffers::Offset<FBCar>(fbb_.EndTable(start_, 3));
+    auto o = flatbuffers::Offset<FBCar>(fbb_.EndTable(start_, 2));
     return o;
   }
 };
 
 inline flatbuffers::Offset<FBCar> CreateFBCar(flatbuffers::FlatBufferBuilder &_fbb,
-   flatbuffers::Offset<flatbuffers::String> CarObjectType = 0,
    const Vec3 *Position = 0,
    flatbuffers::Offset<flatbuffers::String> XCMeshResourceName = 0) {
   FBCarBuilder builder_(_fbb);
   builder_.add_XCMeshResourceName(XCMeshResourceName);
   builder_.add_Position(Position);
-  builder_.add_CarObjectType(CarObjectType);
   return builder_.Finish();
 }
 
@@ -410,15 +404,12 @@ inline flatbuffers::Offset<FBDoor> CreateFBDoor(flatbuffers::FlatBufferBuilder &
 }
 
 struct FBSoldier FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  const flatbuffers::String *SoldierObjectType() const { return GetPointer<const flatbuffers::String *>(4); }
-  const Vec3 *Position() const { return GetStruct<const Vec3 *>(6); }
-  const flatbuffers::String *XCMeshResourceName() const { return GetPointer<const flatbuffers::String *>(8); }
+  const Vec3 *Position() const { return GetStruct<const Vec3 *>(4); }
+  const flatbuffers::String *XCMeshResourceName() const { return GetPointer<const flatbuffers::String *>(6); }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 4 /* SoldierObjectType */) &&
-           verifier.Verify(SoldierObjectType()) &&
-           VerifyField<Vec3>(verifier, 6 /* Position */) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 8 /* XCMeshResourceName */) &&
+           VerifyField<Vec3>(verifier, 4 /* Position */) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, 6 /* XCMeshResourceName */) &&
            verifier.Verify(XCMeshResourceName()) &&
            verifier.EndTable();
   }
@@ -427,25 +418,22 @@ struct FBSoldier FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct FBSoldierBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_SoldierObjectType(flatbuffers::Offset<flatbuffers::String> SoldierObjectType) { fbb_.AddOffset(4, SoldierObjectType); }
-  void add_Position(const Vec3 *Position) { fbb_.AddStruct(6, Position); }
-  void add_XCMeshResourceName(flatbuffers::Offset<flatbuffers::String> XCMeshResourceName) { fbb_.AddOffset(8, XCMeshResourceName); }
+  void add_Position(const Vec3 *Position) { fbb_.AddStruct(4, Position); }
+  void add_XCMeshResourceName(flatbuffers::Offset<flatbuffers::String> XCMeshResourceName) { fbb_.AddOffset(6, XCMeshResourceName); }
   FBSoldierBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
   FBSoldierBuilder &operator=(const FBSoldierBuilder &);
   flatbuffers::Offset<FBSoldier> Finish() {
-    auto o = flatbuffers::Offset<FBSoldier>(fbb_.EndTable(start_, 3));
+    auto o = flatbuffers::Offset<FBSoldier>(fbb_.EndTable(start_, 2));
     return o;
   }
 };
 
 inline flatbuffers::Offset<FBSoldier> CreateFBSoldier(flatbuffers::FlatBufferBuilder &_fbb,
-   flatbuffers::Offset<flatbuffers::String> SoldierObjectType = 0,
    const Vec3 *Position = 0,
    flatbuffers::Offset<flatbuffers::String> XCMeshResourceName = 0) {
   FBSoldierBuilder builder_(_fbb);
   builder_.add_XCMeshResourceName(XCMeshResourceName);
   builder_.add_Position(Position);
-  builder_.add_SoldierObjectType(SoldierObjectType);
   return builder_.Finish();
 }
 

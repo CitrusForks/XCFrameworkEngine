@@ -47,24 +47,30 @@ void PCSoldier::Update(float dt)
 
     if (getIsControlled())
     {
+        bool isMoving = false;
+
         if (m_directInput->KeyDown(INPUT_UP))
         {
             Walk(50);
+            isMoving = true;
         }
 
         if (m_directInput->KeyDown(INPUT_DOWN))
         {
             Walk(-50);
+            isMoving = true;
         }
 
         if (m_directInput->KeyDown(INPUT_LEFT))
         {
             Strafe(-20);
+            isMoving = true;
         }
 
         if (m_directInput->KeyDown(INPUT_RIGHT))
         {
             Strafe(20);
+            isMoving = true;
         }
 
         Yaw(m_directInput->MouseDX() * dt, 5.0f);
@@ -73,6 +79,12 @@ void PCSoldier::Update(float dt)
         if (m_directInput->KeyDown(INPUT_KEY_SPACE))
         {
             Jump(20);
+            isMoving = true;
+        }
+
+        if (!isMoving)
+        {
+            ClearVelocity();
         }
     }
 

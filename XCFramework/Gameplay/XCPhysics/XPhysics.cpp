@@ -75,6 +75,12 @@ void XPhysics::ClearForce()
     m_ForceAccumulator = XMLoadFloat3(&vec);
 }
 
+void XPhysics::ClearVelocity()
+{
+    XCVec3 vec = XCVec3(0, 0, 0);
+    m_Velocity = XMLoadFloat3(&vec);
+}
+
 bool XPhysics::HasFiniteMass()
 {
     return m_InverseMass >= 0.0f;

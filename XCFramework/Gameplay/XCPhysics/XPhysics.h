@@ -19,6 +19,7 @@ public:
     void                InitXPhysics(XCVecIntrinsic4 _position, XCVecIntrinsic4 _velocity, XCVecIntrinsic4 _acceleration, float _mass, float _damping);
     void                Integrator(float dtS);
     void                ClearForce();
+    void                ClearVelocity();
     void                AddForce(XCVecIntrinsic4 _newForce);
     bool                HasFiniteMass();
 

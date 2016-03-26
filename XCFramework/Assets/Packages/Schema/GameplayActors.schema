@@ -60,7 +60,6 @@ table FBMultiTexturedTerrain
 
 table FBCar
 {
-	CarObjectType:string; //PCCar or NPCCar
 	Position:Vec3;
 	XCMeshResourceName:string;
 }
@@ -73,7 +72,6 @@ table FBDoor
 
 table FBSoldier
 {
-	SoldierObjectType:string; //PCSoldier or NPCSoldier
 	Position:Vec3;
 	XCMeshResourceName:string;
 }

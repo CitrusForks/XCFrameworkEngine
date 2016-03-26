@@ -5,8 +5,10 @@ include "GameplayActors.schema";
 table FBOpenWorldScene
 {
 	FBFonts:[FBFont];
-	FBSoldiers:[FBSoldier];
-	FBCars:[FBCar];
+	FBPCSoldiers:[FBSoldier];
+	FBNPCSoldiers:[FBSoldier];
+	FBPCCars:[FBCar];
+	FBNPCCars:[FBCar];
 	FBTexturePlanes:[FBTexturePlane];
 	FBLiveDriveTexturePlanes:[FBLiveDriveTexturePlane];
 	FBMultiTexturedTerrains:[FBMultiTexturedTerrain];
