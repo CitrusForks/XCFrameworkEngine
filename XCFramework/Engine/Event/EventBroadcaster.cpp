@@ -5,19 +5,10 @@
  * For complete license, read License.txt in source root directory. */
 
 #include "stdafx.h"
-
 #include "EventBroadcaster.h"
 
-EventBroadcaster* EventBroadcaster::m_psEventBroadcaster = nullptr;
-
-EventBroadcaster* EventBroadcaster::GetInstance()
+EventBroadcaster::EventBroadcaster()
 {
-    if (m_psEventBroadcaster == nullptr)
-    {
-        m_psEventBroadcaster = new EventBroadcaster();
-    }
-
-    return m_psEventBroadcaster;
 }
 
 EventBroadcaster::~EventBroadcaster()
@@ -45,6 +36,10 @@ void EventBroadcaster::RemoveListener(IEventListener* listener)
             }
         }
     }
+}
+
+void EventBroadcaster::Update()
+{
 }
 
 void EventBroadcaster::BroadcastEvent(IEvent* evt)

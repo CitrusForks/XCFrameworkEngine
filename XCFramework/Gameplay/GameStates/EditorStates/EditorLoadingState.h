@@ -5,7 +5,6 @@
 
 namespace GameState
 {
-
     class EditorLoadingState : public IGameState
     {
     public:
@@ -14,7 +13,7 @@ namespace GameState
         EditorLoadingState(void);
         virtual ~EditorLoadingState(void);
 
-        void                        Init(GameFiniteStateMachine& gameFSM);
+        void                        Init();
         void                        Update(float dt);
         void                        Draw(XC_Graphics& graphicsSystem);
         void                        Destroy();
@@ -23,5 +22,4 @@ namespace GameState
         int                         m_loadTaskId;
         TaskManager*                m_taskMgr;
     };
-
 }

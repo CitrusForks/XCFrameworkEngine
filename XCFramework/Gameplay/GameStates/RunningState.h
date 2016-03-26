@@ -14,7 +14,6 @@
 
 namespace GameState
 {
-
     class RunningState : public IGameState
     {
     public:
@@ -23,11 +22,10 @@ namespace GameState
         RunningState(void);
         virtual ~RunningState(void);
 
-        void                    Init(GameFiniteStateMachine& gameFSM);
+        void                    Init();
         void                    Update(float dt);
         void                    Draw(XC_Graphics& graphicsSystem);
         void                    Destroy();
-
 
     private:
         int                     m_currentMainPlayableActor;
@@ -38,5 +36,4 @@ namespace GameState
         DirectInput*            m_directInput;
         World*                  m_worldSystem;
     };
-
 }

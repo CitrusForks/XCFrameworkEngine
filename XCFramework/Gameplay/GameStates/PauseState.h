@@ -19,7 +19,7 @@ namespace GameState
         PauseState(void);
         virtual ~PauseState(void);
 
-        void                Init(GameFiniteStateMachine& gameFSM);
+        void                Init();
         void                Update(float dt);
         void                Draw(XC_Graphics& graphicsSystem);
         void                Destroy();

@@ -7,6 +7,8 @@
 #pragma once
 
 #include "Engine/ApplicationFramework/Win32/AppFramework_Win32.h"
+
+#include "Engine/Event/EventBroadcaster.h"
 #include "Engine/Utils/Timer.h"
 #include "Engine/TaskManager/TaskManager.h"
 #include "Engine/Input/Directinput.h"
@@ -26,15 +28,17 @@ public:
     ~Game_Win32();
 
     int                     Init();
-    void                    OnResize();
     void                    Update(float dt);
     void                    Draw();
-    void                    EnableFullScreenMode(bool enable);
     void                    Destroy();
 
     void                    RegisterSystems();
+    void                    OnResize();
+    void                    EnableFullScreenMode(bool enable);
 
 private:
+    
+    EventBroadcaster*            m_eventBroadcaster;
     Timer*                       m_timer;
     INetPeer*                    m_liveDriveClient;
     DirectInput*                 m_directInputSystem;

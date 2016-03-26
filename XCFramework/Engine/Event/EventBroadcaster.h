@@ -6,25 +6,24 @@
 
 #pragma once
 
+#include "Engine/System/ISystem.h"
 #include "Engine/Event/IEvent.h"
 #include "Engine/Event/IEventListener.h"
 
-class EventBroadcaster
+class EventBroadcaster : public ISystem
 {
 public:
+    DECLARE_SYSTEMOBJECT_CREATION(EventBroadcaster)
+
+    EventBroadcaster();
     ~EventBroadcaster();
 
-    static EventBroadcaster*    GetInstance();
-    virtual void                BroadcastEvent(IEvent* evt);
-    virtual void                AddListener(IEventListener* listener);
-    virtual void                RemoveListener(IEventListener* listener);
+    void                Update();
+    void                BroadcastEvent(IEvent* evt);
+    void                AddListener(IEventListener* listener);
+    void                RemoveListener(IEventListener* listener);
 
 private:
-    EventBroadcaster() { }
-
-    static EventBroadcaster*         m_psEventBroadcaster;
     std::vector<IEventListener*>     m_eventListeners;
 };
-
-#define EVENTMANAGER            EventBroadcaster::GetInstance()
 

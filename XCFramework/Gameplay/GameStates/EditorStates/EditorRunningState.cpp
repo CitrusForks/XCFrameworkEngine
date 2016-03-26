@@ -1,10 +1,10 @@
 #include "stdafx.h"
 
 #include "Gameplay/GameStates/EditorStates/EditorRunningState.h"
+#include "Gameplay/WorldEditor.h"
 
 #include "Engine/Resource/ResourceManager.h"
 #include "Engine/Graphics/XC_Camera/XC_CameraManager.h"
-#include "Gameplay/WorldEditor.h"
 
 using namespace GameState;
 
@@ -15,10 +15,9 @@ EditorRunningState::EditorRunningState(void)
 
 EditorRunningState::~EditorRunningState(void)
 {
-
 }
 
-void GameState::EditorRunningState::Init(GameFiniteStateMachine& gameFSM)
+void EditorRunningState::Init(GameFiniteStateMachine& gameFSM)
 {
     TaskManager& taskManger = (TaskManager&)SystemLocator::GetInstance()->RequestSystem("TaskManager");
     SystemContainer& sysContainer = (SystemContainer&)SystemLocator::GetInstance()->GetSystemContainer();
@@ -60,7 +59,7 @@ void EditorRunningState::Update(float dt)
     m_worldEditor->Update(dt);
 }
 
-void GameState::EditorRunningState::Draw(XC_Graphics& graphicsSystem)
+void EditorRunningState::Draw(XC_Graphics& graphicsSystem)
 {
     m_lightManagerSystem->Draw(graphicsSystem);
     m_worldEditor->Draw(graphicsSystem);
@@ -69,7 +68,5 @@ void GameState::EditorRunningState::Draw(XC_Graphics& graphicsSystem)
 void EditorRunningState::Destroy()
 {
     m_lightManagerSystem->Destroy();
-    delete(m_lightManagerSystem);
-
     m_worldEditor->Destroy();
 }

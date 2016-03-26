@@ -10,7 +10,6 @@
 #include "Engine/Resource/ResourceManager.h"
 #include "Gameplay/GameStates/GameStateTypes.h"
 
-#include "Gameplay/GameFiniteStateMachine.h"
 #include "Engine/Graphics/XC_GraphicsDx11.h"
 #include "Engine/TaskManager/TaskManager.h"
 
@@ -26,9 +25,9 @@ LoadingState::~LoadingState(void)
 {
 }
 
-void GameState::LoadingState::Init(GameFiniteStateMachine& gameFSM)
+void LoadingState::Init()
 {
-    IGameState::Init(gameFSM);
+    IGameState::Init();
 
     ResourceManager& resMgr = (ResourceManager&)SystemLocator::GetInstance()->RequestSystem("ResourceManager");
 
@@ -43,7 +42,9 @@ void LoadingState::Update(float dt)
     //Wait for resource loader to complete the loading of resources. When done move to next state.
     if ( resMgr.IsPackageLoaded())
     {
-        m_gameFSM->SetState("LoadingWorldState", STATE_DESTROY);
+        Event_GameStateChange event("LoadingWorldState", STATE_DESTROY);
+        EventBroadcaster& broadcaster = (EventBroadcaster&)SystemLocator::GetInstance()->RequestSystem("EventBroadcaster");
+        broadcaster.BroadcastEvent(&event);
     }
 }
 

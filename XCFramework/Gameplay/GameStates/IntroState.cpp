@@ -7,7 +7,6 @@
 #include "stdafx.h"
 
 #include "Gameplay/GameStates/IntroState.h"
-#include "Gameplay/GameFiniteStateMachine.h"
 
 using namespace GameState;
 
@@ -20,18 +19,20 @@ IntroState::~IntroState(void)
 {
 }
 
-void GameState::IntroState::Init(GameFiniteStateMachine& gameFSM)
+void IntroState::Init()
 {
-    IGameState::Init(gameFSM);
+    IGameState::Init();
 }
 
 void IntroState::Update(float dt)
 {
     Logger("[GAME STATE] Intro");
-    m_gameFSM->SetState("MainMenuState", STATE_DESTROY);
+    Event_GameStateChange event("MainMenuState", STATE_DESTROY);
+    EventBroadcaster& broadcaster = (EventBroadcaster&)SystemLocator::GetInstance()->RequestSystem("EventBroadcaster");
+    broadcaster.BroadcastEvent(&event);
 }
 
-void GameState::IntroState::Draw(XC_Graphics& graphicsSystem)
+void IntroState::Draw(XC_Graphics& graphicsSystem)
 {
     IGameState::Draw(graphicsSystem);
 }

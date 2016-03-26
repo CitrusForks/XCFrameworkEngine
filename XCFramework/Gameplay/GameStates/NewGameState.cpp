@@ -7,10 +7,8 @@
 #include "stdafx.h"
 
 #include "Gameplay/GameStates/NewGameState.h"
-#include "Gameplay/GameFiniteStateMachine.h"
 
 using namespace GameState;
-
 
 NewGameState::NewGameState(void)
 {
@@ -22,14 +20,16 @@ NewGameState::~NewGameState(void)
 {
 }
 
-void GameState::NewGameState::Init(GameFiniteStateMachine& gameFSM)
+void NewGameState::Init()
 {
-    IGameState::Init(gameFSM);
+    IGameState::Init();
 }
 
 void NewGameState::Update(float dt)
 {
-    m_gameFSM->SetState("LoadingState", STATE_DESTROY);
+    Event_GameStateChange event("LoadingState", STATE_DESTROY);
+    EventBroadcaster& broadcaster = (EventBroadcaster&)SystemLocator::GetInstance()->RequestSystem("EventBroadcaster");
+    broadcaster.BroadcastEvent(&event);
 }
 
 void NewGameState::Draw(XC_Graphics& graphicsSystem)

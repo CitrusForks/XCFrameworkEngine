@@ -7,8 +7,11 @@
 #pragma once
 
 #include "Engine/Serializer/IBase.h"
+#include "Engine/Event/IEvent.h"
+#include "Engine/Event/EventBroadcaster.h"
 
-class GameFiniteStateMachine;
+#include "Gameplay/GameStates/GameStateTypes.h"
+
 class XC_Graphics;
 
 namespace GameState
@@ -19,7 +22,7 @@ namespace GameState
         IGameState(void);
         virtual ~IGameState(void);
 
-        virtual void            Init(GameFiniteStateMachine& gameFSM);
+        virtual void            Init();
         virtual void            Update(float dt) = 0;
         virtual void            Draw(XC_Graphics& graphicsSystem);
         virtual void            Destroy();
@@ -28,7 +31,19 @@ namespace GameState
 
     protected:
         bool                    m_isPaused;
-        GameFiniteStateMachine* m_gameFSM;
     };
-
 }
+
+class Event_GameStateChange : public IEvent
+{
+public:
+    Event_GameStateChange(std::string stateName, EWhatToDoWithPreviousState prevState)
+        : IEvent(EventType_GameStateChange)
+        , m_stateName(stateName)
+        , m_previousState(prevState)
+    {
+    }
+
+    std::string                 m_stateName;
+    EWhatToDoWithPreviousState  m_previousState;
+};

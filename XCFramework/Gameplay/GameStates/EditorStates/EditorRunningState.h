@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Gameplay/GameStates/IGameState.h"
-#include "Engine/Graphics/XC_Lighting/XC_LightManager.h"
 #include "Gameplay/GameActors/GameActorsFactory.h"
+#include "Engine/Graphics/XC_Lighting/XC_LightManager.h"
 
 class WorldEditor;
 
@@ -17,7 +17,7 @@ namespace GameState
         EditorRunningState(void);
         virtual ~EditorRunningState(void);
 
-        void                        Init(GameFiniteStateMachine& gameFSM);
+        void                        Init();
         void                        Update(float dt);
         void                        Draw(XC_Graphics& graphicsSystem);
         void                        Destroy();

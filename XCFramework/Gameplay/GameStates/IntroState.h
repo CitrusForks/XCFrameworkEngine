@@ -7,12 +7,9 @@
 #pragma once
 
 #include "Gameplay/GameStates/IGameState.h"
-#include "Engine/Graphics/BasicGeometry/CubeMesh.h"
-
 
 namespace GameState
 {
-
     class IntroState :public IGameState
     {
     public:
@@ -21,10 +18,9 @@ namespace GameState
         IntroState(void);
         virtual ~IntroState(void);
 
-        void                Init(GameFiniteStateMachine& gameFSM);
+        void                Init();
         void                Update(float dt);
         void                Draw(XC_Graphics& graphicsSystem);
         void                Destroy();
     };
-
 }

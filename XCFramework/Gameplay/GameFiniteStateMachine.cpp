@@ -38,8 +38,10 @@ void GameFiniteStateMachine::Init()
     TaskManager* taskMgr = &SystemLocator::GetInstance()->RequestSystem<TaskManager>("TaskManager");
     m_worldSystem->Init(*taskMgr);
 
-
     m_IsGameExit = false;
+
+    EventBroadcaster& broadCaster = (EventBroadcaster&)SystemLocator::GetInstance()->RequestSystem("EventBroadcaster");
+    broadCaster.AddListener(this);
 
     SetState("IntroState");
 }
@@ -56,6 +58,9 @@ void GameFiniteStateMachine::Draw(XC_Graphics& graphicsSystem)
 
 void GameFiniteStateMachine::Destroy()
 {
+    EventBroadcaster& broadCaster = (EventBroadcaster&)SystemLocator::GetInstance()->RequestSystem("EventBroadcaster");
+    broadCaster.RemoveListener(this);
+
     for (auto& state : m_StateStack)
     {
         if (state)
@@ -74,6 +79,15 @@ void GameFiniteStateMachine::Destroy()
     m_worldSystem->Destroy();
     m_gameActorFactory->DestroyFactory();
     m_gameStateFactory->DestroyFactory();
+}
+
+void GameFiniteStateMachine::OnEvent(IEvent* event)
+{
+    if (event && event->GetEventType() == EventType_GameStateChange)
+    {
+        Event_GameStateChange* stateEvent = (Event_GameStateChange*) event;
+        SetState(stateEvent->m_stateName, stateEvent->m_previousState);
+    }
 }
 
 void GameFiniteStateMachine::SetState(std::string stateName, EWhatToDoWithPreviousState _what)
@@ -100,7 +114,7 @@ void GameFiniteStateMachine::SetState(std::string stateName, EWhatToDoWithPrevio
 
     if (!m_StateStack.back()->GetPauseState())
     {
-        m_StateStack.back()->Init(*this);
+        m_StateStack.back()->Init();
     }
 
     m_CurrentGameState = stateName;

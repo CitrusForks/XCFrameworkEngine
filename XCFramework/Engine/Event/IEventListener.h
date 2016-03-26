@@ -15,6 +15,6 @@ public:
     IEventListener();
     virtual ~IEventListener();
 
-    virtual void                OnEvent(IEvent* evt) = 0;
+    virtual void OnEvent(IEvent* evt) = 0;
 };
 

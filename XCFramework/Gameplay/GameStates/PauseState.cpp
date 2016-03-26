@@ -21,9 +21,9 @@ PauseState::~PauseState(void)
 {
 }
 
-void GameState::PauseState::Init(GameFiniteStateMachine& gameFSM)
+void GameState::PauseState::Init()
 {
-    IGameState::Init(gameFSM);
+    IGameState::Init();
 }
 
 void PauseState::Update(float dt)

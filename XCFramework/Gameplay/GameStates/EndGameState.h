@@ -10,7 +10,7 @@
 
 namespace GameState
 {
-    class EndGameState :public IGameState
+    class EndGameState : public IGameState
     {
     public:
         DECLARE_OBJECT_CREATION(EndGameState)
@@ -18,10 +18,9 @@ namespace GameState
         EndGameState(void);
         virtual ~EndGameState(void);
 
-        void                    Init(GameFiniteStateMachine& gameFSM);
+        void                    Init();
         void                    Update(float dt);
         void                    Draw(XC_Graphics& graphicsSystem);
         void                    Destroy();
     };
-
 }

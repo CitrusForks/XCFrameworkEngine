@@ -43,6 +43,9 @@ int Game_Win32::Init()
     //Timer
     m_timer = (Timer*)&m_systemContainer->CreateNewSystem("Timer");
 
+    //Event Broadcaster
+    m_eventBroadcaster = (EventBroadcaster*)&m_systemContainer->CreateNewSystem("EventBroadcaster");
+
     //TaskManager
     m_taskManagingSystem = (TaskManager*) &m_systemContainer->CreateNewSystem("TaskManager");
 
@@ -95,6 +98,7 @@ void Game_Win32::RegisterSystems()
     m_systemContainer = &SystemLocator::GetInstance()->GetSystemContainer();
 
     m_systemContainer->RegisterSystem<Timer>("Timer");
+    m_systemContainer->RegisterSystem<EventBroadcaster>("EventBroadcaster");
     m_systemContainer->RegisterSystem<DirectInput_Win32>("InputSystem");
     m_systemContainer->RegisterSystem<TaskManager>("TaskManager");
 
@@ -122,6 +126,7 @@ void Game_Win32::OnResize()
 void Game_Win32::Update(float dt)
 {
     m_timer->Update();
+    m_eventBroadcaster->Update();
 
     m_directInputSystem->Update();
 
@@ -178,6 +183,7 @@ void Game_Win32::Destroy()
     m_resourceManagingSystem->Destroy();
     m_taskManagingSystem->UnregisterAllTasks();
     m_networkManagingSystem->Destroy();
+    m_eventBroadcaster->Destroy();
 
     SystemLocator::GetInstance()->Destroy();
 }

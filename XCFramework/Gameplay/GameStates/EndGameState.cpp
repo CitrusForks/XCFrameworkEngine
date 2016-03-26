@@ -8,7 +8,6 @@
 
 #include "Gameplay/GameStates/EndGameState.h"
 
-
 using namespace GameState;
 
 EndGameState::EndGameState(void)
@@ -20,9 +19,9 @@ EndGameState::~EndGameState(void)
 {
 }
 
-void EndGameState::Init(GameFiniteStateMachine& gameFSM)
+void EndGameState::Init()
 {
-    IGameState::Init(gameFSM);
+    IGameState::Init();
 }
 
 void EndGameState::Update(float dt)

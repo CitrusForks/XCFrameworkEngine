@@ -1,10 +1,10 @@
 #include "stdafx.h"
 
 #include "Gameplay/GameStates/EditorStates/EditorLoadingState.h"
-#include "Engine/Graphics/XC_GraphicsDx11.h"
-#include "Engine/Resource/ResourceManager.h"
 #include "Gameplay/GameStates/GameStateTypes.h"
-#include "Gameplay/GameFiniteStateMachine.h"
+
+#include "Engine/Graphics/XC_Graphics.h"
+#include "Engine/Resource/ResourceManager.h"
 #include "Engine/TaskManager/TaskManager.h"
 
 using namespace GameState;
@@ -16,14 +16,13 @@ EditorLoadingState::EditorLoadingState(void)
 
 EditorLoadingState::~EditorLoadingState(void)
 {
-
 }
 
 void GameState::EditorLoadingState::Init(GameFiniteStateMachine& gameFSM)
 {
     IGameState::Init(gameFSM);
 
-    ResourceManager& resMgr = (ResourceManager&)SystemLocator::GetInstance()->RequestSystem("ResourceManager");
+    ResourceManager& resMgr = (ResourceManager&) SystemLocator::GetInstance()->RequestSystem("ResourceManager");
     m_taskMgr = (TaskManager*) &SystemLocator::GetInstance()->RequestSystem("TaskManager");
 
     //Load the resources here.
@@ -35,7 +34,9 @@ void EditorLoadingState::Update(float dt)
     //Wait for resource loader to complete the loading of resources. When done move to next state.
     if (m_taskMgr->GetTaskState(m_loadTaskId) == TASKSTATE_DESTROY)
     {
-        m_gameFSM->SetState("EditorRunningState", STATE_DESTROY);
+        Event_GameStateChange event("EditorRunningState", STATE_DESTROY);
+        EventBroadcaster& broadcaster = (EventBroadcaster&) SystemLocator::GetInstance()->RequestSystem("EventBroadcaster");
+        broadcaster.BroadcastEvent(&event);
     }
 }
 
@@ -51,6 +52,6 @@ void EditorLoadingState::Destroy()
 {
     IGameState::Destroy();
 
-    XC_Graphics& graphicsSystem = (XC_Graphics&)SystemLocator::GetInstance()->RequestSystem("GraphicsSystem");
+    XC_Graphics& graphicsSystem = (XC_Graphics&) SystemLocator::GetInstance()->RequestSystem("GraphicsSystem");
     graphicsSystem.SetClearColor(XCVec4(1.0f, 1.0f, 1.0f, 1.0f));
 }

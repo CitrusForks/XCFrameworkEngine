@@ -5,10 +5,21 @@
  * For complete license, read License.txt in source root directory. */
 
 #pragma once
+
+#include "EventTypes.h"
+
 class IEvent
 {
 public:
-    IEvent();
+    IEvent(EventType type)
+        : m_eventType(type)
+    {}
+
     virtual ~IEvent();
+
+    EventType    GetEventType() { return m_eventType; }
+
+private:
+    EventType    m_eventType;
 };
 

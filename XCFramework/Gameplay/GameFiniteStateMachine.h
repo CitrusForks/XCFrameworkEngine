@@ -7,6 +7,8 @@
 #pragma once
 
 #include "Engine/System/ISystem.h"
+#include "Engine/Event/IEventListener.h"
+
 #include "Gameplay/GameStates/IGameState.h"
 #include "GameStates/GameStateTypes.h"
 
@@ -16,7 +18,7 @@
 
 using namespace GameState;
 
-class GameFiniteStateMachine : public ISystem
+class GameFiniteStateMachine : public ISystem, IEventListener
 {
 public:
     DECLARE_SYSTEMOBJECT_CREATION(GameFiniteStateMachine)
@@ -40,6 +42,8 @@ public:
     GameStatesFactory&          GetGameStateFactory() { return *m_gameStateFactory; }
     GameActorsFactory&          GetGameActorsFactory() { return *m_gameActorFactory; }
     World&                      GetWorldSystem() { return *m_worldSystem; }
+    
+    virtual void                OnEvent(IEvent* event);
 
 private:
 
@@ -55,3 +59,4 @@ private:
     GameActorsFactory*          m_gameActorFactory;
     World*                      m_worldSystem;
 };
+

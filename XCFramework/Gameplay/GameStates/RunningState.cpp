@@ -6,10 +6,9 @@
 
 #include "stdafx.h"
 
-#include "Gameplay/GameStates/RunningState.h"
-
-#include "Gameplay/GameFiniteStateMachine.h"
 #include "Engine/Resource/ResourceManager.h"
+
+#include "Gameplay/GameStates/RunningState.h"
 
 #ifdef LEGACY_LOADING
 #include "Gameplay/GameActors/GameActorsFactory.h"
@@ -28,9 +27,9 @@ RunningState::~RunningState(void)
     Logger("[GAME STATE RUNNING] DESTROYING RUNNING STATE");
 }
 
-void GameState::RunningState::Init(GameFiniteStateMachine& gameFSM)
+void RunningState::Init()
 {
-    IGameState::Init(gameFSM);
+    IGameState::Init();
 
     m_cameraSystem = &SystemLocator::GetInstance()->RequestSystem<XC_CameraManager>("CameraManager");
     m_directInput = &SystemLocator::GetInstance()->RequestSystem<DirectInput>("InputSystem");
@@ -166,7 +165,6 @@ void GameState::RunningState::Init(GameFiniteStateMachine& gameFSM)
 #endif
 }
 
-
 void RunningState::Update(float dt)
 {
     //This is hack, the world should tell whether it's ready by checking all the actors are loaded correctly?
@@ -209,12 +207,14 @@ void RunningState::Update(float dt)
     if (m_directInput->KeyDown(INPUT_KEY_ESCAPE))
     {
         //Goto end state
-        m_gameFSM->SetState("EndState", STATE_DESTROY);
+        Event_GameStateChange event("EndState", STATE_DESTROY);
+        EventBroadcaster& broadcaster = (EventBroadcaster&)SystemLocator::GetInstance()->RequestSystem("EventBroadcaster");
+        broadcaster.BroadcastEvent(&event);
     }
 }
 
 
-void GameState::RunningState::Draw(XC_Graphics& graphicsSystem)
+void RunningState::Draw(XC_Graphics& graphicsSystem)
 {
     if (m_worldSystem->IsWorldReady())
     {

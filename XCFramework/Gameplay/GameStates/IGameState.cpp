@@ -20,17 +20,14 @@ IGameState::~IGameState(void)
 {
 }
 
-void GameState::IGameState::Init(GameFiniteStateMachine& gameFSM)
+void IGameState::Init()
 {
-    m_gameFSM = &gameFSM;
 }
 
 void IGameState::Draw(XC_Graphics& graphicsSystem)
 {
-
 }
 
 void IGameState::Destroy()
 {
-
 }

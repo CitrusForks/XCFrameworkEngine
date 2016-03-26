@@ -19,14 +19,13 @@ namespace GameState
         LoadingWorldState(void);
         virtual ~LoadingWorldState(void);
 
-        void                    Init(GameFiniteStateMachine& gameFSM);
+        void                    Init();
         void                    Update(float dt);
         void                    Draw(XC_Graphics& graphicsSystem);
         void                    Destroy();
 
-        static void             cbLoadTask();
+    private:
 
-    private:                    
         unsigned long           m_taskId;
         WorldSceneLoader*       m_worldLoader;
         std::future<int>        m_futureWorldLoaded;
