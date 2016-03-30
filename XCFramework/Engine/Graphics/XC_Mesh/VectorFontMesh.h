@@ -13,9 +13,14 @@ class VectorFontMesh : public XCMeshFBX
 public:
     DECLARE_OBJECT_CREATION(VectorFontMesh)
 
+    struct VectorFontInstanceBuffer
+    {
+        D3DConstantBuffer*      m_instanceBufferGPU;
+        cbVectorFontInstanced   m_instanceBuffer;
+    };
+
     struct FontData
     {
-        cbPerObjectInstanced  orientation;
         unsigned int          submeshId;
         unsigned int          instanceCount;
 
@@ -29,17 +34,21 @@ public:
     ~VectorFontMesh();
 
     void            Init(int resourceId, std::string userFriendlyName, bool loaded = false);
-    void            Load(const void* buffer);
     void            DrawText(std::string text, XCVec3Unaligned position, RenderContext& context);
     void            Destroy();
 
 protected:
+    void            CreateConstantBuffer();
+
     void            Draw(RenderContext& context);
     void            DrawSubMesh(RenderContext& renderContext, unsigned int meshIndex, unsigned int instanceCount = 1);
 
 private:
+    std::vector<FontData>                  m_subMeshesIdBuffer;
+    std::vector<VectorFontInstanceBuffer>  m_vectorFontInstanceBuffers;
+
     //This buffer is actual text to be drawn
     std::string                m_buffer;
-    std::vector<FontData>      m_subMeshesIdBuffer;
+
     BasicMaterial              m_material;
 };

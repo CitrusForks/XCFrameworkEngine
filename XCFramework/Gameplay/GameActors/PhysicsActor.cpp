@@ -61,7 +61,7 @@ void PhysicsActor::SetInitialPhysicsProperties()
 {
     if (m_pMesh)
     {
-        m_boundBox->CreateBoundBox(m_pMesh->GetComputedAABoundBox());
+        m_boundBox->CreateBoundBox(m_pMesh->GetAABB());
         m_boundBox->Transform(m_MTranslation, m_MRotation);
     }
 }

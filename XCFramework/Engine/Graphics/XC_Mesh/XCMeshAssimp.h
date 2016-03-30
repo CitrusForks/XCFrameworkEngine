@@ -8,22 +8,14 @@
 
 #include "Engine/Graphics/XC_Mesh/XCMesh.h"
 
-class XCMeshCustom : public XCMesh
+class XCMeshAssimp : public XCMesh
 {
 public:
-    DECLARE_OBJECT_CREATION(XCMeshCustom)
+    DECLARE_OBJECT_CREATION(XCMeshAssimp)
 
-    XCMeshCustom()
-    {
-        m_isSkinnedMesh = false;
-    }
+    XCMeshAssimp()
+    {}
 
-    ~XCMeshCustom()
-    {
-    }
-
-    void                    Load(const void* buffer);
-    void                    DrawSubMeshes(RenderContext& renderContext);
-
-private:
+protected:
+    virtual bool            LoadMesh();
 };

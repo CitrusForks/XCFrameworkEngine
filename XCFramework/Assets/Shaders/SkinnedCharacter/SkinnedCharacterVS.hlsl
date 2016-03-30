@@ -17,17 +17,17 @@ struct PerObjectBuffer
     Material    gMaterial;
 };
 
-cbuffer cbInstancedBuffer : register(b0)
-{
-    PerObjectBuffer gPerObject[100];
-};
-
-cbuffer cbLightsPerFrame : register(b1)
+cbuffer cbLightsPerFrame : register(b0)
 {
     DirectionalLight gDirLight;
     PointLight       gPointLight;
     SpotLight        gSpotLight;
     float3           gEyePosW;
+};
+
+cbuffer cbInstancedBuffer : register(b1)
+{
+    PerObjectBuffer gPerObject[100];
 };
 
 cbuffer cbBoneBuffer : register(b2)
@@ -62,22 +62,15 @@ VertexOut VSMain(VertexIn vin)
     VertexOut vout;
 
     //Calculate the position of vertex by applying animation
-    float4 weight = float4(gEyePosW, 1.0f);
-    weight = vin.BlendWeights;
+    float4 weight = vin.BlendWeights;
 
     weight.w = 1.0f - dot(weight.xyz, float3(1, 1, 1));
     
     float4 localPos = float4(vin.PosL, 1.0f);
-    float3 objPos = localPos.xyz;
-    weight.x = 1.0f;
-    //weight.y = 1.0f;
-    //weight.z = 1.0f;
-    //weight.w = 1.0f;
-
-    objPos          += mul(localPos, gBoneMatrix[vin.BlendIndices.x]) * weight.x;
-    objPos          += mul(localPos, gBoneMatrix[vin.BlendIndices.y]) * weight.y;
-    objPos          += mul(localPos, gBoneMatrix[vin.BlendIndices.z]) * weight.z;
-    objPos          += mul(localPos, gBoneMatrix[vin.BlendIndices.w]) * weight.w;
+    float3 objPos    = mul(localPos, gBoneMatrix[vin.BlendIndices.x]) * weight.x;
+    //objPos          += mul(localPos, gBoneMatrix[vin.BlendIndices.y]) * weight.y;
+    //objPos          += mul(localPos, gBoneMatrix[vin.BlendIndices.z]) * weight.z;
+    //objPos          += mul(localPos, gBoneMatrix[vin.BlendIndices.w]) * weight.w;
 
     // Transform to world space.
     vout.PosW = mul(float4(objPos, 1.0), gPerObject[vin.InstanceIndex].gWorld).xyz;

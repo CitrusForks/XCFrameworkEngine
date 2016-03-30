@@ -95,7 +95,7 @@ bool XC3DSMeshLoader::loadMeshFromFile(std::string fileName, XCMesh* const outMe
                 } while (ch != '\0' && i < 20);
 
                 pObjectName[i] = '\0';
-                subMesh->setObjectName(pObjectName);
+                subMesh->SetObjectName(pObjectName);
 
                 //cout<<"Object Name : "<< obj.objectName;
 #if defined(WRITE_DATA_TO_FILE)
@@ -111,7 +111,7 @@ bool XC3DSMeshLoader::loadMeshFromFile(std::string fileName, XCMesh* const outMe
         case CHUNK_VERTICESLIST:
             {
                 fread(&tempChunk.amtOfData, sizeof(unsigned short), 1, fp);
-                subMesh->setNoOfVertices(tempChunk.amtOfData);
+                subMesh->SetNoOfVertices(tempChunk.amtOfData);
 
                 //cout<<"No of vertices : "<< obj.noOfVertices;
 #if defined(WRITE_DATA_TO_FILE)
@@ -126,7 +126,7 @@ bool XC3DSMeshLoader::loadMeshFromFile(std::string fileName, XCMesh* const outMe
                         fread(&z, sizeof(float), 1, fp);
     
                         //printf("Vertex [%d] : %f %f %f\n", obj.vertex[i].x, obj.vertex[i].y, obj.vertex[i].z);
-                        subMesh->addVertex(x, y, z);
+                        subMesh->AddVertex(x, y, z);
 #if defined(WRITE_DATA_TO_FILE)
                     fprintf(outFile, "Vertex [%d] : %f  %f  %f\n", i, x, y, z);
 #endif
@@ -141,7 +141,7 @@ bool XC3DSMeshLoader::loadMeshFromFile(std::string fileName, XCMesh* const outMe
             {
 
                 fread(&tempChunk.amtOfData, sizeof(unsigned short), 1, fp);
-                subMesh->setNoOfFaces(tempChunk.amtOfData);
+                subMesh->SetNoOfFaces(tempChunk.amtOfData);
 
                 //cout<<"No of Faces : "<< obj.noOfFaces;
 #if defined(WRITE_DATA_TO_FILE)
@@ -155,7 +155,7 @@ bool XC3DSMeshLoader::loadMeshFromFile(std::string fileName, XCMesh* const outMe
                     fread(&b, sizeof(unsigned short), 1, fp);
                     fread(&c, sizeof(unsigned short), 1, fp);
                     fread(&flags, sizeof(unsigned short), 1, fp);
-                    subMesh->addFace(a, b, c, flags);
+                    subMesh->AddFace(a, b, c, flags);
 
                     //printf("Faces [%d] : %d %d %d\n", obj.face[i].a, obj.face[i].b, obj.face[i].c);
 #if defined(WRITE_DATA_TO_FILE)
@@ -180,7 +180,7 @@ bool XC3DSMeshLoader::loadMeshFromFile(std::string fileName, XCMesh* const outMe
                     fread(&u, sizeof(float), 1, fp);
                     fread(&v, sizeof(float), 1, fp);
                     
-                    subMesh->addMapCoord(u, v);
+                    subMesh->AddMapCoord(u, v);
                     //printf("Map Coord [%d] : %f %f\n", obj.mapCoord[i].u, obj.mapCoord[i].v);
 #if defined(WRITE_DATA_TO_FILE)
                     fprintf(outFile, "Map Coord [%d] : %f  %f \n", i, u, v);

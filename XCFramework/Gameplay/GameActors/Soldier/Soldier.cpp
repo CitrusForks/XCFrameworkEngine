@@ -197,11 +197,11 @@ void Soldier::Draw(RenderContext& context)
     }
     else if(m_useShaderType == ShaderType_SkinnedCharacter)
     {
-        static XCMatrix4Unaligned scaling = XMMatrixScaling(0.01f, 0.01f, 0.01f);
+        static XCMatrix4Unaligned scaling = XMMatrixScaling(1.0f, 1.0f, 1.0f);
         static XCMatrix4Unaligned rotation = XMMatrixRotationX(XM_PI);
 
-        XCMatrix4Unaligned transform = aiMatrixToMatrix4Unaligned(m_pMesh->GetSceneAnimator()->GetGlobalTransform(m_pMesh->GetSceneNode()->mRootNode));
-        transform = scaling * transform;
+        XCMatrix4Unaligned transform = m_pMesh->GetRootTransform();
+        //transform = scaling * transform;
 
         perObject = {
             ToXCMatrix4Unaligned(XMMatrixTranspose(transform)),

@@ -142,7 +142,7 @@ public:
      * @return A reference to a vector of bone matrices. Stays stable till the
      *   next call to GetBoneMatrices();
      */
-    const std::vector<XCMatrix4Unaligned>& GetBoneMatrices( const aiNode* pNode,
+    const std::vector<aiMatrix4x4>& GetBoneMatrices( const aiNode* pNode,
         size_t pMeshIndex = 0);
 
 
@@ -197,7 +197,7 @@ protected:
     BoneMap mBoneNodesByName;
 
     /** Array to return transformations results inside. */
-    std::vector<XCMatrix4Unaligned> mTransforms;
+    std::vector<aiMatrix4x4> mTransforms;
 
     /** Identity matrix to return a reference to in case of error */
     aiMatrix4x4 mIdentityMatrix;

@@ -42,38 +42,37 @@ public:
 
     MeshData(ShaderType shaderType);
 
-    void    init();
-    void    destroy();
+    void    Init();
+    void    Destroy();
 
-    std::string getSubMeshName() { return m_objectName; }
-    void        createConstantBuffers();
-    void    addVertex(float x, float y, float z);
-    void    addVertex(Vertex& vert);
-    void    addMapCoord(float u, float v);
-    void    addFace(Face& face);
-    void    addFace(unsigned short a, unsigned short b, unsigned short c, unsigned short flag);
-    void    addBoneInfo(XCVec4Unaligned boneIndex, XCVec4Unaligned boneWeight);
+    std::string GetSubMeshName() { return m_objectName; }
+    void    AddVertex(float x, float y, float z);
+    void    AddVertex(Vertex& vert);
+    void    AddMapCoord(float u, float v);
+    void    AddFace(Face& face);
+    void    AddFace(unsigned short a, unsigned short b, unsigned short c, unsigned short flag);
+    void    AddBoneInfo(XCVec4Unaligned boneIndex, XCVec4Unaligned boneWeight);
 
-    int     getNoOfVertices() { return m_noOfVertices; }
-    int     getNoOfFaces() { return m_noOfFaces; }
+    int     GetNoOfVertices() { return m_noOfVertices; }
+    int     GetNoOfFaces() { return m_noOfFaces; }
 
-    void    setNoOfVertices(unsigned int noVerts) { m_noOfVertices = noVerts; }
-    void    setNoOfFaces(unsigned int noFaces) { m_noOfFaces = noFaces; }
-    void    setObjectName(const char* objName) { m_objectName = objName; }
-    void    setNoOfBones(unsigned int noBones) { m_noOfBones = noBones; }
+    void    SetNoOfVertices(unsigned int noVerts) { m_noOfVertices = noVerts; }
+    void    SetNoOfFaces(unsigned int noFaces) { m_noOfFaces = noFaces; }
+    void    SetObjectName(const char* objName) { m_objectName = objName; }
+    void    SetNoOfBones(unsigned int noBones) { m_noOfBones = noBones; }
 
-    void    setGeometryTranslation(XCVec3Unaligned trans) { m_initialTranslation = trans; }
-    void    setGeometryRotation(XCVec3Unaligned rot) { m_initialRotation = rot; }
-    void    setGeometryScaling(XCVec3Unaligned scale) { m_initialScaling = scale; }
+    void    SetGeometryTranslation(XCVec3Unaligned trans) { m_initialTranslation = trans; }
+    void    SetGeometryRotation(XCVec3Unaligned rot) { m_initialRotation = rot; }
+    void    SetGeometryScaling(XCVec3Unaligned scale) { m_initialScaling = scale; }
 
-    const XCVec3Unaligned& getGeometryTranslation()     { return m_initialTranslation; }
-    const XCVec3Unaligned& getGeometryRotation()        { return m_initialRotation; }
-    const XCVec3Unaligned& getGeometryScaling()         { return m_initialScaling; }
+    const XCVec3Unaligned& GetGeometryTranslation()     { return m_initialTranslation; }
+    const XCVec3Unaligned& GetGeometryRotation()        { return m_initialRotation; }
+    const XCVec3Unaligned& GetGeometryScaling()         { return m_initialScaling; }
 
     //Get Geometry buffers
-    void*                       getVertexBuffer()   { return m_vertexBuffer; }
-    void*                       getInstanceBuffer() { return m_instanceBuffer; }
-    IndexBuffer<unsigned int>&  getIndexBuffer()    { return m_indexBuffer; }
+    void*                       GetVertexBuffer()   { return m_vertexBuffer; }
+    void*                       GetInstanceBuffer() { return m_instanceBuffer; }
+    IndexBuffer<unsigned int>&  GetIndexBuffer()    { return m_indexBuffer; }
 
     //Raw Geometry containers. TODO : Clear them when buffers are created.
     std::vector<Vertex>                m_vertices;
@@ -87,10 +86,11 @@ public:
     MeshNode*                          m_meshNodeStructure;
 #endif
 
-    D3DConstantBuffer*                  m_boneBuffer;
-    D3DConstantBuffer*                  m_constantBuffer;
+    float                               m_width;
+
 private:
 
+    //Geometry Buffers
     void*                              m_vertexBuffer;
     void*                              m_instanceBuffer;
     IndexBuffer<unsigned int>          m_indexBuffer;
@@ -106,7 +106,4 @@ private:
     XCVec3Unaligned                    m_initialScaling;
     XCVec3Unaligned                    m_initialRotation;
     XCVec3Unaligned                    m_initialTranslation;
-
-    //Instance count
-    unsigned int                       m_instanceCount;
 };

@@ -12,7 +12,10 @@
 
 #include <fstream>
 
+#define _XM_NO_INTRINSICS_
+#include <DirectXMath.h>
 
+using namespace DirectX;
 
 class XCMesh
 {
@@ -316,12 +319,25 @@ void TraverseMesh(FbxNode* pNode)
 
     //Get the geometry transform
     FbxVector4 translation = pNode->GetGeometricTranslation(FbxNode::eSourcePivot);
-    XCMesh::Vector4 trans = { translation[0], translation[1], translation[2], translation[3] };
-    mesh.m_geometricTranslation = trans;
-    
+    XMVECTOR trans = XMLoadFloat4(&XMFLOAT4(translation[0], translation[1], translation[2], translation[3]));
+    mesh.m_geometricTranslation.x = XMVectorGetX(trans);
+    mesh.m_geometricTranslation.y = XMVectorGetY(trans);
+    mesh.m_geometricTranslation.z = XMVectorGetZ(trans);
+
+    XMVECTOR originTranslate = XMLoadFloat4(&XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f)) - trans;
+    originTranslate.vector4_f32[1] = 0.0f; originTranslate.vector4_f32[2] = 0.0f; originTranslate.vector4_f32[3] = 1.0f;
+
+    if (trans.vector4_f32[0] < 0)
+        originTranslate = -XMVector3Length(originTranslate);
+    else
+        originTranslate = XMVector3Length(originTranslate);
+
     //fill the vertices & uv coords
     std::vector<XCMesh::Vertex> vertices;
     std::vector<unsigned int> indices;
+
+    XMMATRIX originMat = XMMatrixTranslation(XMVectorGetX(originTranslate), 0.0f, 0.0f);
+    XMVECTOR xmVertex;
 
     for (unsigned int polygonIndex = 0; polygonIndex < lMesh->GetPolygonCount(); ++polygonIndex)
     {
@@ -330,7 +346,11 @@ void TraverseMesh(FbxNode* pNode)
             int vIndex = lMesh->GetPolygonVertex(polygonIndex, faceVertexIndex);
 
             FbxVector4 v1Data = lControlPoints[vIndex];
-            XCMesh::Vertex vertex = { v1Data[0], v1Data[1], v1Data[2] };
+            //Translate here to origin
+            xmVertex = XMLoadFloat3(&XMFLOAT3(v1Data[0], v1Data[1], v1Data[2]));
+            xmVertex = XMVector3Transform(xmVertex, originMat);
+
+            XCMesh::Vertex vertex = { XMVectorGetX(xmVertex), XMVectorGetY(xmVertex), XMVectorGetZ(xmVertex) };
 
             printf("Polygon : %f %f %f ", vertex.x, vertex.y, vertex.z);
 
@@ -340,7 +360,7 @@ void TraverseMesh(FbxNode* pNode)
                 return fabs(v.x) == fabs(vertex.x) && fabs(v.y) == fabs(vertex.y) && fabs(v.z) == fabs(vertex.z);
             });
 
-            if (foundVertex == vertices.end())
+            if (1/*foundVertex == vertices.end()*/)
             {
                 //New vertex found. Add it to our vertices
                 vertices.push_back(vertex);
@@ -414,7 +434,7 @@ bool ExportMesh(std::string meshFilename)
 
     unsigned int size = g_nbOfMeshes;
 
-    std::ofstream outStream("ABC.xcmesh", std::ios::out | std::ios::binary);
+    std::ofstream outStream("jd_objectcenter.xcmesh", std::ios::out | std::ios::binary);
     outStream.write(reinterpret_cast<char*>(&size), sizeof(size));
 
     for (unsigned int nbMesh = 0; nbMesh < size; ++nbMesh)
@@ -464,11 +484,11 @@ int main(int argc, char* argv[])
 
         //if (strcmp(operation.c_str(), "export") == 0)
         {
-            result = ExportMesh("ABC.FBX");
+            result = ExportMesh("jd_objectcenter.FBX");
         }
         //else if (strcmp(operation.c_str(), "import") == 0)
         {
-            result = ImportMesh("ABC.xcmesh");
+            result = ImportMesh("jd_objectcenter.xcmesh");
         }
         meshContainer.clear();
     }

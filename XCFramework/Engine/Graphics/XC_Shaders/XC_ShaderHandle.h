@@ -19,8 +19,6 @@ static const std::vector<std::string> gs_slotPriority =
     "PerObjectBuffer",
     "cbInstancedBuffer",
     "cbWVP",
-
-    //Constant buffers per frame
     "cbBoneBuffer",
 
     //Texture slots

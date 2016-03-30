@@ -11,8 +11,71 @@
 #include "Engine/Graphics/XC_Shaders/XC_ShaderHandle.h"
 #include "Engine/FlatBuffersInterface/FlatBuffersSystem.h"
 
+void XCMeshFBX::Destroy()
+{
+    XCMesh::Destroy();
+}
 
-void DisplayString(const char* pHeader, const char* pValue  = "", const char* pSuffix = "")
+bool XCMeshFBX::LoadMesh()
+{
+    bool result = true;
+
+    //Initialize FBX Mgr
+    //The first thing to do is to create the FBX Manager which is the object allocator for almost all the classes in the SDK
+    m_fbxMgr = FbxManager::Create();
+    if (!m_fbxMgr)
+    {
+        Logger("Error: Unable to create FBX Manager!\n");
+        return false;
+    }
+    else
+    {
+        Logger("Autodesk FBX SDK version %s\n", m_fbxMgr->GetVersion());
+    }
+
+    //Create an IOSettings object. This object holds all import/export settings.
+    FbxIOSettings* ios = FbxIOSettings::Create(m_fbxMgr, IOSROOT);
+    m_fbxMgr->SetIOSettings(ios);
+
+    //Load plugins from the executable directory (optional)
+    FbxString lPath = FbxGetApplicationDirectory();
+    m_fbxMgr->LoadPluginsDirectory(lPath.Buffer());
+
+    //Create an FBX scene. This object holds most objects imported/exported from/to files.
+    m_fbxScene = FbxScene::Create(m_fbxMgr, "My Scene");
+    if (!m_fbxScene)
+    {
+        Logger("Error: Unable to create FBX scene!\n");
+        result = false;
+    }
+
+    //Load the scene
+    result = LoadScene(m_fbxMgr, m_fbxScene, m_resourcePath.c_str());
+
+    XCASSERT(result);
+
+    if (result)
+    {
+        DisplayMetaData(m_fbxScene);
+        DisplayHierarchy(m_fbxScene);
+        DisplayContent(m_fbxScene);
+    }
+
+    return result;
+}
+
+void XCMeshFBX::CreateConstantBuffer()
+{
+    XCMesh::CreateConstantBuffer();
+
+}
+
+void XCMeshFBX::Draw(RenderContext & context)
+{
+    XCMesh::Draw(context);
+}
+
+void DisplayString(const char* pHeader, const char* pValue = "", const char* pSuffix = "")
 {
     FbxString lString;
 
@@ -181,114 +244,6 @@ void DisplayColor(const char* pHeader, FbxColor pValue, const char* pSuffix = ""
     Logger(lString);
 }
 
-
-void XCMeshFBX::Load(const void * buffer)
-{
-    Logger("Loading FBX mesh");
-
-    const FBXCMesh* fbXCMesh = (const FBXCMesh*)buffer;
-    
-    m_userFriendlyName = fbXCMesh->MeshName()->c_str();
-    m_resourcePath = getPlatformPath(fbXCMesh->MeshPath()->c_str());
-    m_texture = (Texture2D*)m_resourceManager->GetResource(fbXCMesh->TextureRes()->c_str());
-    m_globalScaling = XCVec3Unaligned(fbXCMesh->InitialScaling()->x(), fbXCMesh->InitialScaling()->y(), fbXCMesh->InitialScaling()->z());
-    m_globalRotation = XCVec3Unaligned(fbXCMesh->InitialRotation()->x(), fbXCMesh->InitialRotation()->x(), fbXCMesh->InitialRotation()->x());
-    m_shaderType = fbXCMesh->ShaderUsage();
-
-    XC_Graphics& graphicsSystem = (XC_Graphics&)SystemLocator::GetInstance()->RequestSystem<XC_Graphics>("GraphicsSystem");
-    m_shaderHandler = (XCShaderHandle*)graphicsSystem.GetShaderManagerSystem().GetShader(m_shaderType);
-
-    const char* meshFilename = fbXCMesh->MeshPath()->c_str();
-
-    //Initialize FBX Mgr
-    //The first thing to do is to create the FBX Manager which is the object allocator for almost all the classes in the SDK
-    m_fbxMgr = FbxManager::Create();
-    if (!m_fbxMgr)
-    {
-        Logger("Error: Unable to create FBX Manager!\n");
-        return;
-    }
-    else
-    {
-        Logger("Autodesk FBX SDK version %s\n", m_fbxMgr->GetVersion());
-    }
-
-    //Create an IOSettings object. This object holds all import/export settings.
-    FbxIOSettings* ios = FbxIOSettings::Create(m_fbxMgr, IOSROOT);
-    m_fbxMgr->SetIOSettings(ios);
-
-    //Load plugins from the executable directory (optional)
-    FbxString lPath = FbxGetApplicationDirectory();
-    m_fbxMgr->LoadPluginsDirectory(lPath.Buffer());
-
-    //Create an FBX scene. This object holds most objects imported/exported from/to files.
-    m_fbxScene = FbxScene::Create(m_fbxMgr, "My Scene");
-    if (!m_fbxScene)
-    {
-        Logger("Error: Unable to create FBX scene!\n");
-        return;
-    }
-
-    //Load the scene
-    bool result = LoadScene(m_fbxMgr, m_fbxScene, meshFilename);
-
-    XCASSERT(result);
-
-    DisplayMetaData(m_fbxScene);
-    DisplayHierarchy(m_fbxScene);
-    DisplayContent(m_fbxScene);
-
-    /*
-    for (unsigned int meshIndex = 0; meshIndex < m_scene->mNumMeshes; ++meshIndex)
-    {
-                {
-            submesh->setObjectName(fbXCMesh->MeshName()->c_str());
-            submesh->setNoOfVertices(mesh[meshIndex]->mNumVertices);
-            submesh->setNoOfFaces(mesh[meshIndex]->mNumFaces);
-            submesh->setNoOfBones(mesh[meshIndex]->mNumBones);
-
-            SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
-            submesh->m_boneBuffer = heap.CreateBufferView(D3DBufferDesc(BUFFERTYPE_CBV, sizeof(cbBoneBuffer)));
-
-            //fill the vertices & uv coords
-            aiVector3D* vertex = mesh[meshIndex]->mVertices;
-            aiVector3D** uvCoord = mesh[meshIndex]->mTextureCoords;
-            
-            float boneIndex[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-            float boneWeight[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-
-            for (unsigned int vertexIndex = 0; vertexIndex < mesh[meshIndex]->mNumVertices; ++vertexIndex)
-            {
-                //Add vertex
-                submesh->addVertex(vertex[vertexIndex].x, vertex[vertexIndex].y, vertex[vertexIndex].z);
-
-                //Add UV
-                if (mesh[meshIndex]->HasTextureCoords(0))
-                {
-                    submesh->addMapCoord(abs(uvCoord[0][vertexIndex].x), abs(uvCoord[0][vertexIndex].y));
-                }
-            }
-
-
-            //fill the faces
-            aiFace* face = mesh[meshIndex]->mFaces;
-            unsigned int* indices = nullptr;
-            for (unsigned int faceIndex = 0; faceIndex < mesh[meshIndex]->mNumFaces; ++faceIndex)
-            {
-                indices = face[faceIndex].mIndices;
-                submesh->addFace(indices[0], indices[1], indices[2], 0);
-            }
-        }
-    }
-    */
-
-
-
-    //filterSubMeshes();
-    CreateBuffers();
-    CreateConstantBuffer();
-}
-
 bool XCMeshFBX::LoadScene(FbxManager* pManager, FbxDocument* pScene, const char* pFilename)
 {
     int lFileMajor, lFileMinor, lFileRevision;
@@ -296,7 +251,6 @@ bool XCMeshFBX::LoadScene(FbxManager* pManager, FbxDocument* pScene, const char*
     //int lFileFormat = -1;
     int i, lAnimStackCount;
     bool lStatus;
-    char lPassword[1024];
 
     // Get the file version number generate by the FBX SDK.
     FbxManager::GetFileFormatVersion(lSDKMajor, lSDKMinor, lSDKRevision);
@@ -375,26 +329,7 @@ bool XCMeshFBX::LoadScene(FbxManager* pManager, FbxDocument* pScene, const char*
 
     if (lStatus == false && lImporter->GetStatus().GetCode() == FbxStatus::ePasswordError)
     {
-        Logger("Please enter password: ");
-
-        lPassword[0] = '\0';
-
-        FBXSDK_CRT_SECURE_NO_WARNING_BEGIN
-            scanf("%s", lPassword);
-        FBXSDK_CRT_SECURE_NO_WARNING_END
-
-            FbxString lString(lPassword);
-
-        FbxIOSettings* ioSettings = m_fbxMgr->GetIOSettings();
-        ioSettings->SetStringProp(IMP_FBX_PASSWORD, lString);
-        ioSettings->SetBoolProp(IMP_FBX_PASSWORD_ENABLE, true);
-
-        lStatus = lImporter->Import(pScene);
-
-        if (lStatus == false && lImporter->GetStatus().GetCode() == FbxStatus::ePasswordError)
-        {
-            Logger("\nPassword is wrong, import aborted.\n");
-        }
+        XCASSERT(false);
     }
 
     // Destroy the importer.
@@ -513,7 +448,7 @@ void XCMeshFBX::DisplayContent(FbxNode* pNode)
             break;
 
         case FbxNodeAttribute::eMesh:
-            DisplayMesh(pNode);
+            ParseMesh(pNode);
             break;
 
         }
@@ -525,7 +460,7 @@ void XCMeshFBX::DisplayContent(FbxNode* pNode)
     }
 }
 
-void XCMeshFBX::DisplayMesh(FbxNode* pNode)
+void XCMeshFBX::ParseMesh(FbxNode* pNode)
 {
     FbxMesh* lMesh = (FbxMesh*)pNode->GetNodeAttribute();
     FbxVector4* lControlPoints = lMesh->GetControlPoints();
@@ -534,9 +469,9 @@ void XCMeshFBX::DisplayMesh(FbxNode* pNode)
 
     MeshData* submesh = CreateAndGetSubMesh();
     {
-        submesh->setObjectName(pNode->GetName());
-        submesh->setNoOfVertices(lMesh->GetPolygonCount() * 3);
-        submesh->setNoOfFaces(lMesh->GetPolygonCount());
+        submesh->SetObjectName(pNode->GetName());
+        submesh->SetNoOfVertices(lMesh->GetPolygonCount() * 3);
+        submesh->SetNoOfFaces(lMesh->GetPolygonCount());
 
         SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
 
@@ -544,7 +479,7 @@ void XCMeshFBX::DisplayMesh(FbxNode* pNode)
         FbxVector4 translation = pNode->GetGeometricTranslation(FbxNode::eSourcePivot);
         XCVecIntrinsic4 trans = toXMVECTOR(translation[0], translation[1], translation[2], translation[3]);
 
-        Logger("[FONT] Located @ %f %f %f", trans.vector4_f32[0], trans.vector4_f32[1], trans.vector4_f32[2]);
+        Logger("[XCMeshFBX] Located @ %f %f %f", trans.vector4_f32[0], trans.vector4_f32[1], trans.vector4_f32[2]);
         
         XCVecIntrinsic4 originTranslate = toXMVECTOR(0.0f, 0.0f, 0.0f, 1.0f) - trans;
         originTranslate.vector4_f32[1] = 0.0f; originTranslate.vector4_f32[2] = 0.0f; originTranslate.vector4_f32[3] = 1.0f;
@@ -554,9 +489,9 @@ void XCMeshFBX::DisplayMesh(FbxNode* pNode)
         else
             originTranslate = XMVector3Length(originTranslate);
 
-        Logger("[FONT] Translating with a distance of : %f ", originTranslate.vector4_f32[0]);
+        Logger("[XCMeshFBX] Translating with a distance of : %f ", originTranslate.vector4_f32[0]);
 
-        submesh->setGeometryTranslation(XCVec3Unaligned((XMVectorGetX(originTranslate)), 0.0f, 0.0f));
+        submesh->SetGeometryTranslation(XCVec3Unaligned((XMVectorGetX(originTranslate)), 0.0f, 0.0f));
 
         //fill the vertices & uv coords
         for (int polygonIndex = 0; polygonIndex < lMesh->GetPolygonCount(); ++polygonIndex)
@@ -581,7 +516,7 @@ void XCMeshFBX::DisplayMesh(FbxNode* pNode)
                 if (foundVertex == submesh->m_vertices.end())
                 {
                     //New vertex found. Add it to our vertices
-                    submesh->addVertex(vertex);
+                    submesh->AddVertex(vertex);
                     faceValue[faceVertexIndex] = submesh->m_vertices.size() - 1;
                 }
                 else
@@ -590,14 +525,14 @@ void XCMeshFBX::DisplayMesh(FbxNode* pNode)
                     faceValue[faceVertexIndex] = foundVertex - submesh->m_vertices.begin();
                 }
 
-                submesh->addMapCoord(1.0f, 1.0f);
+                submesh->AddMapCoord(1.0f, 1.0f);
             }
 
             XCASSERT(faceValue[0] != -1);
 
             //Add the face to our submesh
             MeshData::Face face = { faceValue[0], faceValue[1], faceValue[2], faceValue[3] };
-            submesh->addFace(face);
+            submesh->AddFace(face);
             //Logger("Face : %d %d %d", face.a, face.b, face.c);
         }
     }
@@ -847,29 +782,4 @@ void XCMeshFBX::DisplayAndGeneratePolygons(FbxMesh* pMesh, MeshData* submesh)
         }
     }
     DisplayString("");
-}
-
-void XCMeshFBX::Init(int resourceId, std::string userFriendlyName, bool loaded)
-{
-    XCMesh::Init(resourceId, userFriendlyName, loaded);
-}
-
-void XCMeshFBX::Draw(RenderContext& context)
-{
-    XCMesh::Draw(context);
-}
-
-void XCMeshFBX::DrawSubMesh(RenderContext& renderContext, unsigned int meshIndex)
-{
-    XCMesh::DrawSubMesh(renderContext, meshIndex);
-}
-
-void XCMeshFBX::DrawSubMeshes(RenderContext& renderContext)
-{
-    XCMesh::DrawSubMeshes(renderContext);
-}
-
-void XCMeshFBX::Destroy()
-{
-    XCMesh::Destroy();
 }

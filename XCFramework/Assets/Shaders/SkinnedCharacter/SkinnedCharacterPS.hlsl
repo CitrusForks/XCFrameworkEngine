@@ -17,12 +17,7 @@ struct PerObjectBuffer
     Material    gMaterial;
 };
 
-cbuffer cbInstancedBuffer : register(b0)
-{
-    PerObjectBuffer gPerObject[100];
-};
-
-cbuffer cbLightsPerFrame : register(b1)
+cbuffer cbLightsPerFrame : register(b0)
 {
     DirectionalLight gDirLight;
     PointLight       gPointLight;
@@ -30,11 +25,15 @@ cbuffer cbLightsPerFrame : register(b1)
     float3           gEyePosW;
 };
 
+cbuffer cbInstancedBuffer : register(b1)
+{
+    PerObjectBuffer gPerObject[100];
+};
+
 cbuffer cbBoneBuffer : register(b2)
 {
     float4x4    gBoneMatrix[60];
 };
-
 
 Texture2D       gDiffuseMap : register(t0);    //Mapped with ShaderResource Variable
 SamplerState	samLinear : register(s0);

@@ -53,8 +53,8 @@ void FontActor::Draw(RenderContext& context)
 {
     IActor::Draw(context);
 
-    m_fontMesh->DrawText("ABCDE AA BB CC DD CB DB EA", XCVec3Unaligned(0.0f, 10.0f, 0.0f), context);
-    m_fontMesh->DrawText("AA BB CC DD CB DB EA AD", XCVec3Unaligned(10.0f, 0.0f, 0.0f), context);
+    m_fontMesh->DrawText("ABCD", XCVec3Unaligned(1.0f, 10.0f, 0.0f), context);
+    //m_fontMesh->DrawText("0123456789", XCVec3Unaligned(1.0f, 0.0f, 0.0f), context);
 }
 
 void FontActor::Destroy()

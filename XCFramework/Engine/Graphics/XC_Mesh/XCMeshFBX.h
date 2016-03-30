@@ -15,25 +15,22 @@ public:
     DECLARE_OBJECT_CREATION(XCMeshFBX)
 
     XCMeshFBX()
-    {
-        m_isSkinnedMesh = false;
-    }
+    {}
 
     virtual ~XCMeshFBX()
     {
         if (m_fbxMgr)
+        {
             m_fbxMgr->Destroy();
+        }
     }
 
-    virtual void            Init(int resourceId, std::string userFriendlyName, bool loaded = false);
     virtual void            Destroy();
 
-    void                    Load(const void* buffer);
-
 protected:
+    virtual bool            LoadMesh();
+    virtual void            CreateConstantBuffer();
     virtual void            Draw(RenderContext& context);
-    virtual void            DrawSubMesh(RenderContext& renderContext, unsigned int meshIndex);
-    virtual void            DrawSubMeshes(RenderContext& renderContext);
 
     bool                    LoadScene(FbxManager* pManager, FbxDocument* pScene, const char* pFilename);
     void                    DisplayMetaData(FbxScene* pScene);
@@ -41,7 +38,7 @@ protected:
     void                    DisplayHierarchy(FbxNode* pNode, int pDepth);
     void                    DisplayContent(FbxScene* pScene);
     void                    DisplayContent(FbxNode* pNode);
-    void                    DisplayMesh(FbxNode* pNode);
+    void                    ParseMesh(FbxNode* pNode);
     void                    DisplayAndGeneratePolygons(FbxMesh* pMesh, MeshData* submesh);
 
 private:

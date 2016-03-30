@@ -34,9 +34,12 @@ void PSO_Dx12::GenerateDefaultPSO(PSO_Dx12* inPso, RasterType rasterizerType, bo
     {
     case RasterType_FillSolid:
         rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
+        rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
         break;
+
     case RasterType_FillWireframe:
         rasterizerDesc.FillMode = D3D12_FILL_MODE_WIREFRAME;
+        rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
         break;
 
     default:

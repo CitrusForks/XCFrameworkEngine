@@ -79,7 +79,7 @@ void SceneAnimator::Calculate( double pTime)
         return;
 
     // calculate current local transformations
-    mAnimEvaluator->Evaluate( pTime);
+    mAnimEvaluator->Evaluate(0.0f);
 
     // and update all node transformations with the results
     UpdateTransforms( mRootNode, mAnimEvaluator->GetTransformations());
@@ -109,7 +109,7 @@ const aiMatrix4x4& SceneAnimator::GetGlobalTransform( const aiNode* node) const
 
 // ------------------------------------------------------------------------------------------------
 // Calculates the bone matrices for the given mesh.
-const std::vector<XCMatrix4Unaligned>& SceneAnimator::GetBoneMatrices( const aiNode* pNode, size_t pMeshIndex /* = 0 */)
+const std::vector<aiMatrix4x4>& SceneAnimator::GetBoneMatrices( const aiNode* pNode, size_t pMeshIndex /* = 0 */)
 {
     ai_assert( pMeshIndex < pNode->mNumMeshes);
     size_t meshIndex = pNode->mMeshes[pMeshIndex];
@@ -117,7 +117,9 @@ const std::vector<XCMatrix4Unaligned>& SceneAnimator::GetBoneMatrices( const aiN
     const aiMesh* mesh = mScene->mMeshes[meshIndex];
 
     // resize array and initialise it with identity matrices
-    mTransforms.resize( 60, XMMatrixTranspose(XMMatrixIdentity()));
+    //mTransforms.resize( 60, XMMatrixTranspose(XMMatrixIdentity()));
+    mTransforms.clear();
+    mTransforms.resize(60, aiMatrix4x4());
 
     // calculate the mesh's inverse global transform
     aiMatrix4x4 globalInverseMeshTransform = GetGlobalTransform( pNode);
@@ -129,8 +131,10 @@ const std::vector<XCMatrix4Unaligned>& SceneAnimator::GetBoneMatrices( const aiN
     {
         const aiBone* bone = mesh->mBones[a];
         const aiMatrix4x4& currentGlobalTransform = GetGlobalTransform( mBoneNodesByName[ bone->mName.data ]);
-        mTransforms[a] = aiMatrixToMatrix4Unaligned(globalInverseMeshTransform * currentGlobalTransform * bone->mOffsetMatrix);
-        mTransforms[a] = XMMatrixTranspose(mTransforms[a]);
+        //mTransforms[a] = aiMatrixToMatrix4Unaligned(globalInverseMeshTransform * currentGlobalTransform * bone->mOffsetMatrix);
+        //mTransforms[a] = XMMatrixTranspose(mTransforms[a]);
+        mTransforms[a] = globalInverseMeshTransform * currentGlobalTransform * bone->mOffsetMatrix;
+        //mTransforms[a].Transpose();
     }
 
     // and return the result
