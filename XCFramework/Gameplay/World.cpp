@@ -186,7 +186,7 @@ void World::Update(float dt)
 
     for (auto& gameObject : m_GameObjects)
     {
-        if (gameObject.second->isInvalidated())
+        if (gameObject.second->IsInvalidated())
         {
             RequestRemoveActor(gameObject.second->GetBaseObjectId());
         }

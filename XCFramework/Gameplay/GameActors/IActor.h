@@ -8,8 +8,9 @@
 
 #include "Engine/Serializer/IBase.h"
 #include "Engine/ObjectBase/IObjectDimensions.h"
-#include "Gameplay/GameActors/GameActorTypes.h"
 #include "Engine/Graphics/IRenderableObject.h"
+
+#include "Gameplay/GameActors/GameActorTypes.h"
 
 class IActor : public IBase, public IObjectDimensions, public IRenderableObject
 {
@@ -25,12 +26,11 @@ public:
     virtual             void        Draw(RenderContext& renderContext);
     virtual             void        Destroy();
 
+    virtual             void        Invalidate();
     virtual             bool        IsWorldReady()                   { return m_worldReady; }
     virtual             void        SetWorldReady(bool isReady)      { m_worldReady = isReady; }
 
-    virtual             void        Invalidate();
-
-    bool                            isInvalidated()                  { return m_invalidated; }
+    bool                            IsInvalidated()                  { return m_invalidated; }
 
 protected:
     std::string                     m_userFriendlyName;
