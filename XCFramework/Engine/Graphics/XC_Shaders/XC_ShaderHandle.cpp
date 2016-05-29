@@ -302,6 +302,9 @@ void XCShaderHandle::GeneratePSO()
     m_pso->m_psos[PSOType_RASTER_FILL_WIREFRAME].m_psoDesc.PS = { m_pPS, m_psSize };
 #endif
 
+    //Check the depth enable.
+    m_pso->m_psos[PSOType_RASTER_FILL_SOLID].m_psoDesc.DepthStencilState.DepthEnable     = m_enableDepth;
+    m_pso->m_psos[PSOType_RASTER_FILL_WIREFRAME].m_psoDesc.DepthStencilState.DepthEnable = m_enableDepth;
 
     m_pso->CreateGraphicPSO(m_device, PSOType_RASTER_FILL_SOLID);
     m_pso->CreateGraphicPSO(m_device, PSOType_RASTER_FILL_WIREFRAME);
@@ -370,8 +373,6 @@ void XCShaderHandle::ApplyShader(ID3DDeviceContext& context, RasterType rasterTy
     context.IASetInputLayout(m_pInputLayout);
     context.VSSetShader(m_pVS, nullptr, 0);
     context.PSSetShader(m_pPS, nullptr, 0);
-#elif defined(XCGRAPHICS_GNM)
-    IShader::ApplyShader(context);
 #endif
 }
 

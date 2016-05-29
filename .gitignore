@@ -23,3 +23,5 @@ XCFramework/.vs/*
 *.vcxproj
 *.suo
 *log.txt
+/XCTools/FBXToXCMeshConverter/FBXToXCMeshConverter/Debug
+/XCTools/FBXToXCMeshConverter/Debug
