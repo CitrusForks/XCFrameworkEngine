@@ -16,12 +16,32 @@ IActor::IActor(void)
 
     m_worldReady = false;
     m_invalidated = false;
+    m_isRenderable = false;
+
+    m_actorState = ActorState_None;
+}
+
+void IActor::PreLoad(const void* fbBuffer)
+{
+    m_actorState = ActorState_Loading;
 }
 
 void IActor::Load()
 {
-    m_invalidated = false;
-    m_worldReady = true;
+}
+
+void IActor::UpdateState()
+{
+    if (!m_worldReady && m_actorState == ActorState_Loaded)
+    {
+        m_invalidated = false;
+        m_worldReady = true;
+        m_isRenderable = true;
+    }
+    else if (m_worldReady && m_actorState == ActorState_Unloaded)
+    {
+        Invalidate();
+    }
 }
 
 IActor::~IActor(void)
@@ -37,14 +57,18 @@ void IActor::Draw(RenderContext& renderContext)
 {
 }
 
+void IActor::Unload()
+{
+    m_actorState = ActorState_Unloaded;
+}
+
 void IActor::Destroy()
 {
-    Invalidate();
-    m_worldReady = false;
 }
 
 void IActor::Invalidate()
 {
-    m_invalidated = true;
+    m_invalidated   = true;
+    m_worldReady    = false;
+    m_isRenderable  = false;
 }
-

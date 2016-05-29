@@ -17,7 +17,8 @@ public:
 
     virtual ~IEvent();
 
-    EventType    GetEventType() { return m_eventType; }
+    EventType    GetEventType()                 { return m_eventType; }
+    void         SetEventType(EventType type)   { m_eventType = type; }
 
 private:
     EventType    m_eventType;

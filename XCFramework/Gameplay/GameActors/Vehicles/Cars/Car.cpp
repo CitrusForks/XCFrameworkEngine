@@ -11,6 +11,7 @@
 #include "Engine/Graphics/XC_Shaders/XC_ShaderManager.h"
 #include "Engine/Graphics/XC_Shaders/XC_ShaderHandle.h"
 #include "Engine/Graphics/XC_Camera/XC_CameraManager.h"
+#include "Engine/Resource/ResourceManager.h"
 
 Car::Car(void)
 {
@@ -20,9 +21,10 @@ Car::~Car(void)
 {
 }
 
-void Car::PreLoad(XCVec3 initialPosition, XCMesh* pMesh)
+void Car::PreLoad(XCVec3 initialPosition, std::string pMesh)
 {
-    m_pMesh = pMesh;
+    ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
+    m_pMesh = &resMgr.AcquireResource(pMesh.c_str());
     
     m_material.Ambient = XCVec4(1.0f, 1.0f, 1.0f, 1.0f);
     m_material.Diffuse = XCVec4(0.5f, 0.8f, 0.0f, 1.0f);
@@ -58,7 +60,7 @@ void Car::Update(float dt)
 {
     m_World = m_MScaling * m_MRotation * m_MTranslation;
     
-    m_pMesh->Update(dt);
+    m_pMesh->GetResource<XCMesh>()->Update(dt);
     
     PhysicsActor::Update(dt);
 }
@@ -94,7 +96,7 @@ void Car::Draw(RenderContext& context)
         m_material
     };
 
-    m_pMesh->DrawInstanced(perObject);
+    m_pMesh->GetResource<XCMesh>()->DrawInstanced(perObject);
 
     PhysicsActor::Draw(context);
 }
@@ -102,4 +104,7 @@ void Car::Draw(RenderContext& context)
 void Car::Destroy()
 {
     PhysicsActor::Destroy();
+
+    ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
+    resMgr.ReleaseResource(m_pMesh);
 }

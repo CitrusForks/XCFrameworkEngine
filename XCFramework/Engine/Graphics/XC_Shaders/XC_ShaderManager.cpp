@@ -21,13 +21,13 @@
 #include "Engine/Graphics/XC_Shaders/src/SkinnedCharacter.h"
 #endif
 
-#include "Engine/FlatBuffersInterface/FlatBuffersSystem.h"
 #include "Assets/Packages/PackageConsts.h"
 
 
 XC_ShaderManager::XC_ShaderManager(ID3DDevice& device)
     : m_device(device)
 {
+    m_rasterType = RasterType_FillSolid;
 }
 
 XC_ShaderManager::~XC_ShaderManager(void)
@@ -74,11 +74,11 @@ void XC_ShaderManager::LoadShaders()
     IShader* binShader;
 
     FlatBuffersSystem& fbSystem = SystemLocator::GetInstance()->RequestSystem<FlatBuffersSystem>("FlatBuffersSystem");
-    fbSystem.ParseAndLoadFile(SHADER_SCHEMA_FILEPATH);
-    fbSystem.ParseAndLoadFile(SHADER_DATA_FILEPATH);
+    fbSystem.ParseAndLoadFile(SHADER_SCHEMA_FILEPATH, m_fbBuffer);
+    fbSystem.ParseAndLoadFile(SHADER_DATA_FILEPATH, m_fbBuffer);
 
 #if defined(LOAD_SHADERS_FROM_DATA)
-    auto FBShadersRoot = GetFBRootShader(fbSystem.GetBufferFromLoadedData());
+    auto FBShadersRoot = GetFBRootShader(m_fbBuffer.GetBufferFromLoadedData());
 
     for (auto it = FBShadersRoot->FBShaders()->begin(); it != FBShadersRoot->FBShaders()->end(); ++it)
     {
@@ -221,8 +221,9 @@ void XC_ShaderManager::LoadSamplers()
 
 void XC_ShaderManager::SetRasterizerState(ID3DDeviceContext& context, RasterType type)
 {
+    m_rasterType = type;
 #if defined(XCGRAPHICS_DX11)
-    context.RSSetState(m_rasterizerStates[type]);
+    context.RSSetState(m_rasterizerStates[m_rasterType]);
 #endif
 }
 

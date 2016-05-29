@@ -21,7 +21,7 @@ void IShader::CreateConstantBuffers()
 {
 }
 
-void IShader::ApplyShader(ID3DDeviceContext& context)
+void IShader::ApplyShader(ID3DDeviceContext& context, RasterType rasterType)
 {
 }
 

@@ -23,9 +23,10 @@ protected:
     void                    LoadBuffer(Type buffer, std::string actorName);
 
 private:
-    std::string             m_packageName;
-    World&                  m_worldRef;
-    GameActorsFactory*      m_actorFactory;
+    std::string                 m_packageName;
+    World&                      m_worldRef;
+    GameActorsFactory*          m_actorFactory;
+    FlatBuffersSystem::FBBuffer m_fbBuffer;
 };
 
 template<class Type>

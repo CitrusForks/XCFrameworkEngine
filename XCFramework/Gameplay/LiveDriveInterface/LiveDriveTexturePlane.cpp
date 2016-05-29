@@ -44,7 +44,7 @@ void LiveDriveTexturePlane::PreLoad(const void* fbBuffer)
 #if defined(XCGRAPHICS_DX11)
     m_liveDriveTexture = new Texture2D(graphicsSystem.GetRenderTexture(RENDERTARGET_LIVEDRIVE).GetShaderResourceView());
 #endif
-    m_texture = m_liveDriveTexture;
+    m_texture->m_Resource = m_liveDriveTexture;
 
     SimpleActor::PreLoad(fbBuffer);
 }

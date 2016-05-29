@@ -8,6 +8,7 @@
 
 #include "Gameplay/GameFiniteStateMachine.h"
 #include "Engine/System/SystemLocator.h"
+#include "Engine/Event/IEventListener.h"
 
 GameFiniteStateMachine::GameFiniteStateMachine()
 {

@@ -34,10 +34,10 @@ void WorldSceneLoader::Run()
     AsyncTask::Run();
 
     FlatBuffersSystem& fbSystem = SystemLocator::GetInstance()->RequestSystem<FlatBuffersSystem>("FlatBuffersSystem");
-    fbSystem.ParseAndLoadFile(OPENWORLD_SCHEMA_FILEPATH);
-    fbSystem.ParseAndLoadFile(m_packageName);
+    fbSystem.ParseAndLoadFile(OPENWORLD_SCHEMA_FILEPATH, m_fbBuffer);
+    fbSystem.ParseAndLoadFile(m_packageName, m_fbBuffer);
 
-    auto fbWorld = GetFBOpenWorldScene(fbSystem.GetBufferFromLoadedData());
+    auto fbWorld = GetFBOpenWorldScene(m_fbBuffer.GetBufferFromLoadedData());
 
     //Fonts
     LoadBuffer<const flatbuffers::Vector<flatbuffers::Offset<FBFont>>*>(fbWorld->FBFonts(), "FontActor");

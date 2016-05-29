@@ -7,7 +7,7 @@
 #pragma once
 
 #include "Gameplay/GameActors/SimpleActor.h"
-#include "Engine/Graphics/XC_Textures/CubeTexture3D.h"
+#include "Engine/Resource/ResourceHandle.h"
 #include "Engine/Graphics/XC_Shaders/XC_ShaderTypes.h"
 #include "Engine/Graphics/XC_Shaders/XC_VertexFormat.h"
 #include "Engine/Graphics/XC_Materials/MaterialTypes.h"
@@ -23,20 +23,21 @@ public:
     SimpleSkyBox(void);
     virtual ~SimpleSkyBox(void);
 
-    void                            Init(int actorId);
-    void                            PreLoad(const void* fbBuffer);
-    void                            PreLoad(XCVecIntrinsic4 initialPosition, XCVecIntrinsic4 initialRotation, XCVecIntrinsic4 initialScaling, BasicMaterial material, CubeTexture3D* texture, RasterType rasterType);
-    void                            Load();
-    void                            Update(float dt);
-    void                            Draw(RenderContext& renderContext);
-    void                            Destroy();
+    void                            Init(int actorId) override;
+    void                            PreLoad(const void* fbBuffer) override;
+    void                            Load() override;
+    void                            UpdateState() override;
+    void                            Update(float dt) override;
+    void                            Draw(RenderContext& renderContext) override;
+    void                            Destroy() override;
+
     void                            BuildBuffers();
 
 protected:
     unsigned int                    m_Stride;
     unsigned int                    m_Offset;
 
-    CubeTexture3D*                  m_cubeMapTexture;
+    ResourceHandle*                 m_cubeMapTexture;
 
     ShaderType                      m_useShaderType;
     BasicMaterial                   m_material;

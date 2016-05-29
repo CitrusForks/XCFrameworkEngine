@@ -47,7 +47,7 @@ void SimpleSkyBox::PreLoad(const void* fbBuffer)
     m_material.Specular = XCVec4(skyBoxBuff->Material()->Specular()->x(), skyBoxBuff->Material()->Specular()->y(), skyBoxBuff->Material()->Specular()->z(), skyBoxBuff->Material()->Specular()->w());
 
     ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
-    m_cubeMapTexture = (CubeTexture3D*) resMgr.GetResource(skyBoxBuff->CubeTexture3DResourceName()->c_str());
+    m_cubeMapTexture = &resMgr.AcquireResource(skyBoxBuff->CubeTexture3DResourceName()->c_str());
 
     m_rasterType = (RasterType) skyBoxBuff->RasterizerType();
 
@@ -59,16 +59,6 @@ void SimpleSkyBox::PreLoad(const void* fbBuffer)
     SimpleActor::PreLoad(fbBuffer);
 }
 
-void SimpleSkyBox::PreLoad(XCVecIntrinsic4 initialPosition, XCVecIntrinsic4 initialRotation, XCVecIntrinsic4 initialScaling, BasicMaterial material, CubeTexture3D* texture, RasterType rasterType)
-{
-    m_currentPosition = initialPosition;
-    m_initialRotation = initialRotation;
-    m_initialScaling  = initialScaling;
-    m_material        = material;
-    m_cubeMapTexture  = texture;
-    m_rasterType      = rasterType;
-}
-
 void SimpleSkyBox::Load()
 {
     m_MTranslation = XMMatrixTranslation(XMVectorGetX(m_currentPosition), XMVectorGetY(m_currentPosition), XMVectorGetZ(m_currentPosition));
@@ -78,6 +68,16 @@ void SimpleSkyBox::Load()
 
     BuildBuffers();
     SimpleActor::Load();
+}
+
+void SimpleSkyBox::UpdateState()
+{
+    if (m_cubeMapTexture->m_Resource->IsLoaded())
+    {
+        m_actorState = IActor::ActorState_Loaded;
+    }
+
+    SimpleActor::UpdateState();
 }
 
 void SimpleSkyBox::BuildBuffers()
@@ -157,7 +157,7 @@ void SimpleSkyBox::Draw(RenderContext& context)
 #else
     cubeMapShader->setWVP(context.GetDeviceContext(), wbuffer);
 #endif
-    cubeMapShader->SetResource("gCubeMap", context.GetDeviceContext(), m_cubeMapTexture->getTextureResource());
+    cubeMapShader->SetResource("gCubeMap", context.GetDeviceContext(), m_cubeMapTexture);
     context.GetShaderManagerSystem().DrawIndexedInstanced(context.GetDeviceContext(), 36, m_indexBuffer.GetIndexBufferInGPUMem());
     graphicsSystem.SetLessEqualDepthStencilView(context.GetDeviceContext(), false);
 }
@@ -165,4 +165,7 @@ void SimpleSkyBox::Draw(RenderContext& context)
 void SimpleSkyBox::Destroy()
 {
     SimpleActor::Destroy();
+
+    ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
+    resMgr.ReleaseResource(m_cubeMapTexture);
 }

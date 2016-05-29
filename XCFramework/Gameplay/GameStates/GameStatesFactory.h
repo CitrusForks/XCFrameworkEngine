@@ -21,16 +21,17 @@ public:
     GameStatesFactory();
     virtual ~GameStatesFactory();
 
-    void                            InitFactory();
+    void                            InitFactory()       override final;
+    void                            DestroyFactory()    override final;
+
     void                            RegisterStates();
+
     IGameState*                     CreateState(std::string userFriendlyName);
     void                            LoadStates(FILE* packageFile, IGameState* const gameState);
-    void                            DestroyFactory();
 
 private:
 
-    int                                         m_statesCount;
-    std::map<EGameState, std::string>           m_registeredStates;
-
-    std::mutex                                  m_gameStatesFactoryLock;
+    int                                  m_statesCount;
+    std::map<EGameState, std::string>    m_registeredStates;
+    std::mutex                           m_gameStatesFactoryLock;
 };

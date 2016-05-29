@@ -19,10 +19,7 @@ public:
     virtual ~PCSoldier(void);
 
     virtual void                        Init(int actorId);
-    virtual void                        PreLoad(const void* fbBuffer);
-    virtual void                        PreLoad(XCVec3 _initialPosition, XCMesh* pMesh);
     virtual void                        Update(float dt);
-    virtual void                        Destroy();
 
 protected:
     DirectInput*                        m_directInput;

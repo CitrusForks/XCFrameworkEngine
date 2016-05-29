@@ -3,7 +3,6 @@
 #include "Gameplay/GameStates/EditorStates/EditorRunningState.h"
 #include "Gameplay/WorldEditor.h"
 
-#include "Engine/Resource/ResourceManager.h"
 #include "Engine/Graphics/XC_Camera/XC_CameraManager.h"
 
 using namespace GameState;
@@ -37,18 +36,16 @@ void EditorRunningState::Init(GameFiniteStateMachine& gameFSM)
     cameraMgr.SetCameraType(CAMERATYPE_FPS);
 
     //Add all the objects into the world
-    ResourceManager& resMgr = (ResourceManager&)SystemLocator::GetInstance()->RequestSystem("ResourceManager");
-
     SimpleSkyBox* pSkyBox = (SimpleSkyBox*) m_gameActorFactory->CreateActor("SimpleSkyBox");
-    pSkyBox->PreLoad(toXMVECTOR(0.0f, 0.0f, 0.0f, 1.0f), toXMVECTOR(0.0f, 0.0f, 0.0f, 1.0f), toXMVECTOR(1000.0f, 1000.0f, 1000.0f, 1.0f), BasicMaterial(), (CubeTexture3D*)resMgr.GetResource("cubemap_bright"), RASTERIZERTYPE_FILL_SOLID);
+    pSkyBox->PreLoad(toXMVECTOR(0.0f, 0.0f, 0.0f, 1.0f), toXMVECTOR(0.0f, 0.0f, 0.0f, 1.0f), toXMVECTOR(1000.0f, 1000.0f, 1000.0f, 1.0f), BasicMaterial(), "cubemap_bright", RASTERIZERTYPE_FILL_SOLID);
     m_worldEditor->RequestAddActor(pSkyBox);
 
     Terrain* pHeightMapTerrain = (Terrain*) m_gameActorFactory->CreateActor("Terrain");
     pHeightMapTerrain->PreLoad("Assets\\Textures\\Environment\\Terrain\\SimpleTerrain1.bmp",
-                            (Texture2D*)resMgr.GetResource("multi_grass"),
-                            (Texture2D*)resMgr.GetResource("multi_ground"),
-                            (Texture2D*)resMgr.GetResource("Sand"),
-                            (Texture2D*)resMgr.GetResource("multi_blend"),
+                            "multi_grass",
+                            "multi_ground",
+                            "Sand",
+                            "multi_blend",
                             XCVec3(50, -20, -40), 25, 25, 1.0f, 1.0f);
     m_worldEditor->RequestAddActor(pHeightMapTerrain);
 }

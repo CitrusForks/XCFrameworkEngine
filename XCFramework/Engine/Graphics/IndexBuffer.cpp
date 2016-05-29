@@ -5,3 +5,6 @@
  * For complete license, read License.txt in source root directory. */
 
 #include "stdafx.h"
+
+#include "IndexBuffer.h"
+

@@ -14,16 +14,6 @@ CubeTexture3D::CubeTexture3D()
 {
     m_resourceType = RESOURCETYPE_CUBETEXTURE3D;
     m_textureCoordinateMatrix = XMMatrixIdentity();
-
-#if defined(XCGRAPHICS_DX11)
-    m_texture2DDesc = { 0 };
-    m_texture2D = nullptr;
-
-    for (unsigned int index = 0; index < 6; ++index)
-    {
-        m_cubeMapRTV[index] = nullptr;
-    }
-#endif
 }
 
 CubeTexture3D::~CubeTexture3D()
@@ -33,25 +23,6 @@ CubeTexture3D::~CubeTexture3D()
 void CubeTexture3D::Init(int resourceId, std::string userFriendlyName)
 {
     Texture2D::Init(resourceId, userFriendlyName);
-
-    /*XC_GraphicsDx11& graphicSys = SystemLocator::GetInstance()->RequestSystem<XC_GraphicsDx11>("GraphicsSystem");
-
-    m_texture2DDesc.Width = CUBE_MAP_SIZE;
-    m_texture2DDesc.Height = CUBE_MAP_SIZE;
-    m_texture2DDesc.MipLevels = 0;
-    m_texture2DDesc.ArraySize = 6;
-    m_texture2DDesc.SampleDesc.Count = 1;
-    m_texture2DDesc.SampleDesc.Quality = 0;
-    m_texture2DDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    m_texture2DDesc.Usage = D3D11_USAGE_DEFAULT;
-    m_texture2DDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
-    m_texture2DDesc.CPUAccessFlags = 0;
-    m_texture2DDesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS | D3D11_RESOURCE_MISC_TEXTURECUBE;
-
-    //Create the 6 Texture2D
-    ValidateResult(graphicSys.GetDevice()->CreateTexture2D(&m_texture2DDesc, 0, &m_texture2D));
-    
-    CreateRenderTargets();*/
 }
 
 void CubeTexture3D::Load(const void* buffer)
@@ -60,12 +31,12 @@ void CubeTexture3D::Load(const void* buffer)
 
     m_userFriendlyName = fbTexture3D->ResourceName()->c_str();
     m_resourcePath = getPlatformPath(fbTexture3D->ResourcePath()->c_str());
-    loadTexture();
+    LoadTexture();
 
     IResource::Load(buffer);
 }
 
-void CubeTexture3D::loadTexture()
+void CubeTexture3D::LoadTexture()
 {
     XC_Graphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XC_Graphics>("GraphicsSystem");
 
@@ -128,7 +99,7 @@ void CubeTexture3D::loadTexture()
     renderPool.RequestResourceDeviceContext(this);
     WaitResourceUpdate();
 #elif defined(XCGRAPHICS_DX11)
-    Texture2D::loadTexture();
+    Texture2D::LoadTexture();
 #endif
 
     Logger("[TEXTURE 3D] Texture Loaded");
@@ -158,15 +129,5 @@ void CubeTexture3D::CreateRenderTargets()
 
 void CubeTexture3D::Destroy()
 {
-#if defined(XCGRAPHICS_DX11)
-    ReleaseCOM(m_texture2D);
-    for (unsigned int index = 0; index < 6; ++index)
-    {
-        if (m_cubeMapRTV[index] != nullptr)
-        {
-            ReleaseCOM(m_cubeMapRTV[index]);
-        }
-    }
-#endif
     Texture2D::Destroy();
 }

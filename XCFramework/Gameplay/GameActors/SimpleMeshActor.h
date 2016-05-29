@@ -8,7 +8,7 @@
 
 #include "Gameplay/GameActors/SimpleActor.h"
 
-class XCMesh;
+class ResourceHandle;
 
 class SimpleMeshActor : public SimpleActor
 {
@@ -25,5 +25,5 @@ public:
     virtual void                Destroy();
 
 protected:
-    XCMesh*                     m_pMesh;
+    ResourceHandle*             m_pMesh;
 };

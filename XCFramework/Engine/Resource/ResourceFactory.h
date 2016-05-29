@@ -18,15 +18,14 @@ public:
     ResourceFactory();
     virtual ~ResourceFactory();
 
-    void                            InitFactory();
+    void                            InitFactory()    override final;
+    void                            DestroyFactory() override final;
 
     IResource*                      createResource(std::string classKey, std::string userFriendlyName);
     IResource*                      createResource(std::string classKey);
 
     void                            loadResource(FILE* packageFile, IResource* const resource);
     void                            loadResource(const void* buffer, IResource* const resource);
-
-    void                            DestroyFactory();
 
 private:
     int                             m_resourceCount;

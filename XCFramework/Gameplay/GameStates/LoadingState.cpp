@@ -7,11 +7,13 @@
 #include "stdafx.h"
 
 #include "Gameplay/GameStates/LoadingState.h"
-#include "Engine/Resource/ResourceManager.h"
 #include "Gameplay/GameStates/GameStateTypes.h"
 
-#include "Engine/Graphics/XC_GraphicsDx11.h"
+#include "Engine/Resource/ResourceManager.h"
+#include "Engine/Graphics/XC_Graphics.h"
 #include "Engine/TaskManager/TaskManager.h"
+#include "Engine/Resource/LoadPackageFileFBTask.h"
+#include "Engine/Graphics/BasicGeometry/MeshGeneratorSystem.h"
 
 #include "Assets/Packages/PackageConsts.h"
 
@@ -29,22 +31,32 @@ void LoadingState::Init()
 {
     IGameState::Init();
 
-    ResourceManager& resMgr = (ResourceManager&)SystemLocator::GetInstance()->RequestSystem("ResourceManager");
+    TaskManager& taskMgr = SystemLocator::GetInstance()->RequestSystem<TaskManager>("TaskManager");
 
-    //Load the resources here.
-    m_taskId = resMgr.LoadResourcesFromPackageFB(RESOURCE_DATA_FILEPATH);
+    m_loadPackageTask = new LoadPackageFileFBTask(RESOURCE_DATA_FILEPATH);
+    m_futurePackageLoaded = taskMgr.RegisterTask(m_loadPackageTask);
 }
 
 void LoadingState::Update(float dt)
 {
-    ResourceManager& resMgr = (ResourceManager&)SystemLocator::GetInstance()->RequestSystem("ResourceManager");
-
     //Wait for resource loader to complete the loading of resources. When done move to next state.
-    if ( resMgr.IsPackageLoaded())
+    if (m_futurePackageLoaded._Is_ready() /*&& m_futurePackageLoaded.wait_for(std::chrono::seconds(1)) == std::future_status::ready */)
     {
-        Event_GameStateChange event("LoadingWorldState", STATE_DESTROY);
-        EventBroadcaster& broadcaster = (EventBroadcaster&)SystemLocator::GetInstance()->RequestSystem("EventBroadcaster");
-        broadcaster.BroadcastEvent(&event);
+        if(m_futurePackageLoaded.valid() && m_futurePackageLoaded.get() > 0)
+        {
+            //Load the Runtime Mesh Generator to load the basic meshes.
+            SystemContainer& container = (SystemContainer&)SystemLocator::GetInstance()->GetSystemContainer();
+            container.RegisterSystem<MeshGeneratorSystem>("MeshGenerator");
+
+            MeshGeneratorSystem& meshGenerator = (MeshGeneratorSystem&)container.CreateNewSystem("MeshGenerator");
+            meshGenerator.Load();
+
+            container.RemoveSystem("MeshGenerator");
+
+            Event_GameStateChange event("LoadingWorldState", STATE_DESTROY);
+            EventBroadcaster& broadcaster = (EventBroadcaster&)SystemLocator::GetInstance()->RequestSystem("EventBroadcaster");
+            broadcaster.BroadcastEvent(&event);
+        }
     }
 }
 
@@ -59,4 +71,7 @@ void GameState::LoadingState::Draw(XC_Graphics& graphicsSystem)
 void LoadingState::Destroy()
 {
     IGameState::Destroy();
+
+    TaskManager& taskMgr = SystemLocator::GetInstance()->RequestSystem<TaskManager>("TaskManager");
+    taskMgr.UnregisterTask(m_loadPackageTask->GetThreadId());
 }

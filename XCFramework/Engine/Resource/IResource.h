@@ -14,53 +14,61 @@
 class IResource : public IBase
 {
 public:
+    
+    enum ResourceState
+    {
+        ResourceState_Loading,
+        ResourceState_Loaded,
+
+        ResourceState_UnLoading,
+        ResourceState_UnLoaded
+    };
+
     IResource();
     virtual ~IResource();
 
-    virtual void            Init(int id, std::string userFriendlyName, bool loaded = false);
+    virtual void            Init(int id, std::string userFriendlyName);
 
     //Dynamic loading/spawning or legacy data structure
     virtual void            Load(std::string resourcePath);
 
     //Flat buffer serialization
-    virtual void            Load(const void* fbBuffer) 
-    {
-        m_loaded = true;
-    }
+    virtual void            Load(const void* fbBuffer);
+    virtual void            Unload();
 
+    virtual void            UpdateState();
     virtual void            Update(float dt) {}
     virtual void            Draw() {}
     virtual void            Draw(RenderContext& context) {}
 
+    virtual void            RenderContextCallback(RenderContext& renderContext);
+
     virtual void            Destroy();
 
-    void WaitResourceUpdate()
-    {
-        while (!m_resourceUpdated);
-    }
+    void                    WaitResourceUpdate();
 
-    virtual void RenderContextCallback(RenderContext& renderContext)
-    {
-        m_resourceUpdated = true;
-    }
-
-    int                     getResourecId()                     { return m_resourceId; }
-    EResourceType           getResourceType()                   { return m_resourceType;  }
+    int                     GetResourecId()                                  { return m_resourceId; }
+    EResourceType           GetResourceType()                                { return m_resourceType;  }
     
-    std::string             getUserFriendlyName()               { return m_userFriendlyName;  }
-    std::string             getResourcePath()                   { return m_resourcePath; }
+    std::string             SetUserFriendlyName(std::string usrFriendlyName) { m_userFriendlyName = usrFriendlyName; }
+    std::string             GetUserFriendlyName()                            { return m_userFriendlyName;  }
+    std::string             GetResourcePath()                                { return m_resourcePath; }
+                                                                             
+    int                     IsLoaded()                                       { return m_resourceState == ResourceState_Loaded; }
 
-    int                     isLoaded()                          { return m_loaded; }
-    
+    ResourceState           GetResourceState()                               { return m_resourceState; }
+    void                    SetResourceState(ResourceState state)            { m_resourceState = state; }
+
 protected:
     EResourceType           m_resourceType;
     int                     m_resourceId;
-    bool                    m_loaded;
+    ResourceState           m_resourceState;
 
     std::string             m_resourcePath;
     std::string             m_userFriendlyName;
 
     std::atomic<bool>       m_resourceUpdated;
+    bool                    m_isResourceReady;
 };
 
 

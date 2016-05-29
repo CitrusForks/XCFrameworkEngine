@@ -20,9 +20,7 @@ public:
     virtual ~NPCSoldier(void);
 
     virtual void                        Init(int actorId);
-    virtual void                        PreLoad(const void* fbBuffer);
     virtual void                        Update(float dt);
-    virtual void                        Destroy();
 
 protected:
     std::unique_ptr<AIBrain>            m_AIBrain;

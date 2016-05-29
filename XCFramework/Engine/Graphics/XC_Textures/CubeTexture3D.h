@@ -13,21 +13,20 @@ class CubeTexture3D : public Texture2D
 public:
     DECLARE_OBJECT_CREATION(CubeTexture3D)
 
-    static const int                      CUBE_MAP_SIZE = 256;
+    static const int    CUBE_MAP_SIZE = 256;
 
     CubeTexture3D();
     ~CubeTexture3D();
 
-    virtual void                          Init(int resourceId, std::string userFriendlyName);
-    virtual void                          Load(const void* buffer);
-    virtual void                          Destroy();
+    virtual void        Init(int resourceId, std::string userFriendlyName) override;
+    virtual void        Load(const void* buffer)                           override;
+    virtual void        Destroy()                                          override;
 
-    void                                  loadTexture();
-    void                                  CreateRenderTargets();
+    void                LoadTexture();
+    void                CreateRenderTargets();
 
 private:
-#if defined(XCGRAPHICS_DX12)
-#elif defined(XCGRAPHICS_DX11)
+#if defined(XCGRAPHICS_DX11)
     D3D11_TEXTURECUBE_FACE              m_textureCubeFace;
     D3D_TEXTURE2D_DESC                  m_texture2DDesc;
     ID3DTexture2D*                      m_texture2D;

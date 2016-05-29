@@ -7,15 +7,16 @@
 #pragma once
 
 #include "Engine/Graphics/RenderContext.h"
+#include "Engine/Graphics/IRenderableObject.h"
 
-class IParticleEffect
+class IParticleEffect : public IRenderableObject
 {
 public:
     IParticleEffect();
     virtual ~IParticleEffect();
 
     virtual void         Update(float dt);
-    virtual void         Draw(RenderContext& renderContext) = 0;
+    virtual void         Draw(RenderContext& renderContext) {}
 
     virtual bool         isAlive() const                        { return m_isAlive; }
     virtual void         setAlive(bool alive)                   { m_isAlive = alive; }

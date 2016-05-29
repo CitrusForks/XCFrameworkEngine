@@ -17,9 +17,9 @@ VectorFontMesh::~VectorFontMesh()
 {
 }
 
-void VectorFontMesh::Init(int resourceId, std::string userFriendlyName, bool loaded)
+void VectorFontMesh::Init(int resourceId, std::string userFriendlyName)
 {
-    XCMeshFBX::Init(resourceId, userFriendlyName, loaded);
+    XCMeshFBX::Init(resourceId, userFriendlyName);
 
     m_material.Ambient = XCVec4(1.0f, 1.0f, 1.0f, 1.0f);
     m_material.Diffuse = XCVec4(0.5f, 0.8f, 0.0f, 1.0f);
@@ -93,6 +93,9 @@ void VectorFontMesh::DrawText(std::string text, XCVec3Unaligned position, Render
 void VectorFontMesh::Destroy()
 {
     XCMeshFBX::Destroy();
+
+    XC_Graphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XC_Graphics>("GraphicsSystem");
+    graphicsSystem.GetRenderingPool().RemoveResourceDrawable((IResource*) this);
 
     for (auto instanceBuffer : m_vectorFontInstanceBuffers)
     {

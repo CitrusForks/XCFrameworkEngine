@@ -8,11 +8,11 @@
 
 #include "Engine/Graphics/RenderWorkerTypeDefines.h"
 #include "Engine/Graphics/RenderContext.h"
-#include "Engine/Thread/Thread.h"
 #include "Engine/Graphics/IRenderableObject.h"
 #include "Engine/Graphics/RenderTargetTypes.h"
 #include "Engine/Graphics/IGraphicsBuffer.h"
 #include "Engine/Resource/IResource.h"
+#include "Engine/Thread/Thread.h"
 #include "Engine/Thread/XCSyncEvent.h"
 
 class XC_Graphics;
@@ -20,8 +20,9 @@ class XC_Graphics;
 class RenderingPool
 {
 public:
-    static const int    NbRenderWorkerThreads = WorkerType_Max;
-    static const int    NbFrameCommandList    = 1;
+
+    static const int NbRenderWorkerThreads = WorkerType_Max;
+    static const int NbFrameCommandList    = 1;
 
     struct RenderWorker
     {
@@ -37,14 +38,9 @@ public:
         Thread                              m_workerThread;
 
         void                                Init();
-
-#if defined(WIN32)
-        static int                          WorkerThreadFunc(void* param);
-#elif defined(XC_ORBIS)
-        static void*                        WorkerThreadFunc(void* param);
-#endif
-
         void                                Destroy();
+
+        static int                          WorkerThreadFunc(void* param);
     };
 
 
@@ -71,6 +67,7 @@ public:
     RenderWorker*       GetRenderWorkers() { return m_renderWorkers; }
 
 private:
+    
     RenderWorker        m_renderWorkers[NbRenderWorkerThreads];
     RenderContext       m_FrameCommandList[NbFrameCommandList];
 

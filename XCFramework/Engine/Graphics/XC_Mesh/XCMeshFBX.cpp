@@ -67,7 +67,6 @@ bool XCMeshFBX::LoadMesh()
 void XCMeshFBX::CreateConstantBuffer()
 {
     XCMesh::CreateConstantBuffer();
-
 }
 
 void XCMeshFBX::Draw(RenderContext & context)
@@ -531,7 +530,7 @@ void XCMeshFBX::ParseMesh(FbxNode* pNode)
             XCASSERT(faceValue[0] != -1);
 
             //Add the face to our submesh
-            MeshData::Face face = { faceValue[0], faceValue[1], faceValue[2], faceValue[3] };
+            MeshData::Face face = { (unsigned short)faceValue[0], (unsigned short)faceValue[1], (unsigned short)faceValue[2], (unsigned short)faceValue[3] };
             submesh->AddFace(face);
             //Logger("Face : %d %d %d", face.a, face.b, face.c);
         }

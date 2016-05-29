@@ -17,8 +17,8 @@ public:
 
     virtual ~SystemFactory();
 
-    void                            InitFactory();
-    void                            DestroyFactory();
+    void                            InitFactory()     override final;
+    void                            DestroyFactory()  override final;
 
     ISystem*                        CreateSystem(std::string sysName);
 

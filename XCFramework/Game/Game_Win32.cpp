@@ -62,7 +62,7 @@ int Game_Win32::Init()
 
     //Resource Manager
     m_resourceManagingSystem = (ResourceManager*) &m_systemContainer->CreateNewSystem("ResourceManager");
-    m_resourceManagingSystem->Init(*m_graphicsSystem, *m_taskManagingSystem);
+    m_resourceManagingSystem->Init(*m_taskManagingSystem);
 
     //Initialize Cameras
     m_cameraManagingSystem = (XC_CameraManager*)&m_systemContainer->CreateNewSystem("CameraManager");

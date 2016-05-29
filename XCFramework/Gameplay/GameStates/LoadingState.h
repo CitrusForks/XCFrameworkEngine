@@ -7,6 +7,7 @@
 #pragma once
 
 #include "Gameplay/GameStates/IGameState.h"
+#include "Engine/TaskManager/Task/ITask.h"
 
 namespace GameState
 {
@@ -25,5 +26,7 @@ namespace GameState
 
     private:                    
         unsigned long           m_taskId;
+        std::future<int>        m_futurePackageLoaded;
+        ITask*                  m_loadPackageTask;
     };
 }

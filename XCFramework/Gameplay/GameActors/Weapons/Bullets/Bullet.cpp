@@ -7,13 +7,13 @@
 #include "stdafx.h"
 
 #include "Bullet.h"
-#include "Engine/Graphics/XC_Shaders/XC_ShaderBufferConstants.h"
+
 #include "Engine/Resource/ResourceManager.h"
+#include "Engine/Graphics/XC_Shaders/XC_ShaderBufferConstants.h"
 #include "Engine/Graphics/XC_Shaders/XC_ShaderManager.h"
 #include "Engine/Graphics/XC_Shaders/XC_ShaderHandle.h"
-#include "Gameplay/GameActors/Weapons/Bullets/BulletsManager.h"
-#include "Gameplay/GameStates/RunningState.h"
 #include "Engine/Graphics/XC_Camera/XC_CameraManager.h"
+#include "Engine/Graphics/XC_Mesh/XCMesh.h"
 
 Bullet::Bullet(void)
 {
@@ -23,12 +23,10 @@ Bullet::~Bullet(void)
 {
 }
 
-void Bullet::PreLoad(XCVec3 initialPosition, XCVec3 target, XCMesh* pMesh)
+void Bullet::PreLoad(XCVec3 initialPosition, XCVec3 target, std::string pMeshName)
 {
-    m_pMesh = pMesh;
-
     ResourceManager& resMgr = (ResourceManager&)SystemLocator::GetInstance()->RequestSystem("ResourceManager");
-    m_texture = (Texture2D*)resMgr.GetResource("pistol_bullet_mesh_tex");
+    m_pMesh     = &resMgr.AcquireResource(pMeshName.c_str());
 
     m_material.Ambient = XCVec4(1.0f, 1.0f, 1.0f, 1.0f);
     m_material.Diffuse = XCVec4(0.5f, 0.8f, 0.0f, 1.0f);
@@ -45,6 +43,7 @@ void Bullet::PreLoad(XCVec3 initialPosition, XCVec3 target, XCMesh* pMesh)
     m_target = XMLoadFloat3(&target);
 
     Logger("[Bullet] Preload done");
+    PhysicsActor::PreLoad(nullptr);
 }
 
 void Bullet::Load()
@@ -67,6 +66,8 @@ void Bullet::Load()
     //Load done. Shoot the bullet
     Shoot(5000.0f);
     Logger("[Bullet] Load done");
+
+    PhysicsActor::Load();
 }
 
 void Bullet::SetInitialPhysicsProperties()
@@ -90,11 +91,7 @@ void Bullet::Update(float dt)
     XCVec3 pos;
     XMStoreFloat3(&pos, m_Position);
 
-#if defined(WIN32)
     m_MTranslation = XMMatrixTranslation(pos.x, pos.y, pos.z);
-#elif defined(XC_ORBIS)
-    m_MTranslation = XMMatrixTranslation(pos.getX(), pos.getY(), pos.getZ());
-#endif
 
     m_currentPosition = m_Position;
 
@@ -104,7 +101,7 @@ void Bullet::Update(float dt)
 
     PhysicsActor::Update(dt);
 
-    m_pMesh->Update(dt);
+    m_pMesh->GetResource<XCMesh>()->Update(dt);
 
     if (XMVectorGetY(m_currentPosition) < -10.0f)
     {
@@ -130,7 +127,7 @@ void Bullet::Draw(RenderContext& context)
         m_material
     };
 
-    m_pMesh->DrawInstanced(perObject);
+    m_pMesh->GetResource<XCMesh>()->DrawInstanced(perObject);
 
     PhysicsActor::Draw(context);
 }

@@ -7,12 +7,13 @@
 #include "stdafx.h"
 
 #include "Soldier.h"
+
+#include "Engine/Graphics/XC_Camera/XC_CameraManager.h"
 #include "Engine/Graphics/XC_Shaders/XC_ShaderBufferConstants.h"
 #include "Engine/Graphics/XC_Shaders/XC_ShaderHandle.h"
-
 #include "Engine/Resource/ResourceManager.h"
+
 #include "Gameplay/GameActors/GameActorsFactory.h"
-#include "Engine/Graphics/XC_Camera/XC_CameraManager.h"
 
 const float Soldier::MAX_PITCH_ANGLE = XM_PIDIV4;
 
@@ -24,22 +25,21 @@ Soldier::~Soldier(void)
 {
 }
 
-void Soldier::PreLoad(XCVec3 initialPosition, XCMesh* pMesh)
+void Soldier::PreLoad(const void* fbBuffer)
 {
-    ResourceManager& resMgr = (ResourceManager&)SystemLocator::GetInstance()->RequestSystem("ResourceManager");
-    GameActorsFactory& actorFactory = (GameActorsFactory&)SystemLocator::GetInstance()->RequestSystem("GameActorsFactory");
+    const FBSoldier* soldierBuff = (FBSoldier*)fbBuffer;
 
-    m_pMesh = pMesh;
+    ResourceManager& resMgr = (ResourceManager&)SystemLocator::GetInstance()->RequestSystem("ResourceManager");
+    m_pMesh = &resMgr.AcquireResource(soldierBuff->XCMeshResourceName()->c_str());
+
+    //Get initial position
+    m_currentPosition = XMLoadFloat3(&XCVec3(soldierBuff->Position()->x(), soldierBuff->Position()->y(), soldierBuff->Position()->z()));
 
     m_material.Ambient = XCVec4(1.0f, 1.0f, 1.0f, 1.0f);
     m_material.Diffuse = XCVec4(0.5f, 0.8f, 0.0f, 1.0f);
     m_material.Specular = XCVec4(0.2f, 0.2f, 0.2f, 16.0f);
 
-
-    //Get initial position
-    m_currentPosition = XMLoadFloat3(&initialPosition);
-
-    m_useShaderType = pMesh->IsSkinnedMesh()? ShaderType_SkinnedCharacter : ShaderType_LightTexture;
+    m_useShaderType = m_pMesh->GetResource<XCMesh>()->IsSkinnedMesh()? ShaderType_SkinnedCharacter : ShaderType_LightTexture;
     m_useRenderWorkerType = WorkerType_XCMesh;
     m_collisionDetectionType = COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX;
 
@@ -50,10 +50,13 @@ void Soldier::PreLoad(XCVec3 initialPosition, XCMesh* pMesh)
     m_totalPitchAngle = 0.0f;
 
     //Gun mesh
-    m_gun = ((Gun*) actorFactory.CreateActor("Gun"));
-    m_gun->PreLoad(this, initialPosition, (XCMesh*) resMgr.GetResource("Gun"));
-}
+    GameActorsFactory& actorFactory = (GameActorsFactory&)SystemLocator::GetInstance()->RequestSystem("GameActorsFactory");
 
+    m_gun = ((Gun*) actorFactory.CreateActor("Gun"));
+    m_gun->PreLoad(this, XMVectorToXMFloat3(&m_currentPosition), "Gun");
+
+    PhysicsActor::PreLoad(fbBuffer);
+}
 
 void Soldier::Load()
 {
@@ -82,6 +85,11 @@ void Soldier::SetInitialPhysicsProperties()
     InitXPhysics(m_currentPosition, XMLoadFloat3(&vec), XMLoadFloat3(&vec), 10, (float)0.8);
 }
 
+void Soldier::UpdateState()
+{
+    PhysicsActor::UpdateState();
+}
+
 void Soldier::Update(float dt)
 {
     //Update the rotation based on initial and transformed.
@@ -89,7 +97,7 @@ void Soldier::Update(float dt)
 
     m_World = m_MScaling * m_MRotation * m_MTranslation;
 
-    m_pMesh->Update(dt);
+    m_pMesh->GetResource<XCMesh>()->Update(dt);
 
     PhysicsActor::Update(dt);
 
@@ -200,7 +208,7 @@ void Soldier::Draw(RenderContext& context)
         static XCMatrix4Unaligned scaling = XMMatrixScaling(1.0f, 1.0f, 1.0f);
         static XCMatrix4Unaligned rotation = XMMatrixRotationX(XM_PI);
 
-        XCMatrix4Unaligned transform = m_pMesh->GetRootTransform();
+        XCMatrix4Unaligned transform = m_pMesh->GetResource<XCMesh>()->GetRootTransform();
         //transform = scaling * transform;
 
         perObject = {
@@ -212,7 +220,7 @@ void Soldier::Draw(RenderContext& context)
         };
     }
 
-    m_pMesh->DrawInstanced(perObject);
+    m_pMesh->GetResource<XCMesh>()->DrawInstanced(perObject);
 
     PhysicsActor::Draw(context);
 
@@ -222,5 +230,9 @@ void Soldier::Draw(RenderContext& context)
 void Soldier::Destroy()
 {
     PhysicsActor::Destroy();
+
+    ResourceManager& resMgr = (ResourceManager&)SystemLocator::GetInstance()->RequestSystem("ResourceManager");
+    resMgr.ReleaseResource(m_pMesh);
+
     m_gun->Destroy();
 }

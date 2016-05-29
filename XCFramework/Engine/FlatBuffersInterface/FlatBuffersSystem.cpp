@@ -9,7 +9,7 @@
 #include "FlatBuffersSystem.h"
 #include "Assets/Packages/PackageConsts.h"
 
-const char* FlatBuffersSystem::m_includeDirs[] = { RESOURCE_SCHEMA_FOLDERPATH, RESOURCE_DATA_FOLDERPATH, nullptr };
+const char* FlatBuffersSystem::m_includeDirs[] = { RESOURCE_SCHEMA_FOLDERPATH, RESOURCE_DATA_FOLDERPATH, SHADER_SCHEMA_FILEPATH, nullptr };
 
 FlatBuffersSystem::FlatBuffersSystem()
 {
@@ -27,27 +27,14 @@ void FlatBuffersSystem::Destroy()
 {
 }
 
-bool FlatBuffersSystem::ParseAndLoadFile(std::string fileName)
+bool FlatBuffersSystem::ParseAndLoadFile(std::string fileName, FBBuffer& buffer)
 {
     std::string rawData;
     
     bool result = flatbuffers::LoadFile(fileName.c_str(), false, &rawData);
     XCASSERT(result);
 
-    result = m_fbParser.Parse(rawData.c_str(), m_includeDirs, nullptr);
-    XCASSERT(result);
-
-    return result;
-}
-
-bool FlatBuffersSystem::ParseAndLoadMeshFile(std::string fileName)
-{
-    std::string rawData;
-
-    bool result = flatbuffers::LoadFile(fileName.c_str(), false, &rawData);
-    XCASSERT(result);
-
-    result = m_fbParserMesh.Parse(rawData.c_str(), m_includeDirs, nullptr);
+    result = buffer.m_fbParser.Parse(rawData.c_str(), m_includeDirs, nullptr);
     XCASSERT(result);
 
     return result;

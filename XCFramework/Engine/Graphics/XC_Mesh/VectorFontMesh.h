@@ -31,16 +31,16 @@ public:
     };
     
     VectorFontMesh();
-    ~VectorFontMesh();
+    virtual ~VectorFontMesh();
 
-    void            Init(int resourceId, std::string userFriendlyName, bool loaded = false);
+    void            Init(int resourceId, std::string userFriendlyName) override;
     void            DrawText(std::string text, XCVec3Unaligned position, RenderContext& context);
-    void            Destroy();
+    void            Destroy() override;
 
 protected:
-    void            CreateConstantBuffer();
+    void            CreateConstantBuffer() override;
 
-    void            Draw(RenderContext& context);
+    void            Draw(RenderContext& context) override;
     void            DrawSubMesh(RenderContext& renderContext, unsigned int meshIndex, unsigned int instanceCount = 1);
 
 private:

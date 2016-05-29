@@ -10,7 +10,10 @@
 #include "Engine/System/SystemLocator.h"
 #include "Engine/Utils/FileIO.h"
 
+#if defined(LEGACY_LOADING)
 #include "LoadPackageFileTask.h"
+#endif
+
 #include "LoadPackageFileFBTask.h"
 
 ResourceManager::ResourceManager()
@@ -24,66 +27,105 @@ ResourceManager::~ResourceManager(void)
     delete(m_resourceFactory);
 }
 
-void ResourceManager::Init(XC_Graphics& graphicsSystem, TaskManager& taskManger)
+void ResourceManager::Init(TaskManager& taskManger)
 {
     HMODULE module = LoadLibrary("assimp.dll");
     XCASSERT(module != nullptr);
 
-    m_XCGraphicsSystem = &graphicsSystem;
     m_taskManager = &taskManger;
+
     SystemContainer& container = SystemLocator::GetInstance()->GetSystemContainer();
     container.RegisterSystem<ResourceFactory>("ResourceFactory");
     
     m_resourceFactory = (ResourceFactory*) &container.CreateNewSystem("ResourceFactory");
     m_resourceFactory->InitFactory();
+
+    //Start the ResourceLoader task
+    m_resourceLoaderTask = new ResourceLoaderTask();
+    m_taskManager->RegisterTask(m_resourceLoaderTask);
 }
 
 void ResourceManager::Update()
 {
-    //TODO : Hot reloading of resources on the fly
-    if (m_futurePackageLoaded._Is_ready() /*&& m_futurePackageLoaded.wait_for(std::chrono::seconds(1)) == std::future_status::ready */)
+    for (auto& resHandle : m_ResourcePool)
     {
-        if(m_futurePackageLoaded.valid() && m_futurePackageLoaded.get() > 0)
+        IResource* resource = resHandle.second.m_Resource;
+
+        if(resource->GetResourceState() == IResource::ResourceState_Loaded 
+            && resource->GetResourceState() != IResource::ResourceState_UnLoading 
+            && resHandle.second.m_refCount == 0)
         {
-            m_packageLoaded = true;
+            //Unload it. Or stay unloaded
+            ResourceLoaderTask::ResourceRequestInfo info = { ResourceLoaderTask::ResourceRequestType_Unload, resHandle.second };
+            resHandle.second.m_Resource->SetResourceState(IResource::ResourceState_UnLoading);
+
+            m_resourceLoaderTask->AddRequest(info);
+        }
+        else if (resource->GetResourceState() == IResource::ResourceState_UnLoaded 
+            && resource->GetResourceState() != IResource::ResourceState_Loading 
+            && resHandle.second.m_refCount > 0)
+        {
+            //load it
+            ResourceLoaderTask::ResourceRequestInfo info = { ResourceLoaderTask::ResourceRequestType_Load, resHandle.second };
+            resource->SetResourceState(IResource::ResourceState_Loading);
+
+            m_resourceLoaderTask->AddRequest(info);
+        }
+        else if(resource->GetResourceState() == IResource::ResourceState_Loading 
+            || resource->GetResourceState() == IResource::ResourceState_UnLoading)
+        {
+            //Update the reosurce, they might be waiting for other resources to be loaded.
+            resource->UpdateState();
         }
     }
 }
 
-template<class ResourceType, class ResourceParam>
-void ResourceManager::LoadResource(ResourceParam param)
+ResourceHandle& ResourceManager::AcquireResource(const char* userFriendlyName)
 {
-    //RESOURCE_FACTORY->createResource()
-}
+    auto res = std::find_if(m_ResourcePool.begin(), m_ResourcePool.end(), [userFriendlyName](const std::pair<std::string, ResourceHandle> handle) -> bool
+    {
+        return strcmp(userFriendlyName, handle.second.m_Resource->GetUserFriendlyName().c_str()) == 0;
+    });
 
-IResource* ResourceManager::GetResource(const char* userFriendlyName)
-{
-    auto res = m_ResourcePool.find(userFriendlyName);
     if (res != m_ResourcePool.end())
     {
+        res->second.m_refCount++;
         return res->second;
     }
 
     XCASSERT(false);
-    return nullptr;
+    return ResourceHandle();
 }
 
+void ResourceManager::ReleaseResource(ResourceHandle * resHandle)
+{
+    if (resHandle->m_refCount > 0)
+    {
+        resHandle->m_refCount--;
+    }
+    else
+    {
+        Logger("[Resource] Trying to release a resource which has a refcount == 0");
+        XCASSERT(false);
+    }
+}
+
+#if defined(LEGACY_LOADING)
 int ResourceManager::LoadResourcesFromPackage(char* filePath)
 {
     //Read the file and create resources and load contents based on it
-    //TODO : Creating FILE API and then reading it from there
     m_loadPackageTask = new LoadPackageFileTask(filePath);
     m_futurePackageLoaded = m_taskManager->RegisterTask(m_loadPackageTask);
 
-    return 0;
+    return true;
 }
+#endif
 
 int ResourceManager::LoadResourcesFromPackageFB(const char* dataPath)
 {
-    m_loadPackageTask = new LoadPackageFileFBTask(dataPath);
-    m_futurePackageLoaded = m_taskManager->RegisterTask(m_loadPackageTask);
 
-    return 0;
+
+    return true;
 }
 
 bool ResourceManager::IsPackageLoaded()
@@ -91,17 +133,60 @@ bool ResourceManager::IsPackageLoaded()
     return m_packageLoaded;
 }
 
-void ResourceManager::AddResource(IResource* resource)
+IResource* ResourceManager::CreateResource(std::string resourceTypeName, std::string userFriendlyName)
 {
-    m_ResourcePool[resource->getUserFriendlyName()] = resource;
+    return m_resourceFactory->createResource(resourceTypeName, userFriendlyName);
+}
+
+void ResourceManager::AddResource(ResourceHandle& resource)
+{
+    if (resource.m_Resource)
+    {
+        auto exists = std::find_if(m_ResourcePool.begin(), m_ResourcePool.end(), [&resource](std::pair<std::string, ResourceHandle> res) -> bool
+        {
+            return strcmp(res.first.c_str(), resource.m_Resource->GetUserFriendlyName().c_str()) == 0;
+        });
+
+        if (exists == m_ResourcePool.end())
+        {
+            m_ResourcePool[resource.m_Resource->GetUserFriendlyName()] = resource;
+        }
+        else
+        {
+            XCASSERT(false);
+            Logger("[ResourceManager] Adding a resource with same userfriendly name %s. Is it intended? ", resource.m_Resource->GetUserFriendlyName().c_str());
+        }
+    }
+}
+
+void ResourceManager::CreateAddResource(std::string resourceTypeName, std::string userFriendlyName, const void* startFBResourcePtr)
+{
+    IResource* resource = CreateResource(resourceTypeName, userFriendlyName);
+    
+    ResourceHandle resHandle = {};
+    resHandle.m_Resource = resource;
+    resHandle.m_serializerBuffer = startFBResourcePtr;
+
+    AddResource(resHandle);
 }
 
 void ResourceManager::Destroy()
 {
     for (auto& resource : m_ResourcePool)
     {
-        resource.second->Destroy();
+        if (resource.second.m_refCount == 0)
+        {
+            resource.second.m_Resource->Destroy();
+        }
+        else
+        {
+            Logger("[Resource] Trying to destroy a resource with refcount > 0.");
+            XCASSERT(false);
+        }
     }
+
+    m_resourceLoaderTask->Destroy();
+    m_taskManager->UnregisterTask(m_resourceLoaderTask->GetThreadId());
 
     m_ResourcePool.clear();
 
@@ -111,6 +196,7 @@ void ResourceManager::Destroy()
     container.RemoveSystem("ResourceFactory");
 }
 
+#if defined(EDITOR)
 const char* ResourceManager::GetResourceNameAtIndex(int index)
 {
     int count = 0;
@@ -125,7 +211,6 @@ const char* ResourceManager::GetResourceNameAtIndex(int index)
     return nullptr;
 }
 
-#if defined(EDITOR)
 void ResourceManager::GetResourceList(ResourceInfo* resourcePtr)
 {
     int index = 0;

@@ -10,6 +10,7 @@
 #include "Engine/Graphics/XC_Shaders/XC_RasterizerTypes.h"
 #include "Engine/Graphics/XC_Shaders/IShader.h"
 #include "Engine/Graphics/SharedDescriptorHeap.h"
+#include "Engine/FlatBuffersInterface/FlatBuffersSystem.h"
 
 class XC_ShaderManager
 {
@@ -56,4 +57,6 @@ private:
 #endif
 
     ID3DDevice&                 m_device;
+    RasterType                  m_rasterType;
+    FlatBuffersSystem::FBBuffer m_fbBuffer;
 };

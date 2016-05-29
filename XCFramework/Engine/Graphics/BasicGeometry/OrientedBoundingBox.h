@@ -6,13 +6,11 @@
 
 #pragma once
 
-#include "Engine/Graphics/BasicGeometry/CubeMesh.h"
-
 #if !defined(XC_ORBIS)
 #include <DirectXCollision.h>
 #endif
 
-class OrientedBoundingBox : public CubeMesh
+class OrientedBoundingBox
 {
 public:
     static const int MAX_OBB_CORNER_POINTS_COUNT = 8;
@@ -21,9 +19,11 @@ public:
     virtual ~OrientedBoundingBox();
 
     virtual void               Init();
-    virtual void               Load();
-    virtual void               Update(float dt);
-    virtual void               Draw(RenderContext& context);
+
+    void                       CreateBoundBox();
+    void                       CreateBoundBox(XCVecIntrinsic4 min, XCVecIntrinsic4 max);
+    void                       CreateBoundBox(OrientedBoundingBox* const boundBox);
+    void                       Transform(XCMatrix4 translateMat, XCMatrix4 rotateMatrix);
 
     //Oriented Bounding Box
     BoundingOrientedBox        m_bBox;
@@ -31,9 +31,4 @@ public:
 
     XCVecIntrinsic4            m_boxCenter;
     XCVecIntrinsic4            m_boxExtends;
-
-    void                       CreateBoundBox();
-    void                       CreateBoundBox(XCVecIntrinsic4 min, XCVecIntrinsic4 max);
-    void                       CreateBoundBox(OrientedBoundingBox* const boundBox);
-    void                       Transform(XCMatrix4 translateMat, XCMatrix4 rotateMatrix);
 };

@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "Engine/Graphics/BasicGeometry/OrientedBoundingBox.h"
+#include "Engine/Graphics/BasicGeometry/RenderableOBB.h"
 
 //Forward reference to the OBBHierarchy
 class OBBHierarchy;
@@ -39,22 +39,22 @@ struct TerrainQuad
     {
     }
 
-    OBBHierarchy*                               getChildNode() { return m_nextChildNode.get(); }
-    void                                        setChildNodeOBB(std::unique_ptr<OBBHierarchy> obb) { m_nextChildNode = std::move(obb); }
-    bool                                        hasChildNode();
+    OBBHierarchy*                    GetChildNode() { return m_nextChildNode.get(); }
+    void                             SetChildNodeOBB(std::unique_ptr<OBBHierarchy> obb) { m_nextChildNode = std::move(obb); }
+    bool                             HasChildNode();
 
 
-    std::unique_ptr<OrientedBoundingBox>        m_bbox;
-    std::unique_ptr<OBBHierarchy>               m_nextChildNode;
+    std::unique_ptr<RenderableOBB>   m_bbox;
+    std::unique_ptr<OBBHierarchy>    m_nextChildNode;
 
-    int                                         m_totalWidth;
-    int                                         m_rowStart;
-    int                                         m_rowEnd;
-    int                                         m_colStart;
-    int                                         m_colEnd;
+    XCVecIntrinsic4                  m_vMin;
+    XCVecIntrinsic4                  m_vMax;
 
-    XCVecIntrinsic4                                    m_vMin;
-    XCVecIntrinsic4                                    m_vMax;
+    int                              m_totalWidth;
+    int                              m_rowStart;
+    int                              m_rowEnd;
+    int                              m_colStart;
+    int                              m_colEnd;
 };
 
 class OBBHierarchy
@@ -65,19 +65,16 @@ public:
     OBBHierarchy();
     ~OBBHierarchy();
 
-    void                                        addQuad(std::unique_ptr<TerrainQuad> bbox) { m_Quads.push_back(std::move(bbox));  }
-
-    void                                        createTerrainOBBHierarchy(int levels, int rowStart, int totalRows, int colStart, int totalColumns, int totalWidth);
-
-    void                                        computeQuad(int row, int col, XCVec3 pos);
-    void                                        computeOBBForAllQuads();
+    void                                        AddQuad(std::unique_ptr<TerrainQuad> bbox) { m_Quads.push_back(std::move(bbox));  }
+    void                                        CreateTerrainOBBHierarchy(int levels, int rowStart, int totalRows, int colStart, int totalColumns, int totalWidth);
+    void                                        ComputeQuad(int row, int col, XCVec3 pos);
+    void                                        ComputeOBBForAllQuads();
+    void                                        Transform(XCMatrix4 translateMat, XCMatrix4 rotateMatrix);
 
     void                                        Update(float dt);
     void                                        Draw(RenderContext& context);
 
-    TerrainQuad*                                getQuadCollidingWithOBB(OrientedBoundingBox* bbox);
-
-    void                                        Transform(XCMatrix4 translateMat, XCMatrix4 rotateMatrix);
+    TerrainQuad*                                GetQuadCollidingWithOBB(OrientedBoundingBox* bbox);
 
 private:
     std::vector<std::unique_ptr<TerrainQuad>>   m_Quads;

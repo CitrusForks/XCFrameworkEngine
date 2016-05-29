@@ -11,7 +11,6 @@
 #include "Gameplay/GameActors/SimpleMeshActor.h"
 
 #include "Engine/Graphics/XC_Materials/MaterialTypes.h"
-#include "Engine/Graphics/XC_Mesh/XCMesh.h"
 #include "Gameplay/GameActors/PhysicsActor.h"
 
 
@@ -23,20 +22,17 @@ public:
     Bullet(void);
     virtual ~Bullet(void);
 
-    virtual void                        PreLoad(XCVec3 initialPosition, XCVec3 target, XCMesh* pMesh);
     virtual void                        Load();
     virtual void                        SetInitialPhysicsProperties();
     virtual void                        Update(float dt);
     virtual void                        Draw(RenderContext& context);
     virtual void                        Destroy();
 
-    virtual void                        Shoot(float scalarForce);
+    void                                PreLoad(XCVec3 initialPosition, XCVec3 target, std::string pMeshName);
+    void                                Shoot(float scalarForce);
 
 protected:
     ShaderType                          m_useShaderType;
-
-    Texture2D*                          m_texture;
     BasicMaterial                       m_material;
-
     XCVecIntrinsic4                     m_target;
 };

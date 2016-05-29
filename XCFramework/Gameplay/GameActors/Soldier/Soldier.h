@@ -7,9 +7,9 @@
 #pragma once
 
 #include "Engine/Graphics/XC_Shaders/XC_VertexFormat.h"
-#include "Gameplay/GameActors/PhysicsActor.h"
-
 #include "Engine/Graphics/XC_Materials/MaterialTypes.h"
+
+#include "Gameplay/GameActors/PhysicsActor.h"
 #include "Gameplay/GameActors/Weapons/Guns/Gun.h"
 
 class Soldier : public PhysicsActor
@@ -22,13 +22,14 @@ public:
     Soldier(void);
     virtual ~Soldier(void);
  
-    virtual void                        PreLoad(XCVec3 initialPosition, XCMesh* pMesh);
-    virtual void                        Load();
-    virtual void                        Update(float dt);
-    virtual void                        Draw(RenderContext& context);
-    virtual void                        Destroy();
+    virtual void                        PreLoad(const void* fbBuffer)   override;
+    virtual void                        Load()                          override;
+    virtual void                        UpdateState()                   override;
+    virtual void                        Update(float dt)                override;
+    virtual void                        Draw(RenderContext& context)    override;
+    virtual void                        Destroy()                       override;
 
-    void                                SetInitialPhysicsProperties();
+    void                                SetInitialPhysicsProperties()   override final;
 
     virtual void                        ApplyRotation(XCMatrix4 rotation);
 

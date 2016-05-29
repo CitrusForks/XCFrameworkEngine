@@ -9,6 +9,10 @@
 #include "XC_ShaderHandle.h"
 #include "XC_VertexFormat.h"
 #include "XC_RasterizerTypes.h"
+
+#include "Engine/Graphics/XC_Textures/Texture2D.h"
+#include "Engine/Graphics/XC_Textures/CubeTexture3D.h"
+
 #include "Assets/Packages/PackageConsts.h"
 
 //#define LOG_SHADER_SLOTS 1
@@ -265,7 +269,9 @@ void XCShaderHandle::GenerateRootSignature()
     ID3DBlob* errors;
 
     ValidateResult(D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signature, &errors));
-    ValidateResult(m_device.CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&m_pso->m_rootSignature)));
+    
+    m_pso->CreateRootSignature(m_device, signature->GetBufferPointer(), signature->GetBufferSize(), PSOType_RASTER_FILL_SOLID);
+    m_pso->CreateRootSignature(m_device, signature->GetBufferPointer(), signature->GetBufferSize(), PSOType_RASTER_FILL_WIREFRAME);
 
     ReleaseCOM(signature);
     ReleaseCOM(errors);
@@ -275,20 +281,30 @@ void XCShaderHandle::GeneratePSO()
 {
     //Generate PSO
 
-    PSO_Dx12::GenerateDefaultPSO(m_pso, RasterType_FillSolid, m_enableDepth);
+    PSO_Dx12::GenerateDefaultPSO(m_pso, PSOType_RASTER_FILL_SOLID);
+    PSO_Dx12::GenerateDefaultPSO(m_pso, PSOType_RASTER_FILL_WIREFRAME);
 
-    m_pso->m_psoDesc.InputLayout    = m_inputLayoutDesc;
-    m_pso->m_psoDesc.pRootSignature = m_pso->m_rootSignature;
+    m_pso->m_psos[PSOType_RASTER_FILL_SOLID].m_psoDesc.InputLayout    = m_inputLayoutDesc;
 #if defined(USE_D3D_COMPILER)
-    m_pso->m_psoDesc.VS = { reinterpret_cast<UINT8*>(m_pVS->GetBufferPointer()), m_pVS->GetBufferSize() };
-    m_pso->m_psoDesc.PS = { reinterpret_cast<UINT8*>(m_pPS->GetBufferPointer()), m_pPS->GetBufferSize() };
+    m_pso->m_psos[PSOType_RASTER_FILL_SOLID].m_psoDesc.VS = { reinterpret_cast<UINT8*>(m_pVS->GetBufferPointer()), m_pVS->GetBufferSize() };
+    m_pso->m_psos[PSOType_RASTER_FILL_SOLID].m_psoDesc.PS = { reinterpret_cast<UINT8*>(m_pPS->GetBufferPointer()), m_pPS->GetBufferSize() };
 #else
-    m_pso->m_psoDesc.VS = { m_pVS, m_vsSize };
-    m_pso->m_psoDesc.PS = { m_pPS, m_psSize };
+    m_pso->m_psos[PSOType_RASTER_FILL_SOLID].m_psoDesc.VS = { m_pVS, m_vsSize };
+    m_pso->m_psos[PSOType_RASTER_FILL_SOLID].m_psoDesc.PS = { m_pPS, m_psSize };
 #endif
 
-    //Create the actual PSO.
-    ValidateResult(m_device.CreateGraphicsPipelineState(&m_pso->m_psoDesc, IID_PPV_ARGS(&m_pso->m_pPso)));
+    m_pso->m_psos[PSOType_RASTER_FILL_WIREFRAME].m_psoDesc.InputLayout = m_inputLayoutDesc;
+#if defined(USE_D3D_COMPILER)
+    m_pso->m_psos[PSOType_RASTER_FILL_WIREFRAME].m_psoDesc.VS = { reinterpret_cast<UINT8*>(m_pVS->GetBufferPointer()), m_pVS->GetBufferSize() };
+    m_pso->m_psos[PSOType_RASTER_FILL_WIREFRAME].m_psoDesc.PS = { reinterpret_cast<UINT8*>(m_pPS->GetBufferPointer()), m_pPS->GetBufferSize() };
+#else
+    m_pso->m_psos[PSOType_RASTER_FILL_WIREFRAME].m_psoDesc.VS = { m_pVS, m_vsSize };
+    m_pso->m_psos[PSOType_RASTER_FILL_WIREFRAME].m_psoDesc.PS = { m_pPS, m_psSize };
+#endif
+
+
+    m_pso->CreateGraphicPSO(m_device, PSOType_RASTER_FILL_SOLID);
+    m_pso->CreateGraphicPSO(m_device, PSOType_RASTER_FILL_WIREFRAME);
 }
 
 void XCShaderHandle::SortSlots()
@@ -340,7 +356,7 @@ unsigned int XCShaderHandle::GetSlotPriority(std::string bufferName)
     return gs_slotPriority.size();
 }
 
-void XCShaderHandle::ApplyShader(ID3DDeviceContext& context)
+void XCShaderHandle::ApplyShader(ID3DDeviceContext& context, RasterType rasterType)
 {
 #if defined(XCGRAPHICS_DX12)
 
@@ -348,11 +364,8 @@ void XCShaderHandle::ApplyShader(ID3DDeviceContext& context)
     Logger("[Apply Shader] %s", m_vertexShaderPath.c_str());
 #endif
 
-    //Set the pso
-    context.SetPipelineState(m_pso->m_pPso);
+    m_pso->SetGraphicsPipelineState(context, rasterType);
 
-    //Set Root signature
-    context.SetGraphicsRootSignature(&m_pso->GetRootSignature());
 #elif defined(XCGRAPHICS_DX11)
     context.IASetInputLayout(m_pInputLayout);
     context.VSSetShader(m_pVS, nullptr, 0);
@@ -408,7 +421,7 @@ void XCShaderHandle::SetSampler(std::string bufferName, ID3DDeviceContext& conte
     //XCASSERT(false);
 }
 
-void XCShaderHandle::SetResource(std::string bufferName, ID3DDeviceContext& context, D3DShaderResourceView* tex)
+void XCShaderHandle::SetResource(std::string bufferName, ID3DDeviceContext& context, ResourceHandle* tex)
 {
     auto bufferRes = std::find_if(m_shaderSlots.begin(), m_shaderSlots.end(),
         [&bufferName](ShaderSlot slot) -> bool
@@ -419,7 +432,20 @@ void XCShaderHandle::SetResource(std::string bufferName, ID3DDeviceContext& cont
     if (tex && bufferRes != m_shaderSlots.end())
     {
         unsigned int slotNb = bufferRes - m_shaderSlots.begin();
-        context.SetGraphicsRootDescriptorTable(slotNb, tex->m_gpuHandle);
+
+        switch (tex->m_Resource->GetResourceType())
+        {
+        case RESOURCETYPE_TEXTURE2D:
+            context.SetGraphicsRootDescriptorTable(slotNb, static_cast<Texture2D*>(tex->m_Resource)->GetTextureResource()->m_gpuHandle);
+            break;
+
+        case RESOURCETYPE_CUBETEXTURE3D:
+            context.SetGraphicsRootDescriptorTable(slotNb, static_cast<CubeTexture3D*>(tex->m_Resource)->GetTextureResource()->m_gpuHandle);
+            break;
+
+        default:
+            XCASSERT(false);
+        }
 
 #if defined(LOG_SHADER_SLOTS)
         Logger("[SLOT] Setting %s @ slot %d", bufferName.c_str(), slotNb);

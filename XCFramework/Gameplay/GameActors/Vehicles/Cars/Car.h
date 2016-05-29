@@ -19,19 +19,18 @@ public:
     Car(void);
     virtual  ~Car(void);
 
-    virtual void                        PreLoad(XCVec3 initialPosition, XCMesh* pMesh);
-    virtual void                        Load();
-    virtual void                        Update(float dt);
-    virtual void                        Draw(RenderContext& context);
-    virtual void                        Destroy();
-
-    void                                SetInitialPhysicsProperties();
-    void                                Accelerate(float dt);
-    void                                Steer(float angle, float scalarForce);
-
-protected:
-    ShaderType                        m_useShaderType;
-
-    BasicMaterial                       m_material;
-    bool                                m_isMainCharacter;
+    virtual void        PreLoad(XCVec3 initialPosition, std::string pMesh);
+    virtual void        Load() override;
+    virtual void        Update(float dt) override;
+    virtual void        Draw(RenderContext& context) override;
+    virtual void        Destroy() override;
+                        
+    void                SetInitialPhysicsProperties() override;
+    void                Accelerate(float dt);
+    void                Steer(float angle, float scalarForce);
+                        
+protected:              
+    ShaderType          m_useShaderType;
+    BasicMaterial       m_material;
+    bool                m_isMainCharacter;
 };

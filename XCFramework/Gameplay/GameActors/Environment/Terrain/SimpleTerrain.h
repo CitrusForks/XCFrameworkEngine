@@ -35,7 +35,7 @@ public:
     virtual int                         GetNoOfVertices() const         { return m_totalVertices;  }
 
 protected:
-    XCVec3                            m_initialPosition;
+    XCVec3                              m_initialPosition;
     int                                 m_rows;
     int                                 m_cols;
     int                                 m_totalVertices;
@@ -45,7 +45,7 @@ protected:
 
     VertexBuffer<VertexPosColor>        m_vertexPosColorBuffer;
     VertexBuffer<VertexPosNormTex>      m_vertexPosNormTexBuffer;
-    IndexBuffer<unsigned int>                   m_indexBuffer;
+    IndexBuffer<unsigned int>           m_indexBuffer;
 
-    ShaderType                        m_useShaderType;
+    ShaderType                          m_useShaderType;
 };

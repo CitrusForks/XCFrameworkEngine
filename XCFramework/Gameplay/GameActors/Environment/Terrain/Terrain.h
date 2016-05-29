@@ -7,10 +7,8 @@
 #pragma once
 
 #include "Gameplay/GameActors/Environment/Terrain/SimpleTerrain.h"
-#include "Engine/Graphics/XC_Materials/MaterialTypes.h"
-#include "Engine/Graphics/XC_Textures/Texture2D.h"
 #include "Gameplay/XCPhysics/OBBHierarchy.h"
-
+#include "Engine/Graphics/XC_Materials/MaterialTypes.h"
 
 class Terrain : public SimpleTerrain
 {
@@ -22,7 +20,8 @@ public:
     virtual ~Terrain(void);
  
     virtual void                        PreLoad(const void* fbBuffer);
-    virtual void                        PreLoad(const char* _pHeightMapFileName, Texture2D* const terrainTexture, Texture2D* const terrainTexture1, Texture2D* const terrainTexture2, Texture2D* const blendMap, XCVec3 _initialPosition, int _rows, int _column, float _rowSpacing, float _colSpacing);
+    virtual void                        PreLoad(const char* _pHeightMapFileName, std::string terrainTexture, std::string terrainTexture1, std::string terrainTexture2, std::string blendMap, XCVec3 _initialPosition, int _rows, int _column, float _rowSpacing, float _colSpacing);
+    virtual void                        UpdateState();
     virtual void                        Load();
     virtual void                        GenerateVertices();
     virtual void                        GenerateVerticesNormal();
@@ -45,10 +44,7 @@ protected:
     BasicMaterial                       m_material;
 
     //MultiTex
-    Texture2D*                          m_texture;
-    Texture2D*                          m_texture1;
-    Texture2D*                          m_texture2;
-    Texture2D*                          m_textureBlend;
+    std::vector<ResourceHandle*>        m_textures;
 
     std::unique_ptr<OBBHierarchy>       m_OBBHierarchy;
 

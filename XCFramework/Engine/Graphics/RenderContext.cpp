@@ -35,7 +35,7 @@ void RenderContext::Init(ID3DDevice* device, XC_ShaderManager& shaderMgr, bool c
         0,
         D3D12_COMMAND_LIST_TYPE_DIRECT,
         m_commandAllocator,
-        m_shaderManager->GetShader(ShaderType_SolidColor)->GetPso().m_pPso,
+        m_shaderManager->GetShader(ShaderType_SolidColor)->GetPso().m_psos[PSOType_RASTER_FILL_SOLID].m_pPso,
         IID_PPV_ARGS(&m_deviceContext)));
 
     ValidateResult(m_deviceContext->Close());

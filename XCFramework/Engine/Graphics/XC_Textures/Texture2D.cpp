@@ -38,7 +38,7 @@ Texture2D::~Texture2D()
 {
 }
 
-void Texture2D::loadTexture()
+void Texture2D::LoadTexture()
 {
     XC_Graphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XC_Graphics>("GraphicsSystem");
 
@@ -92,36 +92,6 @@ void Texture2D::loadTexture()
 
 #elif defined(XCGRAPHICS_DX11)
     ValidateResult(CreateDDSTextureFromFile(graphicsSystem.GetDevice(), str, nullptr, &m_diffuseMapTextureSRV));
-#elif defined(XCGRAPHICS_GNM)
-    // Initialize a Gnm::Texture object
-    MemorySystemOrbis* memorySystem = (MemorySystemOrbis*) &SystemLocator::GetInstance()->RequestSystem<MemorySystem>("MemorySystem"); 
-    Allocator& allocator = memorySystem->GetAllocator();
-
-    m_diffuseMapTextureSRV = new D3DShaderResourceView();
-
-    void *textureData = nullptr;
-
-#if defined(USE_DEFAULT_TEXTURE)
-    sce::Gnm::SizeAlign textureSizeAlign = m_diffuseMapTextureSRV->initAs2d(
-        512, 512, 1,
-        sce::Gnm::kDataFormatR8G8B8A8UnormSrgb,
-        sce::Gnm::kTileModeDisplay_LinearAligned,
-        sce::Gnm::kNumFragments1);
-
-    // Allocate the texture data using the alignment returned by initAs2d
-    textureData = allocator.allocate(textureSizeAlign, SCE_KERNEL_WC_GARLIC);
-    XCASSERT(textureData != nullptr);
-
-    // Read the texture data
-    ValidateResult(readFileData("/hostapp/Assets/Textures/Common/texture.raw", textureData, textureSizeAlign.m_size));
-
-    // Set the base data address in the texture object
-    m_diffuseMapTextureSRV->setBaseAddress(textureData);
-#else
-    GnfError errorCode = loadTextureFromGnf(m_diffuseMapTextureSRV, m_resourcePath.c_str(), 0, &allocator);
-    XCASSERT(errorCode == kGnfErrorNone);
-#endif
-
 #endif
 
     Logger("[TEXTURE 2D] Texture %s Loaded", wc.c_str());
@@ -156,7 +126,7 @@ void Texture2D::Load(std::string resourcePath)
 {
     m_userFriendlyName = "dynamically_spawned_texture2D";
     m_resourcePath = resourcePath;
-    loadTexture();
+    LoadTexture();
 
     IResource::Load(nullptr);
 }
@@ -167,25 +137,34 @@ void Texture2D::Load(const void* buffer)
 
     m_userFriendlyName = fbTexture2D->ResourceName()->c_str();
     m_resourcePath = getPlatformPath(fbTexture2D->ResourcePath()->c_str());
-    loadTexture();
+    LoadTexture();
 
     IResource::Load(buffer);
 }
 
-void Texture2D::Destroy()
+void Texture2D::UpdateState()
 {
-    IResource::Destroy();
+    if (m_resourceUpdated)
+    {
+        m_resourceState = IResource::ResourceState_Loaded;
+    }
 
+    IResource::UpdateState();
+}
+
+void Texture2D::Unload()
+{
     if (m_diffuseMapTextureSRV)
     {
 #if defined(XCGRAPHICS_DX12)
         m_diffuseMapTextureSRV->Release();
-        delete(m_diffuseMapTextureSRV);
+
+        SharedDescriptorHeap& heap = SystemLocator::GetInstance()->RequestSystem<SharedDescriptorHeap>("SharedDescriptorHeap");
+        heap.DestroyBuffer(m_diffuseMapTextureSRV);
         m_diffuseMapTextureSRV = nullptr;
+
 #elif defined(XCGRAPHICS_DX11)
         ReleaseCOM(m_diffuseMapTextureSRV);
-#elif defined(XCGRAPHICS_GNM)
-        delete(m_diffuseMapTextureSRV);
 #endif
     }
 
@@ -193,14 +172,16 @@ void Texture2D::Destroy()
     if (m_diffuseMapTextureSRVUpload)
     {
         m_diffuseMapTextureSRVUpload->Release();
-        delete(m_diffuseMapTextureSRVUpload);
+        SharedDescriptorHeap& heap = SystemLocator::GetInstance()->RequestSystem<SharedDescriptorHeap>("SharedDescriptorHeap");
+        heap.DestroyBuffer(m_diffuseMapTextureSRV);
         m_diffuseMapTextureSRVUpload = nullptr;
     }
-
-    if (m_sharedCB)
-    {
-        SharedDescriptorHeap& heap = SystemLocator::GetInstance()->RequestSystem<SharedDescriptorHeap>("SharedDescriptorHeap");
-        heap.DestroyBuffer(m_sharedCB);
-    }
 #endif
+}
+
+void Texture2D::Destroy()
+{
+    IResource::Destroy();
+    
+    Unload();
 }

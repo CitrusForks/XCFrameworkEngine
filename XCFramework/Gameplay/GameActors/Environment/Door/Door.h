@@ -6,16 +6,11 @@
 
 #pragma once
 
-#include "Engine/Graphics/XC_Shaders/XC_VertexFormat.h"
 #include "Gameplay/GameActors/PhysicsActor.h"
-
-#include "Engine/Input/Directinput.h"
-
-#include "Engine/Graphics/XC_Mesh/XCMesh.h"
-#include "Engine/Graphics/XC_Textures/Texture2D.h"
 
 #include "Engine/Graphics/XC_Materials/MaterialTypes.h"
 #include "Engine/Graphics/XC_Shaders/XC_ShaderTypes.h"
+#include "Engine/Input/Directinput.h"
 
 class Door : public PhysicsActor
 {
@@ -26,7 +21,7 @@ public:
     virtual ~Door(void);
     
     virtual void                        PreLoad(const void* fbBuffer);
-    virtual void                        PreLoad(Texture2D* tex, XCVec3 _initialPosition, XCMesh* pMesh);
+    virtual void                        PreLoad(XCVec3 _initialPosition, std::string pMesh);
     virtual void                        Load();
     virtual void                        SetInitialPhysicsProperties();
     virtual void                        Update(float dt);

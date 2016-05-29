@@ -6,6 +6,8 @@
 
 #include "stdafx.h"
 
+#if UNUSED
+
 #include "Engine/Graphics/BasicGeometry/CubeMesh.h"
 #include "Engine/Graphics/XC_Graphics.h"
 #include "Engine/Graphics/XC_Shaders/XC_VertexShaderLayout.h"
@@ -28,7 +30,7 @@ void CubeMesh::Init()
     m_material.Specular = XCVec4(0.2f, 0.2f, 0.2f, 16.0f);
 
     ResourceManager& resMgr = (ResourceManager&)SystemLocator::GetInstance()->RequestSystem("ResourceManager");
-    m_texture = (Texture2D*)resMgr.GetResource("Sand");
+    m_texture = (Texture2D*)resMgr.AcquireResource("Sand");
 
     m_useShaderType = ShaderType_LightTexture;
 
@@ -150,7 +152,7 @@ void CubeMesh::Draw(RenderContext& context)
     // Set constants
     cbWorld wbuffer = { XMMatrixTranspose(m_World) };
     cbInvTransposeWorld invTransWorld = { InverseTranspose(m_World) };
-    cbMatTexPerObject matTexPerObject = { *m_texture->getTextureCoordinateMatrix(), m_material };
+    cbMatTexPerObject matTexPerObject = { *m_texture->GetTextureCoordinateMatrix(), m_material };
 
     if (m_useShaderType == ShaderType_LightTexture)
     {
@@ -158,7 +160,7 @@ void CubeMesh::Draw(RenderContext& context)
         lightTexShader->setCBWorld(context.GetDeviceContext(), &wbuffer);
         lightTexShader->setCBInvTransposeMatrix(context.GetDeviceContext(), &invTransWorld);
         lightTexShader->setCBMatTexPerObject(context.GetDeviceContext(), &matTexPerObject);
-        lightTexShader->setTexture2D(context.GetDeviceContext(), m_texture->getTextureResource());
+        lightTexShader->setTexture2D(context.GetDeviceContext(), m_texture->GetTextureResource());
     }
     else
     {
@@ -175,3 +177,4 @@ void CubeMesh::Destroy()
 {
     m_texture = nullptr;
 }
+#endif

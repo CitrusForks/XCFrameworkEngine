@@ -7,7 +7,6 @@
 #pragma once
 
 #include "Engine/System/ISystem.h"
-#include "Engine/Event/IEventListener.h"
 
 #include "Gameplay/GameStates/IGameState.h"
 #include "GameStates/GameStateTypes.h"

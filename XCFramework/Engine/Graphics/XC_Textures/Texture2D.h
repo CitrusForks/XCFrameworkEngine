@@ -24,23 +24,26 @@ public:
 
     virtual ~Texture2D();
 
-    virtual void                 Load(std::string resourcePath);
-    virtual void                 Load(const void* fbTexture2D);
-    virtual void                 Destroy();
+    virtual void                 Load(std::string resourcePath) override;
+    virtual void                 Load(const void* fbTexture2D)  override;
+    virtual void                 UpdateState();
+    virtual void                 Unload()                       override;
+    virtual void                 Destroy()                      override;
     
     void                         RenderContextCallback(RenderContext& renderContext);
-    void                         loadTexture();
-    D3DShaderResourceView*       getTextureResource() { return m_diffuseMapTextureSRV; }
-    void                         setSRV(D3DShaderResourceView* srv) { m_diffuseMapTextureSRV = srv; }
-    XCMatrix4*                   getTextureCoordinateMatrix() { return &m_textureCoordinateMatrix; }
-    void                         setTextureCoordinateMatrix(XCMatrix4 matrix) { m_textureCoordinateMatrix = matrix; }
+    void                         LoadTexture();
+    
+    D3DShaderResourceView*       GetTextureResource()               { return m_diffuseMapTextureSRV; }
+    void                         SetSRV(D3DShaderResourceView* srv) { m_diffuseMapTextureSRV = srv; }
+    
+    XCMatrix4*                   GetTextureCoordinateMatrix() { return &m_textureCoordinateMatrix; }
+    void                         SetTextureCoordinateMatrix(XCMatrix4 matrix) { m_textureCoordinateMatrix = matrix; }
 
 protected:
     D3DShaderResourceView*       m_diffuseMapTextureSRV;
     XCMatrix4                    m_textureCoordinateMatrix;
 
 #if defined(XCGRAPHICS_DX12)
-    D3DConstantBuffer*           m_sharedCB;                    //Shared ShaderResourceView ref'ed from SharedDescriptorHeap.
     D3DShaderResourceView*       m_diffuseMapTextureSRVUpload;
     DirectX::TexMetadata         m_texMetaData;
     DirectX::ScratchImage        m_scratchImage;

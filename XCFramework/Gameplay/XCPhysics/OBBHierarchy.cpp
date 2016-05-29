@@ -21,9 +21,9 @@ void OBBHierarchy::Update(float dt)
     for(unsigned int index = 0; index < m_Quads.size(); index++)
     {
         m_Quads[index]->m_bbox->Update(dt);
-        if (m_Quads[index]->hasChildNode())
+        if (m_Quads[index]->HasChildNode())
         {
-            m_Quads[index]->getChildNode()->Update(dt);
+            m_Quads[index]->GetChildNode()->Update(dt);
         }
     }
 }
@@ -34,9 +34,9 @@ void OBBHierarchy::Transform(XCMatrix4 translateMat, XCMatrix4 rotateMatrix)
     {
         m_Quads[index]->m_bbox->Transform(translateMat, rotateMatrix);
 
-        if (m_Quads[index]->hasChildNode())
+        if (m_Quads[index]->HasChildNode())
         {
-            m_Quads[index]->getChildNode()->Transform(translateMat, rotateMatrix);
+            m_Quads[index]->GetChildNode()->Transform(translateMat, rotateMatrix);
         }
 
     }
@@ -49,14 +49,14 @@ void OBBHierarchy::Draw(RenderContext& context)
     {
         m_Quads[index]->m_bbox->Draw(context);
 
-        if (m_Quads[index]->hasChildNode())
+        if (m_Quads[index]->HasChildNode())
         {
-            m_Quads[index]->getChildNode()->Draw(context);
+            m_Quads[index]->GetChildNode()->Draw(context);
         }
     }
 }
 
-bool TerrainQuad::hasChildNode()
+bool TerrainQuad::HasChildNode()
 { 
     if (m_nextChildNode != nullptr)
     {
@@ -65,7 +65,7 @@ bool TerrainQuad::hasChildNode()
     return false;
 }
 
-void OBBHierarchy::createTerrainOBBHierarchy(int levels, int rowStart, int totalRows, int colStart, int totalColumns, int totalWidth)
+void OBBHierarchy::CreateTerrainOBBHierarchy(int levels, int rowStart, int totalRows, int colStart, int totalColumns, int totalWidth)
 {
     //Base condition to return from here, if this is the 0th level.
     if (levels == 0)
@@ -116,8 +116,8 @@ void OBBHierarchy::createTerrainOBBHierarchy(int levels, int rowStart, int total
                 break;
             }
 
-            m_Quads[quadIndex]->setChildNodeOBB(std::move(childNodeOBB));
-            m_Quads[quadIndex]->getChildNode()->addQuad(std::move(quad));
+            m_Quads[quadIndex]->SetChildNodeOBB(std::move(childNodeOBB));
+            m_Quads[quadIndex]->GetChildNode()->AddQuad(std::move(quad));
         }
     }
     
@@ -127,12 +127,12 @@ void OBBHierarchy::createTerrainOBBHierarchy(int levels, int rowStart, int total
         //Then call respectively for every quad create
         for(unsigned int quadIndex = 0; quadIndex < m_Quads.size(); quadIndex++)
         {
-            m_Quads[quadIndex]->getChildNode()->createTerrainOBBHierarchy(levels - 1, rowStart, rowMid - rowStart, colStart, colMid - colStart, totalWidth);
+            m_Quads[quadIndex]->GetChildNode()->CreateTerrainOBBHierarchy(levels - 1, rowStart, rowMid - rowStart, colStart, colMid - colStart, totalWidth);
         }
     }
 }
 
-void OBBHierarchy::computeQuad(int row, int col, XCVec3 pos)
+void OBBHierarchy::ComputeQuad(int row, int col, XCVec3 pos)
 {
     for(unsigned int quadIndex = 0; quadIndex < m_Quads.size(); quadIndex++)
     {
@@ -142,33 +142,32 @@ void OBBHierarchy::computeQuad(int row, int col, XCVec3 pos)
             m_Quads[quadIndex]->m_vMin = XMVectorMin(m_Quads[quadIndex]->m_vMin, XMLoadFloat3(&pos));
             m_Quads[quadIndex]->m_vMax = XMVectorMax(m_Quads[quadIndex]->m_vMax, XMLoadFloat3(&pos));
 
-            if (m_Quads[quadIndex]->hasChildNode())
+            if (m_Quads[quadIndex]->HasChildNode())
             {
-                m_Quads[quadIndex]->getChildNode()->computeQuad(row, col, pos);
+                m_Quads[quadIndex]->GetChildNode()->ComputeQuad(row, col, pos);
             }
             break;
         }
     }
 }
 
-void OBBHierarchy::computeOBBForAllQuads()
+void OBBHierarchy::ComputeOBBForAllQuads()
 {
     for(unsigned int quadIndex = 0; quadIndex < m_Quads.size(); quadIndex++)
     {
-        m_Quads[quadIndex]->m_bbox = std::make_unique<OrientedBoundingBox>();
+        m_Quads[quadIndex]->m_bbox = std::make_unique<RenderableOBB>();
         m_Quads[quadIndex]->m_bbox->Init();
         m_Quads[quadIndex]->m_bbox->CreateBoundBox(m_Quads[quadIndex]->m_vMin, m_Quads[quadIndex]->m_vMax);
-        m_Quads[quadIndex]->m_bbox->Load();
 
-        if (m_Quads[quadIndex]->hasChildNode())
+        if (m_Quads[quadIndex]->HasChildNode())
         {
-            m_Quads[quadIndex]->getChildNode()->computeOBBForAllQuads();
+            m_Quads[quadIndex]->GetChildNode()->ComputeOBBForAllQuads();
         }
     }
 }
 
 //Recursive Algorithm which finds the most inner quad that collides with the OBB
-TerrainQuad* OBBHierarchy::getQuadCollidingWithOBB(OrientedBoundingBox* bbox)
+TerrainQuad* OBBHierarchy::GetQuadCollidingWithOBB(OrientedBoundingBox* bbox)
 {
     //Check if colliding with current quads
     for(unsigned int quadIndex = 0; quadIndex < m_Quads.size(); quadIndex++)
@@ -177,9 +176,9 @@ TerrainQuad* OBBHierarchy::getQuadCollidingWithOBB(OrientedBoundingBox* bbox)
         if (type == CONTAINS || type == INTERSECTS)
         {
             //If Collided, check if we have child node, then return from that child TerrainQuad
-            if (m_Quads[quadIndex]->hasChildNode())
+            if (m_Quads[quadIndex]->HasChildNode())
             {
-                return m_Quads[quadIndex]->getChildNode()->getQuadCollidingWithOBB(bbox);
+                return m_Quads[quadIndex]->GetChildNode()->GetQuadCollidingWithOBB(bbox);
             }
             
             //else return the current TerrainQuad

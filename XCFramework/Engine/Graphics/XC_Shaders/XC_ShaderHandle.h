@@ -10,6 +10,7 @@
 #include "Engine/Graphics/XC_Shaders/XC_VertexFormat.h"
 #include "Engine/Graphics/VertexBuffer.h"
 #include "Engine/Graphics/IndexBuffer.h"
+#include "Engine/Resource/ResourceHandle.h"
 
 //Add all the slots priority wise
 static const std::vector<std::string> gs_slotPriority =
@@ -71,11 +72,11 @@ public:
     ~XCShaderHandle();
 
     void            Load(const void* fbBuffer);
-    void            ApplyShader(ID3DDeviceContext& context);
+    void            ApplyShader(ID3DDeviceContext& context, RasterType rasterType = RasterType_FillSolid);
     void            Reset(ID3DDeviceContext& context) {}
     void            SetConstantBuffer(std::string bufferName, ID3DDeviceContext& context, D3D12_GPU_DESCRIPTOR_HANDLE& gpuHandle);
     void            SetSampler(std::string bufferName, ID3DDeviceContext& context, D3D12_GPU_DESCRIPTOR_HANDLE& gpuHandle);
-    void            SetResource(std::string bufferName, ID3DDeviceContext& context, D3DShaderResourceView* tex);
+    void            SetResource(std::string bufferName, ID3DDeviceContext& context, ResourceHandle* tex);
     VertexFormat    GetVertexFormat() { return m_vertexFormat; }
 
     void* CreateVertexBuffer()

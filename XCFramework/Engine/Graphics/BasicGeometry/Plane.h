@@ -16,11 +16,11 @@ public:
     void                SetPlaneNormal(XCVecIntrinsic4 norm) { m_planeNormal = norm; }
     void                SetDConstant(XCVecIntrinsic4 value) { m_dVector = value; }
 
-    XCVecIntrinsic4            GetPlaneNormal() { return m_planeNormal; }
+    XCVecIntrinsic4     GetPlaneNormal() { return m_planeNormal; }
 
 protected:
-    XCVecIntrinsic4            m_planeNormal;
-    XCVecIntrinsic4            m_dVector;
+    XCVecIntrinsic4     m_planeNormal;
+    XCVecIntrinsic4     m_dVector;
 
-    XCVecIntrinsic4            m_vertices[4];
+    XCVecIntrinsic4     m_vertices[4];
 };

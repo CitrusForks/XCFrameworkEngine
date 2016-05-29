@@ -7,8 +7,7 @@
 #pragma once
 
 #include "IActor.h"
-#include "Engine/Graphics/XC_Mesh/XCMesh.h"
-#include "Engine/Graphics/XC_Mesh/VectorFontMesh.h"
+#include "Engine/Resource/ResourceHandle.h"
 
 class FontActor : public IActor
 {
@@ -18,13 +17,14 @@ public:
     FontActor();
     virtual ~FontActor(void);
     
-    virtual void                        Init(int actorId);
-    virtual void                        PreLoad(const void* fbBuffer);
-    virtual void                        Load();
-    virtual void                        Update(float dt);
-    virtual void                        Draw(RenderContext& context);
-    virtual void                        Destroy();
+    virtual void                        Init(int actorId) override;
+    virtual void                        PreLoad(const void* fbBuffer) override;
+    virtual void                        Load() override;
+    virtual void                        UpdateState() override;
+    virtual void                        Update(float dt) override;
+    virtual void                        Draw(RenderContext& context) override;
+    virtual void                        Destroy() override;
     
 protected:
-    VectorFontMesh*                     m_fontMesh;
+    ResourceHandle*                     m_fontMesh;
 };

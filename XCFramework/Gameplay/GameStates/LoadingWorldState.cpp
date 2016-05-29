@@ -36,7 +36,7 @@ void GameState::LoadingWorldState::Init()
 void LoadingWorldState::Update(float dt)
 {
     //Wait for resource loader to complete the loading of resources. When done move to next state.
-    if (m_futureWorldLoaded.get() > 0)
+    if (m_futureWorldLoaded._Is_ready() && m_futureWorldLoaded.valid() && m_futureWorldLoaded.get() > 0)
     {
         Event_GameStateChange event("RunningState", STATE_DESTROY);
         EventBroadcaster& broadcaster = (EventBroadcaster&)SystemLocator::GetInstance()->RequestSystem("EventBroadcaster");

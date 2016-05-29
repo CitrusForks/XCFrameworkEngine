@@ -6,6 +6,8 @@
 
 #pragma once
 
+#if UNUSED 
+
 #include "Engine/ObjectBase/IObjectDimensions.h"
 #include "Engine/Graphics/XC_Shaders/XC_ShaderTypes.h"
 #include "Engine/Graphics/XC_Shaders/XC_VertexFormat.h"
@@ -40,12 +42,14 @@ protected:
     unsigned int                    m_Stride;
     unsigned int                    m_Offset;
 
-    ShaderType                    m_useShaderType;
+    ShaderType                      m_useShaderType;
     BasicMaterial                   m_material;
     Texture2D*                      m_texture;
 
     VertexBuffer<VertexPosNormTex>  m_vertexBuffer;
     IndexBuffer<unsigned int>       m_indexBuffer;
 
-    RasterType                m_rasterType;
+    RasterType                      m_rasterType;
 };
+
+#endif

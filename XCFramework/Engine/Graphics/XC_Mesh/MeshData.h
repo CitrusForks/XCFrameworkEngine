@@ -32,6 +32,13 @@ public:
 
     struct Face
     {
+        Face(unsigned short x, unsigned short y, unsigned short z, unsigned short w = 0)
+            : a(x)
+            , b(y)
+            , c(z)
+            , flags(w)
+        {}
+
         unsigned short a;
         unsigned short b;
         unsigned short c;

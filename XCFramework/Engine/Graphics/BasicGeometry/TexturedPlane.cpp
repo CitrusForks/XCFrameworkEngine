@@ -51,7 +51,7 @@ void TexturedPlane::PreLoad(const void* fbBuffer)
     m_material.Specular = XCVec4(texPlaneBuff->Material()->Specular()->x(), texPlaneBuff->Material()->Specular()->y(), texPlaneBuff->Material()->Specular()->z(), texPlaneBuff->Material()->Specular()->w());
 
     ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
-    m_texture = (Texture2D*)resMgr.GetResource(texPlaneBuff->ResourceName()->c_str());
+    m_texture = &resMgr.AcquireResource(texPlaneBuff->ResourceName()->c_str());
 
     m_rasterType = (RasterType) texPlaneBuff->RasterizerType();
 
@@ -63,13 +63,16 @@ void TexturedPlane::PreLoad(const void* fbBuffer)
     SimpleActor::PreLoad(fbBuffer);
 }
 
-void TexturedPlane::PreLoad(XCVecIntrinsic4 initialPosition, XCVecIntrinsic4 initialRotation, XCVecIntrinsic4 initialScaling, BasicMaterial material, Texture2D* texture, RasterType rasterType)
+void TexturedPlane::PreLoad(XCVecIntrinsic4 initialPosition, XCVecIntrinsic4 initialRotation, XCVecIntrinsic4 initialScaling, BasicMaterial material, std::string texture, RasterType rasterType)
 {
     m_currentPosition = initialPosition;
     m_initialRotation = initialRotation;
     m_initialScaling  = initialScaling;
     m_material        = material;
-    m_texture         = texture;
+
+    ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
+    m_texture = &resMgr.AcquireResource(texture.c_str());
+
     m_rasterType      = rasterType;
 }
 
@@ -119,7 +122,7 @@ void TexturedPlane::Draw(RenderContext& context)
         ToXCMatrix4Unaligned(XMMatrixTranspose(m_World)),
         ToXCMatrix4Unaligned(XMMatrixTranspose(m_World * cam->GetViewMatrix() * cam->GetProjMatrix())),
         ToXCMatrix4Unaligned(InverseTranspose(m_World)),
-        ToXCMatrix4Unaligned(*m_texture->getTextureCoordinateMatrix()),
+        ToXCMatrix4Unaligned(XMMatrixIdentity()),
         m_material
     };
 
@@ -133,7 +136,7 @@ void TexturedPlane::Draw(RenderContext& context)
     lightTexShader->setCBPerObject(context.GetDeviceContext(), perObject);
 #endif
 
-    lightTexShader->SetResource("gDiffuseMap", context.GetDeviceContext(), m_texture->getTextureResource());
+    lightTexShader->SetResource("gDiffuseMap", context.GetDeviceContext(), m_texture);
 
     context.GetShaderManagerSystem().DrawNonIndexed(context.GetDeviceContext(), 6);
 }
@@ -141,4 +144,7 @@ void TexturedPlane::Draw(RenderContext& context)
 void TexturedPlane::Destroy()
 {
     SimpleActor::Destroy();
+
+    ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
+    resMgr.ReleaseResource(m_texture);
 }

@@ -17,25 +17,39 @@ class IActor : public IBase, public IObjectDimensions, public IRenderableObject
 public:
     DECLARE_OBJECT_CREATION(IActor)
 
+    enum ActorState
+    {
+        ActorState_None,
+        ActorState_Loading,
+        ActorState_Loaded,
+        ActorState_Unloaded
+    };
+
     IActor(void);
     virtual ~IActor(void);
 
-    virtual             void        PreLoad(const void* fbBuffer) {}
-    virtual             void        Load();
-    virtual             void        Update(float dt);
-    virtual             void        Draw(RenderContext& renderContext);
-    virtual             void        Destroy();
+    virtual void        PreLoad(const void* fbBuffer);
+    virtual void        Load();
+    virtual void        UpdateState();
+    virtual void        Update(float dt);
+    virtual void        Draw(RenderContext& renderContext);
+    virtual void        Unload();
+    virtual void        Destroy();
+    
+    void                SetWorldReady(bool isReady)      { m_worldReady = isReady; }
+    bool                IsWorldReady()                   { return m_worldReady; }
 
-    virtual             void        Invalidate();
-    virtual             bool        IsWorldReady()                   { return m_worldReady; }
-    virtual             void        SetWorldReady(bool isReady)      { m_worldReady = isReady; }
+    void                Invalidate();
+    bool                IsInvalidated()                  { return m_invalidated; }
 
-    bool                            IsInvalidated()                  { return m_invalidated; }
+    ActorState          GetActorState()                  { return m_actorState; }
 
 protected:
-    std::string                     m_userFriendlyName;
-    EGameActorType                  m_actorType;
 
-    bool                            m_worldReady;
-    bool                            m_invalidated;
+    std::string         m_userFriendlyName;
+    EGameActorType      m_actorType;
+                        
+    bool                m_worldReady;
+    bool                m_invalidated;
+    ActorState          m_actorState;
 };

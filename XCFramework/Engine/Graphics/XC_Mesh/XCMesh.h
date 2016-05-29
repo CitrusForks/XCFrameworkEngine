@@ -8,7 +8,7 @@
 
 #include "Engine/Resource/IResource.h"
 
-#include "Engine/Resource/ResourceManager.h"
+#include "Engine/Resource/ResourceHandle.h"
 #include "Engine/Graphics/XC_Shaders/XC_VertexFormat.h"
 #include "Engine/Graphics/BasicGeometry/OrientedBoundingBox.h"
 #include "Engine/Graphics/XC_Shaders/XC_ShaderHandle.h"
@@ -30,11 +30,21 @@ public:
     XCMesh();
     virtual ~XCMesh(void);
 
-    virtual void                            Init(int resourceId, std::string userFriendlyName, bool loaded = false);
-    virtual void                            Load(const void* buffer);
+    virtual void                            Init(int resourceId, std::string userFriendlyName)  override;
+    virtual void                            Load(const void* buffer)                            override;
+    virtual void                            Unload()                                            override;
+    virtual void                            UpdateState()                                       override;
+    virtual void                            Update(float dt)                                    override;
+    virtual void                            Destroy()                                           override;
+
     virtual void                            Load(std::string fileName, float intialScaling = 1.0f);
-    virtual void                            Update(float dt);
-    virtual void                            Destroy();
+
+    void                                    RegisterDrawable();
+    void                                    UnregisterDrawable();
+
+    //Load Dynamic. Make sure the MeshData is filled up before calling this.
+    void                                    InitDynamic(std::string resPath, ShaderType shaderUsage, std::string textureName, XCVec3Unaligned scaling, XCVec3Unaligned rotation);
+    void                                    LoadDynamic();
 
     MeshData*                               CreateAndGetSubMesh();
     void                                    DrawInstanced(PerObjectBuffer& objectBuffer);
@@ -67,17 +77,12 @@ protected:
 
     //Member Variables--------------------------------------------------------------------------------------------------------------------------------------------------
     std::vector<MeshData*>                  m_subMeshes;
-
-
-
     ShaderType                              m_shaderType;
     XCShaderHandle*                         m_shaderHandler;
+    ResourceHandle*                         m_texture;
 
     //This is computed in the object space. Every actor having this mesh should maintain a clone of this and update that and set this every frame
     std::unique_ptr<OrientedBoundingBox>    m_computedBoundBox; 
-    
-    ResourceManager*                        m_resourceManager;
-    Texture2D*                              m_texture;
     
     //Skinned mesh members
     bool                                    m_isSkinnedMesh;

@@ -11,17 +11,16 @@
 IResource::IResource()
     : m_resourceType(RESOURCETYPE_MAX)
     , m_resourceId(-1)
-    , m_loaded(false)
+    , m_resourceState(ResourceState_UnLoaded)
     , m_userFriendlyName("")
     , m_resourcePath("")
     , m_resourceUpdated(false)
 {
 }
 
-void IResource::Init(int id, std::string userFriendlyName, bool loaded /* =false*/)
+void IResource::Init(int id, std::string userFriendlyName)
 {
     m_resourceId = id;
-    m_loaded = loaded;
     m_userFriendlyName = userFriendlyName;
 }
 
@@ -32,9 +31,41 @@ IResource::~IResource()
 void IResource::Load(std::string resourcePath)
 {
     m_resourcePath = resourcePath;
+    m_resourceState = ResourceState_Loading;
+}
+
+void IResource::Load(const void* fbBuffer)
+{
+    m_resourceState = ResourceState_Loading;
+}
+
+void IResource::Unload()
+{
+    m_resourceState = ResourceState_UnLoaded;
+}
+
+void IResource::UpdateState()
+{
+    if (!m_isResourceReady && m_resourceState == ResourceState_Loaded)
+    {
+        m_isResourceReady = true;
+    }
+    else if (m_isResourceReady && m_resourceState == ResourceState_UnLoaded)
+    {
+        m_isResourceReady = false;
+    }
+}
+
+void IResource::WaitResourceUpdate()
+{
+    while (!m_resourceUpdated);
+}
+
+void IResource::RenderContextCallback(RenderContext& renderContext)
+{
+    m_resourceUpdated = true;
 }
 
 void IResource::Destroy()
 {
-    m_loaded = false;
 }

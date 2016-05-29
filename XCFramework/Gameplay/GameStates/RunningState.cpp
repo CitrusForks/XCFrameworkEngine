@@ -58,7 +58,7 @@ void RunningState::Init()
 #endif
 
     std::unique_ptr<SimpleSkyBox> pSkyBox = (std::unique_ptr<SimpleSkyBox>)(SimpleSkyBox*)actorFactory.CreateActor("SimpleSkyBox");
-    pSkyBox->PreLoad(toXMVECTOR(0.0f, 0.0f, 0.0f, 1.0f), toXMVECTOR(0.0f, 0.0f, 0.0f, 1.0f), toXMVECTOR(1000.0f, 1000.0f, 1000.0f, 1.0f), BasicMaterial(), (CubeTexture3D*)resMgr.GetResource("cubemap_bright"), RasterType_FillSolid);
+    pSkyBox->PreLoad(toXMVECTOR(0.0f, 0.0f, 0.0f, 1.0f), toXMVECTOR(0.0f, 0.0f, 0.0f, 1.0f), toXMVECTOR(1000.0f, 1000.0f, 1000.0f, 1.0f), BasicMaterial(), (CubeTexture3D*)resMgr.AcquireResource("cubemap_bright"), RasterType_FillSolid);
     m_worldSystem->RequestAddActor(std::move(pSkyBox));
 
     std::unique_ptr<TexturedPlane> pTexturedPlane = (std::unique_ptr<TexturedPlane>)(TexturedPlane*)actorFactory.CreateActor("TexturedPlane");
@@ -71,19 +71,19 @@ void RunningState::Init()
     
     std::unique_ptr<Terrain> pHeightMapTerrain = (std::unique_ptr<Terrain>)(Terrain*)actorFactory.CreateActor("Terrain");
     pHeightMapTerrain->PreLoad("Assets\\Textures\\Environment\\Terrain\\SimpleTerrain1.bmp",
-                                                    (Texture2D*)resMgr.GetResource("multi_grass"),
-                                                    (Texture2D*)resMgr.GetResource("multi_ground"), 
-                                                    (Texture2D*)resMgr.GetResource("Sand"),
-                                                    (Texture2D*)resMgr.GetResource("multi_blend"),
+                                                    (Texture2D*)resMgr.AcquireResource("multi_grass"),
+                                                    (Texture2D*)resMgr.AcquireResource("multi_ground"), 
+                                                    (Texture2D*)resMgr.AcquireResource("Sand"),
+                                                    (Texture2D*)resMgr.AcquireResource("multi_blend"),
                                                     XCVec3(50, -20, -40), 25, 25, 1.0f, 1.0f);
     m_worldSystem->RequestAddActor(std::move(pHeightMapTerrain));
     
     pHeightMapTerrain = (std::unique_ptr<Terrain>)(Terrain*)actorFactory.CreateActor("Terrain");
     pHeightMapTerrain->PreLoad("Assets\\Textures\\Environment\\Terrain\\terrain1.bmp",
-                                                  (Texture2D*)resMgr.GetResource("Sand"),
-                                                  (Texture2D*)resMgr.GetResource("multi_ground"),
-                                                  (Texture2D*)resMgr.GetResource("multi_grass"),
-                                                  (Texture2D*)resMgr.GetResource("multi_blend"),
+                                                  (Texture2D*)resMgr.AcquireResource("Sand"),
+                                                  (Texture2D*)resMgr.AcquireResource("multi_ground"),
+                                                  (Texture2D*)resMgr.AcquireResource("multi_grass"),
+                                                  (Texture2D*)resMgr.AcquireResource("multi_blend"),
                                                   XCVec3(300, -20, -40), 25, 25, 1.0f, 1.0f);
     m_worldSystem->RequestAddActor(std::move(pHeightMapTerrain));
 
@@ -91,75 +91,75 @@ void RunningState::Init()
 #if LOAD_STRESS_ENABLE
     pHeightMapTerrain = (std::unique_ptr<Terrain>)(Terrain*)actorFactory.CreateActor("Terrain");
     pHeightMapTerrain->PreLoad("Assets\\Textures\\Environment\\Terrain\\GrayscaleImages\\gradient1.bmp",
-                                                  (Texture2D*)resMgr.GetResource("Sand"),
-                                                  (Texture2D*)resMgr.GetResource("multi_ground"),
-                                                  (Texture2D*)resMgr.GetResource("multi_grass"),
-                                                  (Texture2D*)resMgr.GetResource("multi_blend"),
+                                                  (Texture2D*)resMgr.AcquireResource("Sand"),
+                                                  (Texture2D*)resMgr.AcquireResource("multi_ground"),
+                                                  (Texture2D*)resMgr.AcquireResource("multi_grass"),
+                                                  (Texture2D*)resMgr.AcquireResource("multi_blend"),
                                                   XCVec3(50, -20, -300), 25, 25, 1.0f, 1.0f);
     m_worldSystem->RequestAddActor(std::move(pHeightMapTerrain));
 
     pHeightMapTerrain = std::make_unique<Terrain>("Assets\\Textures\\Environment\\Terrain\\GrayscaleImages\\gradient2.bmp",
-                                                    (Texture2D*)resMgr.GetResource("Sand"),
-                                                    (Texture2D*)resMgr.GetResource("multi_ground"),
-                                                    (Texture2D*)resMgr.GetResource("multi_grass"),
-                                                    (Texture2D*)resMgr.GetResource("multi_blend"),
+                                                    (Texture2D*)resMgr.AcquireResource("Sand"),
+                                                    (Texture2D*)resMgr.AcquireResource("multi_ground"),
+                                                    (Texture2D*)resMgr.AcquireResource("multi_grass"),
+                                                    (Texture2D*)resMgr.AcquireResource("multi_blend"),
                                                     XCVec3(300, -20, 100), 25, 25, 1.0, 1.0);
 
     pHeightMapTerrain = std::make_unique<Terrain>("Assets\\Textures\\Environment\\Terrain\\GrayscaleImages\\gradient.bmp",
-    (Texture2D*)resMgr.GetResource("Sand"),
-    (Texture2D*)resMgr.GetResource("multi_ground"),
-    (Texture2D*)resMgr.GetResource("multi_grass"),
-    (Texture2D*)resMgr.GetResource("multi_blend"),
+    (Texture2D*)resMgr.AcquireResource("Sand"),
+    (Texture2D*)resMgr.AcquireResource("multi_ground"),
+    (Texture2D*)resMgr.AcquireResource("multi_grass"),
+    (Texture2D*)resMgr.AcquireResource("multi_blend"),
     XCVec3(300, -20, -200), 25, 25, 1.0, 1.0);
 #endif
 
     std::unique_ptr<PCCar> pCarMesh = (std::unique_ptr<PCCar>)(PCCar*)actorFactory.CreateActor("PCCar");
-    pCarMesh->PreLoad(XCVec3(0, 2, 0), (XCMesh*)resMgr.GetResource("PorcheCar"));
+    pCarMesh->PreLoad(XCVec3(0, 2, 0), (XCMesh*)resMgr.AcquireResource("PorcheCar"));
     m_worldSystem->RequestAddActor(std::move(pCarMesh));
 
     std::unique_ptr<NPCCar> pCarMeshNPC = (std::unique_ptr<NPCCar>)(NPCCar*)actorFactory.CreateActor("NPCCar");
-    pCarMeshNPC->PreLoad(XCVec3(10, 2, 10), (XCMesh*)resMgr.GetResource("PorcheCar"));
+    pCarMeshNPC->PreLoad(XCVec3(10, 2, 10), (XCMesh*)resMgr.AcquireResource("PorcheCar"));
     m_worldSystem->RequestAddActor(std::move(pCarMeshNPC));
 
     std::unique_ptr<Door> pDoorMesh = (std::unique_ptr<Door>)(Door*)actorFactory.CreateActor("Door");
-    pDoorMesh->PreLoad((Texture2D*)resMgr.GetResource("multi_ground"), XCVec3(0, 2, 10), (XCMesh*)resMgr.GetResource("WoodenDoor"));
+    pDoorMesh->PreLoad((Texture2D*)resMgr.AcquireResource("multi_ground"), XCVec3(0, 2, 10), (XCMesh*)resMgr.AcquireResource("WoodenDoor"));
     m_worldSystem->RequestAddActor(std::move(pDoorMesh));
 
     std::unique_ptr<PCSoldier> pSoldierMesh = (std::unique_ptr<PCSoldier>)(PCSoldier*)actorFactory.CreateActor("PCSoldier");
-    pSoldierMesh->PreLoad(XCVec3(10, 2, 10), (XCMesh*)resMgr.GetResource("Soldier"));
+    pSoldierMesh->PreLoad(XCVec3(10, 2, 10), (XCMesh*)resMgr.AcquireResource("Soldier"));
     m_worldSystem->RequestAddActor(std::move(pSoldierMesh));
 
     std::unique_ptr<NPCSoldier> pSoldierMeshNPC = (std::unique_ptr<NPCSoldier>)(NPCSoldier*)actorFactory.CreateActor("NPCSoldier");
-    pSoldierMeshNPC->PreLoad(XCVec3(-30, 2, 50), (XCMesh*)resMgr.GetResource("Soldier"));
+    pSoldierMeshNPC->PreLoad(XCVec3(-30, 2, 50), (XCMesh*)resMgr.AcquireResource("Soldier"));
     m_worldSystem->RequestAddActor(std::move(pSoldierMeshNPC));
     pSoldierMeshNPC = (std::unique_ptr<NPCSoldier>)(NPCSoldier*)actorFactory.CreateActor("NPCSoldier");
-    pSoldierMeshNPC->PreLoad(XCVec3(-30, 2, 60), (XCMesh*)resMgr.GetResource("Soldier"));
+    pSoldierMeshNPC->PreLoad(XCVec3(-30, 2, 60), (XCMesh*)resMgr.AcquireResource("Soldier"));
     m_worldSystem->RequestAddActor(std::move(pSoldierMeshNPC));
     pSoldierMeshNPC = (std::unique_ptr<NPCSoldier>)(NPCSoldier*)actorFactory.CreateActor("NPCSoldier");
-    pSoldierMeshNPC->PreLoad(XCVec3(-30, 2, 70), (XCMesh*)resMgr.GetResource("Soldier"));
+    pSoldierMeshNPC->PreLoad(XCVec3(-30, 2, 70), (XCMesh*)resMgr.AcquireResource("Soldier"));
     m_worldSystem->RequestAddActor(std::move(pSoldierMeshNPC));
     pSoldierMeshNPC = (std::unique_ptr<NPCSoldier>)(NPCSoldier*)actorFactory.CreateActor("NPCSoldier");
-    pSoldierMeshNPC->PreLoad(XCVec3(-30, 2, 80), (XCMesh*)resMgr.GetResource("Soldier"));
+    pSoldierMeshNPC->PreLoad(XCVec3(-30, 2, 80), (XCMesh*)resMgr.AcquireResource("Soldier"));
     m_worldSystem->RequestAddActor(std::move(pSoldierMeshNPC));
     pSoldierMeshNPC = (std::unique_ptr<NPCSoldier>)(NPCSoldier*)actorFactory.CreateActor("NPCSoldier");
-    pSoldierMeshNPC->PreLoad(XCVec3(-30, 2, 90), (XCMesh*)resMgr.GetResource("Soldier"));
+    pSoldierMeshNPC->PreLoad(XCVec3(-30, 2, 90), (XCMesh*)resMgr.AcquireResource("Soldier"));
     m_worldSystem->RequestAddActor(std::move(pSoldierMeshNPC));
     
 #if LOAD_STRESS_ENABLE
     pSoldierMeshNPC = (std::unique_ptr<NPCSoldier>)(NPCSoldier*)actorFactory.CreateActor("NPCSoldier");
-    pSoldierMeshNPC->PreLoad(XCVec3(-30, 2, 10), (XCMesh*)resMgr.GetResource("Soldier"));
+    pSoldierMeshNPC->PreLoad(XCVec3(-30, 2, 10), (XCMesh*)resMgr.AcquireResource("Soldier"));
     m_worldSystem->RequestAddActor(std::move(pSoldierMeshNPC));
     pSoldierMeshNPC = (std::unique_ptr<NPCSoldier>)(NPCSoldier*)actorFactory.CreateActor("NPCSoldier");
-    pSoldierMeshNPC->PreLoad(XCVec3(-30, 2, 20), (XCMesh*)resMgr.GetResource("Soldier"));
+    pSoldierMeshNPC->PreLoad(XCVec3(-30, 2, 20), (XCMesh*)resMgr.AcquireResource("Soldier"));
     m_worldSystem->RequestAddActor(std::move(pSoldierMeshNPC));
     pSoldierMeshNPC = (std::unique_ptr<NPCSoldier>)(NPCSoldier*)actorFactory.CreateActor("NPCSoldier");
-    pSoldierMeshNPC->PreLoad(XCVec3(-30, 2, 30), (XCMesh*)resMgr.GetResource("Soldier"));
+    pSoldierMeshNPC->PreLoad(XCVec3(-30, 2, 30), (XCMesh*)resMgr.AcquireResource("Soldier"));
     m_worldSystem->RequestAddActor(std::move(pSoldierMeshNPC));
     pSoldierMeshNPC = (std::unique_ptr<NPCSoldier>)(NPCSoldier*)actorFactory.CreateActor("NPCSoldier");
-    pSoldierMeshNPC->PreLoad(XCVec3(-30, 2, 40), (XCMesh*)resMgr.GetResource("Soldier"));
+    pSoldierMeshNPC->PreLoad(XCVec3(-30, 2, 40), (XCMesh*)resMgr.AcquireResource("Soldier"));
     m_worldSystem->RequestAddActor(std::move(pSoldierMeshNPC));
     pSoldierMeshNPC = (std::unique_ptr<NPCSoldier>)(NPCSoldier*)actorFactory.CreateActor("NPCSoldier");
-    pSoldierMeshNPC->PreLoad(XCVec3(-30, 2, 100), (XCMesh*)resMgr.GetResource("Soldier"));
+    pSoldierMeshNPC->PreLoad(XCVec3(-30, 2, 100), (XCMesh*)resMgr.AcquireResource("Soldier"));
     m_worldSystem->RequestAddActor(std::move(pSoldierMeshNPC));
 #endif
 #endif

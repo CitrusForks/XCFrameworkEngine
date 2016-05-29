@@ -8,6 +8,9 @@
 
 //#define USE_WRAP_MODE
 
+//This macros enables wireframe cube box around physics objects
+//#define DEBUG_OBB 1
+
 #if defined(XCGRAPHICS_DX12)
 
 //#define SINGLE_THREAD_RENDER    1

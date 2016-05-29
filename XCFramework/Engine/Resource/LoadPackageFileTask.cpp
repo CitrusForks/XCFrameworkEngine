@@ -62,7 +62,9 @@ void LoadPackageFileTask::Run()
                     //Anyway load the resource
                     m_resourceManager->GetResourceFactory().loadResource(fp, resource);
                     
-                    m_resourceManager->AddResource(resource);
+                    ResourceHandle resHandle = {};
+                    resHandle.m_Resource = resource;
+                    m_resourceManager->AddResource(resHandle);
                 }
             }
         };

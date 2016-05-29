@@ -21,9 +21,10 @@ PistolBullet::~PistolBullet(void)
 {
 }
 
-PistolBullet::PistolBullet(IActor* parentActor, XCVec3 initialPosition, XCMesh* pMesh)
+PistolBullet::PistolBullet(IActor* parentActor, XCVec3 initialPosition, std::string pMesh)
 {
-    m_pMesh = pMesh;
+    ResourceManager& resMgr = (ResourceManager&)SystemLocator::GetInstance()->RequestSystem("ResourceManager");
+    m_pMesh = &resMgr.AcquireResource(pMesh.c_str());
 
     m_material.Ambient = XCVec4(1.0f, 1.0f, 1.0f, 1.0f);
     m_material.Diffuse = XCVec4(0.5f, 0.8f, 0.0f, 1.0f);
@@ -70,7 +71,7 @@ void PistolBullet::Update(float dt)
 
     m_World = m_MScaling * m_MRotation * m_MTranslation;
 
-    m_pMesh->Update(dt);
+    m_pMesh->GetResource<XCMesh>()->Update(dt);
 
     SimpleMeshActor::Update(dt);
 }

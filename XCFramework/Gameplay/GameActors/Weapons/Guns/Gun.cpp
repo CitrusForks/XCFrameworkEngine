@@ -7,15 +7,15 @@
 #include "stdafx.h"
 
 #include "Gun.h"
+
+#include "Gameplay/World.h"
+#include "Gameplay/GameActors/GameActorsFactory.h"
+#include "Gameplay/GameActors/Weapons/Bullets/Bullet.h"
+
+#include "Engine/Resource/ResourceManager.h"
 #include "Engine/Graphics/XC_Shaders/XC_ShaderBufferConstants.h"
 #include "Engine/Graphics/XC_Shaders/XC_ShaderHandle.h"
-
-#include "Gameplay/GameActors/GameActorsFactory.h"
-#include "Gameplay/World.h"
-
-#include "Gameplay/GameActors/Weapons/Bullets/Bullet.h"
 #include "Engine/Graphics/XC_Camera/XC_CameraManager.h"
-
 
 Gun::Gun(void)
 {
@@ -25,11 +25,12 @@ Gun::~Gun(void)
 {
 }
 
-void Gun::PreLoad(IActor* parentActor, XCVec3 initialPosition, XCMesh* pMesh)
+void Gun::PreLoad(IActor* parentActor, XCVec3 initialPosition, std::string pMesh)
 {
     SubActor::Init(parentActor);
 
-    m_pMesh = pMesh;
+    ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
+    m_pMesh = &resMgr.AcquireResource(pMesh.c_str());
 
     m_directInput = (DirectInput*)&SystemLocator::GetInstance()->RequestSystem("InputSystem");
 
@@ -85,7 +86,7 @@ void Gun::Update(float dt)
 
     m_World = m_MScaling * m_MRotation * m_MTranslation;
 
-    m_pMesh->Update(dt);
+    m_pMesh->GetResource<XCMesh>()->Update(dt);
 
     SimpleMeshActor::Update(dt);
 }
@@ -138,7 +139,7 @@ void Gun::Draw(RenderContext& context)
         m_material
     };
 
-    m_pMesh->DrawInstanced(perObject);
+    m_pMesh->GetResource<XCMesh>()->DrawInstanced(perObject);
     SimpleMeshActor::Draw(context);
 }
 
@@ -160,15 +161,15 @@ void Gun::CheckInput()
 
 void Gun::ShootBullet(std::string bulletActorType, XCVec3 startPosition, XCVec3 target)
 {
-    GameActorsFactory& actorFactory = (GameActorsFactory&)SystemLocator::GetInstance()->RequestSystem("GameActorsFactory");
-    ResourceManager& resMgr = (ResourceManager&)SystemLocator::GetInstance()->RequestSystem("ResourceManager");
+    GameActorsFactory& actorFactory = SystemLocator::GetInstance()->RequestSystem<GameActorsFactory>("GameActorsFactory");
+    ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
     World& worldSystem = (World&)SystemLocator::GetInstance()->RequestSystem("World");
 
     Bullet* bullet = (Bullet*)actorFactory.CreateActor(bulletActorType);
 
     if (bullet)
     {
-        bullet->PreLoad(startPosition, target, (XCMesh*)resMgr.GetResource("PistolBullet"));
+        bullet->PreLoad(startPosition, target, "PistolBullet");
         worldSystem.RequestAddActor(bullet);
     }
 }
@@ -176,4 +177,7 @@ void Gun::ShootBullet(std::string bulletActorType, XCVec3 startPosition, XCVec3 
 void Gun::Destroy()
 {
     SimpleMeshActor::Destroy();
+
+    ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
+    resMgr.ReleaseResource(m_pMesh);
 }

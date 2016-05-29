@@ -18,18 +18,22 @@ class FlatBuffersSystem : public ISystem
 public:
     DECLARE_SYSTEMOBJECT_CREATION(FlatBuffersSystem)
 
+    struct FBBuffer
+    {
+        flatbuffers::Parser           m_fbParser;
+
+        const void*                   GetBufferFromLoadedData() const { return m_fbParser.builder_.GetBufferPointer(); }
+    };
+
     FlatBuffersSystem();
     virtual ~FlatBuffersSystem();
 
     virtual void            Init();
     virtual void            Destroy();
 
-    bool                    ParseAndLoadFile(std::string fileName);
-    bool                    ParseAndLoadMeshFile(std::string fileName);
-    const void*             GetBufferFromLoadedData() const { return m_fbParser.builder_.GetBufferPointer(); }
+    bool                    ParseAndLoadFile(std::string fileName, FBBuffer& buffer);
 
 private:
-    flatbuffers::Parser           m_fbParser;
-    flatbuffers::Parser           m_fbParserMesh;
+    
     static const char*            m_includeDirs[];
 };

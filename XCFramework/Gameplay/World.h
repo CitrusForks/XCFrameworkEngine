@@ -7,9 +7,11 @@
 #pragma once
 
 #include "Engine/TaskManager/Task/AsyncTask.h"
-#include "Gameplay/XCPhysics/ParticleContact.h"
 #include "Engine/TaskManager/TaskManager.h"
 #include "Engine/Thread/CriticalSection.h"
+#include "Engine/Event/IEventListener.h"
+
+#include "Gameplay/XCPhysics/ParticleContact.h"
 
 class World;
 
@@ -67,14 +69,15 @@ public:
 
     void                        AddTask(IPendingTask* task);
     void                        ProcessFromWorld();
-    bool                        hasBufferedPendingTasks() { return m_bufferedPendingTaskList.size() > 0; }
+    bool                        HasBufferedPendingTasks() { return m_bufferedPendingTaskList.size() > 0; }
 
 private:
-    std::queue<IPendingTask*>                     m_pendingTaskList;
-    std::vector<IPendingTask*>                    m_bufferedPendingTaskList;
-    CriticalSection                               m_pendingTaskLock;
 
-    World&                                        m_parentWorld;
+    std::queue<IPendingTask*>   m_pendingTaskList;
+    std::vector<IPendingTask*>  m_bufferedPendingTaskList;
+    CriticalSection             m_pendingTaskLock;
+
+    World&                      m_parentWorld;
 };
 
 
@@ -94,7 +97,7 @@ private:
     World&                      m_parentWorld;
 };
 
-class World : public ISystem
+class World : public ISystem, public IEventListener
 {
 public:
     DECLARE_SYSTEMOBJECT_CREATION(World)
@@ -133,6 +136,8 @@ public:
 
     void                                        EnablePhysics(bool enable)                  { m_isPhysicsEnabled = enable; XPhysics::s_enableGravity = enable; }
     bool                                        IsPhysicsEnabled()                          { return m_isPhysicsEnabled; }
+
+    void                                        OnEvent(IEvent* evt);
 
 protected: 
     bool                                        CheckCollision(PhysicsActor* obj1, PhysicsActor* obj2);

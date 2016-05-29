@@ -78,7 +78,7 @@ void RenderingPool::RemoveRenderableObject(IRenderableObject* obj, int baseObjId
 
 void RenderingPool::AddResourceDrawable(IResource* obj)
 {
-    switch (obj->getResourceType())
+    switch (obj->GetResourceType())
     {
     case RESOURCETYPE_MESH:
         m_renderWorkers[WorkerType_XCMesh].m_resourceRefList.push_back(obj);
@@ -92,7 +92,7 @@ void RenderingPool::AddResourceDrawable(IResource* obj)
 
 void RenderingPool::RemoveResourceDrawable(IResource* obj)
 {
-    switch (obj->getResourceType())
+    switch (obj->GetResourceType())
     {
     case RESOURCETYPE_MESH:
     {
@@ -152,7 +152,10 @@ void RenderingPool::Render()
     {
         for (auto& obj : workers.m_renderableObjectRefList)
         {
-            obj.second->Draw(workers.m_renderContext);
+            if (obj.second->IsRenderable())
+            {
+                obj.second->Draw(workers.m_renderContext);
+            }
         }
 
 #if defined(XCGRAPHICS_DX12)
@@ -177,8 +180,6 @@ void RenderingPool::Render()
         //Wait workers to end
         workers.m_finishRender.WaitEvent(1);
     }
-
-
 #endif
 }
 
@@ -222,11 +223,7 @@ void RenderingPool::RenderWorker::Init()
     m_finishRender.CreateEvent();
 }
 
-#if defined(WIN32)
 int RenderingPool::RenderWorker::WorkerThreadFunc(void* param)
-#elif defined(XC_ORBIS)
-void* RenderingPool::RenderWorker::WorkerThreadFunc(void* param)
-#endif
 {
     RenderWorker* worker = (RenderWorker*)param;
 
@@ -235,10 +232,16 @@ void* RenderingPool::RenderWorker::WorkerThreadFunc(void* param)
         //Wait for signal from main thread
         worker->m_beginRender.WaitEvent(1);
 
-        //Call Render
-        for (auto& obj : worker->m_renderableObjectRefList)
+        if (worker->m_workerId != WorkerType_ResourceLoader)
         {
-            obj.second->Draw(worker->m_renderContext);
+            //Call Render
+            for (auto& obj : worker->m_renderableObjectRefList)
+            {
+                if (obj.second->IsRenderable())
+                {
+                    obj.second->Draw(worker->m_renderContext);
+                }
+            }
         }
 
         //In the case of instancing mesh rendering. The WorkerType_XCMesh renders all actors first which will accumulate all instance 
@@ -247,7 +250,10 @@ void* RenderingPool::RenderWorker::WorkerThreadFunc(void* param)
         {
             for (auto& obj : worker->m_resourceRefList)
             {
-                obj->Draw(worker->m_renderContext);
+                if (obj->IsLoaded())
+                {
+                    obj->Draw(worker->m_renderContext);
+                }
             }
         }
         else if (worker->m_workerId == WorkerType_ResourceLoader)
@@ -256,7 +262,7 @@ void* RenderingPool::RenderWorker::WorkerThreadFunc(void* param)
             while (worker->m_resourceRefList.size() > 0)
             {
                 res = worker->m_resourceRefList.back();
-                switch (res->getResourceType())
+                switch (res->GetResourceType())
                 {
                 case RESOURCETYPE_VERTEXBUFFER:
                 case RESOURCETYPE_INDEXBUFFER:

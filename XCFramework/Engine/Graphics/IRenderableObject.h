@@ -15,11 +15,16 @@ public:
     IRenderableObject()
     {
         m_useRenderWorkerType = WorkerType_Max;
+        m_isRenderable = false;
     }
+    virtual ~IRenderableObject() {}
 
     virtual void        Draw(RenderContext& context) = 0;
-    RenderWorkerType    GetRenderOnWorkerType() { return m_useRenderWorkerType; }
 
+    RenderWorkerType    GetRenderOnWorkerType() { return m_useRenderWorkerType; }
+    bool                IsRenderable()          { return m_isRenderable; }
 protected:
+
     RenderWorkerType    m_useRenderWorkerType;
+    bool                m_isRenderable;
 };

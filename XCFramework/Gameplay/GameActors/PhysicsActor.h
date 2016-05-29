@@ -8,45 +8,46 @@
 
 #include "Gameplay/GameActors/AnimatedActor.h"
 #include "Gameplay/XCPhysics/XPhysics.h"
-#include "Engine/Graphics/XC_Mesh/XCMesh.h"
 #include "Gameplay/XCPhysics/CollisionDetectionTypes.h"
 #include "Gameplay/AI/INavigator.h"
 
+#include "Engine/Graphics/XC_Mesh/XCMesh.h"
+#include "Engine/Graphics/BasicGeometry/RenderableOBB.h"
 
 class PhysicsActor : public AnimatedActor, public XPhysics, public INavigator
 {
 public:
-    DECLARE_OBJECT_CREATION(PhysicsActor);
+    DECLARE_OBJECT_CREATION(PhysicsActor)
 
     PhysicsActor();
     virtual ~PhysicsActor(void);
     
     //To make a Physics Object Immovable, set Inverse Mass to 0
-    virtual void                        Init(int actorId);
-    virtual void                        PreLoad(const void* fbBuffer) { AnimatedActor::PreLoad(fbBuffer); }
-    virtual void                        Load();
-    virtual	void                        SetInitialPhysicsProperties();
-    virtual void                        Update(float dt);
-    virtual void                        Draw(RenderContext& context);
-    virtual void                        Invalidate();
-    virtual void                        Destroy();
+    virtual void                Init(int actorId)             override;
+    virtual void                PreLoad(const void* fbBuffer) override   { AnimatedActor::PreLoad(fbBuffer); }
+    virtual void                Load()                        override;
+    virtual void                UpdateState()                 override;
+    virtual void                Update(float dt)              override;
+    virtual void                Draw(RenderContext& context)  override;
+    virtual void                Unload()                      override;
+    virtual void                Destroy()                     override;
     
-    XCMesh*                             getMesh()               { return m_pMesh;  }
-    OrientedBoundingBox*                getBoundBox()           { return m_boundBox; }
+    virtual	void                SetInitialPhysicsProperties();
 
-    ECollisionDetectionType             getCollisionDetectionType()                 { return m_collisionDetectionType; }
+    OrientedBoundingBox*        GetBoundBox()                            { return (OrientedBoundingBox*)m_boundBox; }
+    ECollisionDetectionType     GetCollisionDetectionType()              { return m_collisionDetectionType; }
 
-    void                                SetSecondaryLook(XCVecIntrinsic4 look)             { m_secondaryLookAxis = look; }
-    void                                SetSecondaryUp(XCVecIntrinsic4 up)                 { m_secondaryLookAxis = up; }
-    void                                SetSecondaryRight(XCVecIntrinsic4 right)           { m_secondaryLookAxis = right; }
+    void                        SetSecondaryLook(XCVecIntrinsic4 look)   { m_secondaryLookAxis = look; }
+    void                        SetSecondaryUp(XCVecIntrinsic4 up)       { m_secondaryLookAxis = up; }
+    void                        SetSecondaryRight(XCVecIntrinsic4 right) { m_secondaryLookAxis = right; }
 
 protected:
-    XCMesh*                             m_pMesh;
-    ECollisionDetectionType             m_collisionDetectionType;
+    ResourceHandle*             m_pMesh;
+    ECollisionDetectionType     m_collisionDetectionType;
 
-    OrientedBoundingBox*                m_boundBox;
+    RenderableOBB*              m_boundBox;
 
-    XCVecIntrinsic4                     m_secondaryLookAxis;
-    XCVecIntrinsic4                     m_secondaryUpAxis;
-    XCVecIntrinsic4                     m_secondaryRightAxis;
+    XCVecIntrinsic4             m_secondaryLookAxis;
+    XCVecIntrinsic4             m_secondaryUpAxis;
+    XCVecIntrinsic4             m_secondaryRightAxis;
 };

@@ -7,9 +7,10 @@
 #include "stdafx.h"
 
 #include "XCMesh.h"
-#include "Engine/Graphics/XC_GraphicsDx11.h"
+
+#include "Engine/Resource/ResourceManager.h"
+#include "Engine/Graphics/XC_Graphics.h"
 #include "Engine/Graphics/XC_Mesh/XC3DSMeshLoader.h"
-#include "Engine/Graphics/XC_Shaders/XC_ShaderHandle.h"
 #include "Engine/Graphics/XC_Lighting/XC_LightManager.h"
 
 XCMesh::XCMesh()
@@ -23,20 +24,15 @@ XCMesh::XCMesh()
     m_instanceCount = 0;
 }
 
-void XCMesh::Init(int resourceId, std::string userFriendlyName, bool loaded)
+void XCMesh::Init(int resourceId, std::string userFriendlyName)
 {
     IResource::Init(resourceId, userFriendlyName);
 
     m_computedBoundBox = std::make_unique<OrientedBoundingBox>();
     m_computedBoundBox->Init();
 
-    m_resourceManager = &SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
-
-    //Register with the rendering pool that this is drawable
-    XC_Graphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XC_Graphics>("GraphicsSystem");
-    graphicsSystem.GetRenderingPool().AddResourceDrawable((IResource*) this);
+    RegisterDrawable();
 }
-
 
 XCMesh::~XCMesh(void)
 {
@@ -73,24 +69,93 @@ void XCMesh::Load(std::string fileName, float initialScaling /* = 1.0f */)
     CreateConstantBuffer();
 }
 
+void XCMesh::Unload()
+{
+    //Clear the instance bufferss
+    for (auto instanceBuffer : m_instanceBuffers)
+    {
+        m_shaderHandler->DestroyConstantBuffer(instanceBuffer.m_cbInstancedBufferGPU);
+    }
+
+    m_instanceBuffers.clear();
+
+    for (auto boneBuffer : m_boneBuffers)
+    {
+        m_shaderHandler->DestroyConstantBuffer(boneBuffer.m_cbBoneBufferGPU);
+    }
+
+    m_boneBuffers.clear();
+
+
+    for (auto& subMesh : m_subMeshes)
+    {
+        subMesh->Destroy();
+        delete(subMesh);
+    }
+
+    m_subMeshes.clear();
+}
+
+void XCMesh::UpdateState()
+{
+    if (m_resourceUpdated && m_texture && m_texture->m_Resource->IsLoaded())
+    {
+        m_resourceState = IResource::ResourceState_Loaded;
+    }
+
+    IResource::UpdateState();
+}
+
 void XCMesh::Load(const void* buffer)
 {
-    const FBXCMesh* fbXCMesh = (const FBXCMesh*)buffer;
+    if (buffer)
+    {
+        const FBXCMesh* fbXCMesh = (const FBXCMesh*)buffer;
 
-    m_userFriendlyName = fbXCMesh->MeshName()->c_str();
-    m_resourcePath = getPlatformPath(fbXCMesh->MeshPath()->c_str());
-    m_texture = (Texture2D*)m_resourceManager->GetResource(fbXCMesh->TextureRes()->c_str());
+        m_resourcePath = getPlatformPath(fbXCMesh->ResourcePath()->c_str());
 
-    //Transforms
-    m_globalScaling     = XCVec3Unaligned(fbXCMesh->InitialScaling()->x(), fbXCMesh->InitialScaling()->y(), fbXCMesh->InitialScaling()->z());
-    m_globalRotation    = XCVec3Unaligned(fbXCMesh->InitialRotation()->x(), fbXCMesh->InitialRotation()->y(), fbXCMesh->InitialRotation()->z());
-    m_shaderType        = fbXCMesh->ShaderUsage();
+        ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
+        m_texture = &resMgr.AcquireResource(fbXCMesh->TextureRes()->c_str());
+
+        //Transforms
+        m_globalScaling = XCVec3Unaligned(fbXCMesh->InitialScaling()->x(), fbXCMesh->InitialScaling()->y(), fbXCMesh->InitialScaling()->z());
+        m_globalRotation = XCVec3Unaligned(fbXCMesh->InitialRotation()->x(), fbXCMesh->InitialRotation()->y(), fbXCMesh->InitialRotation()->z());
+        m_shaderType = fbXCMesh->ShaderUsage();
+
+        XC_Graphics& graphicsSystem = (XC_Graphics&)SystemLocator::GetInstance()->RequestSystem<XC_Graphics>("GraphicsSystem");
+        m_shaderHandler = (XCShaderHandle*)graphicsSystem.GetShaderManagerSystem().GetShader(m_shaderType);
+    }
+
+    LoadDynamic();
+
+    IResource::Load(buffer);
+}
+
+void XCMesh::InitDynamic(std::string resPath, ShaderType shaderUsage, std::string textureName, XCVec3Unaligned scaling, XCVec3Unaligned rotation)
+{
+    m_resourcePath = resPath;
+
+    m_computedBoundBox = std::make_unique<OrientedBoundingBox>();
+    m_computedBoundBox->Init();
+
+    RegisterDrawable();
+
+    m_shaderType = shaderUsage;
+
+    ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
+    m_texture = &resMgr.AcquireResource(textureName.c_str());
 
     XC_Graphics& graphicsSystem = (XC_Graphics&)SystemLocator::GetInstance()->RequestSystem<XC_Graphics>("GraphicsSystem");
-    m_shaderHandler = (XCShaderHandle*) graphicsSystem.GetShaderManagerSystem().GetShader(m_shaderType);
+    m_shaderHandler = (XCShaderHandle*)graphicsSystem.GetShaderManagerSystem().GetShader(m_shaderType);
 
+    m_globalScaling = scaling;
+    m_globalRotation = rotation;
+}
+
+void XCMesh::LoadDynamic()
+{
     LoadMesh();
-    
+
     //Filter out objects with zero vertices
     FilterSubMeshes();
 
@@ -99,6 +164,8 @@ void XCMesh::Load(const void* buffer)
 
     //Create Constant Buffers
     CreateConstantBuffer();
+
+    m_resourceUpdated = true;
 }
 
 XCMatrix4Unaligned XCMesh::GetRootTransform()
@@ -319,13 +386,8 @@ void XCMesh::CreateBuffers()
                 }
 
                 transformedVertex = XMLoadFloat3(&vertexPos);
-                //transformedVertex = XMVector3TransformNormal(transformedVertex, transformMatrix);
+                transformedVertex = XMVector3TransformNormal(transformedVertex, transformMatrix);
                 XMStoreFloat3(&vertexPos, transformedVertex);
-
-                if (objIndex == 1)
-                {
-                    blendIndices.x = 52;
-                }
 
                 vertex = VertexPosNormTexBIndexBWeight(vertexPos,
                     XCVec3Unaligned(0.33f, 0.33f, 0.33f),
@@ -407,7 +469,6 @@ void XCMesh::CreateBuffers()
                     min = vertexPos.x;
                 }
 
-
                 transformedVertex = XMLoadFloat4(&vertexPos);
                 transformedVertex = XMVector3Transform(transformedVertex, transformMatrix);
                 XMStoreFloat4(&vertexPos, transformedVertex);
@@ -448,7 +509,6 @@ void XCMesh::CreateBuffers()
     m_computedBoundBox->m_boxCenter = 0.5f * (vMin + vMax);
     m_computedBoundBox->m_boxExtends = 0.5f * (vMax - vMin);
     m_computedBoundBox->CreateBoundBox();
-    m_computedBoundBox->Load();
 
     Logger("[XCMesh] Created buffer for Resource : %s", m_resourcePath.c_str());
 }
@@ -522,36 +582,54 @@ void XCMesh::Update(float dt)
 {
     //Need not update. Update the clone of this of every actor
     //m_computedBoundBox.Update(dt);
-
-    if (m_sceneAnimator)
+    if (m_resourceState)
     {
-        aiAnimation* anim = m_sceneAnimator->CurrentAnim();
-
-        static double g_dCurrent = 0.0f;
-        g_dCurrent += clock() / double(CLOCKS_PER_SEC) - m_lastPlayedAnimTime;
-
-        double time = g_dCurrent;
-
-        if (anim && anim->mDuration > 0.0) {
-            double tps = anim->mTicksPerSecond ? anim->mTicksPerSecond : 25.f;
-            time = fmod(time, anim->mDuration / tps);
-        }
-
-        m_sceneAnimator->Calculate(time);
-        m_lastPlayedAnimTime = (float)g_dCurrent;
-        /*
-        if (m_lastPlayedAnimTime > anim->mDuration)
+        if (m_sceneAnimator)
         {
-            Logger("Resetting @ %f", currentTime);
-            m_lastPlayedAnimTime = 0.0f;
+            aiAnimation* anim = m_sceneAnimator->CurrentAnim();
+
+            static double g_dCurrent = 0.0f;
+            g_dCurrent += clock() / double(CLOCKS_PER_SEC) - m_lastPlayedAnimTime;
+
+            double time = g_dCurrent;
+
+            if (anim && anim->mDuration > 0.0) {
+                double tps = anim->mTicksPerSecond ? anim->mTicksPerSecond : 25.f;
+                time = fmod(time, anim->mDuration / tps);
+            }
+
+            m_sceneAnimator->Calculate(time);
+            m_lastPlayedAnimTime = (float)g_dCurrent;
+            /*
+            if (m_lastPlayedAnimTime > anim->mDuration)
+            {
+                Logger("Resetting @ %f", currentTime);
+                m_lastPlayedAnimTime = 0.0f;
+            }
+            else
+            {
+                Logger("Updating @ %f", currentTime);
+                m_lastPlayedAnimTime += dt;
+            }
+            */
         }
-        else
-        {
-            Logger("Updating @ %f", currentTime);
-            m_lastPlayedAnimTime += dt;
-        }
-        */
     }
+}
+
+
+void XCMesh::RegisterDrawable()
+{
+    //Register with the rendering pool that this is drawable
+    XC_Graphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XC_Graphics>("GraphicsSystem");
+    graphicsSystem.GetRenderingPool().AddResourceDrawable((IResource*) this);
+}
+
+void XCMesh::UnregisterDrawable()
+{
+    //UnRegister with the rendering pool that this is no more drawable
+    XC_Graphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XC_Graphics>("GraphicsSystem");
+    RenderingPool& renderPool = graphicsSystem.GetRenderingPool();
+    renderPool.RemoveResourceDrawable(this);
 }
 
 void XCMesh::Draw(RenderContext& context)
@@ -563,7 +641,7 @@ void XCMesh::Draw(RenderContext& context)
 
         XC_LightManager* lightMgr = (XC_LightManager*)&SystemLocator::GetInstance()->RequestSystem("LightsManager");
         m_shaderHandler->SetConstantBuffer("cbLightsPerFrame", context.GetDeviceContext(), lightMgr->getLightConstantBuffer()->m_gpuHandle);
-        m_shaderHandler->SetResource("gDiffuseMap", context.GetDeviceContext(), m_texture->getTextureResource());
+        m_shaderHandler->SetResource("gDiffuseMap", context.GetDeviceContext(), m_texture);
 
         DrawSubMeshes(context);
 
@@ -628,48 +706,27 @@ void XCMesh::DrawSubMesh(RenderContext& renderContext, unsigned int meshIndex)
 
 void XCMesh::DrawSubMeshes(RenderContext& renderContext)
 {
-    for (unsigned int index = 0; index < m_subMeshes.size(); index++)
+    if (m_resourceState)
     {
-        DrawSubMesh(renderContext, index);
+        for (unsigned int index = 0; index < m_subMeshes.size(); index++)
+        {
+            DrawSubMesh(renderContext, index);
+        }
     }
-
     //Need not draw. Draw the clone of this in every actor
     //m_computedBoundBox.Draw();
 }
 
-void XCMesh::Destroy()
-{
-    //Clear the instance bufferss
-    for(auto instanceBuffer : m_instanceBuffers)
-    {
-        m_shaderHandler->DestroyConstantBuffer(instanceBuffer.m_cbInstancedBufferGPU);
-    }
-    
-    m_instanceBuffers.clear();
-
-    for (auto boneBuffer : m_boneBuffers)
-    {
-        m_shaderHandler->DestroyConstantBuffer(boneBuffer.m_cbBoneBufferGPU);
-    }
-
-    m_boneBuffers.clear();
-
-    //UnRegister with the rendering pool that this is no more drawable
-    XC_Graphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XC_Graphics>("GraphicsSystem");
-    RenderingPool& renderPool = graphicsSystem.GetRenderingPool();
-    renderPool.RemoveResourceDrawable(this);
-
-    for (auto& subMesh : m_subMeshes)
-    {
-        subMesh->Destroy();
-        delete(subMesh);
-    }
-
-    m_subMeshes.clear();
-}
-
-//
 void XCMesh::DrawInstanced(PerObjectBuffer& objectBuffer)
 {
-    m_instanceBuffers[0].m_cbInstancedBuffer.gPerObject[m_instanceCount++] = objectBuffer;
+    if (m_resourceState)
+    {
+        m_instanceBuffers[0].m_cbInstancedBuffer.gPerObject[m_instanceCount++] = objectBuffer;
+    }
 }
+
+void XCMesh::Destroy()
+{
+    UnregisterDrawable();
+}
+

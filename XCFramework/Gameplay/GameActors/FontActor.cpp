@@ -7,6 +7,8 @@
 #include "stdafx.h"
 
 #include "Gameplay/GameActors/FontActor.h"
+#include "Engine/Resource/ResourceManager.h"
+#include "Engine/Graphics/XC_Mesh/VectorFontMesh.h"
 
 FontActor::FontActor()
 {
@@ -33,15 +35,29 @@ void FontActor::Init(int actorId)
 
 void FontActor::PreLoad(const void* fbBuffer)
 {
+    IActor::PreLoad(fbBuffer);
+
     ResourceManager& resMgr = (ResourceManager&)SystemLocator::GetInstance()->RequestSystem("ResourceManager");
 
     const FBFont* font = (FBFont*)fbBuffer;
-    m_fontMesh = (VectorFontMesh*)resMgr.GetResource(font->FontResourceName()->c_str());
+    m_fontMesh = &resMgr.AcquireResource(font->FontResourceName()->c_str());
 }
 
 void FontActor::Load()
 {
     IActor::Load();
+}
+
+void FontActor::UpdateState()
+{
+    if (m_fontMesh && m_fontMesh->GetResource<VectorFontMesh>()->IsLoaded())
+    {
+        m_actorState = IActor::ActorState_Loaded;
+    }
+    else if (m_fontMesh == nullptr)
+    {
+        m_actorState = IActor::ActorState_Loaded;
+    }
 }
 
 void FontActor::Update(float dt)
@@ -53,7 +69,7 @@ void FontActor::Draw(RenderContext& context)
 {
     IActor::Draw(context);
 
-    m_fontMesh->DrawText("ABCD", XCVec3Unaligned(1.0f, 10.0f, 0.0f), context);
+    m_fontMesh->GetResource<VectorFontMesh>()->DrawText("ABCD", XCVec3Unaligned(1.0f, 10.0f, 0.0f), context);
     //m_fontMesh->DrawText("0123456789", XCVec3Unaligned(1.0f, 0.0f, 0.0f), context);
 }
 

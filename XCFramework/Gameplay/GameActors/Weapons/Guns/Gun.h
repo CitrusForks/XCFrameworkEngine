@@ -23,21 +23,22 @@ public:
     Gun(void);
     virtual ~Gun(void);
 
-    virtual void                 PreLoad(IActor* parentActor, XCVec3 initialPosition, XCMesh* pMesh);
+    virtual void                 PreLoad(IActor* parentActor, XCVec3 initialPosition, std::string pMesh);
     virtual void                 Load();
     virtual void                 Update(float dt);
-    virtual void                 UpdateOffsets(float dt);
     virtual void                 Draw(RenderContext& renderContext);
     virtual void                 Destroy();
-    virtual void                 ApplyOffsetRotation();
-    virtual void                 CheckInput();
-    virtual void                 UpdateGunRecoil(float dt);
 
+    virtual void                 UpdateOffsets(float dt);
+    virtual void                 ApplyOffsetRotation();
+    
+    void                         CheckInput();
+    void                         UpdateGunRecoil(float dt);
     void                         ShootBullet(std::string bulletActorType, XCVec3 startPosition, XCVec3 target);
     SubActor*                    GetSubActor() { return (SubActor*)this; }
 
 protected:
-    ShaderType                  m_useShaderType;
+    ShaderType                   m_useShaderType;
 
     BasicMaterial                m_material;
 

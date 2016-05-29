@@ -16,8 +16,8 @@ table FBCubeTexture3D
 
 table FBXCMesh
 {
-    MeshName:string;
-    MeshPath:string;
+    ResourceName:string;
+    ResourcePath:string;
     TextureRes:string;
     InitialScaling:Vec3;
     InitialRotation:Vec3;

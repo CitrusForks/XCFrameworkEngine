@@ -7,11 +7,10 @@
 #include "stdafx.h"
 
 #include "Door.h"
-#include "Engine/Graphics/XC_Shaders/XC_ShaderBufferConstants.h"
 #include "Engine/Resource/ResourceManager.h"
 #include "Engine/Graphics/XC_Shaders/XC_ShaderHandle.h"
-#include "Engine/Input/Directinput.h"
 #include "Engine/Graphics/XC_Camera/XC_CameraManager.h"
+#include "Engine/Graphics/XC_Mesh/XCMesh.h"
 
 Door::Door(void)
 {
@@ -35,14 +34,15 @@ void Door::PreLoad(const void* fbBuffer)
 {
     const FBDoor* doorBuff = (FBDoor*)fbBuffer;
     ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
-    m_pMesh = (XCMesh*)resMgr.GetResource(doorBuff->XCMeshResourceName()->c_str());
+    m_pMesh = &resMgr.AcquireResource(doorBuff->XCMeshResourceName()->c_str());
 
     PhysicsActor::PreLoad(fbBuffer);
 }
 
-void Door::PreLoad(Texture2D* tex, XCVec3 _initialPosition, XCMesh* pMesh)
+void Door::PreLoad(XCVec3 _initialPosition, std::string pMesh)
 {
-    m_pMesh = pMesh;
+    ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
+    m_pMesh = &resMgr.AcquireResource(pMesh.c_str());
     m_initialPosition = _initialPosition;
 }
 
@@ -73,15 +73,12 @@ void Door::Update(float dt)
     Integrator(dt);
     ClearForce();
 
-#if defined(WIN32)
     m_MTranslation = XMMatrixTranslation(m_initialPosition.x, m_initialPosition.y, m_initialPosition.z);
-#elif defined(XC_ORBIS)
-    m_MTranslation = XMMatrixTranslation(m_initialPosition.getX(), m_initialPosition.getY(), m_initialPosition.getZ());
-#endif
 
     m_World = m_MScaling * m_MRotation * m_MTranslation;
 
-    m_pMesh->Update(dt);
+    m_pMesh->GetResource<XCMesh>()->Update(dt);
+
     PhysicsActor::Update(dt);
 }
 
@@ -97,11 +94,14 @@ void Door::Draw(RenderContext& context)
         m_material
     };
 
-    m_pMesh->DrawInstanced(perObject);
+    m_pMesh->GetResource<XCMesh>()->DrawInstanced(perObject);
     PhysicsActor::Draw(context);
 }
 
 void Door::Destroy()
 {
     PhysicsActor::Destroy();
+
+    ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
+    resMgr.ReleaseResource(m_pMesh);
 }

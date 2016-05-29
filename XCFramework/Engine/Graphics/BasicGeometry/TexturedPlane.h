@@ -8,7 +8,8 @@
 
 #include "Plane.h"
 #include "Gameplay/GameActors/SimpleActor.h"
-#include "Engine/Graphics/XC_Textures/Texture2D.h"
+
+#include "Engine/Resource/ResourceHandle.h"
 #include "Engine/Graphics/XC_Textures/RenderableTexture.h"
 #include "Engine/Graphics/XC_Shaders/XC_VertexFormat.h"
 #include "Engine/Graphics/XC_Shaders/XC_ShaderTypes.h"
@@ -27,7 +28,7 @@ public:
 
     virtual void                     Init(int actorId);
     virtual void                     PreLoad(const void* fbBuffer);
-    virtual void                     PreLoad(XCVecIntrinsic4 initialPosition, XCVecIntrinsic4 initialRotation, XCVecIntrinsic4 initialScaling, BasicMaterial material, Texture2D* texture, RasterType rasterType);
+    virtual void                     PreLoad(XCVecIntrinsic4 initialPosition, XCVecIntrinsic4 initialRotation, XCVecIntrinsic4 initialScaling, BasicMaterial material, std::string texture, RasterType rasterType);
     virtual void                     Load();
     virtual void                     Update(float dt);
     virtual void                     Draw(RenderContext& renderContext);
@@ -37,7 +38,7 @@ public:
 protected:
     ShaderType                        m_useShaderType;
     BasicMaterial                     m_material;
-    Texture2D*                        m_texture;
+    ResourceHandle*                   m_texture;
     VertexBuffer<VertexPosNormTex>    m_vertexBuffer;
     RasterType                        m_rasterType;
 

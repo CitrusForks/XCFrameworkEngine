@@ -32,15 +32,6 @@ void NPCSoldier::Init(int actorId)
     m_AIBrain->SetState(ACTIONSTATE_WALK);
 }
 
-void NPCSoldier::PreLoad(const void* fbBuffer)
-{
-    const FBSoldier* soldierBuff = (FBSoldier*)fbBuffer;
-    ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
-    Soldier::PreLoad(XCVec3(soldierBuff->Position()->x(), soldierBuff->Position()->y(), soldierBuff->Position()->z()), (XCMesh*)resMgr.GetResource(soldierBuff->XCMeshResourceName()->c_str()));
-
-    PhysicsActor::PreLoad(fbBuffer);
-}
-
 void NPCSoldier::Update(float dt)
 {
     //Update Brain with current scenarios.
@@ -62,9 +53,4 @@ void NPCSoldier::Update(float dt)
     m_currentPosition = m_Position;
 
     Soldier::Update(dt);
-}
-
-void NPCSoldier::Destroy()
-{
-    Soldier::Destroy();
 }

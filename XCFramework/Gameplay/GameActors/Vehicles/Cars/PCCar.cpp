@@ -28,9 +28,8 @@ void PCCar::Init(int actorId)
 void PCCar::PreLoad(const void* fbBuffer)
 {
     const FBCar* carBuff = (FBCar*)fbBuffer;
-    ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
-    Car::PreLoad(XCVec3(carBuff->Position()->x(), carBuff->Position()->y(), carBuff->Position()->z()), (XCMesh*)resMgr.GetResource(carBuff->XCMeshResourceName()->c_str()));
 
+    Car::PreLoad(XCVec3(carBuff->Position()->x(), carBuff->Position()->y(), carBuff->Position()->z()), carBuff->XCMeshResourceName()->c_str());
     PhysicsActor::PreLoad(fbBuffer);
 }
 
@@ -74,11 +73,7 @@ void PCCar::Update(float dt)
     XCVec3 pos;
     XMStoreFloat3(&pos, m_Position);
 
-#if defined(WIN32)
     m_MTranslation = XMMatrixTranslation(pos.x, pos.y, pos.z);
-#elif defined(XC_ORBIS)
-    m_MTranslation = XMMatrixTranslation(pos.getX(), pos.getY(), pos.getZ());
-#endif
 
     m_currentPosition = m_Position;
 

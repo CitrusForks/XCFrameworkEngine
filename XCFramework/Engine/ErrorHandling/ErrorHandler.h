@@ -34,11 +34,13 @@ static void Logger(const char* format, ...)
     va_end(list);
 }
 
-inline void ValidateResult(HRESULT hr)
+inline HRESULT ValidateResult(HRESULT hr)
 {
     if (FAILED(hr))
     {
         __debugbreak();
         Logger("[FAILED] In file %s at %d with error code : %x", __FILE__, __LINE__, hr);
     }
+
+    return hr;
 }

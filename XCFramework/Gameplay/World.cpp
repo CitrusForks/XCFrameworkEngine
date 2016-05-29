@@ -8,12 +8,14 @@
 
 #include "Gameplay/World.h"
 #include "Gameplay/XCPhysics/CollisionDetection.h"
-
 #include "Gameplay/GameActors/PhysicsActor.h"
 #include "Gameplay/GameActors/Environment/Terrain/Terrain.h"
-
 #include "Gameplay/GameActors/PlayableCharacterActor.h"
 #include "Gameplay/GameActors/NonPlayableCharacterActor.h"
+#include "Gameplay/WorldEventTypes.h"
+
+#include "Engine/Graphics/XC_Graphics.h"
+#include "Engine/Event/EventBroadcaster.h"
 
 World::World()
 {
@@ -23,7 +25,7 @@ World::World()
     m_worldReady = false;
     m_worldQuiting = false;
 
-    EnablePhysics(false);
+    EnablePhysics(true);
 }
 
 
@@ -45,6 +47,10 @@ void World::Init(TaskManager& taskMgr)
     m_worldCollisionTask = new WorldCollisionTask(*this);
     m_worldCollisionTask->SetTaskPriority(THREAD_PRIORITY_BELOW_NORMAL);
     m_taskManager->RegisterTask(m_worldCollisionTask);
+
+    //Listen to events
+    EventBroadcaster& broadCaster = (EventBroadcaster&)SystemLocator::GetInstance()->RequestSystem("EventBroadcaster");
+    broadCaster.AddListener(this);
 }
 
 //WorldCollisionTask -------------------------------------
@@ -76,7 +82,7 @@ void WorldCollisionTask::Destroy()
 void WorldPendingTasks::Init()
 {
     AsyncTask::Init();
-    m_pendingTaskList.empty();
+    m_bufferedPendingTaskList.clear();
 }
 
 void WorldPendingTasks::AddTask(IPendingTask* task)
@@ -90,40 +96,65 @@ void WorldPendingTasks::Run()
 {
     AsyncTask::Run();
 
-    m_pendingTaskLock.Enter();
-
     IPendingTask* task = nullptr;
 
-    if (m_pendingTaskList.size() > 0)
+    m_pendingTaskLock.Enter();
+    //Dequeue the pending load task one at a time
+    if(m_pendingTaskList.size() > 0)
     {
         task = m_pendingTaskList.front();
         m_pendingTaskList.pop();
     }
-    else
-    {
-        m_parentWorld.SetWorldReady(true);
-    }
-
     m_pendingTaskLock.Exit();
 
-    //Load the actor
-    if (task && task->m_TaskType == PENDINGTASK_ADD)
+    if(task)
     {
-        ((PendingTaskAdd*)task)->m_actor->Load();
-    }
+        bool pushTaskToWorld = false;
 
-    if (task)
-    {
-        m_pendingTaskLock.Enter();
-        //Push the task to the buffer to add/remove. Simple op.
-        m_bufferedPendingTaskList.push_back(task);
-        m_pendingTaskLock.Exit();
+        if (task->m_TaskType == PENDINGTASK_ADD)
+        {
+            //Adding, so make sure to check its state and update accordingly.
+            switch (((PendingTaskAdd*)task)->m_actor->GetActorState())
+            {
+            case IActor::ActorState_None:
+            case IActor::ActorState_Unloaded:
+                XCASSERT(false);
+
+            case IActor::ActorState_Loading:
+                ((PendingTaskAdd*)task)->m_actor->Load();
+                pushTaskToWorld = true;
+                break;
+
+            case IActor::ActorState_Loaded:
+                pushTaskToWorld = true;
+                break;
+
+            default:
+                break;
+            }
+        }
+        else if (task->m_TaskType == PENDINGTASK_REMOVE)
+        {
+            pushTaskToWorld = true;
+        }
+
+        if (pushTaskToWorld)
+        {
+            //Move the task to the buffered task which will be process from world main thread which is actual add/remove from the world actors list.
+            m_pendingTaskLock.Enter();
+            m_bufferedPendingTaskList.push_back(task);
+            m_pendingTaskLock.Exit();
+
+            pushTaskToWorld = false;
+        }
+
+        task = nullptr;
     }
 }
 
 void WorldPendingTasks::ProcessFromWorld()
 {
-    //Call from Main Thread.
+    //Call from Main World Thread.
     bool isEmpty = false;
     IPendingTask* task;
 
@@ -155,6 +186,7 @@ void WorldPendingTasks::ProcessFromWorld()
                     break;
             }
 
+            delete task;
             task = nullptr;
         }
     }
@@ -164,6 +196,8 @@ void WorldPendingTasks::Destroy()
 {
     while (m_pendingTaskList.size() > 0)
     {
+        //TODO: What if the actor are preloaded and we have some destruction to be done before the removal of this tasks.
+        delete (m_pendingTaskList.front());
         m_pendingTaskList.pop();
     }
 
@@ -177,7 +211,7 @@ void World::Update(float dt)
 {
     if (m_addRemoveFlag.load(std::memory_order_acquire))
     {
-        if (m_worldPendingTasks->hasBufferedPendingTasks())
+        if (m_worldPendingTasks->HasBufferedPendingTasks())
         {
             m_worldPendingTasks->ProcessFromWorld();
         }
@@ -190,9 +224,13 @@ void World::Update(float dt)
         {
             RequestRemoveActor(gameObject.second->GetBaseObjectId());
         }
-        else if(gameObject.second->IsWorldReady())
+        else if(gameObject.second->IsWorldReady() && gameObject.second->GetActorState() == IActor::ActorState_Loaded)
         {
             gameObject.second->Update(dt);
+        }
+        else
+        {
+            gameObject.second->UpdateState();
         }
     }
 }
@@ -200,6 +238,19 @@ void World::Update(float dt)
 void World::Draw(XC_Graphics& graphicsSystem)
 {
     //Nothing here. Drawing of actors done in RenderingPool.
+}
+
+void World::OnEvent(IEvent* evt)
+{
+    Event_World* evtWorld = dynamic_cast<Event_World*>(evt);
+    
+    if (evtWorld)
+    {
+        if (evtWorld->GetEventType() == EventType_WorldReady)
+        {
+            SetWorldReady(true);
+        }
+    }
 }
 
 void World::RequestAddActor(IActor* actor)
@@ -241,7 +292,7 @@ void World::AddActor(IActor* actor)
     XC_Graphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XC_Graphics>("GraphicsSystem");
     graphicsSystem.GetRenderingPool().AddRenderableObject((IRenderableObject*)m_GameObjects[actorId], actorId);
 
-    m_GameObjects[actorId]->SetWorldReady(true);
+    //m_GameObjects[actorId]->SetWorldReady(true);
 }
 
 void World::RequestRemoveActor(int key)
@@ -268,8 +319,10 @@ void World::RemoveActor(int _key)
         removeKey(m_PlayableCharacterActors, _key);
         removeKey(m_NonPlayableCharacterActors, _key);
 
+        it->second->Unload();
         it->second->Destroy();
 
+        delete (it->second);
         m_GameObjects.erase(it);
     }
 }
@@ -349,18 +402,18 @@ void World::CheckAllCollisions()
 
 bool World::CheckCollision(PhysicsActor* obj1, PhysicsActor* obj2)
 {
-    switch (obj1->getCollisionDetectionType() | obj2->getCollisionDetectionType())
+    switch (obj1->GetCollisionDetectionType() | obj2->GetCollisionDetectionType())
     {
         case COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX | COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX:
-            if (obj1->getBoundBox()->m_TransformedBox.Intersects(obj2->getBoundBox()->m_TransformedBox))
+            if (obj1->GetBoundBox()->m_TransformedBox.Intersects(obj2->GetBoundBox()->m_TransformedBox))
             {
                 //Before resolving know which corner point was hit
                 XCVec3 points[8];
-                obj1->getBoundBox()->m_TransformedBox.GetCorners(points);
+                obj1->GetBoundBox()->m_TransformedBox.GetCorners(points);
 
                 XCVecIntrinsic4 contactNormal;
 
-                contactNormal = CollisionDetection::getContactNormalFromOBBToOBBTriangleTest(obj1->getBoundBox(), obj2->getBoundBox());
+                contactNormal = CollisionDetection::getContactNormalFromOBBToOBBTriangleTest(obj1->GetBoundBox(), obj2->GetBoundBox());
                 //contactNormal = getContactNormalFromBoundBoxContainedPlane(obj2->getMesh()->getAABoundBox(), obj1->getMesh()->getAABoundBox());
                 //Resolve the collision
                 m_particleContact.ContactResolve(obj1, obj2, 1.0f, 0.0f, contactNormal);
@@ -375,11 +428,11 @@ bool World::CheckCollision(PhysicsActor* obj1, PhysicsActor* obj2)
         case COLLISIONDETECTIONTYPE_TERRAIN | COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX:
             {
                 //Handle terrain and boundbox collision
-                PhysicsActor* bboxActor = obj1->getCollisionDetectionType() == COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX ? obj1 : obj2;
-                PhysicsActor* terrainActor = obj1->getCollisionDetectionType() == COLLISIONDETECTIONTYPE_TERRAIN ? obj1 : obj2;
+                PhysicsActor* bboxActor = obj1->GetCollisionDetectionType() == COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX ? obj1 : obj2;
+                PhysicsActor* terrainActor = obj1->GetCollisionDetectionType() == COLLISIONDETECTIONTYPE_TERRAIN ? obj1 : obj2;
 
                 //XMVECTOR contactPoint = getTerrainPointOfContactWithBoundBox(bboxActor, terrainActor);
-                XCVecIntrinsic4 contactPoint = ((Terrain*)terrainActor)->CheckTerrainCollisionFromPoint(bboxActor->getBoundBox());
+                XCVecIntrinsic4 contactPoint = ((Terrain*)terrainActor)->CheckTerrainCollisionFromPoint(bboxActor->GetBoundBox());
 
                 //Resolve the collision
                 //PARTICLE_CONTACT->ContactResolve(bboxActor, terrainActor, 1.0f, 0.2f, contactNormal);
@@ -402,20 +455,20 @@ bool World::CheckCollision(PhysicsActor* obj1, PhysicsActor* obj2)
 
         case COLLISIONDETECTIONTYPE_BULLET | COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX:
             {
-                PhysicsActor* objectActor = obj1->getCollisionDetectionType() == COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX ? obj1 : obj2;
-                PhysicsActor* bulletActor = obj1->getCollisionDetectionType() == COLLISIONDETECTIONTYPE_BULLET ? obj1 : obj2;
+                PhysicsActor* objectActor = obj1->GetCollisionDetectionType() == COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX ? obj1 : obj2;
+                PhysicsActor* bulletActor = obj1->GetCollisionDetectionType() == COLLISIONDETECTIONTYPE_BULLET ? obj1 : obj2;
 
-                ContainmentType type = objectActor->getBoundBox()->m_TransformedBox.Contains(bulletActor->getBoundBox()->m_TransformedBox);
+                ContainmentType type = objectActor->GetBoundBox()->m_TransformedBox.Contains(bulletActor->GetBoundBox()->m_TransformedBox);
 
                 if (type == CONTAINS || type == INTERSECTS)
                 {
                     //Before resolving know which corner point was hit
                     XCVec3 points[8];
-                    obj1->getBoundBox()->m_TransformedBox.GetCorners(points);
+                    obj1->GetBoundBox()->m_TransformedBox.GetCorners(points);
 
                     XCVecIntrinsic4 contactNormal;
 
-                    contactNormal = CollisionDetection::getContactNormalFromOBBToOBBTriangleTest(obj1->getBoundBox(), obj2->getBoundBox());
+                    contactNormal = CollisionDetection::getContactNormalFromOBBToOBBTriangleTest(obj1->GetBoundBox(), obj2->GetBoundBox());
 
                     //Resolve the collision
                     m_particleContact.ContactResolve(obj1, obj2, 1.0f, 0.5f, contactNormal);
@@ -423,7 +476,7 @@ bool World::CheckCollision(PhysicsActor* obj1, PhysicsActor* obj2)
                     objectActor->Invalidate();
                     bulletActor->Invalidate();
 
-                    Logger("[BULLET HIT] Hit Obj1 : %d Obj 2: %d", obj1->getCollisionDetectionType(), obj2->getCollisionDetectionType());
+                    Logger("[BULLET HIT] Hit Obj1 : %d Obj 2: %d", obj1->GetCollisionDetectionType(), obj2->GetCollisionDetectionType());
 
                     return true;
                 }

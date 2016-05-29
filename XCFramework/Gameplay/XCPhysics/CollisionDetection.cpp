@@ -29,7 +29,7 @@ XCVecIntrinsic4 CollisionDetection::getTerrainPointOfContactWithBoundBox(Physics
     {
         point = terrainActor->GetPointAtIndex(vertexIndex);
 
-        ContainmentType contain = bboxActor->getBoundBox()->m_TransformedBox.Contains(point);
+        ContainmentType contain = bboxActor->GetBoundBox()->m_TransformedBox.Contains(point);
         if (contain == CONTAINS || contain == INTERSECTS)
         {
             //Hit 

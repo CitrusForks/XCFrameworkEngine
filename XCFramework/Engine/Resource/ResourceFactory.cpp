@@ -63,11 +63,11 @@ void ResourceFactory::loadResource(FILE* packageFile, IResource* const resource)
 
     fscanf(packageFile, "%s", rscPath);
     //Based on every resources init parameters, load it.
-    if (resource->getResourceType() == RESOURCETYPE_TEXTURE2D || resource->getResourceType() == RESOURCETYPE_CUBETEXTURE3D)
+    if (resource->GetResourceType() == RESOURCETYPE_TEXTURE2D || resource->GetResourceType() == RESOURCETYPE_CUBETEXTURE3D)
     {
         resource->Load(rscPath);
     }
-    else if (resource->getResourceType() == RESOURCETYPE_MESH)
+    else if (resource->GetResourceType() == RESOURCETYPE_MESH)
     {
         float scaling = 0.0f;
         fscanf(packageFile, "%f", &scaling);

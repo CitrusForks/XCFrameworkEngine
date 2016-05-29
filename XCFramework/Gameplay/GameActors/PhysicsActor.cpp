@@ -7,8 +7,6 @@
 #include "stdafx.h"
 
 #include "Gameplay/GameActors/PhysicsActor.h"
-#include "Engine/Graphics/BasicGeometry/OrientedBoundingBox.h"
-
 #include "Gameplay/World.h"
 
 PhysicsActor::PhysicsActor()
@@ -17,7 +15,7 @@ PhysicsActor::PhysicsActor()
     m_collisionDetectionType = COLLISIONDETECTIONTYPE_MAX;
     m_actorType = GAMEACTOR_PHYSICS;
 
-    m_boundBox = new OrientedBoundingBox();
+    m_boundBox = new RenderableOBB();
 }
 
 PhysicsActor::~PhysicsActor(void)
@@ -47,25 +45,33 @@ void PhysicsActor::Init(int actorId)
 
 void PhysicsActor::Load()
 {
-    SetInitialPhysicsProperties();
-    
-    if (m_pMesh)
+    AnimatedActor::Load();
+}
+
+void PhysicsActor::UpdateState()
+{
+    if (m_pMesh && m_pMesh->GetResource<XCMesh>()->IsLoaded())
     {
-        m_boundBox->Load();
+        SetInitialPhysicsProperties();
+        m_actorState = IActor::ActorState_Loaded;
+    }
+    else if (m_pMesh == nullptr)
+    {
+        //We do not have a mesh. SO its loaded
+        m_actorState = IActor::ActorState_Loaded;
     }
 
-    IActor::Load();
+    IActor::UpdateState();
 }
 
 void PhysicsActor::SetInitialPhysicsProperties()
 {
     if (m_pMesh)
     {
-        m_boundBox->CreateBoundBox(m_pMesh->GetAABB());
+        m_boundBox->CreateBoundBox(m_pMesh->GetResource<XCMesh>()->GetAABB());
         m_boundBox->Transform(m_MTranslation, m_MRotation);
     }
 }
-
 
 void PhysicsActor::Update(float dt)
 {
@@ -88,6 +94,11 @@ void PhysicsActor::Draw(RenderContext& context)
     }
 }
 
+void PhysicsActor::Unload()
+{
+    IActor::Unload();
+}
+
 void PhysicsActor::Destroy()
 {
     if (m_pMesh)
@@ -96,10 +107,4 @@ void PhysicsActor::Destroy()
     }
 
     IActor::Destroy();
-}
-
-void PhysicsActor::Invalidate()
-{
-    m_invalidated = true;
-    IActor::Invalidate();
 }

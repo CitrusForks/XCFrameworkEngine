@@ -32,7 +32,7 @@ public:
     virtual void                     Load(const void* fbBuffer);
     virtual void                     LoadShader() = 0;
     virtual void                     CreateConstantBuffers();
-    virtual void                     ApplyShader(ID3DDeviceContext& context);
+    virtual void                     ApplyShader(ID3DDeviceContext& context, RasterType rasterType = RasterType_FillSolid);
     virtual void                     destroy();
     virtual void                     Reset(ID3DDeviceContext& context) = 0;
                                      

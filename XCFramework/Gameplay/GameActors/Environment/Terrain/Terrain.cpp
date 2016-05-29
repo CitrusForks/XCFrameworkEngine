@@ -6,15 +6,21 @@
 
 #include "stdafx.h"
 
-#include "Terrain.h"
 #if defined(WIN32)
 #include <wingdi.h>
 #endif
-#include "Engine/Graphics/XC_GraphicsDx11.h"
+
+#include "Terrain.h"
+
+#include "Gameplay/WorldEventTypes.h"
+
+#include "Engine/Graphics/XC_Graphics.h"
 #include "Engine/Graphics/XC_Shaders/XC_ShaderBufferConstants.h"
 #include "Engine/Graphics/XC_Shaders/XC_ShaderHandle.h"
 #include "Engine/Graphics/XC_Camera/XC_CameraManager.h"
 #include "Engine/Graphics/XC_Lighting/XC_LightManager.h"
+#include "Engine/Resource/ResourceManager.h"
+#include "Engine/Event/EventBroadcaster.h"
 
 Terrain::Terrain()
 {
@@ -24,11 +30,14 @@ Terrain::Terrain()
 
     m_useShaderType = ShaderType_TerrainMultiTexture;
     m_collisionDetectionType = COLLISIONDETECTIONTYPE_TERRAIN;
+
+    m_textures.clear();
 }
 
 Terrain::~Terrain(void)
 {
-    delete(m_pBitmapImage);
+    if(m_pBitmapImage)
+        delete(m_pBitmapImage);
 }
 
 void Terrain::PreLoad(const void* fbBuffer)
@@ -37,12 +46,14 @@ void Terrain::PreLoad(const void* fbBuffer)
     m_pHeightMapFileName = getPlatformPath(fbTerrainBuff->BitmapFileName()->c_str());
 
     ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
-    m_texture  = (Texture2D*)resMgr.GetResource(fbTerrainBuff->Texture2DResourceName()->c_str());
-    m_texture1 = (Texture2D*)resMgr.GetResource(fbTerrainBuff->Texture2DResourceName1()->c_str());
-    m_texture2 = (Texture2D*)resMgr.GetResource(fbTerrainBuff->Texture2DResourceName2()->c_str());
-    m_textureBlend = (Texture2D*)resMgr.GetResource(fbTerrainBuff->Texture2DBlendResourceName3()->c_str());
+    m_textures.push_back(&resMgr.AcquireResource(fbTerrainBuff->Texture2DResourceName()->c_str()));
+    m_textures.push_back(&resMgr.AcquireResource(fbTerrainBuff->Texture2DResourceName1()->c_str()));
+    m_textures.push_back(&resMgr.AcquireResource(fbTerrainBuff->Texture2DResourceName2()->c_str()));
+    m_textures.push_back(&resMgr.AcquireResource(fbTerrainBuff->Texture2DBlendResourceName3()->c_str()));
+
     m_initialPosition = XCVec3(fbTerrainBuff->Position()->x(), fbTerrainBuff->Position()->y(), fbTerrainBuff->Position()->z());
     m_currentPosition = XMLoadFloat3(&m_initialPosition);
+    
     m_rows = fbTerrainBuff->Rows();
     m_cols = fbTerrainBuff->Column();
     m_rowSpacing = (float)fbTerrainBuff->RowSpacing();
@@ -59,13 +70,25 @@ void Terrain::PreLoad(const void* fbBuffer)
 }
 
 //Multi Textured Terrain
-void Terrain::PreLoad(const char* _pHeightMapFileName, Texture2D* const terrainTexture, Texture2D* const terrainTexture1, Texture2D* const terrainTexture2, Texture2D* const blendMap, XCVec3 initialPosition, int _rows, int _column, float _rowSpacing, float _colSpacing)
+void Terrain::PreLoad(const char* _pHeightMapFileName, 
+    std::string terrainTexture,
+    std::string terrainTexture1,
+    std::string terrainTexture2,
+    std::string blendMap,
+    XCVec3 initialPosition, 
+    int _rows, 
+    int _column, 
+    float _rowSpacing, 
+    float _colSpacing)
 {
     m_pHeightMapFileName = getPlatformPath(_pHeightMapFileName);
-    m_texture = terrainTexture;
-    m_texture1 = terrainTexture1;
-    m_texture2 = terrainTexture2;
-    m_textureBlend = blendMap;
+
+    ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
+    m_textures.push_back(&resMgr.AcquireResource(terrainTexture.c_str()));
+    m_textures.push_back(&resMgr.AcquireResource(terrainTexture1.c_str()));
+    m_textures.push_back(&resMgr.AcquireResource(terrainTexture2.c_str()));
+    m_textures.push_back(&resMgr.AcquireResource(blendMap.c_str()));
+    
     m_currentPosition = XMLoadFloat3(&initialPosition);
     m_rows = _rows;
     m_cols = _column;
@@ -91,7 +114,27 @@ void Terrain::Load()
 
     XCVec3 vec = XCVec3(0, 0, 0);
     InitXPhysics(XMLoadFloat3(&m_initialPosition), XMLoadFloat3(&vec), XMLoadFloat3(&vec), 1000, (float)0.2); //Immovable
-    PhysicsActor::Load();
+    
+    //Terrain is loaded, so fire up the world ready event
+    Event_World event(EventType_WorldReady);
+    EventBroadcaster& broadcaster = (EventBroadcaster&)SystemLocator::GetInstance()->RequestSystem("EventBroadcaster");
+    broadcaster.BroadcastEvent(&event);
+
+    IActor::Load();
+}
+
+void Terrain::UpdateState()
+{
+    for (auto& tex : m_textures)
+    {
+        if (!tex->m_Resource->IsLoaded())
+        {
+            return;
+        }
+    }
+
+    m_actorState = IActor::ActorState_Loaded;
+    IActor::UpdateState();
 }
 
 void Terrain::GenerateVertices()
@@ -129,33 +172,29 @@ void Terrain::GenerateVertices()
     std::unique_ptr<TerrainQuad> quad33 = std::make_unique<TerrainQuad>(m_rows / (noOfQuads / 2) / 2, m_rows / (noOfQuads / 2), 0, (m_cols / (noOfQuads / 2)) / 2, m_cols, vMin, vMax);
     std::unique_ptr<TerrainQuad> quad44 = std::make_unique<TerrainQuad>(m_rows / (noOfQuads / 2) / 2, m_rows / (noOfQuads / 2), m_cols / (noOfQuads / 2) / 2, m_cols / (noOfQuads / 2), m_cols, vMin, vMax);
     
-    childNode1->addQuad(std::move(quad11));
-    childNode1->addQuad(std::move(quad22));
-    childNode1->addQuad(std::move(quad33));
-    childNode1->addQuad(std::move(quad44));
+    childNode1->AddQuad(std::move(quad11));
+    childNode1->AddQuad(std::move(quad22));
+    childNode1->AddQuad(std::move(quad33));
+    childNode1->AddQuad(std::move(quad44));
     
-    quad1->setChildNodeOBB(std::move(childNode1));
+    quad1->SetChildNodeOBB(std::move(childNode1));
     
-    childNode->addQuad(std::move(quad1));
-    childNode->addQuad(std::move(quad2));
-    childNode->addQuad(std::move(quad3));
-    childNode->addQuad(std::move(quad4));
+    childNode->AddQuad(std::move(quad1));
+    childNode->AddQuad(std::move(quad2));
+    childNode->AddQuad(std::move(quad3));
+    childNode->AddQuad(std::move(quad4));
     
-    rootQuad->setChildNodeOBB(std::move(childNode));
-    m_OBBHierarchy->addQuad(std::move(rootQuad));
+    rootQuad->SetChildNodeOBB(std::move(childNode));
+    m_OBBHierarchy->AddQuad(std::move(rootQuad));
 
 
     for (int rowIndex = 0; rowIndex < m_rows; rowIndex++)
     {
         for (int colIndex = 0; colIndex < m_cols; colIndex++)
         {
-#if defined(WIN32)
             float x = m_initialPosition.x - (colIndex * m_rowSpacing);
             float z = m_initialPosition.z + (rowIndex * m_colSpacing);
-#elif defined(XC_ORBIS)
-            float x = m_initialPosition.getX() - (colIndex * m_rowSpacing);
-            float z = m_initialPosition.getZ() + (rowIndex * m_colSpacing);
-#endif
+      
             //float y = m_initialPosition.y + (float)GetHeightAt( (m_rows * rowIndex) + colIndex)/15.0f;
             //float y = m_initialPosition.y + ((float) GetHeightAt(k) / 10.0f);
             float y = (float) GetHeightAt(bitmapRGBIndex) / 50.0f;
@@ -170,13 +209,13 @@ void Terrain::GenerateVertices()
                     {
                         XCVec3 pos(x, y, z);
                         m_vertexPosNormTexBuffer.m_vertexData[verticesIndex++] = VertexPosNormTex(XCVec3Unaligned(x, y, z), XCVec3Unaligned(0.0f, 1.0f, 0.0f), XCVec2Unaligned(0.0f, 1.0f));
-                        m_OBBHierarchy->computeQuad(rowIndex, colIndex, pos);
+                        m_OBBHierarchy->ComputeQuad(rowIndex, colIndex, pos);
                         break;
                     }
             }
         }
     }
-    m_OBBHierarchy->computeOBBForAllQuads();
+    m_OBBHierarchy->ComputeOBBForAllQuads();
 }
 
 void Terrain::GenerateVerticesNormal()
@@ -202,7 +241,7 @@ void Terrain::GenerateVerticesNormal()
 
 XCVecIntrinsic4 Terrain::CheckTerrainCollisionFromPoint(OrientedBoundingBox* bbox)
 {
-    TerrainQuad* quad = m_OBBHierarchy->getQuadCollidingWithOBB(bbox);
+    TerrainQuad* quad = m_OBBHierarchy->GetQuadCollidingWithOBB(bbox);
     XCVecIntrinsic4 vertexPos = XMVectorZero();
 
     if (quad != nullptr)
@@ -312,10 +351,6 @@ void Terrain::Update(float dt)
 {
     SimpleTerrain::Update(dt);
 
-    XCMatrix4 currentCoord = *m_texture->getTextureCoordinateMatrix();
-    currentCoord *= XMMatrixRotationZ(dt);
-    //m_texture->setTextureCoordinateMatrix(currentCoord);
-
     m_OBBHierarchy->Transform(XMMatrixIdentity(), XMMatrixIdentity());
     m_OBBHierarchy->Update(dt);
 }
@@ -334,7 +369,7 @@ void Terrain::Draw(RenderContext& context)
         ToXCMatrix4Unaligned(XMMatrixTranspose(m_World)),
         ToXCMatrix4Unaligned(XMMatrixTranspose(m_World * cam->GetViewMatrix() * cam->GetProjMatrix())),
         ToXCMatrix4Unaligned(InverseTranspose(m_World)),
-        ToXCMatrix4Unaligned(*m_texture->getTextureCoordinateMatrix()),
+        ToXCMatrix4Unaligned(XMMatrixIdentity()),
         m_material
     };
 
@@ -348,7 +383,7 @@ void Terrain::Draw(RenderContext& context)
 #else
         shaderHandle->setCBPerObject(context.GetDeviceContext(), perObject);
 #endif
-        shaderHandle->SetResource("gDiffuseMap", context.GetDeviceContext(), m_texture->getTextureResource());
+        shaderHandle->SetResource("gDiffuseMap", context.GetDeviceContext(), m_textures[0]);
     }
     else if (m_useShaderType == ShaderType_TerrainMultiTexture)
     {
@@ -359,10 +394,10 @@ void Terrain::Draw(RenderContext& context)
 #else
         shaderHandle->setCBPerObject(context.GetDeviceContext(), perObject);
 #endif
-        shaderHandle->SetResource("gDiffuseMap",  context.GetDeviceContext(), m_texture->getTextureResource());
-        shaderHandle->SetResource("gDiffuseMap1", context.GetDeviceContext(), m_texture1->getTextureResource());
-        shaderHandle->SetResource("gDiffuseMap2", context.GetDeviceContext(), m_texture2->getTextureResource());
-        shaderHandle->SetResource("gBlendMap",    context.GetDeviceContext(), m_textureBlend->getTextureResource());
+        shaderHandle->SetResource("gDiffuseMap",  context.GetDeviceContext(), m_textures[0]);
+        shaderHandle->SetResource("gDiffuseMap1", context.GetDeviceContext(), m_textures[1]);
+        shaderHandle->SetResource("gDiffuseMap2", context.GetDeviceContext(), m_textures[2]);
+        shaderHandle->SetResource("gBlendMap",    context.GetDeviceContext(), m_textures[3]);
     }
 
     XC_LightManager* lightMgr = (XC_LightManager*)&SystemLocator::GetInstance()->RequestSystem("LightsManager");
@@ -380,6 +415,13 @@ void Terrain::Destroy()
 {
     SimpleTerrain::Destroy();
 
+    ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
+
+    for (auto& tex : m_textures)
+    {
+        resMgr.ReleaseResource(tex);
+    }
+    
 #if defined(XCGRAPHICS_DX12)
     SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
     heap.DestroyBuffer(m_pCBPerObject);

@@ -27,20 +27,6 @@ void PCSoldier::Init(int actorId)
     TPCChaseableActor::SetChasingAxis(m_secondaryLookAxis, m_secondaryRightAxis, m_secondaryUpAxis);
 }
 
-void PCSoldier::PreLoad(const void* fbBuffer)
-{
-    const FBSoldier* soldierBuff = (FBSoldier*)fbBuffer;
-    ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
-    Soldier::PreLoad(XCVec3(soldierBuff->Position()->x(), soldierBuff->Position()->y(), soldierBuff->Position()->z()), (XCMesh*)resMgr.GetResource(soldierBuff->XCMeshResourceName()->c_str()));
-
-    PhysicsActor::PreLoad(fbBuffer);
-}
-
-void PCSoldier::PreLoad(XCVec3 initialPosition, XCMesh* pMesh)
-{
-    Soldier::PreLoad(initialPosition, pMesh);
-}
-
 void PCSoldier::Update(float dt)
 {
     m_gun->CheckInput();
@@ -103,9 +89,4 @@ void PCSoldier::Update(float dt)
     m_currentPosition = m_Position;
 
     Soldier::Update(dt);
-}
-
-void PCSoldier::Destroy()
-{
-    Soldier::Destroy();
 }

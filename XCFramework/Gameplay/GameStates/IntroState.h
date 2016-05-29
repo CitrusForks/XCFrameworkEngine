@@ -18,9 +18,9 @@ namespace GameState
         IntroState(void);
         virtual ~IntroState(void);
 
-        void                Init();
-        void                Update(float dt);
-        void                Draw(XC_Graphics& graphicsSystem);
-        void                Destroy();
+        void                Init()                              override;
+        void                Update(float dt)                    override;
+        void                Draw(XC_Graphics& graphicsSystem)   override;
+        void                Destroy()                           override;
     };
 }

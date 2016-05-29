@@ -7,7 +7,7 @@
 #pragma once
 
 #include "Engine/TaskManager/Task/AsyncTask.h"
-#include "ResourceManager.h"
+#include "Engine/Resource/ResourceManager.h"
 
 class LoadPackageFileFBTask : public AsyncTask
 {
@@ -21,28 +21,23 @@ public:
 
 protected:
 
-    template<class Type>
-    void LoadBuffer(Type buffer, ResourceManager& resMgr, std::string resourceTypeName);
+    template<class VectorType, class Type>
+    void LoadBuffer(VectorType buffer, ResourceManager& resMgr, std::string resourceTypeName);
 
 private:
-    std::string             m_packageData;
+    std::string                 m_packageData;
+    FlatBuffersSystem::FBBuffer m_fbBuffer;
 };
 
 
-template<class Type>
-void LoadPackageFileFBTask::LoadBuffer(Type buffer, ResourceManager& resMgr, std::string resourceTypeName)
+template<class VectorType, class Type>
+void LoadPackageFileFBTask::LoadBuffer(VectorType buffer, ResourceManager& resMgr, std::string resourceTypeName)
 {
     if (buffer)
     {
         for (auto it = buffer->begin(); it != buffer->end(); ++it)
         {
-            IResource* resource = resMgr.GetResourceFactory().createResource(resourceTypeName);
-
-            if (resource)
-            {
-                resource->Load((void*) *it);
-                resMgr.AddResource(resource);
-            }
+            resMgr.CreateAddResource(resourceTypeName, ((const Type*)*it)->ResourceName()->c_str(), (void*)*it);
         }
     }
 }

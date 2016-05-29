@@ -22,7 +22,7 @@ public:
     DECLARE_OBJECT_CREATION(PistolBullet)
 
     PistolBullet(void);
-    PistolBullet(IActor* parentActor, XCVec3 initialPosition, XCMesh* pMesh);
+    PistolBullet(IActor* parentActor, XCVec3 initialPosition, std::string pMesh);
     
     virtual ~PistolBullet(void);
     
