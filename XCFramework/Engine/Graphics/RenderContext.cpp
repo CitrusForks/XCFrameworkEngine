@@ -9,7 +9,6 @@
 #include "Engine/Graphics/RenderContext.h"
 #include "Engine/Graphics/XC_Graphics.h"
 #include "Engine/Graphics/SharedDescriptorHeap.h"
-#include "Engine/Memory/MemorySystemOrbis.h"
 
 RenderContext::RenderContext()
 {

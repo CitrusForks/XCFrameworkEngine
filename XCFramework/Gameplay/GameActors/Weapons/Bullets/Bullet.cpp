@@ -61,10 +61,6 @@ void Bullet::Load()
     //Trigger the bullet or add force to move
     m_look = m_target;
 
-    PhysicsActor::Load();
-
-    //Load done. Shoot the bullet
-    Shoot(5000.0f);
     Logger("[Bullet] Load done");
 
     PhysicsActor::Load();
@@ -75,6 +71,9 @@ void Bullet::SetInitialPhysicsProperties()
     PhysicsActor::SetInitialPhysicsProperties();
     XCVec3 vec = XCVec3(0, 0, 0);
     InitXPhysics(m_currentPosition, XMLoadFloat3(&vec), XMLoadFloat3(&vec), 1, (float)0.2);
+
+    //Load done. Shoot the bullet
+    Shoot(5000.0f);
 }
 
 void Bullet::Shoot(float scalarForce)

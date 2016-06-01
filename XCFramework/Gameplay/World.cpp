@@ -322,7 +322,7 @@ void World::RemoveActor(int _key)
         it->second->Unload();
         it->second->Destroy();
 
-        delete (it->second);
+        XCDELETE(it->second);
         m_GameObjects.erase(it);
     }
 }

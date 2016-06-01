@@ -162,5 +162,8 @@ Type* MemorySystemWin32::newAlloc(size_t size)
 }
 
 
-#define XCNEW(x)    MemorySystemWin32::ms_pMemorySystem->newAlloc<x>(sizeof(x))
-#define XCDELETE(x) MemorySystemWin32::ms_pMemorySystem->deleteAlloc((void**)&x)
+//#define XCNEW(x)    MemorySystemWin32::ms_pMemorySystem->newAlloc<x>(sizeof(x))
+//#define XCDELETE(x) MemorySystemWin32::ms_pMemorySystem->deleteAlloc((void**)&x)
+
+#define XCNEW(x)        new x
+#define XCDELETE(x)     delete x

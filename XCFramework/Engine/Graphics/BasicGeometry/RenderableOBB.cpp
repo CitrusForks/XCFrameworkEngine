@@ -19,6 +19,7 @@ RenderableOBB::RenderableOBB()
 
 RenderableOBB::~RenderableOBB()
 {
+    Destroy();
 }
 
 void RenderableOBB::Init()
@@ -101,7 +102,12 @@ void RenderableOBB::Draw(RenderContext& context)
 void RenderableOBB::Destroy()
 {
 #if defined(DEBUG_OBB)
-    ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
-    resMgr.ReleaseResource(m_cubeMesh);
+    if (m_cubeMesh)
+    {
+        ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
+        resMgr.ReleaseResource(m_cubeMesh);
+
+        m_cubeMesh = nullptr;
+    }
 #endif
 }

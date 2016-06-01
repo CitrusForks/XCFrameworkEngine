@@ -28,6 +28,8 @@ bool MemorySystemWin32::allocateChunk()
 
 void MemorySystemWin32::deleteAlloc(void** ptrToBlock)
 {
+    delete((*ptrToBlock));
+
     void* t = (*ptrToBlock);
 
     int offset = (char*)t - m_pChunkFront;
