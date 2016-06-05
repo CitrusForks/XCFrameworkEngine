@@ -49,14 +49,14 @@ public:
     void                    SetTaskPriority(int priority) { m_taskPriority = priority; }
 
 protected:
-    bool                                m_isAsync;
-    ETaskState                          m_eCurrentState;
-    int                                 m_InstanceId;
-    std::promise<int>                   m_taskPromise;
+    bool                    m_isAsync;
+    ETaskState              m_eCurrentState;
+    int                     m_InstanceId;
+    std::promise<int>       m_taskPromise;
 
 private:
-    Thread*                             m_threadHandle;
-    std::mutex                          m_stateLock;
-    unsigned long                       m_threadID;
-    int                                 m_taskPriority;
+    Thread*                 m_threadHandle;
+    std::mutex              m_stateLock;
+    unsigned long           m_threadID;
+    int                     m_taskPriority;
 };

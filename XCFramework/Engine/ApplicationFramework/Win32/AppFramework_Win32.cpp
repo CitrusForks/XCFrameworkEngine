@@ -4,10 +4,9 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
-#include "stdafx.h"
+#include "EnginePrecompiledHeader.h"
 
 #include "Engine/ApplicationFramework/Win32/AppFramework_Win32.h"
-#include "Game/Game_Win32.h"
 #include "Engine/Memory/MemorySystemWin32.h"
 
 namespace
@@ -240,35 +239,4 @@ bool AppFramework_Win32::IsDeviceLost()
 void AppFramework_Win32::GLRun()
 {
     g_pD3DApp->Run();
-}
-
-class SampleClass
-{
-public:
-    SampleClass() {}
-    SampleClass(int size) 
-    { 
-        m_size = size; 
-    }
-
-    std::string className;
-    int m_size;
-};
-
-int WINAPI WinMain(__in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, __in LPSTR lpCmdLine, __in int nShowCmd)
-{
-    // Enable run-time memory check for debug builds.
-#if defined(DEBUG) | defined(_DEBUG)
-    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-#endif
-
-    //Initialize memory System
-    MemorySystemWin32 memorySystem(1024 * 1024);
-    memorySystem.allocateChunk();
-
-    Game_Win32 app(hInstance, "", true);
-    app.Run();
-    app.Destroy();
-
-    return 0;
 }

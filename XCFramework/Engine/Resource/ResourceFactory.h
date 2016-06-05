@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "Engine/Serializer/ObjectFactory.h"
+#include "Base/Serializer/ObjectFactory.h"
 #include "IResource.h"
 #include "ResourceTypes.h"
 

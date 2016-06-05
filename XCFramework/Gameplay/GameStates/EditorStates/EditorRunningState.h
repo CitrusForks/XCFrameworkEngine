@@ -2,7 +2,8 @@
 
 #include "Gameplay/GameStates/IGameState.h"
 #include "Gameplay/GameActors/GameActorsFactory.h"
-#include "Engine/Graphics/XC_Lighting/XC_LightManager.h"
+
+#include "Graphics/XC_Lighting/XC_LightManager.h"
 
 class WorldEditor;
 

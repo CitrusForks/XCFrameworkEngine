@@ -7,11 +7,11 @@
 #pragma once
 
 #include "Engine/Input/Directinput.h"
-#include "Engine/Graphics/XC_Shaders/XC_VertexFormat.h"
+#include "Graphics/XC_Shaders/XC_VertexFormat.h"
 #include "Gameplay/GameActors/SimpleMeshActor.h"
-#include "Engine/Graphics/XC_GraphicsDx11.h"
+#include "Graphics/XC_GraphicsDx11.h"
 
-#include "Engine/Graphics/XC_Materials/MaterialTypes.h"
+#include "Graphics/XC_Materials/MaterialTypes.h"
 #include "Gameplay/GameActors/SubActor.h"
 #include "Gameplay/GameActors/Weapons/Bullets/Bullet.h"
 

@@ -9,7 +9,7 @@
 #include "GameActorTypes.h"
 
 //A kind of precompiled header. Define all actors according to their sequence.
-#include "Engine/Serializer/IBase.h"
+#include "Base/Serializer/IBase.h"
 
 #include "IActor.h"
 #include "SimpleActor.h"
@@ -35,5 +35,5 @@
 #include "Vehicles/Cars/PCCar.h"
 #include "Vehicles/Cars/NPCCar.h"
 
-#include "Engine/Graphics/BasicGeometry/TexturedPlane.h"
+#include "Graphics/BasicGeometry/TexturedPlane.h"
 #include "Gameplay/LiveDriveInterface/LiveDriveTexturePlane.h"

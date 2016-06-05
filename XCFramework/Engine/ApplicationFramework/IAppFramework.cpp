@@ -4,11 +4,9 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
-#include "stdafx.h"
+#include "EnginePrecompiledHeader.h"
 
 #include "Engine/ApplicationFramework/IAppFramework.h"
-#include "Engine/Graphics/XC_GraphicsDx11.h"
-
 
 IAppFramework::IAppFramework()
 {
@@ -16,7 +14,6 @@ IAppFramework::IAppFramework()
     m_clientWidth = 800;
     m_clientHeight = 600;
 }
-
 
 IAppFramework::~IAppFramework()
 {

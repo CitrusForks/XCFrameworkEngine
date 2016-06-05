@@ -4,14 +4,14 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
-#include "stdafx.h"
+#include "GameplayPrecompiledHeader.h"
 
 #include "SimpleTerrain.h"
-#include "Engine/Graphics/XC_GraphicsDx11.h"
-#include "Engine/Graphics/XC_Shaders/XC_ShaderBufferConstants.h"
-#include "Engine/Graphics/XC_Shaders/XC_ShaderManager.h"
-#include "Engine/Graphics/XC_Camera/XC_CameraManager.h"
-#include "Engine/Graphics/XC_Shaders/XC_ShaderHandle.h"
+#include "Graphics/XC_GraphicsDx11.h"
+#include "Graphics/XC_Shaders/XC_ShaderBufferConstants.h"
+#include "Graphics/XC_Shaders/XC_ShaderManager.h"
+#include "Gameplay/XC_Camera/XC_CameraManager.h"
+#include "Graphics/XC_Shaders/XC_ShaderHandle.h"
 
 SimpleTerrain::SimpleTerrain(void)
 {
@@ -181,9 +181,9 @@ void SimpleTerrain::Draw(RenderContext& context)
     
     // Set constants
     cbWorld wbuffer = { ToXCMatrix4Unaligned(XMMatrixTranspose(m_World)) };
-    XC_CameraManager* cam = (XC_CameraManager*)&SystemLocator::GetInstance()->RequestSystem("CameraManager");
+    ICamera& cam = context.GetShaderManagerSystem().GetGlobalShaderData().m_camera;
     cbWVP perObject = {
-        ToXCMatrix4Unaligned(XMMatrixTranspose(cam->GetProjMatrix() * cam->GetViewMatrix() * m_World)),
+        ToXCMatrix4Unaligned(XMMatrixTranspose(cam.GetViewMatrix() * cam.GetProjectionMatrix() * m_World)),
     };
 
     //TODO

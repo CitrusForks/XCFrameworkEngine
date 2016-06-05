@@ -4,7 +4,7 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
-#include "stdafx.h"
+#include "GameplayPrecompiledHeader.h"
 
 #include "Gun.h"
 
@@ -13,9 +13,9 @@
 #include "Gameplay/GameActors/Weapons/Bullets/Bullet.h"
 
 #include "Engine/Resource/ResourceManager.h"
-#include "Engine/Graphics/XC_Shaders/XC_ShaderBufferConstants.h"
-#include "Engine/Graphics/XC_Shaders/XC_ShaderHandle.h"
-#include "Engine/Graphics/XC_Camera/XC_CameraManager.h"
+#include "Graphics/XC_Shaders/XC_ShaderBufferConstants.h"
+#include "Graphics/XC_Shaders/XC_ShaderHandle.h"
+#include "Gameplay/XC_Camera/XC_CameraManager.h"
 
 Gun::Gun(void)
 {
@@ -130,10 +130,10 @@ void Gun::ApplyOffsetRotation()
 void Gun::Draw(RenderContext& context)
 {
     // Set constants
-    XC_CameraManager* cam = (XC_CameraManager*)&SystemLocator::GetInstance()->RequestSystem("CameraManager");
+    ICamera& cam = context.GetShaderManagerSystem().GetGlobalShaderData().m_camera;
     PerObjectBuffer perObject = {
         ToXCMatrix4Unaligned(XMMatrixTranspose(m_World)),
-        ToXCMatrix4Unaligned(XMMatrixTranspose(m_World * cam->GetViewMatrix() * cam->GetProjMatrix())),
+        ToXCMatrix4Unaligned(XMMatrixTranspose(m_World * cam.GetViewMatrix() * cam.GetProjectionMatrix())),
         ToXCMatrix4Unaligned(InverseTranspose(m_World)),
         ToXCMatrix4Unaligned(XMMatrixIdentity()),
         m_material

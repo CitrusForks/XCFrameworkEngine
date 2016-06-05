@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "Engine/Graphics/BasicGeometry/RenderableOBB.h"
+#include "Graphics/BasicGeometry/RenderableOBB.h"
 
 //Forward reference to the OBBHierarchy
 class OBBHierarchy;

@@ -18,7 +18,7 @@ public:
     virtual void            CreateMainWindow();
 
     virtual int             Init();
-    virtual void            OnResize() = 0;
+    virtual void            OnResize()       = 0;
     virtual void            Run();
     virtual void            Update(float dt) = 0;
     virtual void            Draw()           = 0;

@@ -6,10 +6,10 @@
 
 #pragma once
 
-#include "Engine/Serializer/IBase.h"
 #include "Engine/Resource/ResourceTypes.h"
 #include "Assets/Packages/PackageConsts.h"
-#include "Engine/Graphics/RenderContext.h"
+
+class RenderContext;
 
 class IResource : public IBase
 {

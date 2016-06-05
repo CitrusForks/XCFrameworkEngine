@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "Engine/FlatBuffersInterface/FlatBuffersSystem.h"
 #include "Engine/TaskManager/Task/AsyncTask.h"
 #include "Engine/Resource/ResourceManager.h"
 

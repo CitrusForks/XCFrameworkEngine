@@ -6,12 +6,12 @@
 
 #pragma once
 
-#include "Engine/Utils/GraphicUtils.h"
-#include "Engine/Graphics/XC_Shaders/XC_VertexFormat.h"
+#include "Engine/Utils/EngineUtils.h"
+#include "Graphics/XC_Shaders/XC_VertexFormat.h"
 #include "Gameplay/GameActors/PhysicsActor.h"
-#include "Engine/Graphics/XC_Shaders/XC_ShaderTypes.h"
-#include "Engine/Graphics/VertexBuffer.h"
-#include "Engine/Graphics/IndexBuffer.h"
+#include "Graphics/XC_Shaders/XC_ShaderTypes.h"
+#include "Graphics/VertexBuffer.h"
+#include "Graphics/IndexBuffer.h"
 
 class SimpleTerrain : public PhysicsActor
 {

@@ -4,7 +4,7 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
-#include "stdafx.h"
+#include "GameplayPrecompiledHeader.h"
 
 #include "Gameplay/World.h"
 #include "Gameplay/XCPhysics/CollisionDetection.h"
@@ -14,7 +14,7 @@
 #include "Gameplay/GameActors/NonPlayableCharacterActor.h"
 #include "Gameplay/WorldEventTypes.h"
 
-#include "Engine/Graphics/XC_Graphics.h"
+#include "Graphics/XC_Graphics.h"
 #include "Engine/Event/EventBroadcaster.h"
 
 World::World()

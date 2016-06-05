@@ -8,8 +8,8 @@
 
 #include "Gameplay/GameStates/IGameState.h"
 #include "Engine/Input/Directinput.h"
-#include "Engine/Graphics/XC_Camera/XC_CameraManager.h"
-#include "Engine/Graphics/XC_Lighting/XC_LightManager.h"
+#include "Gameplay/XC_Camera/XC_CameraManager.h"
+#include "Graphics/XC_Lighting/XC_LightManager.h"
 #include "Gameplay/World.h"
 
 namespace GameState

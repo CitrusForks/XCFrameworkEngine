@@ -8,7 +8,7 @@
 
 #include "Gameplay/GameActors/Environment/Terrain/SimpleTerrain.h"
 #include "Gameplay/XCPhysics/OBBHierarchy.h"
-#include "Engine/Graphics/XC_Materials/MaterialTypes.h"
+#include "Graphics/XC_Materials/MaterialTypes.h"
 
 class Terrain : public SimpleTerrain
 {

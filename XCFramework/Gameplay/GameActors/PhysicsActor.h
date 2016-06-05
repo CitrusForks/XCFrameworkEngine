@@ -7,12 +7,13 @@
 #pragma once
 
 #include "Gameplay/GameActors/AnimatedActor.h"
-#include "Gameplay/XCPhysics/XPhysics.h"
 #include "Gameplay/XCPhysics/CollisionDetectionTypes.h"
-#include "Gameplay/AI/INavigator.h"
+#include "AI/INavigator.h"
 
-#include "Engine/Graphics/XC_Mesh/XCMesh.h"
-#include "Engine/Graphics/BasicGeometry/RenderableOBB.h"
+#include "Graphics/XC_Mesh/XCMesh.h"
+#include "Graphics/BasicGeometry/RenderableOBB.h"
+
+#include "XCPhysics/XPhysics.h"
 
 class PhysicsActor : public AnimatedActor, public XPhysics, public INavigator
 {

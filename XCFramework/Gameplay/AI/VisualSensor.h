@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "Gameplay/AI/ISensor.h"
+#include "ISensor.h"
 
 class VisualSensor : public ISensor
 {

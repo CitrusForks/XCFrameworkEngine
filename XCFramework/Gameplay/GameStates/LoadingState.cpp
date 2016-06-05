@@ -4,16 +4,16 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
-#include "stdafx.h"
+#include "GameplayPrecompiledHeader.h"
 
 #include "Gameplay/GameStates/LoadingState.h"
 #include "Gameplay/GameStates/GameStateTypes.h"
 
 #include "Engine/Resource/ResourceManager.h"
-#include "Engine/Graphics/XC_Graphics.h"
+#include "Graphics/XC_Graphics.h"
 #include "Engine/TaskManager/TaskManager.h"
 #include "Engine/Resource/LoadPackageFileFBTask.h"
-#include "Engine/Graphics/BasicGeometry/MeshGeneratorSystem.h"
+#include "Graphics/BasicGeometry/MeshGeneratorSystem.h"
 
 #include "Assets/Packages/PackageConsts.h"
 

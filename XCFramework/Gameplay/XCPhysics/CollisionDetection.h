@@ -7,7 +7,7 @@
 #pragma once
 
 #include "Gameplay/GameActors/PhysicsActor.h"
-#include "Engine/Graphics/BasicGeometry/Plane.h"
+#include "Graphics/BasicGeometry/Plane.h"
 
 #if defined(WIN32)
 #include <DirectXCollision.h>

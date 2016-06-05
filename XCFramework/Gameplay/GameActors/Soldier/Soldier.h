@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include "Engine/Graphics/XC_Shaders/XC_VertexFormat.h"
-#include "Engine/Graphics/XC_Materials/MaterialTypes.h"
+#include "Graphics/XC_Shaders/XC_VertexFormat.h"
+#include "Graphics/XC_Materials/MaterialTypes.h"
 
 #include "Gameplay/GameActors/PhysicsActor.h"
 #include "Gameplay/GameActors/Weapons/Guns/Gun.h"

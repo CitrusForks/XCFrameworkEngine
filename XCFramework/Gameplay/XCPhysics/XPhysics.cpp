@@ -4,10 +4,8 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
-#include "stdafx.h"
-
-#include "Engine/Utils/GraphicUtils.h"
-#include "Gameplay/XCPhysics/XPhysics.h"
+#include "GameplayPrecompiledHeader.h"
+#include "XCPhysics/XPhysics.h"
 
 bool XPhysics::s_enableGravity = false;
 

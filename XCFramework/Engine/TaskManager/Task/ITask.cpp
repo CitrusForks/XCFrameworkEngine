@@ -4,7 +4,7 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
-#include "stdafx.h"
+#include "EnginePrecompiledHeader.h"
 #include "ITask.h"
 
 
@@ -13,7 +13,6 @@ ITask::ITask()
     m_isAsync = false;
     m_taskPriority = THREAD_PRIORITY_NORMAL;
 }
-
 
 ITask::~ITask(void)
 {

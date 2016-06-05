@@ -4,7 +4,7 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
-#include "stdafx.h"
+#include "EnginePrecompiledHeader.h"
 
 #include "Engine/Input/Directinput.h"
 
@@ -18,7 +18,6 @@ void DirectInput::Init(HINSTANCE _hAppInstance, HWND _hAppWnd, unsigned long key
 
 void DirectInput::Destroy()
 {
-
 }
 
 DirectInput::~DirectInput()
@@ -35,7 +34,6 @@ void DirectInput::ResetAllFakeInputs()
 
 void DirectInput::Update()
 {
-
 }
 
 void DirectInput::SetFakeKeyDown(char key)

@@ -4,15 +4,15 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
-#include "stdafx.h"
+#include "EnginePrecompiledHeader.h"
 
 #include "Engine/Resource/ResourceFactory.h"
-#include "Engine/Graphics/XC_Textures/Texture2D.h"
-#include "Engine/Graphics/XC_Textures/CubeTexture3D.h"
-#include "Engine/Graphics/XC_Mesh/XCMesh.h"
-#include "Engine/Graphics/XC_Mesh/XCMeshAssimp.h"
-#include "Engine/Graphics/XC_Mesh/XCMeshFBX.h"
-#include "Engine/Graphics/XC_Mesh/VectorFontMesh.h"
+#include "Graphics/XC_Textures/Texture2D.h"
+#include "Graphics/XC_Textures/CubeTexture3D.h"
+#include "Graphics/XC_Mesh/XCMesh.h"
+#include "Graphics/XC_Mesh/XCMeshAssimp.h"
+#include "Graphics/XC_Mesh/XCMeshFBX.h"
+#include "Graphics/XC_Mesh/VectorFontMesh.h"
 
 ResourceFactory::ResourceFactory()
 {

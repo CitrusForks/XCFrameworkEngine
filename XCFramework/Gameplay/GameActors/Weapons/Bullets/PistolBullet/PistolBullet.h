@@ -6,15 +6,13 @@
 
 #pragma once
 
-#include "Engine/Utils/GraphicUtils.h"
-#include "Engine/Graphics/XC_Shaders/XC_VertexFormat.h"
+#include "Engine/Utils/EngineUtils.h"
 #include "Gameplay/GameActors/SimpleMeshActor.h"
-#include "Engine/Graphics/XC_Shaders/XC_ShaderManager.h"
-#include "Engine/Graphics/XC_GraphicsDx11.h"
-
-#include "Engine/Graphics/XC_Materials/MaterialTypes.h"
-#include "Engine/Graphics/XC_Mesh/XCMesh.h"
 #include "Gameplay/GameActors/SubActor.h"
+
+#include "Graphics/XC_Shaders/XC_VertexFormat.h"
+#include "Graphics/XC_Materials/MaterialTypes.h"
+#include "Graphics/XC_Mesh/XCMesh.h"
 
 class PistolBullet : public SimpleMeshActor, public SubActor
 {
@@ -36,10 +34,9 @@ public:
     SubActor*                           GetSubActor()                       { return (SubActor*)this;  }
 
 protected:
+
     ShaderType                          m_useShaderType;
-
     BasicMaterial                       m_material;
-
     XCVecIntrinsic4                     m_secondaryLookAxis;
     XCVecIntrinsic4                     m_secondaryUpAxis;
     XCVecIntrinsic4                     m_secondaryRightAxis;

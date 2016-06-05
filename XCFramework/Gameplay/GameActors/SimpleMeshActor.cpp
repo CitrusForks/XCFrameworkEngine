@@ -4,14 +4,13 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
-#include "stdafx.h"
+#include "GameplayPrecompiledHeader.h"
 
 #include "Gameplay/GameActors/SimpleMeshActor.h"
 
 
 SimpleMeshActor::SimpleMeshActor(void)
 {
-    m_actorType = GAMEACTOR_SIMPLEMESH;
 }
 
 SimpleMeshActor::~SimpleMeshActor(void)

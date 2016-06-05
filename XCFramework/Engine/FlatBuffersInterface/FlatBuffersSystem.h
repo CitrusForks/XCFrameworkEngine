@@ -35,5 +35,5 @@ public:
 
 private:
     
-    static const char*            m_includeDirs[];
+    static const char*      m_includeDirs[];
 };

@@ -8,8 +8,8 @@
 
 #include "Gameplay/GameActors/PhysicsActor.h"
 
-#include "Engine/Graphics/XC_Materials/MaterialTypes.h"
-#include "Engine/Graphics/XC_Shaders/XC_ShaderTypes.h"
+#include "Graphics/XC_Materials/MaterialTypes.h"
+#include "Graphics/XC_Shaders/XC_ShaderTypes.h"
 #include "Engine/Input/Directinput.h"
 
 class Door : public PhysicsActor

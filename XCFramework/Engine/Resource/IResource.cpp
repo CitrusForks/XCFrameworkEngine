@@ -4,9 +4,8 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
-#include "stdafx.h"
+#include "EnginePrecompiledHeader.h"
 #include "IResource.h"
-
 
 IResource::IResource()
     : m_resourceType(RESOURCETYPE_MAX)

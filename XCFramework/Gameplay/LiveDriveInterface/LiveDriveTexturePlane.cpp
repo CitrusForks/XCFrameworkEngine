@@ -4,12 +4,12 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
-#include "stdafx.h"
+#include "GameplayPrecompiledHeader.h"
 
 #include "LiveDriveTexturePlane.h"
 #include "Assets/Packages/Schema/BasicTypes_generated.h"
 #include "Assets/Packages/Schema/GameplayActors_generated.h"
-#include "Engine/Graphics/XC_Graphics.h"
+#include "Graphics/XC_Graphics.h"
 
 LiveDriveTexturePlane::LiveDriveTexturePlane()
 {
@@ -45,8 +45,6 @@ void LiveDriveTexturePlane::PreLoad(const void* fbBuffer)
     m_liveDriveTexture = new Texture2D(graphicsSystem.GetRenderTexture(RENDERTARGET_LIVEDRIVE).GetShaderResourceView());
 #endif
     m_texture->m_Resource = m_liveDriveTexture;
-
-    SimpleActor::PreLoad(fbBuffer);
 }
 
 void LiveDriveTexturePlane::Update(float dt)

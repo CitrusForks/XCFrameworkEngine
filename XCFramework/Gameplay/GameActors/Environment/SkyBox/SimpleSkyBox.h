@@ -8,12 +8,12 @@
 
 #include "Gameplay/GameActors/SimpleActor.h"
 #include "Engine/Resource/ResourceHandle.h"
-#include "Engine/Graphics/XC_Shaders/XC_ShaderTypes.h"
-#include "Engine/Graphics/XC_Shaders/XC_VertexFormat.h"
-#include "Engine/Graphics/XC_Materials/MaterialTypes.h"
-#include "Engine/Graphics/XC_Shaders/XC_RasterizerTypes.h"
-#include "Engine/Graphics/VertexBuffer.h"
-#include "Engine/Graphics/IndexBuffer.h"
+#include "Graphics/XC_Shaders/XC_ShaderTypes.h"
+#include "Graphics/XC_Shaders/XC_VertexFormat.h"
+#include "Graphics/XC_Materials/MaterialTypes.h"
+#include "Graphics/XC_Shaders/XC_RasterizerTypes.h"
+#include "Graphics/VertexBuffer.h"
+#include "Graphics/IndexBuffer.h"
 
 class SimpleSkyBox : public SimpleActor
 {

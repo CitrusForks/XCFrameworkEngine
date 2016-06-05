@@ -16,7 +16,7 @@ public:
     DECLARE_SYSTEMOBJECT_CREATION(DirectInput_Win32)
 
     DirectInput_Win32();
-    ~DirectInput_Win32();
+    virtual ~DirectInput_Win32();
 
     void                        Init(HINSTANCE hAppInstance, HWND hAppWnd, unsigned long keyboardCoopFlags, unsigned long mouseCoopFlags);
     void                        Destroy();
@@ -33,6 +33,7 @@ public:
     void                        SetFakeKeyDown(char key);
     void                        SetFakeMouseInput(FakeMouseInputType type, float value);
     void                        ResetAllFakeInputs();
+
 private:
 
     char                        m_KeyboardState[256];

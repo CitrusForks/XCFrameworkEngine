@@ -6,13 +6,13 @@
 
 #pragma once
 
-#include "Engine/Utils/GraphicUtils.h"
-#include "Engine/Graphics/XC_Shaders/XC_VertexFormat.h"
-#include "Gameplay/GameActors/SimpleMeshActor.h"
+#include "Engine/Utils/EngineUtils.h"
 
-#include "Engine/Graphics/XC_Materials/MaterialTypes.h"
+#include "Gameplay/GameActors/SimpleMeshActor.h"
 #include "Gameplay/GameActors/PhysicsActor.h"
 
+#include "Graphics/XC_Materials/MaterialTypes.h"
+#include "Graphics/XC_Shaders/XC_VertexFormat.h"
 
 class Bullet : public PhysicsActor
 {

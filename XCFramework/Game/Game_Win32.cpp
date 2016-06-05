@@ -4,20 +4,24 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
-#include "stdafx.h"
+#include "GamePrecompiledHeader.h"
 
 #include "Game_Win32.h"
+
 #include "Assets/Packages/PackageConsts.h"
-#include "Engine/System/SystemLocator.h"
-#include "Engine/Network/Clients/LiveDriveVRClient.h"
+
+#include "Network/Clients/LiveDriveVRClient.h"
+
 #include "Engine/Input/Directinput_Win32.h"
+#include "Engine/System/SystemLocator.h"
+#include "Engine/Memory/MemorySystemWin32.h"
 
 #if defined(XCGRAPHICS_DX12)
-#include "Engine/Graphics/XC_GraphicsDx12.h"
+#include "Graphics/XC_GraphicsDx12.h"
 #elif defined(XCGRAPHICS_DX11)
-#include "Engine/Graphics/XC_GraphicsDx11.h"
+#include "Graphics/XC_GraphicsDx11.h"
 #elif defined(XCGRAPHICS_GL)
-#include "Engine/Graphics/XC_GraphicsGL.h"
+#include "Graphics/XC_GraphicsGL.h"
 #endif
 
 Game_Win32::Game_Win32(HINSTANCE hInstance, std::string winCaption, bool enable4xMsaa)
@@ -39,9 +43,6 @@ int Game_Win32::Init()
 
     //Register Systems
     RegisterSystems();
-
-    //Timer
-    m_timer = (Timer*)&m_systemContainer->CreateNewSystem("Timer");
 
     //Event Broadcaster
     m_eventBroadcaster = (EventBroadcaster*)&m_systemContainer->CreateNewSystem("EventBroadcaster");
@@ -66,7 +67,7 @@ int Game_Win32::Init()
 
     //Initialize Cameras
     m_cameraManagingSystem = (XC_CameraManager*)&m_systemContainer->CreateNewSystem("CameraManager");
-    m_cameraManagingSystem->InitializeCameras(*m_graphicsSystem, *m_directInputSystem, m_clientWidth, m_clientHeight);
+    m_cameraManagingSystem->InitializeCameras(*m_graphicsSystem, m_clientWidth, m_clientHeight);
     m_cameraManagingSystem->SetCameraType(CAMERATYPE_BASIC);
 
     //Gameplay state machine
@@ -80,7 +81,7 @@ int Game_Win32::Init()
 #if defined(LIVE_DRIVE_ENABLED)
     //Initalize the network clients
     m_liveDriveClient = new LiveDriveVRClient();
-    m_liveDriveClient->init(IP_ADDRESS, DEFAULT_PORT);
+    m_liveDriveClient->Init(IP_ADDRESS, DEFAULT_PORT);
 
     m_networkManagingSystem->AddNetPeer(m_liveDriveClient);
 #endif
@@ -97,7 +98,6 @@ void Game_Win32::RegisterSystems()
 {
     m_systemContainer = &SystemLocator::GetInstance()->GetSystemContainer();
 
-    m_systemContainer->RegisterSystem<Timer>("Timer");
     m_systemContainer->RegisterSystem<EventBroadcaster>("EventBroadcaster");
     m_systemContainer->RegisterSystem<DirectInput_Win32>("InputSystem");
     m_systemContainer->RegisterSystem<TaskManager>("TaskManager");
@@ -125,7 +125,6 @@ void Game_Win32::OnResize()
 
 void Game_Win32::Update(float dt)
 {
-    m_timer->Update();
     m_eventBroadcaster->Update();
 
     m_directInputSystem->Update();
@@ -135,10 +134,9 @@ void Game_Win32::Update(float dt)
 
     m_networkManagingSystem->Update();
 
-    m_gameFSM->Update(dt);
-
-    //This update is necessary after WORLD is drawn, because of camera dependency on some of the object's of world
     m_cameraManagingSystem->Update(dt);
+
+    m_gameFSM->Update(dt);
 
     //Do the tasks if any
     m_taskManagingSystem->Update();
@@ -186,4 +184,22 @@ void Game_Win32::Destroy()
     m_eventBroadcaster->Destroy();
 
     SystemLocator::GetInstance()->Destroy();
+}
+
+int WINAPI WinMain(__in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, __in LPSTR lpCmdLine, __in int nShowCmd)
+{
+    // Enable run-time memory check for debug builds.
+#if defined(DEBUG) | defined(_DEBUG)
+    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
+
+    //Initialize memory System
+    MemorySystemWin32 memorySystem(1024 * 1024);
+    memorySystem.allocateChunk();
+
+    Game_Win32 app(hInstance, "", true);
+    app.Run();
+    app.Destroy();
+
+    return 0;
 }

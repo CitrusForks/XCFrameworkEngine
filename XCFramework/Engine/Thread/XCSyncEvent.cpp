@@ -4,14 +4,13 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
-#include "stdafx.h"
+#include "EnginePrecompiledHeader.h"
 
 #include "XCSyncEvent.h"
 
 XCSyncEvent::XCSyncEvent(void)
 {
 }
-
 
 XCSyncEvent::~XCSyncEvent(void)
 {

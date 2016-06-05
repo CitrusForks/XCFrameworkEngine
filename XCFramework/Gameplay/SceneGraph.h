@@ -7,7 +7,8 @@
 #pragma once
 
 #include "Gameplay/GameActors/IActor.h"
-#include "Engine/Graphics/XC_Graphics.h"
+
+class XC_Graphics;
 
 class SceneGraph
 {

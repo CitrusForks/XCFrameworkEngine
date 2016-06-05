@@ -4,9 +4,9 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
-#include "stdafx.h"
+#include "GameplayPrecompiledHeader.h"
 
-#include "Gameplay/AI/AINavigator.h"
+#include "AINavigator.h"
 
 const float AINavigator::DISTANCE_ABS          = 5.0f;
 const float AINavigator::LOOK_TARGET_ANGLE_ABS = 0.2f;

@@ -4,9 +4,8 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
-#include "stdafx.h"
+#include "EnginePrecompiledHeader.h"
 #include "SyncTask.h"
-
 
 SyncTask::SyncTask(void)
 {
@@ -17,8 +16,6 @@ SyncTask::SyncTask(void)
 SyncTask::~SyncTask(void)
 {
 }
-
-
 
 void SyncTask::Init()
 {

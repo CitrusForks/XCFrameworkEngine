@@ -21,7 +21,7 @@ public:
     ISystem&              CreateNewSystem(std::string sysName);
     
     template<class T>
-    T&              CreateNewSystem(std::string sysName)
+    T& CreateNewSystem(std::string sysName)
     {
         return (T&)CreateNewSystem(sysName);
     }

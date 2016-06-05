@@ -9,37 +9,37 @@
 #include "Engine/ApplicationFramework/Win32/AppFramework_Win32.h"
 
 #include "Engine/Event/EventBroadcaster.h"
-#include "Engine/Utils/Timer.h"
 #include "Engine/TaskManager/TaskManager.h"
 #include "Engine/Input/Directinput.h"
-#include "Engine/Graphics/XC_Graphics.h"
 #include "Engine/FlatBuffersInterface/FlatBuffersSystem.h"
-#include "Engine/Graphics/XC_Camera/XC_CameraManager.h"
 #include "Engine/Resource/ResourceManager.h"
-#include "Engine/Network/INetPeer.h"
-#include "Engine/Network/NetworkManager.h"
+
+#include "Network/INetPeer.h"
+#include "Network/NetworkManager.h"
+
+#include "Graphics/XC_Graphics.h"
 
 #include "Gameplay/GameFiniteStateMachine.h"
+#include "Gameplay/XC_Camera/XC_CameraManager.h"
 
 class Game_Win32 : public AppFramework_Win32
 {
 public:
     Game_Win32(HINSTANCE hInstance, std::string winCaption, bool enable4xMsaa);
-    ~Game_Win32();
+    virtual ~Game_Win32();
 
-    int                     Init();
-    void                    Update(float dt);
-    void                    Draw();
-    void                    Destroy();
+    int                          Init();
+    void                         Update(float dt);
+    void                         Draw();
+    void                         Destroy();
 
-    void                    RegisterSystems();
-    void                    OnResize();
-    void                    EnableFullScreenMode(bool enable);
+    void                         RegisterSystems();
+    void                         OnResize();
+    void                         EnableFullScreenMode(bool enable);
 
 private:
     
     EventBroadcaster*            m_eventBroadcaster;
-    Timer*                       m_timer;
     INetPeer*                    m_liveDriveClient;
     DirectInput*                 m_directInputSystem;
     XC_Graphics*                 m_graphicsSystem;

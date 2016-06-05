@@ -6,6 +6,8 @@
 
 #pragma once
 
+#if defined(UNUSED)
+
 #include "Engine/System/ISystem.h"
 #include "Engine/Graphics/XC_Graphics.h"
 
@@ -102,3 +104,5 @@ private:
     float         m_perFrameTime;
     int           m_fps;
 };
+
+#endif

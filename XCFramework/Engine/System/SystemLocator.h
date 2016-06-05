@@ -18,7 +18,7 @@ public:
     ISystem&                            RequestSystem(std::string sysName);
 
     template<class T>
-    T&                                   RequestSystem(std::string sysName)
+    T&                                  RequestSystem(std::string sysName)
     {
         return (T&)m_systemContainer.GetSystem(sysName);
     }

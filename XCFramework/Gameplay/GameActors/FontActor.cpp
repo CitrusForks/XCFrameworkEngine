@@ -4,15 +4,14 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
-#include "stdafx.h"
+#include "GameplayPrecompiledHeader.h"
 
 #include "Gameplay/GameActors/FontActor.h"
 #include "Engine/Resource/ResourceManager.h"
-#include "Engine/Graphics/XC_Mesh/VectorFontMesh.h"
+#include "Graphics/XC_Mesh/VectorFontMesh.h"
 
 FontActor::FontActor()
 {
-    m_actorType = GAMEACTOR_FONT;
     m_useRenderWorkerType = WorkerType_Misc;
     m_useRenderWorkerType = WorkerType_XCMesh;
 }

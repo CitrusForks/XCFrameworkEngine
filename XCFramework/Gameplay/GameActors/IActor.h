@@ -6,11 +6,9 @@
 
 #pragma once
 
-#include "Engine/Serializer/IBase.h"
+#include "Base/Serializer/IBase.h"
 #include "Engine/ObjectBase/IObjectDimensions.h"
-#include "Engine/Graphics/IRenderableObject.h"
-
-#include "Gameplay/GameActors/GameActorTypes.h"
+#include "Graphics/IRenderableObject.h"
 
 class IActor : public IBase, public IObjectDimensions, public IRenderableObject
 {
@@ -47,7 +45,6 @@ public:
 protected:
 
     std::string         m_userFriendlyName;
-    EGameActorType      m_actorType;
                         
     bool                m_worldReady;
     bool                m_invalidated;

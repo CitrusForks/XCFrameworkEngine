@@ -6,8 +6,6 @@
 
 #pragma once
 
-#include "Engine/Utils/GraphicUtils.h"
-
 class IAppFramework
 {
 public:
@@ -18,22 +16,19 @@ public:
     HWND                    GetMainWnd();
 
     //Framework Methods
-    virtual int             Init()                      = 0;
-    
-    virtual void            OnResize()                  = 0;
-    virtual void            Run()                       = 0;
+    virtual int             Init()                 = 0;
+    virtual void            OnResize()             = 0;
+    virtual void            Run()                  = 0;
     virtual void            Update(float dt)       = 0;
     virtual void            Draw( )                = 0;
-
-    virtual void            Destroy()                   = 0;
+    virtual void            Destroy()              = 0;
     
     void                    EnableFullScreenMode(bool enable);
     bool                    IsDeviceLost();
-    
 
 protected:
     //Override these methods, if you need to change working
-    virtual void            CalculateFramesPerSecond(float dt){}	//Call from update method
+    virtual void            CalculateFramesPerSecond(float dt) {}	//Call from update method
     
     //Customized data members
     std::string             m_MainWndCaption;

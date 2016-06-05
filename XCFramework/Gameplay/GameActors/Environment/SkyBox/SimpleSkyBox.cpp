@@ -4,14 +4,15 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
-#include "stdafx.h"
+#include "GameplayPrecompiledHeader.h"
 
 #include "Gameplay/GameActors/Environment/SkyBox/SimpleSkyBox.h"
-#include "Engine/Graphics/XC_GraphicsDx11.h"
-#include "Engine/Graphics/XC_Shaders/XC_ShaderBufferConstants.h"
-#include "Engine/Graphics/XC_Shaders/XC_ShaderHandle.h"
+
+#include "Graphics/XC_Graphics.h"
+#include "Graphics/XC_Shaders/XC_ShaderBufferConstants.h"
+#include "Graphics/XC_Shaders/XC_ShaderHandle.h"
+
 #include "Engine/Resource/ResourceManager.h"
-#include "Engine/Graphics/XC_Camera/XC_CameraManager.h"
 
 SimpleSkyBox::SimpleSkyBox(void)
 {
@@ -141,12 +142,12 @@ void SimpleSkyBox::Draw(RenderContext& context)
 
     // Set constants
     //Calculate wvp and set it to the constant.
-    XC_CameraManager* cam = (XC_CameraManager*)&SystemLocator::GetInstance()->RequestSystem<XC_CameraManager>("CameraManager");
+    ICamera& cam = context.GetShaderManagerSystem().GetGlobalShaderData().m_camera;
 
-    cbWVP wbuffer = { ToXCMatrix4Unaligned(XMMatrixTranspose(m_World * cam->GetViewMatrix() * cam->GetProjMatrix())) };
+    cbWVP wbuffer = { ToXCMatrix4Unaligned(XMMatrixTranspose(m_World * cam.GetViewMatrix() * cam.GetProjectionMatrix())) };
 
     // Set constants
-    XCShaderHandle* cubeMapShader = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(ShaderType_SimpleCubeMap);
+    XCShaderHandle* cubeMapShader = (XCShaderHandle*) context.GetShaderManagerSystem().GetShader(ShaderType_SimpleCubeMap);
 
     cubeMapShader->SetVertexBuffer(context.GetDeviceContext(), &m_vertexBuffer);
     cubeMapShader->SetIndexBuffer(context.GetDeviceContext(), m_indexBuffer);

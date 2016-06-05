@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "GameplayPrecompiledHeader.h"
 
 #include "Gameplay/GameStates/EditorStates/EditorRunningState.h"
 #include "Gameplay/WorldEditor.h"
