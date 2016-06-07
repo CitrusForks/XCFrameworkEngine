@@ -6,28 +6,8 @@
 
 #pragma once
 
-#define NOMINMAX
-
 #include <WinSock2.h>
 
- //std, stl
-#include <string>
-#include <sstream>
-#include <list>
-#include <vector>
-#include <map>
-#include <queue>
-
- //Thread
-#include <future>
-#include <atomic>
-#include <mutex>
-
-#include "Engine/Memory/MemorySystemWin32.h"
-
-#include "Base/Serializer/IBase.h"
-#include "Base/ErrorHandling/ErrorHandler.h"
-#include "Base/XCMath/XCMathIncludes.h"
-
-#include "Engine/System/SystemLocator.h"
-#include "Engine/Utils/EngineUtils.h"
+#include "Base/BaseCommonIncludes.h"
+#include "Engine/EngineCommonIncludes.h"
+#include "Graphics/GraphicsCommonIncludes.h"
