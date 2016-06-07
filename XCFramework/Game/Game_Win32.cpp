@@ -179,7 +179,7 @@ void Game_Win32::Destroy()
     m_directInputSystem->Destroy();
     m_graphicsSystem->Destroy();
     m_resourceManagingSystem->Destroy();
-    m_taskManagingSystem->UnregisterAllTasks();
+    m_taskManagingSystem->Destroy();
     m_networkManagingSystem->Destroy();
     m_eventBroadcaster->Destroy();
 

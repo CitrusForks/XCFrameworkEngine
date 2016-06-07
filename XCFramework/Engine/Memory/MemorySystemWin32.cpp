@@ -177,7 +177,7 @@ void* MemorySystemWin32::getPointerToAllocatedBlock(int blockIndex)
     int offsetAdded = 0;
     char* pStart = m_pChunkFront;
 
-    for (int index = 0; index < m_allocatedBytesList.size(); index++)
+    for (unsigned int index = 0; index < m_allocatedBytesList.size(); index++)
     {
         if (index == blockIndex)
         {

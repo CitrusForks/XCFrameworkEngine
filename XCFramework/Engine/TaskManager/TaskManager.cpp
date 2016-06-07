@@ -33,7 +33,6 @@ void* RunProcess(void* lpParam)
 #endif
 }
 
-
 std::future<int> TaskManager::RegisterTask(ITask *_pTask)
 {
     m_taskQueue.push_back(_pTask);
@@ -54,7 +53,6 @@ std::future<int> TaskManager::RegisterTask(ITask *_pTask)
 
     return m_taskQueue.back()->GetFuture();
 }
-
 
 bool TaskManager::UnregisterTask(unsigned int _id)
 {
@@ -108,7 +106,6 @@ int TaskManager::GetTaskIndex(unsigned long threadId)
     return -1;
 }
 
-
 void TaskManager::UnregisterAllTasks()
 {
     for (unsigned int i = 0; i < m_taskQueue.size(); i++)
@@ -116,7 +113,6 @@ void TaskManager::UnregisterAllTasks()
         m_taskQueue.erase(m_taskQueue.begin() + i);
     }
 }
-
 
 void TaskManager::Update()
 {
@@ -151,7 +147,6 @@ void TaskManager::Update()
         }
 }
 
-
 bool TaskManager::CreateAsyncThread()
 {
     //Create a new Thread and init the process
@@ -169,4 +164,9 @@ bool TaskManager::CreateAsyncThread()
     Logger("Thread Created with Instance Id : %d", threadID);
 
     return true;
+}
+
+void TaskManager::Destroy()
+{
+    UnregisterAllTasks();
 }

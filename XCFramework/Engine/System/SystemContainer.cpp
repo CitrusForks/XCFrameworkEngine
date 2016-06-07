@@ -74,11 +74,13 @@ ISystem& SystemContainer::GetSystem(std::string sysName)
 
 void SystemContainer::Destroy()
 {
-    //The one who new's the system is suppose to delete the system.
-    /*for (auto it = m_systemContainer.begin(); it != m_systemContainer.end(); ++it)
+    for (auto it = m_systemContainer.begin(); it != m_systemContainer.end(); ++it)
     {
-        delete(it->second);
-    }*/
+        if (it->second)
+        {
+            delete(it->second);
+        }
+    }
 
     m_systemContainer.clear();
     m_systemFactory->DestroyFactory();

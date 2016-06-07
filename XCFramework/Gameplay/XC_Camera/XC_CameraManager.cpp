@@ -86,7 +86,6 @@ void XC_CameraManager::AttachCameraToActor(IActor* actor, XCVecIntrinsic4 distan
     ((ThirdPersonCamera*) m_Cameras[CAMERATYPE_TPS].get())->SetDistanceFromTarget(distanceFromTarget);
 }
 
-
 void XC_CameraManager::Update(float dt)
 {
     m_Cameras[m_currentCameraType]->Update(dt);

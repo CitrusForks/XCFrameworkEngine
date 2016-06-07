@@ -17,6 +17,8 @@ public:
     TaskManager()   {}
     ~TaskManager(void);
 
+    void                    Destroy();
+
     std::future<int>        RegisterTask(ITask *_pProcess);
 
     bool                    UnregisterTask(unsigned long threadId);
