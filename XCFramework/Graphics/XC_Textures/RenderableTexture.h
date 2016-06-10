@@ -8,6 +8,8 @@
 
 #if defined(XCGRAPHICS_DX11) || defined(XCGRAPHICS_GNM)
 
+#include "Graphics/D3DConstantBuffer.h"
+
 class RenderableTexture
 {
 public:
@@ -30,7 +32,7 @@ public:
     void                        SetRenderableTarget(ID3DDeviceContext& context, ID3DDepthStencilView* depthView);
     void                        ClearRenderTarget(ID3DDeviceContext& context, ID3DDepthStencilView* depthView, const XCVec4& color);
 
-    ID3DShaderResourceView*     GetShaderResourceView() { return m_pSRV; }
+    D3DConstantBuffer*          GetShaderResourceView() { return m_pSRV; }
     ID3DTexture2D*              GetTexture2D() { return m_pRenderTargetTexture;  }
 
     void                        DumpTextureToFile();
@@ -44,7 +46,7 @@ public:
 private:
     ID3DTexture2D*              m_pRenderTargetTexture;
     ID3DRenderTargetView*       m_pRenderTargetView;
-    ID3DShaderResourceView*     m_pSRV;
+    D3DConstantBuffer*          m_pSRV;
 
     ID3DTexture2D*              m_pRenderTargetTextureStaged;
     ID3DTexture2D*              m_pSingleSampledTex;

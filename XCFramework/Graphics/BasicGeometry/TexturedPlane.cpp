@@ -53,10 +53,8 @@ void TexturedPlane::PreLoad(const void* fbBuffer)
 
     m_rasterType = (RasterType) texPlaneBuff->RasterizerType();
 
-#if defined(XCGRAPHICS_DX12)
     SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
     m_pCBPerObject = heap.CreateBufferView(D3DBufferDesc(BUFFERTYPE_CBV, sizeof(PerObjectBuffer)));
-#endif
 }
 
 void TexturedPlane::PreLoad(XCVecIntrinsic4 initialPosition, XCVecIntrinsic4 initialRotation, XCVecIntrinsic4 initialScaling, BasicMaterial material, std::string texture, RasterType rasterType)
@@ -109,7 +107,7 @@ void TexturedPlane::Draw(RenderContext& context)
     context.ApplyShader(m_useShaderType);
 
     // Set constants
-    //TODO: Remove all teh overrides from here. Need to create a textureplaneactor from gameplay that will inherit this and then make it renderable
+    //TODO: Remove all teh overrides from here. Need to create a texture planeactor from gameplay that will inherit this and then make it renderable
    ICamera& cam = context.GetShaderManagerSystem().GetGlobalShaderData().m_camera;
     PerObjectBuffer perObject = {
         ToXCMatrix4Unaligned(XMMatrixTranspose(m_World)),
@@ -122,12 +120,8 @@ void TexturedPlane::Draw(RenderContext& context)
     XCShaderHandle* lightTexShader = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(ShaderType_LightTexture);
     lightTexShader->SetVertexBuffer(context.GetDeviceContext(), &m_vertexBuffer);
 
-#if defined(XCGRAPHICS_DX12)
     memcpy(m_pCBPerObject->m_cbDataBegin, &perObject, sizeof(PerObjectBuffer));
-    lightTexShader->SetConstantBuffer("PerObjectBuffer", context.GetDeviceContext(), m_pCBPerObject->m_gpuHandle);
-#else
-    lightTexShader->setCBPerObject(context.GetDeviceContext(), perObject);
-#endif
+    lightTexShader->SetConstantBuffer("PerObjectBuffer", context.GetDeviceContext(), *m_pCBPerObject);
 
     lightTexShader->SetResource("gDiffuseMap", context.GetDeviceContext(), m_texture);
 
@@ -138,4 +132,7 @@ void TexturedPlane::Destroy()
 {
     ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
     resMgr.ReleaseResource(m_texture);
+
+    SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
+    heap.DestroyBuffer(m_pCBPerObject);
 }

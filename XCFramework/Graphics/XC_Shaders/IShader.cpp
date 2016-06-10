@@ -36,7 +36,6 @@ void IShader::MemCpyConstants(ID3DDeviceContext& context, void* dest, void* src,
 #endif
 }
 
-#if defined(XCGRAPHICS_DX12)
 D3DConstantBuffer* IShader::CreateBuffer(BufferType bufferType, int sizeOfType)
 {
     D3DConstantBuffer* constantBuff = nullptr;
@@ -55,30 +54,8 @@ D3DConstantBuffer* IShader::CreateBuffer(BufferType bufferType, int sizeOfType)
     return constantBuff;
 }
 
-#elif defined(XCGRAPHICS_DX11)
-ID3D11Buffer* IShader::CreateBuffer(int sizeOfType)
+void IShader::Destroy()
 {
-    ID3D11Buffer* buffer;
-    D3D11_BUFFER_DESC bd;
-    ZeroMemory(&bd, sizeof(bd));
-    bd.Usage = D3D11_USAGE_DYNAMIC;
-    bd.ByteWidth = sizeOfType;
-    bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-    bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-
-    ValidateResult(m_device.CreateBuffer(&bd, nullptr, &buffer));
-
-    return buffer;
-}
-
-
-#endif
-
-void IShader::destroy()
-{
-#if defined(XCGRAPHICS_DX12)
-
-
 #if defined(USE_D3D_COMPILER)
     ReleaseCOM(m_pPS);
     ReleaseCOM(m_pVS);
@@ -88,12 +65,4 @@ void IShader::destroy()
     if (m_pPS)
         delete m_pPS;
 #endif
-#elif defined(XCGRAPHICS_DX11)
-    ReleaseCOM(m_pInputLayout);
-
-    ReleaseCOM(m_pPS);
-    ReleaseCOM(m_pVS);
-#endif
-
-
 }

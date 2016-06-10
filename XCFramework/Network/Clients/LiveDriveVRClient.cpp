@@ -10,11 +10,6 @@
 
 #include "Engine/Input/Directinput.h"
 
-#if defined(XCGRAPHICS_DX11)
-#include "Graphics/XC_Graphics.h"
-#include "Graphics/XC_Textures/RenderableTexture.h"
-#endif
-
 LiveDriveVRClient::LiveDriveVRClient()
 {
     Logger("[Network] LiveDriveVRClient initialized");

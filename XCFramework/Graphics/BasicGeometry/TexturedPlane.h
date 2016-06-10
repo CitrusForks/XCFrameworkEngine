@@ -43,7 +43,5 @@ protected:
     VertexBuffer<VertexPosNormTex>    m_vertexBuffer;
     RasterType                        m_rasterType;
 
-#if defined(XCGRAPHICS_DX12)
     D3DConstantBuffer*                m_pCBPerObject;
-#endif
 };

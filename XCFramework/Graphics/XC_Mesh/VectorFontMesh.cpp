@@ -137,7 +137,7 @@ void VectorFontMesh::Draw(RenderContext& context)
     for (auto subMesh : m_subMeshesIdBuffer)
     {
         memcpy(m_vectorFontInstanceBuffers[subMesh.submeshId].m_instanceBufferGPU->m_cbDataBegin, &m_vectorFontInstanceBuffers[subMesh.submeshId].m_instanceBuffer.gWVP[0], sizeof(XCMatrix4Unaligned) * subMesh.instanceCount);
-        shader->SetConstantBuffer("cbPerObjectInstanced", context.GetDeviceContext(), m_vectorFontInstanceBuffers[subMesh.submeshId].m_instanceBufferGPU->m_gpuHandle);
+        shader->SetConstantBuffer("cbPerObjectInstanced", context.GetDeviceContext(), *m_vectorFontInstanceBuffers[subMesh.submeshId].m_instanceBufferGPU);
         DrawSubMesh(context, subMesh.submeshId, subMesh.instanceCount);
     }
 

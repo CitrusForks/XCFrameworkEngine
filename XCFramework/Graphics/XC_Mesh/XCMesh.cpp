@@ -549,16 +549,6 @@ void XCMesh::CreateConstantBuffer()
     }
 }
 
-#if defined(XCGRAPHICS_DX11)
-void XCMesh::BuildBuffer(unsigned int sizeOfType, void* ptrToBuffer, unsigned int length, ID3D11Buffer* buffer, D3D11_BUFFER_DESC desc)
-{
-    D3D11_SUBRESOURCE_DATA vInitData;
-    vInitData.pSysMem = ptrToBuffer;
-
-    ValidateResult(m_resourceManager->GetXCGraphicsDx11System().GetDevice()->CreateBuffer(&desc, &vInitData, &buffer));
-}
-#endif
-
 void XCMesh::FilterSubMeshes()
 {
     unsigned int index = 0;
@@ -640,7 +630,7 @@ void XCMesh::Draw(RenderContext& context)
         context.ApplyShader(m_shaderType);
 
         XC_LightManager* lightMgr = (XC_LightManager*)&SystemLocator::GetInstance()->RequestSystem("LightsManager");
-        m_shaderHandler->SetConstantBuffer("cbLightsPerFrame", context.GetDeviceContext(), lightMgr->getLightConstantBuffer()->m_gpuHandle);
+        m_shaderHandler->SetConstantBuffer("cbLightsPerFrame", context.GetDeviceContext(), lightMgr->GetLightConstantBuffer());
         m_shaderHandler->SetResource("gDiffuseMap", context.GetDeviceContext(), m_texture);
 
         DrawSubMeshes(context);
@@ -657,14 +647,14 @@ void XCMesh::DrawSubMesh(RenderContext& renderContext, unsigned int meshIndex)
     case ShaderType_LightTexture:
     {
         memcpy(m_instanceBuffers[0].m_cbInstancedBufferGPU->m_cbDataBegin, &m_instanceBuffers[0].m_cbInstancedBuffer, sizeof(cbInstancedBuffer));
-        m_shaderHandler->SetConstantBuffer("cbInstancedBuffer", renderContext.GetDeviceContext(), m_instanceBuffers[0].m_cbInstancedBufferGPU->m_gpuHandle);
+        m_shaderHandler->SetConstantBuffer("cbInstancedBuffer", renderContext.GetDeviceContext(), *m_instanceBuffers[0].m_cbInstancedBufferGPU);
         break;
     }
 
     case ShaderType_SkinnedCharacter:
     {
         memcpy(m_instanceBuffers[0].m_cbInstancedBufferGPU->m_cbDataBegin, &m_instanceBuffers[0].m_cbInstancedBuffer, sizeof(cbInstancedBuffer));
-        m_shaderHandler->SetConstantBuffer("cbInstancedBuffer", renderContext.GetDeviceContext(), m_instanceBuffers[0].m_cbInstancedBufferGPU->m_gpuHandle);
+        m_shaderHandler->SetConstantBuffer("cbInstancedBuffer", renderContext.GetDeviceContext(), *m_instanceBuffers[0].m_cbInstancedBufferGPU);
 
         std::vector<aiMatrix4x4> boneMatrix = m_sceneAnimator->GetBoneMatrices(m_scene->mRootNode, meshIndex);
 
@@ -687,7 +677,7 @@ void XCMesh::DrawSubMesh(RenderContext& renderContext, unsigned int meshIndex)
         }
 
         memcpy(m_boneBuffers[meshIndex].m_cbBoneBufferGPU->m_cbDataBegin, &matrices, sizeof(cbBoneBuffer));
-        m_shaderHandler->SetConstantBuffer("cbBoneBuffer", renderContext.GetDeviceContext(), m_boneBuffers[meshIndex].m_cbBoneBufferGPU->m_gpuHandle);
+        m_shaderHandler->SetConstantBuffer("cbBoneBuffer", renderContext.GetDeviceContext(), *m_boneBuffers[meshIndex].m_cbBoneBufferGPU);
         break;
     }
 

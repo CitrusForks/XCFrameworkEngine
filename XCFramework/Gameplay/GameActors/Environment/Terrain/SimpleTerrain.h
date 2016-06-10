@@ -48,4 +48,7 @@ protected:
     IndexBuffer<unsigned int>           m_indexBuffer;
 
     ShaderType                          m_useShaderType;
+
+private:
+    D3DConstantBuffer*                  m_pCBPerObject;
 };

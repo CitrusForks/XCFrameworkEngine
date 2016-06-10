@@ -152,13 +152,10 @@ void SimpleSkyBox::Draw(RenderContext& context)
     cubeMapShader->SetVertexBuffer(context.GetDeviceContext(), &m_vertexBuffer);
     cubeMapShader->SetIndexBuffer(context.GetDeviceContext(), m_indexBuffer);
 
-#if defined(XCGRAPHICS_DX12)
     memcpy(m_CBwvp->m_cbDataBegin, &wbuffer, sizeof(cbWVP));
-    cubeMapShader->SetConstantBuffer("cbWVP", context.GetDeviceContext(), m_CBwvp->m_gpuHandle);
-#else
-    cubeMapShader->setWVP(context.GetDeviceContext(), wbuffer);
-#endif
+    cubeMapShader->SetConstantBuffer("cbWVP", context.GetDeviceContext(), *m_CBwvp);
     cubeMapShader->SetResource("gCubeMap", context.GetDeviceContext(), m_cubeMapTexture);
+    
     context.GetShaderManagerSystem().DrawIndexedInstanced(context.GetDeviceContext(), 36, m_indexBuffer.GetIndexBufferInGPUMem());
     graphicsSystem.SetLessEqualDepthStencilView(context.GetDeviceContext(), false);
 }

@@ -43,7 +43,6 @@ void XC_ShaderManager::Init()
     ZeroMemory(&m_samplerDesc, sizeof(m_samplerDesc));
 #endif
 
-#if defined(XCGRAPHICS_DX12)
     //Initialize shader shared descriptor heap
     SystemContainer& container = SystemLocator::GetInstance()->GetSystemContainer();
     container.RegisterSystem<SharedDescriptorHeap>("SharedDescriptorHeap");
@@ -61,10 +60,8 @@ void XC_ShaderManager::Init()
         + NbOfTextureResources 
 #endif
         + 100);
-#endif
 
     LoadShaders();
-
     LoadRasterizers();
     LoadSamplers();
 }
@@ -233,16 +230,14 @@ void XC_ShaderManager::Destroy()
     {
         if (m_Shaders[(ShaderType)shaderIndex] != nullptr)
         {
-            m_Shaders[(ShaderType)shaderIndex]->destroy();
+            m_Shaders[(ShaderType)shaderIndex]->Destroy();
         }
     }
     m_Shaders.clear();
 
-#if defined(XCGRAPHICS_DX12)
     m_sharedDescriptorHeap->Destroy();
     SystemContainer& container = SystemLocator::GetInstance()->GetSystemContainer();
     container.RemoveSystem("SharedDescriptorHeap");
-#endif
 }
 
 void XC_ShaderManager::ApplyShader(ID3DDeviceContext& context, ShaderType _ShaderType)
@@ -272,11 +267,7 @@ void XC_ShaderManager::DrawNonIndexed(ID3DDeviceContext& context, unsigned int v
 
 void XC_ShaderManager::DrawIndexedInstanced(ID3DDeviceContext& context, unsigned int _indexCount, void* indexGpuAddr, unsigned int instanceCount)
 {
-#if defined(XCGRAPHICS_DX12)
     context.DrawIndexedInstanced(_indexCount, instanceCount, 0, 0, 0);
-#elif defined(XCGRAPHICS_DX11)
-    context.DrawIndexed(_indexCount, 0, 0);
-#endif
 }
 
 void XC_ShaderManager::ClearShaderAndRenderStates(ID3DDeviceContext& context)

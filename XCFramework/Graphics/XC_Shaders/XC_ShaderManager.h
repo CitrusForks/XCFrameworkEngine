@@ -32,7 +32,10 @@ public:
 
     void                  SetRasterizerState(ID3DDeviceContext& context, RasterType type);
     IShader*              GetShader(ShaderType shaderType);
+
+#if defined(XCGRAPHICS_DX12)
     ID3D12DescriptorHeap* GetSamplerDescriptorHeap() { return m_samplerHeap; }
+#endif
 
     void                  ApplyShader(ID3DDeviceContext& context, ShaderType _ShaderType);
 
@@ -57,7 +60,6 @@ private:
     D3D12_SAMPLER_DESC          m_samplerDesc;
     ID3D12DescriptorHeap*       m_samplerHeap;
 
-    SharedDescriptorHeap*       m_sharedDescriptorHeap;
 #elif defined(XCGRAPHICS_DX11)
     D3D11_RASTERIZER_DESC                        m_rasterizerDesc;
     std::map<RasterType, ID3D11RasterizerState*> m_rasterizerStates;
@@ -66,6 +68,7 @@ private:
     ID3D11SamplerState*                          m_SamplerLinear;
 #endif
 
+    SharedDescriptorHeap*       m_sharedDescriptorHeap;
     ID3DDevice&                 m_device;
     RasterType                  m_rasterType;
     FlatBuffersSystem::FBBuffer m_fbBuffer;

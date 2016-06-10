@@ -29,8 +29,8 @@ RenderableTexture::RenderableTexture(ID3DDevice& device, ID3DDeviceContext& cont
 #if defined(XCGRAPHICS_GNM)
     m_pRenderTargetView = new ID3DRenderTargetView;
 #endif
+    
 }
-
 
 RenderableTexture::~RenderableTexture()
 {
@@ -113,7 +113,7 @@ bool RenderableTexture::PreLoad(int msaaQuality, int texWidth, int texHeight)
     shaderResourceViewDesc.Texture2D.MipLevels = 1;
 
     // Create the shader resource view.
-    ValidateResult(m_device.CreateShaderResourceView(m_pRenderTargetTextureStaged, &shaderResourceViewDesc, &m_pSRV));
+    ValidateResult(m_device.CreateShaderResourceView(m_pRenderTargetTextureStaged, &shaderResourceViewDesc, &m_pSRV->m_cbResource));
 
     // RGB Texture for transferring over the network
     m_renderableTexture->m_texData = new unsigned char[texWidth * texHeight * 3];

@@ -25,3 +25,5 @@ XCFramework/.vs/*
 *log.txt
 /XCTools/FBXToXCMeshConverter/FBXToXCMeshConverter/Debug
 /XCTools/FBXToXCMeshConverter/Debug
+/XCTools/XCShaderCompiler/XCShaderCompiler/obj/Debug
+/XCTools/XCShaderCompiler/XCShaderCompiler/bin/Debug

@@ -18,8 +18,8 @@ public:
     XC_Graphics(void);
     virtual ~XC_Graphics(void);
     
-    virtual  void               InitGraphicsWindow(HWND _mainWnd, int _width, int _height, bool _enable4xMsaa);
-    ID3DDevice*                 GetDevice()         { return m_pD3DDevice; }
+    virtual  void                   InitGraphicsWindow(HWND _mainWnd, int _width, int _height, bool _enable4xMsaa);
+    ID3DDevice*                     GetDevice()         { return m_pD3DDevice; }
 
     virtual ID3DDeviceContext*      GetDeviceContext() = 0;
     virtual ID3DCommandAllocator*   GetDeviceCommandAllocator() = 0;

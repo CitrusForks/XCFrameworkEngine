@@ -8,8 +8,12 @@
 
 #include "Network/Client.h"
 
+#if defined(XCGRAPHICS_DX11)
+#include "Graphics/XC_Graphics.h"
+#include "Graphics/XC_Textures/RenderableTexture.h"
+#endif
+
 class DirectInput;
-class XC_Graphics;
 
 static const char* IP_ADDRESS = "192.168.1.101";
 static const int   DEFAULT_PORT = 38300;

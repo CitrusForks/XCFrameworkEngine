@@ -25,7 +25,7 @@ public:
     void                            Draw(XC_Graphics& graphicsSystem);
     void                            Destroy();
 
-    D3DConstantBuffer*              getLightConstantBuffer() { return m_pCBLightsPerFrame; }
+    D3DConstantBuffer&              GetLightConstantBuffer() { return *m_pCBLightsPerFrame; }
 
 private:
 

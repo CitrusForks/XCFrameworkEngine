@@ -37,7 +37,9 @@ public:
     void BuildIndexBuffer();
     void RenderContextCallback(RenderContext& renderContext);
 
+#if defined(XCGRAPHICS_DX12)
     D3D12_INDEX_BUFFER_VIEW& GetIndexBufferView() { return m_indexBufferView; }
+#endif
 
     void* GetIndexBufferInGPUMem()      
     {
@@ -46,12 +48,11 @@ public:
 
 #if defined(XCGRAPHICS_DX12)
     D3D12_INDEX_BUFFER_VIEW             m_indexBufferView;
+    ID3DResource*                       m_pIndexBufferResource;
+    ID3DResource*                       m_pIndexBufferUploadResource;
 #elif defined(XCGRAPHICS_DX11)
     ID3D11Buffer*                       m_pIB;
 #endif
-
-    ID3DResource*                       m_pIndexBufferResource;
-    ID3DResource*                       m_pIndexBufferUploadResource;
 
     std::vector<T>                      m_indexData;
 };

@@ -23,22 +23,23 @@ public:
 
     VertexBuffer(const VertexBuffer& vertexBuffer)
     {
-        m_vertexData = vertexBuffer.m_vertexData;
+        m_vertexData         = vertexBuffer.m_vertexData;
+        m_vertexFormatStride = vertexBuffer.m_vertexFormatStride;
     }
 
     ~VertexBuffer()
-    {
-    }
+    {}
 
     void operator =(const VertexBuffer& vertexBuffer)
     {
         m_vertexData = vertexBuffer.m_vertexData;
     }
 
-    void UpdateState() override;
-
-    void BuildVertexBuffer();
-    void RenderContextCallback(RenderContext& renderContext);
+    void            UpdateState() override;
+    void            BuildVertexBuffer();
+    void            RenderContextCallback(RenderContext& renderContext);
+    unsigned int    GetVertexFormatStride() { return sizeof(T); }
+    void            SetVertexBuffer(ID3DDeviceContext& context);
 
 #if defined(XCGRAPHICS_DX12) 
     D3D12_VERTEX_BUFFER_VIEW& GetVertexBufferView()
@@ -56,6 +57,22 @@ public:
 
     std::vector<T>                      m_vertexData;
 };
+
+template<class T>
+void VertexBuffer<T>::SetVertexBuffer(ID3DDeviceContext& context)
+{
+#if defined(XCGRAPHICS_DX12)
+    context.IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    context.IASetVertexBuffers(0, 1, &m_vertexBufferView);
+#elif defined(XCGRAPHICS_DX11)
+    context.IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+    unsigned int stride = GetVertexFormatStride();
+    unsigned int offset = 0;
+
+    context.IASetVertexBuffers(0, 1, &m_pVB, &stride, &offset);
+#endif
+}
 
 template<class T>
 void VertexBuffer<T>::BuildVertexBuffer()
@@ -94,6 +111,7 @@ void VertexBuffer<T>::BuildVertexBuffer()
     m_vertexBufferView.BufferLocation = m_pVertexBufferResource->GetGPUVirtualAddress();
     m_vertexBufferView.SizeInBytes = vbSize;
     m_vertexBufferView.StrideInBytes = sizeof(T);
+
 #elif defined(XCGRAPHICS_DX11)
     D3D11_BUFFER_DESC vbd;
     vbd.Usage = D3D11_USAGE_DYNAMIC;
@@ -104,7 +122,7 @@ void VertexBuffer<T>::BuildVertexBuffer()
 
     D3D11_SUBRESOURCE_DATA vInitData;
 
-    vbd.ByteWidth = sizeof(T)* m_vertexData.size();
+    vbd.ByteWidth = sizeof(T) * m_vertexData.size();
     vInitData.pSysMem = &m_vertexData[0];
 
     ValidateResult(graphicsSystem.GetDevice()->CreateBuffer(&vbd, &vInitData, &m_pVB));

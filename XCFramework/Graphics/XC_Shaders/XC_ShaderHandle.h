@@ -39,9 +39,9 @@ struct ShaderSlot
     union BufferDesc
     {
         //Constant buffers
-        D3D12_SHADER_BUFFER_DESC     constantBufferDesc;
+        D3D_SHADER_BUFFER_DESC     constantBufferDesc;
         //Texture slots and others
-        D3D12_SHADER_INPUT_BIND_DESC resourceBufferDesc;
+        D3D_SHADER_INPUT_BIND_DESC resourceBufferDesc;
     };
 
     BufferDesc   m_bufferDesc;
@@ -52,13 +52,13 @@ struct ShaderSlot
         return m_bufferType == BUFFERTYPE_CBV ? m_bufferDesc.constantBufferDesc.Name : m_bufferDesc.resourceBufferDesc.Name;
     }
 
-    ShaderSlot(D3D12_SHADER_BUFFER_DESC buffer)
+    ShaderSlot(D3D_SHADER_BUFFER_DESC buffer)
     {
         m_bufferDesc.constantBufferDesc = buffer;
         m_bufferType = BUFFERTYPE_CBV;
     }
 
-    ShaderSlot(D3D12_SHADER_INPUT_BIND_DESC buffer)
+    ShaderSlot(D3D_SHADER_INPUT_BIND_DESC buffer)
     {
         m_bufferDesc.resourceBufferDesc = buffer;
         m_bufferType = BUFFERTYPE_SRV;
@@ -75,8 +75,14 @@ public:
     void            Load(const void* fbBuffer);
     void            ApplyShader(ID3DDeviceContext& context, RasterType rasterType = RasterType_FillSolid);
     void            Reset(ID3DDeviceContext& context) {}
-    void            SetConstantBuffer(std::string bufferName, ID3DDeviceContext& context, D3D12_GPU_DESCRIPTOR_HANDLE& gpuHandle);
+    void            SetConstantBuffer(std::string bufferName, ID3DDeviceContext& context, D3DConstantBuffer& constantBuffer);
+    
+#if defined(XCGRAPHICS_DX12)
     void            SetSampler(std::string bufferName, ID3DDeviceContext& context, D3D12_GPU_DESCRIPTOR_HANDLE& gpuHandle);
+#elif defined(XCGRAPHICS_DX11)
+    void            SetSampler(std::string bufferName, ID3DDeviceContext& context, D3D12_GPU_DESCRIPTOR_HANDLE& gpuHandle);
+#endif
+
     void            SetResource(std::string bufferName, ID3DDeviceContext& context, ResourceHandle* tex);
     VertexFormat    GetVertexFormat() { return m_vertexFormat; }
 
@@ -126,38 +132,26 @@ public:
 
     void SetVertexBuffer(ID3DDeviceContext& context, void* vertexBuffer)
     {
-        D3D12_VERTEX_BUFFER_VIEW vertexBufferView = {};
         switch (m_vertexFormat)
         {
         case VertexFormat_Position:
-            vertexBufferView = ((VertexBuffer<VertexPosColor>*)vertexBuffer)->GetVertexBufferView();
+            ((VertexBuffer<VertexPosColor>*)vertexBuffer)->SetVertexBuffer(context);
             break;
         case VertexFormat_PositionNormalTexture:
-            vertexBufferView = ((VertexBuffer<VertexPosNormTex>*)vertexBuffer)->GetVertexBufferView();
+            ((VertexBuffer<VertexPosNormTex>*)vertexBuffer)->SetVertexBuffer(context);
             break;
 
         case VertexFormat_PositionNormalTextureBlendIndexBlendWeight:
-            vertexBufferView = ((VertexBuffer<VertexPosNormTexBIndexBWeight>*)vertexBuffer)->GetVertexBufferView();
+            ((VertexBuffer<VertexPosNormTexBIndexBWeight>*)vertexBuffer)->SetVertexBuffer(context);
             break;
 
         case VertexFormat_PositionColorInstanceIndex:
-            vertexBufferView = ((VertexBuffer<VertexPosColorInstanceIndex>*)vertexBuffer)->GetVertexBufferView();
+            ((VertexBuffer<VertexPosColorInstanceIndex>*)vertexBuffer)->SetVertexBuffer(context);
             break;
 
         default:
             XCASSERT(false);
         }
-
-#if defined(XCGRAPHICS_DX12)
-        context.IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        context.IASetVertexBuffers(0, 1, &vertexBufferView);
-#elif defined(XCGRAPHICS_DX11)
-        context.IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-        unsigned int stride = sizeof(T);
-        unsigned int offset = 0;
-        context.IASetVertexBuffers(0, 1, &m_pVB, &stride, &offset);
-#endif
     }
 
     void SetIndexBuffer(ID3DDeviceContext& context, IndexBuffer<unsigned int>& indexBuffer)
@@ -166,7 +160,7 @@ public:
         context.IASetIndexBuffer(&indexBuffer.GetIndexBufferView());
 #elif defined(XCGRAPHICS_DX11)
         UINT32 offset = 0;
-        context.IASetIndexBuffer(m_pIB, DXGI_FORMAT_R32_UINT, offset);
+        context.IASetIndexBuffer(indexBuffer.m_pIB, DXGI_FORMAT_R32_UINT, offset);
 #elif defined(XCGRAPHICS_GNM)
         //Specified while drawIndex() call. See below GetIndexBufferInGPUMem
 #endif
@@ -183,12 +177,17 @@ protected:
     unsigned int            GetSizeOfConstantBuffer(std::string& cbName);
 
 private:
-    std::vector<ShaderSlot>                     m_shaderSlots;
-    std::vector<D3D12_SIGNATURE_PARAMETER_DESC> m_shaderInputParams;
 
-    ID3D12ShaderReflection*                     m_vsShaderReflection;
-    ID3D12ShaderReflection*                     m_psShaderReflection;
-    D3D12_INPUT_LAYOUT_DESC                     m_inputLayoutDesc;
+    std::vector<ShaderSlot>                     m_shaderSlots;
+    std::vector<D3D_SIGNATURE_PARAMETER_DESC>   m_shaderInputParams;
+
+    ID3DShaderReflection*                       m_vsShaderReflection;
+    ID3DShaderReflection*                       m_psShaderReflection;
+    D3D_INPUT_LAYOUT_DESC                       m_inputLayoutDesc;
+
+#if defined(XCGRAPHICS_DX11)
+    ID3D11InputLayout*                          m_inputLayout;
+#endif
 
     bool                                        m_enableDepth;
     VertexFormat                                m_vertexFormat;

@@ -47,7 +47,5 @@ protected:
 
     RasterType                      m_rasterType;
 
-#if defined(XCGRAPHICS_DX12)
     D3DConstantBuffer*              m_CBwvp;
-#endif
 };

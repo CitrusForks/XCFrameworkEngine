@@ -6,7 +6,6 @@
 
 #pragma once
 
-#if defined(XCGRAPHICS_DX12)
 
 #include "Graphics/XC_Shaders/XC_RasterizerTypes.h"
 
@@ -17,6 +16,8 @@ enum PSOType
 
     PSOType_Max
 };
+
+#if defined(XCGRAPHICS_DX12)
 
 class PSO_Dx12
 {
@@ -41,9 +42,9 @@ public:
             m_rootSignature = nullptr;
         }
 
-        D3D12_GRAPHICS_PIPELINE_STATE_DESC      m_psoDesc;
-        ID3D12PipelineState*                    m_pPso;
-        ID3D12RootSignature*                    m_rootSignature;
+        D3D12_GRAPHICS_PIPELINE_STATE_DESC  m_psoDesc;
+        ID3D12PipelineState*                m_pPso;
+        ID3D12RootSignature*                m_rootSignature;
     };
 
     bool                                    CreateRootSignature(ID3DDevice& device, void* bufferPtr, unsigned int bufferSize, PSOType type);

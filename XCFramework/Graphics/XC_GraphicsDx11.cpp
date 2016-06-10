@@ -48,6 +48,7 @@ void XC_GraphicsDx11::Destroy()
     ReleaseCOM(m_pD3DDevice);
     ReleaseCOM(m_pdxgiFactory);
     ReleaseCOM(m_pSwapChain);
+}
 
 void XC_GraphicsDx11::InitGraphicsWindow(HWND _mainWnd, int _width, int _height, bool _enable4xMsaa)
 {

@@ -20,7 +20,10 @@
 XCShaderHandle::XCShaderHandle(ID3DDevice& device) 
     : IShader(device)
 {
+#if defined(XCGRAPHICS_DX12)
     m_pso = XCNEW(PSO_Dx12);
+#endif
+
     m_vertexFormat = VertexFormat_Invalid;
 }
 
@@ -39,10 +42,12 @@ XCShaderHandle::~XCShaderHandle()
         delete(m_pPS);
     }
 
+#if defined(XCGRAPHICS_DX12)
     if (m_pso)
     {
         XCDELETE(m_pso);
     }
+#endif
 }
 
 void XCShaderHandle::Load(const void* fbBuffer)
@@ -91,15 +96,15 @@ void XCShaderHandle::LoadShader()
 void XCShaderHandle::ReadShaderDescription()
 {
     //Read the shader descriptions
-    D3D12_SHADER_DESC vsShaderDesc = {};
+    D3D_SHADER_DESC vsShaderDesc = {};
     m_vsShaderReflection->GetDesc(&vsShaderDesc);
 
-    D3D12_SHADER_DESC psShaderDesc = {};
+    D3D_SHADER_DESC psShaderDesc = {};
     m_psShaderReflection->GetDesc(&psShaderDesc);
 
     for (unsigned int cbIndex = 0; cbIndex < vsShaderDesc.ConstantBuffers; ++cbIndex)
     {
-        D3D12_SHADER_BUFFER_DESC desc = {};
+        D3D_SHADER_BUFFER_DESC desc = {};
         m_vsShaderReflection->GetConstantBufferByIndex(cbIndex)->GetDesc(&desc);
 
         if (std::find_if(m_shaderSlots.begin(), m_shaderSlots.end(), [desc](ShaderSlot it) -> bool { return strcmp(it.GetBufferName().c_str(), desc.Name) == 0; }) == m_shaderSlots.end())
@@ -115,7 +120,7 @@ void XCShaderHandle::ReadShaderDescription()
 
     for (unsigned int cbIndex = 0; cbIndex < psShaderDesc.ConstantBuffers; ++cbIndex)
     {
-        D3D12_SHADER_BUFFER_DESC desc = {};
+        D3D_SHADER_BUFFER_DESC desc = {};
         m_psShaderReflection->GetConstantBufferByIndex(cbIndex)->GetDesc(&desc);
 
         if (std::find_if(m_shaderSlots.begin(), m_shaderSlots.end(), [&desc](ShaderSlot it) -> bool { return strcmp(it.GetBufferName().c_str(), desc.Name) == 0; }) == m_shaderSlots.end())
@@ -132,7 +137,7 @@ void XCShaderHandle::ReadShaderDescription()
     //Read the resource slots from vs.
     for (unsigned int resBoundIndex = 0; resBoundIndex < vsShaderDesc.BoundResources; ++resBoundIndex)
     {
-        D3D12_SHADER_INPUT_BIND_DESC inputDesc = {};
+        D3D_SHADER_INPUT_BIND_DESC inputDesc = {};
         m_vsShaderReflection->GetResourceBindingDesc(resBoundIndex, &inputDesc);
 
         if (std::find_if(m_shaderSlots.begin(), m_shaderSlots.end(), [&inputDesc](ShaderSlot it) -> bool { return strcmp(it.GetBufferName().c_str(), inputDesc.Name) == 0; }) == m_shaderSlots.end())
@@ -148,7 +153,7 @@ void XCShaderHandle::ReadShaderDescription()
     //Read the resource slots from ps.
     for (unsigned int resBoundIndex = 0; resBoundIndex < psShaderDesc.BoundResources; ++resBoundIndex)
     {
-        D3D12_SHADER_INPUT_BIND_DESC inputDesc = {};
+        D3D_SHADER_INPUT_BIND_DESC inputDesc = {};
         m_psShaderReflection->GetResourceBindingDesc(resBoundIndex, &inputDesc);
 
         if (std::find_if(m_shaderSlots.begin(), m_shaderSlots.end(), [&inputDesc](ShaderSlot it) -> bool { return strcmp(it.GetBufferName().c_str(), inputDesc.Name) == 0; }) == m_shaderSlots.end())
@@ -175,14 +180,14 @@ void XCShaderHandle::ReadShaderDescription()
     //Input parameters are suppose to be of vertex shader.
     for (unsigned int ipParamIndex = 0; ipParamIndex < vsShaderDesc.InputParameters; ++ipParamIndex)
     {
-        D3D12_SIGNATURE_PARAMETER_DESC desc = {};
+        D3D_SIGNATURE_PARAMETER_DESC desc = {};
         m_vsShaderReflection->GetInputParameterDesc(ipParamIndex, &desc);
         m_shaderInputParams.push_back(desc);
         semanticNames.push_back(desc.SemanticName);
     }
 
-    m_vertexFormat = getVertexFormatFromSematicNames(semanticNames);
-    m_inputLayoutDesc = getInputLayoutFromVertexFormat(m_vertexFormat);
+    m_vertexFormat    = GetVertexFormatFromSematicNames(semanticNames);
+    m_inputLayoutDesc = GetInputLayoutFromVertexFormat(m_vertexFormat);
 }
 
 unsigned int XCShaderHandle::GetSizeOfConstantBuffer(std::string& cbName)
@@ -201,6 +206,7 @@ unsigned int XCShaderHandle::GetSizeOfConstantBuffer(std::string& cbName)
 
 void XCShaderHandle::GenerateRootSignature()
 {
+#if defined(XCGRAPHICS_DX12)
     //Create no of desc ranges and root params
     std::vector<CD3DX12_DESCRIPTOR_RANGE> descRanges(m_shaderSlots.size(), CD3DX12_DESCRIPTOR_RANGE());
     std::vector<CD3DX12_ROOT_PARAMETER>   rootParams(m_shaderSlots.size(), CD3DX12_ROOT_PARAMETER());
@@ -275,16 +281,19 @@ void XCShaderHandle::GenerateRootSignature()
 
     ReleaseCOM(signature);
     ReleaseCOM(errors);
+#endif
 }
 
 void XCShaderHandle::GeneratePSO()
 {
+#if defined(XCGRAPHICS_DX12)
     //Generate PSO
-
     PSO_Dx12::GenerateDefaultPSO(m_pso, PSOType_RASTER_FILL_SOLID);
     PSO_Dx12::GenerateDefaultPSO(m_pso, PSOType_RASTER_FILL_WIREFRAME);
 
-    m_pso->m_psos[PSOType_RASTER_FILL_SOLID].m_psoDesc.InputLayout    = m_inputLayoutDesc;
+    m_pso->m_psos[PSOType_RASTER_FILL_SOLID].m_psoDesc.InputLayout     = m_inputLayoutDesc;
+    m_pso->m_psos[PSOType_RASTER_FILL_WIREFRAME].m_psoDesc.InputLayout = m_inputLayoutDesc;
+
 #if defined(USE_D3D_COMPILER)
     m_pso->m_psos[PSOType_RASTER_FILL_SOLID].m_psoDesc.VS = { reinterpret_cast<UINT8*>(m_pVS->GetBufferPointer()), m_pVS->GetBufferSize() };
     m_pso->m_psos[PSOType_RASTER_FILL_SOLID].m_psoDesc.PS = { reinterpret_cast<UINT8*>(m_pPS->GetBufferPointer()), m_pPS->GetBufferSize() };
@@ -293,7 +302,6 @@ void XCShaderHandle::GeneratePSO()
     m_pso->m_psos[PSOType_RASTER_FILL_SOLID].m_psoDesc.PS = { m_pPS, m_psSize };
 #endif
 
-    m_pso->m_psos[PSOType_RASTER_FILL_WIREFRAME].m_psoDesc.InputLayout = m_inputLayoutDesc;
 #if defined(USE_D3D_COMPILER)
     m_pso->m_psos[PSOType_RASTER_FILL_WIREFRAME].m_psoDesc.VS = { reinterpret_cast<UINT8*>(m_pVS->GetBufferPointer()), m_pVS->GetBufferSize() };
     m_pso->m_psos[PSOType_RASTER_FILL_WIREFRAME].m_psoDesc.PS = { reinterpret_cast<UINT8*>(m_pPS->GetBufferPointer()), m_pPS->GetBufferSize() };
@@ -308,6 +316,10 @@ void XCShaderHandle::GeneratePSO()
 
     m_pso->CreateGraphicPSO(m_device, PSOType_RASTER_FILL_SOLID);
     m_pso->CreateGraphicPSO(m_device, PSOType_RASTER_FILL_WIREFRAME);
+
+#elif defined(XCGRAPHICS_DX11)
+    ValidateResult(m_device.CreateInputLayout(m_inputLayoutDesc.pInputElementDescs, m_inputLayoutDesc.NumElements, m_pVS, m_vsSize, &m_inputLayout));
+#endif
 }
 
 void XCShaderHandle::SortSlots()
@@ -370,14 +382,14 @@ void XCShaderHandle::ApplyShader(ID3DDeviceContext& context, RasterType rasterTy
     m_pso->SetGraphicsPipelineState(context, rasterType);
 
 #elif defined(XCGRAPHICS_DX11)
-    context.IASetInputLayout(m_pInputLayout);
-    context.VSSetShader(m_pVS, nullptr, 0);
-    context.PSSetShader(m_pPS, nullptr, 0);
+    context.IASetInputLayout(m_inputLayout);
+    context.VSSetShader((ID3DVertexShader*) m_pVS, nullptr, 0);
+    context.PSSetShader((ID3DPixelShader*)  m_pPS, nullptr, 0);
 #endif
 }
 
 
-void XCShaderHandle::SetConstantBuffer(std::string bufferName, ID3DDeviceContext& context, D3D12_GPU_DESCRIPTOR_HANDLE& gpuHandle)
+void XCShaderHandle::SetConstantBuffer(std::string bufferName, ID3DDeviceContext& context, D3DConstantBuffer& constantBuffer)
 {
     auto bufferRes = std::find_if(m_shaderSlots.begin(), m_shaderSlots.end(), 
         [&bufferName](ShaderSlot slot) -> bool 
@@ -388,7 +400,13 @@ void XCShaderHandle::SetConstantBuffer(std::string bufferName, ID3DDeviceContext
     if (bufferRes != m_shaderSlots.end())
     {
         unsigned int slotNb = bufferRes - m_shaderSlots.begin();
-        context.SetGraphicsRootDescriptorTable(slotNb, gpuHandle);
+
+#if defined(XCGRAPHICS_DX12)
+        context.SetGraphicsRootDescriptorTable(slotNb, constantBuffer.m_gpuHandle);
+#elif defined(XCGRAPHICS_DX11)
+        context.VSSetConstantBuffers(slotNb, 1, &constantBuffer.m_gpuHandle);
+        context.PSSetConstantBuffers(slotNb, 1, &constantBuffer.m_gpuHandle);
+#endif
 
 #if defined(LOG_SHADER_SLOTS)
         Logger("[SLOT] Set %s @ slot %d", bufferName.c_str(), slotNb);
@@ -410,7 +428,13 @@ void XCShaderHandle::SetSampler(std::string bufferName, ID3DDeviceContext& conte
     if (bufferRes != m_shaderSlots.end())
     {
         unsigned int slotNb = bufferRes - m_shaderSlots.begin();
+
+#if defined(XCGRAPHICS_DX12)
         context.SetGraphicsRootDescriptorTable(slotNb, gpuHandle);
+#elif defined(XCGRAPHICS_DX11)
+        context.VSSetSamplers(slotNb, 1, nullptr);
+        context.PSSetSamplers(slotNb, 1, nullptr);
+#endif
 
 #if defined(LOG_SHADER_SLOTS)
         Logger("[SLOT] Set %s @ slot %d", bufferName.c_str(), slotNb);
@@ -437,11 +461,21 @@ void XCShaderHandle::SetResource(std::string bufferName, ID3DDeviceContext& cont
         switch (tex->m_Resource->GetResourceType())
         {
         case RESOURCETYPE_TEXTURE2D:
+#if defined(XCGRAPHICS_DX12)
             context.SetGraphicsRootDescriptorTable(slotNb, static_cast<Texture2D*>(tex->m_Resource)->GetTextureResource()->m_gpuHandle);
+#elif defined(XCGRAPHICS_DX11)
+            context.VSSetShaderResources(slotNb, 1, &static_cast<Texture2D*>(tex->m_Resource)->GetTextureResource()->m_cbResource);
+            context.PSSetShaderResources(slotNb, 1, &static_cast<Texture2D*>(tex->m_Resource)->GetTextureResource()->m_cbResource);
+#endif
             break;
 
         case RESOURCETYPE_CUBETEXTURE3D:
+#if defined(XCGRAPHICS_DX12)
             context.SetGraphicsRootDescriptorTable(slotNb, static_cast<CubeTexture3D*>(tex->m_Resource)->GetTextureResource()->m_gpuHandle);
+#elif defined(XCGRAPHICS_DX11)
+            context.VSSetShaderResources(slotNb, 1, &static_cast<CubeTexture3D*>(tex->m_Resource)->GetTextureResource()->m_cbResource);
+            context.PSSetShaderResources(slotNb, 1, &static_cast<CubeTexture3D*>(tex->m_Resource)->GetTextureResource()->m_cbResource);
+#endif
             break;
 
         default:

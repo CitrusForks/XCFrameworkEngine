@@ -51,7 +51,7 @@ static const SemanticVariable gs_sematicVariables[] = {
     SemanticVariable(VertexFormat_PositionColorInstanceIndex,                 { "POSITION", "COLOR", "SV_InstanceID" })
 };
 
-static VertexFormat getVertexFormatFromSematicNames(std::vector<std::string>& semanticNames)
+static VertexFormat GetVertexFormatFromSematicNames(std::vector<std::string>& semanticNames)
 {
     for(auto semantic : gs_sematicVariables)
     {
@@ -64,9 +64,9 @@ static VertexFormat getVertexFormatFromSematicNames(std::vector<std::string>& se
     return VertexFormat_Invalid;
 }
 
-static D3D12_INPUT_LAYOUT_DESC getInputLayoutFromVertexFormat(VertexFormat format)
+static D3D_INPUT_LAYOUT_DESC GetInputLayoutFromVertexFormat(VertexFormat format)
 {
-    D3D12_INPUT_LAYOUT_DESC layout = {};
+    D3D_INPUT_LAYOUT_DESC layout = {};
 
     switch (format)
     {
@@ -108,12 +108,12 @@ static D3D12_INPUT_LAYOUT_DESC getInputLayoutFromVertexFormat(VertexFormat forma
     return layout;
 }
 
-static D3D12_INPUT_LAYOUT_DESC getInputLayoutFromSemantics(std::vector<std::string>& semanticNames)
+static D3D12_INPUT_LAYOUT_DESC GetInputLayoutFromSemantics(std::vector<std::string>& semanticNames)
 {
     D3D12_INPUT_LAYOUT_DESC layout = {};
 
-    VertexFormat format = getVertexFormatFromSematicNames(semanticNames);
-    layout = getInputLayoutFromVertexFormat(format);
+    VertexFormat format = GetVertexFormatFromSematicNames(semanticNames);
+    layout = GetInputLayoutFromVertexFormat(format);
 
     return layout;
 }

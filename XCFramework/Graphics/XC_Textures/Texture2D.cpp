@@ -21,13 +21,14 @@ Texture2D::Texture2D()
     m_resourceType = RESOURCETYPE_TEXTURE2D;
     m_textureCoordinateMatrix = XMMatrixIdentity();
 
+    m_diffuseMapTextureSRV = nullptr;
+
 #if defined(XCGRAPHICS_DX12)
-    m_diffuseMapTextureSRV = new D3DShaderResourceView(BUFFERTYPE_SRV);
-    m_diffuseMapTextureSRVUpload = new D3DShaderResourceView(BUFFERTYPE_SRV);
+    m_diffuseMapTextureSRVUpload = new D3DConstantBuffer(BUFFERTYPE_SRV);
 #endif
 }
 
-Texture2D::Texture2D(D3DShaderResourceView* srv)
+Texture2D::Texture2D(D3DConstantBuffer* srv)
 {
     m_diffuseMapTextureSRV = srv;
     m_resourceType = RESOURCETYPE_TEXTURE2D;
@@ -91,7 +92,11 @@ void Texture2D::LoadTexture()
     WaitResourceUpdate();
 
 #elif defined(XCGRAPHICS_DX11)
-    ValidateResult(CreateDDSTextureFromFile(graphicsSystem.GetDevice(), str, nullptr, &m_diffuseMapTextureSRV));
+    SharedDescriptorHeap& heap = SystemLocator::GetInstance()->RequestSystem<SharedDescriptorHeap>("SharedDescriptorHeap");
+    m_diffuseMapTextureSRV = heap.CreateShaderResourceView();
+
+    ValidateResult(LoadFromDDSFile(str, 0, &m_texMetaData, m_scratchImage));
+    ValidateResult(CreateShaderResourceView(graphicsSystem.GetDevice(), m_scratchImage.GetImages(), m_scratchImage.GetImageCount(), m_scratchImage.GetMetadata(), &m_diffuseMapTextureSRV->m_cbResource));
 #endif
 
     Logger("[TEXTURE 2D] Texture %s Loaded", wc.c_str());
@@ -156,24 +161,17 @@ void Texture2D::Unload()
 {
     if (m_diffuseMapTextureSRV)
     {
-#if defined(XCGRAPHICS_DX12)
         m_diffuseMapTextureSRV->Release();
-
         SharedDescriptorHeap& heap = SystemLocator::GetInstance()->RequestSystem<SharedDescriptorHeap>("SharedDescriptorHeap");
         heap.DestroyBuffer(m_diffuseMapTextureSRV);
         m_diffuseMapTextureSRV = nullptr;
-
-#elif defined(XCGRAPHICS_DX11)
-        ReleaseCOM(m_diffuseMapTextureSRV);
-#endif
     }
 
 #if defined(XCGRAPHICS_DX12)
     if (m_diffuseMapTextureSRVUpload)
     {
         m_diffuseMapTextureSRVUpload->Release();
-        SharedDescriptorHeap& heap = SystemLocator::GetInstance()->RequestSystem<SharedDescriptorHeap>("SharedDescriptorHeap");
-        heap.DestroyBuffer(m_diffuseMapTextureSRV);
+        delete m_diffuseMapTextureSRVUpload;
         m_diffuseMapTextureSRVUpload = nullptr;
     }
 #endif

@@ -48,7 +48,5 @@ protected:
 
     std::unique_ptr<OBBHierarchy>       m_OBBHierarchy;
 
-#if defined(XCGRAPHICS_DX12)
     D3DConstantBuffer*                  m_pCBPerObject;
-#endif
 };

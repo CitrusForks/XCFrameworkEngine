@@ -8,6 +8,8 @@
 
 #if defined(XCGRAPHICS_DX12)
 #include "Libs/Dx12Helpers/d3dx12.h"
+#endif
+
 #include "Graphics/D3DConstantBuffer.h"
 
 class SharedDescriptorHeap : public ISystem
@@ -23,21 +25,27 @@ public:
 
     void                    Init(ID3DDevice& device, unsigned int nbOfDesc);
     D3DConstantBuffer*      CreateBufferView(D3DBufferDesc& desc);
-    D3DConstantBuffer*      CreateShaderResourceView(CD3DX12_RESOURCE_DESC& textureDesc, D3D12_SHADER_RESOURCE_VIEW_DESC& viewDesc);
-    void                    DestroyBuffer(D3DConstantBuffer* buffer);
 
+#if defined(XCGRAPHICS_DX12)
+    D3DConstantBuffer*      CreateShaderResourceView(CD3DX12_RESOURCE_DESC& textureDesc, D3D12_SHADER_RESOURCE_VIEW_DESC& viewDesc);
+    ID3D12DescriptorHeap*   GetDescriptorHeap() { return m_sharedDescriptorHeap; }
+#elif defined(XCGRAPHICS_DX11)
+    D3DConstantBuffer*      CreateShaderResourceView();
+#endif
+
+    void                    DestroyBuffer(D3DConstantBuffer* buffer);
     void                    Destroy();
 
-    ID3D12DescriptorHeap*   GetDescriptorHeap() { return m_sharedDescriptorHeap; }
-
 private:
-    D3DConstantBuffer*            findFreeConstantBuffer(BufferType type, unsigned int size);
 
-    ID3D12DescriptorHeap*         m_sharedDescriptorHeap; //SRV, CB, UAV only
-    CD3DX12_CPU_DESCRIPTOR_HANDLE m_cbvCPUOffsetHandle;
-    CD3DX12_GPU_DESCRIPTOR_HANDLE m_cbvGPUOffsetHandle;
-    ID3DDevice*                   m_device;
+    D3DConstantBuffer*      FindFreeConstantBuffer(BufferType type, unsigned int size);
 
+#if defined(XCGRAPHICS_DX12)
+    ID3D12DescriptorHeap*           m_sharedDescriptorHeap; //SRV, CB, UAV only
+    CD3DX12_CPU_DESCRIPTOR_HANDLE   m_cbvCPUOffsetHandle;
+    CD3DX12_GPU_DESCRIPTOR_HANDLE   m_cbvGPUOffsetHandle;
+#endif
+
+    ID3DDevice*                     m_device;
     std::vector<D3DConstantBuffer*> m_constantBuffers;
 };
-#endif

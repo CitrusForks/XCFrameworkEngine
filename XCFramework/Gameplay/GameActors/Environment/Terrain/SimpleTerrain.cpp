@@ -32,6 +32,9 @@ void SimpleTerrain::PreLoad(XCVec3 _initialPosition, int _rows, int _column, flo
     m_cols = _column;
     m_rowSpacing = _rowSpacing;
     m_colSpacing = _colSpacing;
+
+    SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
+    m_pCBPerObject = heap.CreateBufferView(D3DBufferDesc(BUFFERTYPE_CBV, sizeof(PerObjectBuffer)));
 }
 
 void SimpleTerrain::Load()
@@ -176,7 +179,6 @@ void SimpleTerrain::Update(float dt)
 void SimpleTerrain::Draw(RenderContext& context)
 {
     context.SetRasterizerState(RasterType_FillSolid);
-
     context.ApplyShader(m_useShaderType);
     
     // Set constants
@@ -186,9 +188,9 @@ void SimpleTerrain::Draw(RenderContext& context)
         ToXCMatrix4Unaligned(XMMatrixTranspose(cam.GetViewMatrix() * cam.GetProjectionMatrix() * m_World)),
     };
 
-    //TODO
     XCShaderHandle* solidColorShader = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(m_useShaderType);
-    solidColorShader->SetConstantBuffer("cbWVP", context.GetDeviceContext(), D3D12_GPU_DESCRIPTOR_HANDLE());
+    memcpy(m_pCBPerObject->m_cbDataBegin, &perObject, sizeof(PerObjectBuffer));
+    solidColorShader->SetConstantBuffer("cbWVP", context.GetDeviceContext(), *m_pCBPerObject);
     solidColorShader->SetVertexBuffer(context.GetDeviceContext(), &m_vertexPosColorBuffer);
     solidColorShader->SetIndexBuffer(context.GetDeviceContext(), m_indexBuffer);
 
@@ -197,4 +199,6 @@ void SimpleTerrain::Draw(RenderContext& context)
 
 void SimpleTerrain::Destroy()
 {
+    SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
+    heap.DestroyBuffer(m_pCBPerObject);
 }

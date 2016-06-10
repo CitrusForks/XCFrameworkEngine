@@ -65,10 +65,6 @@ protected:
     virtual void                            CreateConstantBuffer();
     void                                    FilterSubMeshes();
 
-#if defined(XCGRAPHICS_DX11)
-    void                                    BuildBuffer(unsigned int sizeOfType, void* ptrToBuffer, unsigned int length, ID3D11Buffer* buffer, D3D11_BUFFER_DESC desc);
-#endif
-
     //Draw calls
     virtual void                            Draw(RenderContext& context);
     virtual void                            DrawSubMesh(RenderContext& renderContext, unsigned int meshIndex);
