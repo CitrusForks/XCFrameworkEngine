@@ -388,7 +388,6 @@ void XCShaderHandle::ApplyShader(ID3DDeviceContext& context, RasterType rasterTy
 #endif
 }
 
-
 void XCShaderHandle::SetConstantBuffer(std::string bufferName, ID3DDeviceContext& context, D3DConstantBuffer& constantBuffer)
 {
     auto bufferRes = std::find_if(m_shaderSlots.begin(), m_shaderSlots.end(), 
@@ -417,7 +416,11 @@ void XCShaderHandle::SetConstantBuffer(std::string bufferName, ID3DDeviceContext
     XCASSERT(false);
 }
 
+#if defined(XCGRAPHICS_DX12)
 void XCShaderHandle::SetSampler(std::string bufferName, ID3DDeviceContext& context, D3D12_GPU_DESCRIPTOR_HANDLE& gpuHandle)
+#elif defined(XCGRAPHICS_DX11)
+void XCShaderHandle::SetSampler(std::string bufferName, ID3DDeviceContext& context, ID3D11SamplerState* samplerState)
+#endif
 {
     auto bufferRes = std::find_if(m_shaderSlots.begin(), m_shaderSlots.end(),
         [&bufferName](ShaderSlot slot) -> bool
@@ -432,8 +435,8 @@ void XCShaderHandle::SetSampler(std::string bufferName, ID3DDeviceContext& conte
 #if defined(XCGRAPHICS_DX12)
         context.SetGraphicsRootDescriptorTable(slotNb, gpuHandle);
 #elif defined(XCGRAPHICS_DX11)
-        context.VSSetSamplers(slotNb, 1, nullptr);
-        context.PSSetSamplers(slotNb, 1, nullptr);
+        //context.VSSetSamplers(slotNb, 1, &samplerState);
+        context.PSSetSamplers(slotNb, 1, &samplerState);
 #endif
 
 #if defined(LOG_SHADER_SLOTS)

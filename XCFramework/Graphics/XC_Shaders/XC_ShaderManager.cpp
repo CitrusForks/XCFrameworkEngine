@@ -244,7 +244,7 @@ void XC_ShaderManager::ApplyShader(ID3DDeviceContext& context, ShaderType _Shade
 {
     m_Shaders[_ShaderType]->ApplyShader(context);
 #if defined(XCGRAPHICS_DX11)
-    context.PSSetSamplers(0, 1, &m_SamplerLinear);
+    ((XCShaderHandle*)m_Shaders[_ShaderType])->SetSampler("samLinear", context, m_SamplerLinear);
 #else
     //Set sampler
     ((XCShaderHandle*)m_Shaders[_ShaderType])->SetSampler("samLinear", context, m_samplerHeap->GetGPUDescriptorHandleForHeapStart());

@@ -10,6 +10,7 @@
 
 #include "RenderableTexture.h"
 #include "Engine/Input/Directinput.h"
+#include "Graphics/SharedDescriptorHeap.h"
 
 #if defined(XCGRAPHICS_DX11) 
 #include "Libs/DirectXTex/DirectXTex/DirectXTex.h"
@@ -47,6 +48,12 @@ void RenderableTexture::Destroy()
 {
     delete(m_renderableTexture->m_texData);
     delete(m_renderableTexture);
+
+    if (m_pSRV)
+    {
+        SharedDescriptorHeap& heap = SystemLocator::GetInstance()->RequestSystem<SharedDescriptorHeap>("SharedDescriptorHeap");
+        heap.DestroyBuffer(m_pSRV);
+    }
 }
 
 void RenderableTexture::OnResize()
@@ -55,7 +62,6 @@ void RenderableTexture::OnResize()
     m_pRenderTargetView->Release();
 #endif
 }
-
 
 bool RenderableTexture::PreLoad(int msaaQuality, int texWidth, int texHeight)
 {
@@ -113,6 +119,9 @@ bool RenderableTexture::PreLoad(int msaaQuality, int texWidth, int texHeight)
     shaderResourceViewDesc.Texture2D.MipLevels = 1;
 
     // Create the shader resource view.
+    SharedDescriptorHeap& heap = SystemLocator::GetInstance()->RequestSystem<SharedDescriptorHeap>("SharedDescriptorHeap");
+    m_pSRV = heap.CreateShaderResourceView();
+
     ValidateResult(m_device.CreateShaderResourceView(m_pRenderTargetTextureStaged, &shaderResourceViewDesc, &m_pSRV->m_cbResource));
 
     // RGB Texture for transferring over the network

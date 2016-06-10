@@ -80,7 +80,7 @@ public:
 #if defined(XCGRAPHICS_DX12)
     void            SetSampler(std::string bufferName, ID3DDeviceContext& context, D3D12_GPU_DESCRIPTOR_HANDLE& gpuHandle);
 #elif defined(XCGRAPHICS_DX11)
-    void            SetSampler(std::string bufferName, ID3DDeviceContext& context, D3D12_GPU_DESCRIPTOR_HANDLE& gpuHandle);
+    void            SetSampler(std::string bufferName, ID3DDeviceContext& context, ID3D11SamplerState* samplerState);
 #endif
 
     void            SetResource(std::string bufferName, ID3DDeviceContext& context, ResourceHandle* tex);
