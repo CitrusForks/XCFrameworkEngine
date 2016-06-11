@@ -122,6 +122,7 @@ void XCShaderHandle::ReadShaderDescription()
         {
             //Push the cb desc to our map with its name
             m_shaderSlots.push_back(ShaderSlot(desc));
+            m_shaderSlots.back().m_shaderSlotId = cbIndex;
         }
 
 #if defined(LOG_SHADER_SLOTS)
@@ -155,11 +156,10 @@ void XCShaderHandle::ReadShaderDescription()
         if (std::find_if(m_shaderSlots.begin(), m_shaderSlots.end(), [&inputDesc](ShaderSlot it) -> bool { return strcmp(it.GetBufferName().c_str(), inputDesc.Name) == 0; }) == m_shaderSlots.end())
         {
 #if defined(LOG_SHADER_SLOTS)
-            Logger("[Resource Bound] Name : %s, Type : %d, Dimensions : %d", inputDesc.Name, inputDesc.Type, inputDesc.Dimension);
+            Logger("[Resource Bound] Name : %s, Type : %d, Dimensions : %d, Bind Point : %d", inputDesc.Name, inputDesc.Type, inputDesc.Dimension, inputDesc.BindPoint);
 #endif
             m_shaderSlots.push_back(ShaderSlot(inputDesc));
-            if(inputDesc.Type != D3D_SHADER_INPUT_TYPE::D3D10_SIT_SAMPLER)
-                m_shaderSlots.back().m_shaderSlotId = resBoundIndex - 1;
+            m_shaderSlots.back().m_shaderSlotId = inputDesc.BindPoint;
         }
     }
 
@@ -172,11 +172,10 @@ void XCShaderHandle::ReadShaderDescription()
         if (std::find_if(m_shaderSlots.begin(), m_shaderSlots.end(), [&inputDesc](ShaderSlot it) -> bool { return strcmp(it.GetBufferName().c_str(), inputDesc.Name) == 0; }) == m_shaderSlots.end())
         {
 #if defined(LOG_SHADER_SLOTS)
-            Logger("[Resource Bound] Name : %s, Type : %d, Dimensions : %d", inputDesc.Name, inputDesc.Type, inputDesc.Dimension);
+            Logger("[Resource Bound] Name : %s, Type : %d, Dimensions : %d, Bind Point : %d", inputDesc.Name, inputDesc.Type, inputDesc.Dimension, inputDesc.BindPoint);
 #endif
             m_shaderSlots.push_back(ShaderSlot(inputDesc));
-            if (inputDesc.Type != D3D_SHADER_INPUT_TYPE::D3D10_SIT_SAMPLER)
-                m_shaderSlots.back().m_shaderSlotId = resBoundIndex - 1;
+            m_shaderSlots.back().m_shaderSlotId = inputDesc.BindPoint;
         }
     }
 
@@ -445,9 +444,9 @@ void XCShaderHandle::SetSampler(std::string bufferName, ID3DDeviceContext& conte
 
     if (bufferRes != m_shaderSlots.end())
     {
+#if defined(XCGRAPHICS_DX12)
         unsigned int slotNb = bufferRes - m_shaderSlots.begin();
 
-#if defined(XCGRAPHICS_DX12)
         context.SetGraphicsRootDescriptorTable(slotNb, gpuHandle);
 #elif defined(XCGRAPHICS_DX11)
         //context.VSSetSamplers(slotNb, 1, &samplerState);
