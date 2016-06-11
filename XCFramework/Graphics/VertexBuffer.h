@@ -126,6 +126,8 @@ void VertexBuffer<T>::BuildVertexBuffer()
     vInitData.pSysMem = &m_vertexData[0];
 
     ValidateResult(graphicsSystem.GetDevice()->CreateBuffer(&vbd, &vInitData, &m_pVB));
+
+    m_resourceUpdated = true;
 #endif
 }
 

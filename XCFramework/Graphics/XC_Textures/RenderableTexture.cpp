@@ -51,8 +51,7 @@ void RenderableTexture::Destroy()
 
     if (m_pSRV)
     {
-        SharedDescriptorHeap& heap = SystemLocator::GetInstance()->RequestSystem<SharedDescriptorHeap>("SharedDescriptorHeap");
-        heap.DestroyBuffer(m_pSRV);
+        delete m_pSRV;
     }
 }
 
@@ -119,8 +118,7 @@ bool RenderableTexture::PreLoad(int msaaQuality, int texWidth, int texHeight)
     shaderResourceViewDesc.Texture2D.MipLevels = 1;
 
     // Create the shader resource view.
-    SharedDescriptorHeap& heap = SystemLocator::GetInstance()->RequestSystem<SharedDescriptorHeap>("SharedDescriptorHeap");
-    m_pSRV = heap.CreateShaderResourceView();
+    m_pSRV = new D3DConstantBuffer(BUFFERTYPE_SRV);
 
     ValidateResult(m_device.CreateShaderResourceView(m_pRenderTargetTextureStaged, &shaderResourceViewDesc, &m_pSRV->m_cbResource));
 
@@ -223,15 +221,16 @@ RenderableTexture::RenderedTextureInfo* RenderableTexture::GetRenderToTexture()
 
     unsigned char* pData = (unsigned char*)subResource.pData;
 
-    //memcpy(m_renderableTexture->m_texData, subResource.pData, texDesc.Height * texDesc.Width * 4);
+    memcpy(m_renderableTexture->m_texData, subResource.pData, texDesc.Height * texDesc.Width * 4);
     
-    unsigned int rgbImageIndex = 0;
+    /*unsigned int rgbImageIndex = 0;
     for (unsigned int pixelIndex = 0; pixelIndex < texDesc.Height * texDesc.Width * 4; pixelIndex += 4)
     {
         m_renderableTexture->m_texData[rgbImageIndex++] = pData[pixelIndex];
         m_renderableTexture->m_texData[rgbImageIndex++] = pData[pixelIndex + 1];
         m_renderableTexture->m_texData[rgbImageIndex++] = pData[pixelIndex + 2];
     }
+    */
 
     m_deviceContext.Unmap(m_pSingleSampledTex, 0);
 #endif

@@ -6,18 +6,18 @@
 
 #pragma once
 
+#if defined(XCGRAPHICS_DX12)
+#include "Libs/Dx12Helpers/d3dx12.h"
+#endif
+
+#include "Graphics/Utils/GraphicUtils.h"
+
 enum BufferType
 {
     BUFFERTYPE_SRV,
     BUFFERTYPE_CBV,
     BUFFERTYPE_UAV
 };
-
-#if defined(XCGRAPHICS_DX12)
-#include "Libs/Dx12Helpers/d3dx12.h"
-#endif
-
-#include "Graphics/Utils/GraphicUtils.h"
 
 class D3DBufferDesc
 {
@@ -34,14 +34,12 @@ public:
 class D3DConstantBuffer
 {
 public:
-    D3DConstantBuffer()
-    {}
 
-    D3DConstantBuffer(BufferType type)
-        : m_bufferType(type)
-    {
-        m_isInUse = false;
-    }
+    explicit D3DConstantBuffer(BufferType type);
+
+    void UploadZeroMemoryDataOnGPU(ID3DDeviceContext& context, unsigned int sizeOfBuffer);
+    void UploadDataOnGPU(ID3DDeviceContext& context, void* buffer, unsigned int sizeOfBuffer);
+    void Release();
 
 #if defined(XCGRAPHICS_DX12)
     //Constant buffer heap
@@ -53,19 +51,9 @@ public:
     ID3D11Buffer*               m_gpuHandle;
     D3DShaderResourceView*      m_cbResource;   //SRV
 #endif
+    
     unsigned int*               m_cbDataBegin;
-
     BufferType                  m_bufferType;
     bool                        m_isInUse;
     unsigned int                m_sizeOfBuffer;
-
-    void                        Release()
-    {
-#if defined(XCGRAPHICS_DX12)
-        ReleaseCOM(m_cbResource);
-#elif defined(XCGRAPHICS_DX11)
-        ReleaseCOM(m_cpuHandle);
-        ReleaseCOM(m_gpuHandle);
-#endif
-    }
 };

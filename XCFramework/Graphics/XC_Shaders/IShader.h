@@ -45,8 +45,6 @@ public:
     D3DConstantBuffer*               CreateBuffer(BufferType bufferType, int sizeOfType = 0);
                                      
 protected:                           
-    void                             MemCpyConstants(ID3DDeviceContext& context, void* dest, void* src, unsigned int size);
-
     ID3DDevice&                      m_device;
 
     UINT8*                           m_pVS;
@@ -56,6 +54,9 @@ protected:
 
 #if defined(XCGRAPHICS_DX12)
     PSO_Dx12*                        m_pso;
+#elif defined(XCGRAPHICS_DX11)
+    ID3DVertexShader*                m_compiledVS;
+    ID3DPixelShader*                 m_compiledPS;
 #endif
 
     std::string                      m_vertexShaderPath;

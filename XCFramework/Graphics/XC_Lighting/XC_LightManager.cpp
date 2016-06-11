@@ -14,22 +14,17 @@
 
 XC_LightManager::XC_LightManager()
 {
-#if defined(XCGRAPHICS_DX12)
-    SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
-    m_pCBLightsPerFrame = heap.CreateBufferView(D3DBufferDesc(BUFFERTYPE_CBV, sizeof(cbLightsPerFrame)));
-#endif
 }
 
 XC_LightManager::~XC_LightManager()
 {
-#if defined(XCGRAPHICS_DX12)
-    SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
-    heap.DestroyBuffer(m_pCBLightsPerFrame);
-#endif
 }
 
 void XC_LightManager::InitializeLights()
 {
+    SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
+    m_pCBLightsPerFrame = heap.CreateBufferView(D3DBufferDesc(BUFFERTYPE_CBV, sizeof(cbLightsPerFrame)));
+
     //Add Lights - To remove. Need a LightManager- Manages all types of light, allows to add and remove lights from world. Maybe we can add this light actors directly into the world
     //Directional light
     DirectionalLight* directionalLight = new DirectionalLight();
@@ -100,28 +95,7 @@ void XC_LightManager::Draw(XC_Graphics& graphicsSystem)
                                         ToXCVec3Unaligned(m_eyePos), 
                                       };
 
-    memcpy(m_pCBLightsPerFrame->m_cbDataBegin, &lightsPerFrame, sizeof(cbLightsPerFrame));
-    
-    //Wherever required, request for this light system and get the buffer and apply the constant buffer
-    /*XCShaderHandle* shaderRef = nullptr;
-
-    RenderingPool::RenderWorker* renderWorkers = graphicsSystem.GetRenderingPool().GetRenderWorkers();
-    for (unsigned int workerIndex = 0; workerIndex < RenderingPool::NbRenderWorkerThreads; ++workerIndex)
-    {
-        RenderContext& context = renderWorkers[workerIndex].m_renderContext;
-     
-        context.ApplyShader(ShaderType_SkinnedCharacter);
-        shaderRef = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(ShaderType_SkinnedCharacter);
-        shaderRef->setConstantBuffer("cbLightsPerFrame", context.GetDeviceContext(), m_pCBLightsPerFrame->m_gpuHandle);
-
-        context.ApplyShader(ShaderType_LightTexture);
-        shaderRef = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(ShaderType_LightTexture);
-        shaderRef->setConstantBuffer("cbLightsPerFrame", context.GetDeviceContext(), m_pCBLightsPerFrame->m_gpuHandle);
-
-        context.ApplyShader(ShaderType_TerrainMultiTexture);
-        shaderRef = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(ShaderType_TerrainMultiTexture);
-        shaderRef->setConstantBuffer("cbLightsPerFrame", context.GetDeviceContext(), m_pCBLightsPerFrame->m_gpuHandle);
-    }*/
+    m_pCBLightsPerFrame->UploadDataOnGPU(*graphicsSystem.GetDeviceContext(), &lightsPerFrame, sizeof(cbLightsPerFrame));
 }
 
 void XC_LightManager::Destroy()
@@ -131,4 +105,7 @@ void XC_LightManager::Destroy()
         delete(m_Lights[(ELightType)index]);
     }
     m_Lights.clear();
+
+    SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
+    heap.DestroyBuffer(m_pCBLightsPerFrame);
 }

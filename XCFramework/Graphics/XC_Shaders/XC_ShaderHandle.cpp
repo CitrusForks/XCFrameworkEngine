@@ -47,6 +47,9 @@ XCShaderHandle::~XCShaderHandle()
     {
         XCDELETE(m_pso);
     }
+#elif defined(XCGRAPHICS_DX11)
+    ReleaseCOM(m_compiledVS);
+    ReleaseCOM(m_compiledPS);
 #endif
 }
 
@@ -81,6 +84,14 @@ void XCShaderHandle::LoadShader()
 #endif
 
     XCASSERT(m_pVS || m_pPS);
+
+#if defined(XCGRAPHICS_DX11)
+    //Create the shaders
+    ValidateResult(m_device.CreateVertexShader(m_pVS, m_vsSize, nullptr, &m_compiledVS));
+    ValidateResult(m_device.CreatePixelShader(m_pPS, m_psSize, nullptr, &m_compiledPS));
+
+    XCASSERT(m_compiledVS || m_compiledPS);
+#endif
 
     //Fetch information on vs
     ValidateResult(D3DReflect(m_pVS, m_vsSize, IID_ID3D11ShaderReflection, (void**)& m_vsShaderReflection));
@@ -127,6 +138,7 @@ void XCShaderHandle::ReadShaderDescription()
         {
             //Push the cb desc to our map with its name
             m_shaderSlots.push_back(ShaderSlot(desc));
+            m_shaderSlots.back().m_shaderSlotId = cbIndex;
         }
 
 #if defined(LOG_SHADER_SLOTS)
@@ -146,9 +158,10 @@ void XCShaderHandle::ReadShaderDescription()
             Logger("[Resource Bound] Name : %s, Type : %d, Dimensions : %d", inputDesc.Name, inputDesc.Type, inputDesc.Dimension);
 #endif
             m_shaderSlots.push_back(ShaderSlot(inputDesc));
+            if(inputDesc.Type != D3D_SHADER_INPUT_TYPE::D3D10_SIT_SAMPLER)
+                m_shaderSlots.back().m_shaderSlotId = resBoundIndex - 1;
         }
     }
-
 
     //Read the resource slots from ps.
     for (unsigned int resBoundIndex = 0; resBoundIndex < psShaderDesc.BoundResources; ++resBoundIndex)
@@ -162,6 +175,8 @@ void XCShaderHandle::ReadShaderDescription()
             Logger("[Resource Bound] Name : %s, Type : %d, Dimensions : %d", inputDesc.Name, inputDesc.Type, inputDesc.Dimension);
 #endif
             m_shaderSlots.push_back(ShaderSlot(inputDesc));
+            if (inputDesc.Type != D3D_SHADER_INPUT_TYPE::D3D10_SIT_SAMPLER)
+                m_shaderSlots.back().m_shaderSlotId = resBoundIndex - 1;
         }
     }
 
@@ -383,8 +398,8 @@ void XCShaderHandle::ApplyShader(ID3DDeviceContext& context, RasterType rasterTy
 
 #elif defined(XCGRAPHICS_DX11)
     context.IASetInputLayout(m_inputLayout);
-    context.VSSetShader((ID3DVertexShader*) m_pVS, nullptr, 0);
-    context.PSSetShader((ID3DPixelShader*)  m_pPS, nullptr, 0);
+    context.VSSetShader(m_compiledVS, nullptr, 0);
+    context.PSSetShader(m_compiledPS, nullptr, 0);
 #endif
 }
 
@@ -436,7 +451,8 @@ void XCShaderHandle::SetSampler(std::string bufferName, ID3DDeviceContext& conte
         context.SetGraphicsRootDescriptorTable(slotNb, gpuHandle);
 #elif defined(XCGRAPHICS_DX11)
         //context.VSSetSamplers(slotNb, 1, &samplerState);
-        context.PSSetSamplers(slotNb, 1, &samplerState);
+        //Always starts from slot 0.
+        context.PSSetSamplers(0, 1, &samplerState);
 #endif
 
 #if defined(LOG_SHADER_SLOTS)
@@ -467,8 +483,8 @@ void XCShaderHandle::SetResource(std::string bufferName, ID3DDeviceContext& cont
 #if defined(XCGRAPHICS_DX12)
             context.SetGraphicsRootDescriptorTable(slotNb, static_cast<Texture2D*>(tex->m_Resource)->GetTextureResource()->m_gpuHandle);
 #elif defined(XCGRAPHICS_DX11)
-            context.VSSetShaderResources(slotNb, 1, &static_cast<Texture2D*>(tex->m_Resource)->GetTextureResource()->m_cbResource);
-            context.PSSetShaderResources(slotNb, 1, &static_cast<Texture2D*>(tex->m_Resource)->GetTextureResource()->m_cbResource);
+            context.VSSetShaderResources((*bufferRes).m_shaderSlotId, 1, &static_cast<Texture2D*>(tex->m_Resource)->GetTextureResource()->m_cbResource);
+            context.PSSetShaderResources((*bufferRes).m_shaderSlotId, 1, &static_cast<Texture2D*>(tex->m_Resource)->GetTextureResource()->m_cbResource);
 #endif
             break;
 
@@ -476,8 +492,8 @@ void XCShaderHandle::SetResource(std::string bufferName, ID3DDeviceContext& cont
 #if defined(XCGRAPHICS_DX12)
             context.SetGraphicsRootDescriptorTable(slotNb, static_cast<CubeTexture3D*>(tex->m_Resource)->GetTextureResource()->m_gpuHandle);
 #elif defined(XCGRAPHICS_DX11)
-            context.VSSetShaderResources(slotNb, 1, &static_cast<CubeTexture3D*>(tex->m_Resource)->GetTextureResource()->m_cbResource);
-            context.PSSetShaderResources(slotNb, 1, &static_cast<CubeTexture3D*>(tex->m_Resource)->GetTextureResource()->m_cbResource);
+            context.VSSetShaderResources((*bufferRes).m_shaderSlotId, 1, &static_cast<CubeTexture3D*>(tex->m_Resource)->GetTextureResource()->m_cbResource);
+            context.PSSetShaderResources((*bufferRes).m_shaderSlotId, 1, &static_cast<CubeTexture3D*>(tex->m_Resource)->GetTextureResource()->m_cbResource);
 #endif
             break;
 

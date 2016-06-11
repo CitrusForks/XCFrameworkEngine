@@ -97,6 +97,8 @@ void Texture2D::LoadTexture()
 
     ValidateResult(LoadFromDDSFile(str, 0, &m_texMetaData, m_scratchImage));
     ValidateResult(CreateShaderResourceView(graphicsSystem.GetDevice(), m_scratchImage.GetImages(), m_scratchImage.GetImageCount(), m_scratchImage.GetMetadata(), &m_diffuseMapTextureSRV->m_cbResource));
+
+    m_resourceUpdated = true;
 #endif
 
     Logger("[TEXTURE 2D] Texture %s Loaded", wc.c_str());

@@ -31,7 +31,6 @@ public:
     static  void            GLRun();
 
 protected:
-    //Override these methods please if you need to change working
     virtual void            InitMainWindow();
     virtual void            CalculateFramesPerSecond(float dt) {}	//Call from update method
 

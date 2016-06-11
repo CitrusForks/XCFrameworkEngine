@@ -44,12 +44,11 @@ D3DConstantBuffer* SharedDescriptorHeap::CreateBufferView(D3DBufferDesc& desc)
     {
         XCASSERT(desc.m_bufferSize);
 
-        constBuffer = new D3DConstantBuffer();
+        constBuffer = new D3DConstantBuffer(BUFFERTYPE_CBV);
 
         //Create the cbv
         if (desc.m_bufferSize)
         {
-            constBuffer->m_bufferType   = BUFFERTYPE_CBV;
             constBuffer->m_sizeOfBuffer = desc.m_bufferSize;
             constBuffer->m_isInUse      = true;
 
@@ -124,8 +123,7 @@ D3DConstantBuffer* SharedDescriptorHeap::CreateShaderResourceView()
     }
     else
     {
-        constBuffer = new D3DConstantBuffer;
-        constBuffer->m_bufferType = BUFFERTYPE_SRV;
+        constBuffer = new D3DConstantBuffer(BUFFERTYPE_SRV);
         constBuffer->m_sizeOfBuffer = 0;
         constBuffer->m_isInUse = true;
 

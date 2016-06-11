@@ -104,6 +104,8 @@ void IndexBuffer<T>::BuildIndexBuffer()
     iInitData.pSysMem = &m_indexData[0];
 
     ValidateResult(graphicsSystem.GetDevice()->CreateBuffer(&ibd, &iInitData, &m_pIB));
+
+    m_resourceUpdated = true;
 #endif
 }
 

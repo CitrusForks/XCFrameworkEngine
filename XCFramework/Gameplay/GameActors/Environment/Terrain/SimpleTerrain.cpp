@@ -184,15 +184,18 @@ void SimpleTerrain::Draw(RenderContext& context)
     // Set constants
     cbWorld wbuffer = { ToXCMatrix4Unaligned(XMMatrixTranspose(m_World)) };
     ICamera& cam = context.GetShaderManagerSystem().GetGlobalShaderData().m_camera;
+    
     cbWVP perObject = {
         ToXCMatrix4Unaligned(XMMatrixTranspose(cam.GetViewMatrix() * cam.GetProjectionMatrix() * m_World)),
     };
-
+    m_pCBPerObject->UploadDataOnGPU(context.GetDeviceContext(), &perObject, sizeof(PerObjectBuffer));
+    
     XCShaderHandle* solidColorShader = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(m_useShaderType);
-    memcpy(m_pCBPerObject->m_cbDataBegin, &perObject, sizeof(PerObjectBuffer));
-    solidColorShader->SetConstantBuffer("cbWVP", context.GetDeviceContext(), *m_pCBPerObject);
     solidColorShader->SetVertexBuffer(context.GetDeviceContext(), &m_vertexPosColorBuffer);
     solidColorShader->SetIndexBuffer(context.GetDeviceContext(), m_indexBuffer);
+
+    solidColorShader->SetConstantBuffer("cbWVP", context.GetDeviceContext(), *m_pCBPerObject);
+
 
     context.GetShaderManagerSystem().DrawIndexedInstanced(context.GetDeviceContext(), m_indexBuffer.m_indexData.size());
 }

@@ -49,7 +49,7 @@ typedef D3D12_INPUT_LAYOUT_DESC         D3D_INPUT_LAYOUT_DESC;
 
 #elif defined(XCGRAPHICS_DX11)
 
-#define LIVE_DRIVE_ENABLED 1
+//#define LIVE_DRIVE_ENABLED 1
 #define LOAD_SHADERS_FROM_DATA 1
 
 typedef ID3D11Device                    ID3DDevice;

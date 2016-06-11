@@ -646,14 +646,14 @@ void XCMesh::DrawSubMesh(RenderContext& renderContext, unsigned int meshIndex)
     {
     case ShaderType_LightTexture:
     {
-        memcpy(m_instanceBuffers[0].m_cbInstancedBufferGPU->m_cbDataBegin, &m_instanceBuffers[0].m_cbInstancedBuffer, sizeof(cbInstancedBuffer));
+        m_instanceBuffers[0].m_cbInstancedBufferGPU->UploadDataOnGPU(renderContext.GetDeviceContext(), &m_instanceBuffers[0].m_cbInstancedBuffer, sizeof(cbInstancedBuffer));
         m_shaderHandler->SetConstantBuffer("cbInstancedBuffer", renderContext.GetDeviceContext(), *m_instanceBuffers[0].m_cbInstancedBufferGPU);
         break;
     }
 
     case ShaderType_SkinnedCharacter:
     {
-        memcpy(m_instanceBuffers[0].m_cbInstancedBufferGPU->m_cbDataBegin, &m_instanceBuffers[0].m_cbInstancedBuffer, sizeof(cbInstancedBuffer));
+        m_instanceBuffers[0].m_cbInstancedBufferGPU->UploadDataOnGPU(renderContext.GetDeviceContext(), &m_instanceBuffers[0].m_cbInstancedBuffer, sizeof(cbInstancedBuffer));
         m_shaderHandler->SetConstantBuffer("cbInstancedBuffer", renderContext.GetDeviceContext(), *m_instanceBuffers[0].m_cbInstancedBufferGPU);
 
         std::vector<aiMatrix4x4> boneMatrix = m_sceneAnimator->GetBoneMatrices(m_scene->mRootNode, meshIndex);
@@ -676,7 +676,7 @@ void XCMesh::DrawSubMesh(RenderContext& renderContext, unsigned int meshIndex)
             *tempmat++ = mat.d1; *tempmat++ = mat.d2; *tempmat++ = mat.d3; *tempmat++ = mat.d4;
         }
 
-        memcpy(m_boneBuffers[meshIndex].m_cbBoneBufferGPU->m_cbDataBegin, &matrices, sizeof(cbBoneBuffer));
+        m_boneBuffers[meshIndex].m_cbBoneBufferGPU->UploadDataOnGPU(renderContext.GetDeviceContext(), &matrices, sizeof(cbBoneBuffer));
         m_shaderHandler->SetConstantBuffer("cbBoneBuffer", renderContext.GetDeviceContext(), *m_boneBuffers[meshIndex].m_cbBoneBufferGPU);
         break;
     }

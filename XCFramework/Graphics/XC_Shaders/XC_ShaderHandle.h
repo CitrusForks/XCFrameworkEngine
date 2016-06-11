@@ -44,9 +44,6 @@ struct ShaderSlot
         D3D_SHADER_INPUT_BIND_DESC resourceBufferDesc;
     };
 
-    BufferDesc   m_bufferDesc;
-    BufferType   m_bufferType;
-
     std::string GetBufferName()
     {
         return m_bufferType == BUFFERTYPE_CBV ? m_bufferDesc.constantBufferDesc.Name : m_bufferDesc.resourceBufferDesc.Name;
@@ -63,6 +60,10 @@ struct ShaderSlot
         m_bufferDesc.resourceBufferDesc = buffer;
         m_bufferType = BUFFERTYPE_SRV;
     }
+
+    BufferDesc      m_bufferDesc;
+    BufferType      m_bufferType;
+    unsigned int    m_shaderSlotId;
 };
 
 class XCShaderHandle : public IShader
@@ -135,6 +136,9 @@ public:
         switch (m_vertexFormat)
         {
         case VertexFormat_Position:
+            ((VertexBuffer<VertexPos>*)vertexBuffer)->SetVertexBuffer(context);
+            break;
+        case VertexFormat_PositionColor:
             ((VertexBuffer<VertexPosColor>*)vertexBuffer)->SetVertexBuffer(context);
             break;
         case VertexFormat_PositionNormalTexture:

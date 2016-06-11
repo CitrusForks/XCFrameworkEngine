@@ -112,11 +112,12 @@ void VectorFontMesh::CreateConstantBuffer()
     {
         VectorFontInstanceBuffer buffer = {};
         SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
+        XC_Graphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XC_Graphics>("GraphicsSystem");
 
         for (unsigned int subMeshIndex = 0; subMeshIndex < m_subMeshes.size(); ++subMeshIndex)
         {
             buffer.m_instanceBufferGPU = m_shaderHandler->CreateConstantBuffer("cbPerObjectInstanced");
-            memset(buffer.m_instanceBufferGPU->m_cbDataBegin, 0, sizeof(cbVectorFontInstanced));
+            buffer.m_instanceBufferGPU->UploadZeroMemoryDataOnGPU(*graphicsSystem.GetDeviceContext(), sizeof(cbVectorFontInstanced));
             m_vectorFontInstanceBuffers.push_back(buffer);
         }
         break;
@@ -136,7 +137,11 @@ void VectorFontMesh::Draw(RenderContext& context)
 
     for (auto subMesh : m_subMeshesIdBuffer)
     {
-        memcpy(m_vectorFontInstanceBuffers[subMesh.submeshId].m_instanceBufferGPU->m_cbDataBegin, &m_vectorFontInstanceBuffers[subMesh.submeshId].m_instanceBuffer.gWVP[0], sizeof(XCMatrix4Unaligned) * subMesh.instanceCount);
+        m_vectorFontInstanceBuffers[subMesh.submeshId].m_instanceBufferGPU->UploadDataOnGPU(
+            context.GetDeviceContext(), 
+            &m_vectorFontInstanceBuffers[subMesh.submeshId].m_instanceBuffer.gWVP[0], 
+            sizeof(XCMatrix4Unaligned) * subMesh.instanceCount);
+
         shader->SetConstantBuffer("cbPerObjectInstanced", context.GetDeviceContext(), *m_vectorFontInstanceBuffers[subMesh.submeshId].m_instanceBufferGPU);
         DrawSubMesh(context, subMesh.submeshId, subMesh.instanceCount);
     }

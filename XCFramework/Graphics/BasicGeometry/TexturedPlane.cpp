@@ -107,7 +107,7 @@ void TexturedPlane::Draw(RenderContext& context)
     context.ApplyShader(m_useShaderType);
 
     // Set constants
-    //TODO: Remove all teh overrides from here. Need to create a texture planeactor from gameplay that will inherit this and then make it renderable
+    //TODO: Remove all the overrides from here. Need to create a texture planeactor from gameplay that will inherit this and then make it renderable
    ICamera& cam = context.GetShaderManagerSystem().GetGlobalShaderData().m_camera;
     PerObjectBuffer perObject = {
         ToXCMatrix4Unaligned(XMMatrixTranspose(m_World)),
@@ -117,12 +117,11 @@ void TexturedPlane::Draw(RenderContext& context)
         m_material
     };
 
+    m_pCBPerObject->UploadDataOnGPU(context.GetDeviceContext(), &perObject, sizeof(PerObjectBuffer));
+
     XCShaderHandle* lightTexShader = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(ShaderType_LightTexture);
     lightTexShader->SetVertexBuffer(context.GetDeviceContext(), &m_vertexBuffer);
-
-    memcpy(m_pCBPerObject->m_cbDataBegin, &perObject, sizeof(PerObjectBuffer));
     lightTexShader->SetConstantBuffer("PerObjectBuffer", context.GetDeviceContext(), *m_pCBPerObject);
-
     lightTexShader->SetResource("gDiffuseMap", context.GetDeviceContext(), m_texture);
 
     context.GetShaderManagerSystem().DrawNonIndexed(context.GetDeviceContext(), 6);

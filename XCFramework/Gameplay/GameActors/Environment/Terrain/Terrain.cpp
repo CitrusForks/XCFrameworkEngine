@@ -13,12 +13,13 @@
 #include "Terrain.h"
 
 #include "Gameplay/WorldEventTypes.h"
+#include "Gameplay/XC_Camera/XC_CameraManager.h"
 
 #include "Graphics/XC_Graphics.h"
 #include "Graphics/XC_Shaders/XC_ShaderBufferConstants.h"
 #include "Graphics/XC_Shaders/XC_ShaderHandle.h"
-#include "Gameplay/XC_Camera/XC_CameraManager.h"
 #include "Graphics/XC_Lighting/XC_LightManager.h"
+
 #include "Engine/Resource/ResourceManager.h"
 #include "Engine/Event/EventBroadcaster.h"
 
@@ -63,10 +64,8 @@ void Terrain::PreLoad(const void* fbBuffer)
 
     PhysicsActor::PreLoad(fbBuffer);
 
-#if defined(XCGRAPHICS_DX12)
     SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
     m_pCBPerObject = heap.CreateBufferView(D3DBufferDesc(BUFFERTYPE_CBV, sizeof(PerObjectBuffer)));
-#endif
 }
 
 //Multi Textured Terrain
@@ -370,18 +369,17 @@ void Terrain::Draw(RenderContext& context)
         ToXCMatrix4Unaligned(XMMatrixIdentity()),
         m_material
     };
+    m_pCBPerObject->UploadDataOnGPU(context.GetDeviceContext(), &perObject, sizeof(PerObjectBuffer));
 
     if (m_useShaderType == ShaderType_LightTexture)
     {
         shaderHandle = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(ShaderType_LightTexture);
-        memcpy(m_pCBPerObject->m_cbDataBegin, &perObject, sizeof(PerObjectBuffer));
         shaderHandle->SetConstantBuffer("PerObjectBuffer", context.GetDeviceContext(), *m_pCBPerObject);
         shaderHandle->SetResource("gDiffuseMap", context.GetDeviceContext(), m_textures[0]);
     }
     else if (m_useShaderType == ShaderType_TerrainMultiTexture)
     {
         shaderHandle = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(ShaderType_TerrainMultiTexture);
-        memcpy(m_pCBPerObject->m_cbDataBegin, &perObject, sizeof(PerObjectBuffer));
         shaderHandle->SetConstantBuffer("PerObjectBuffer", context.GetDeviceContext(), *m_pCBPerObject);
         shaderHandle->SetResource("gDiffuseMap",  context.GetDeviceContext(), m_textures[0]);
         shaderHandle->SetResource("gDiffuseMap1", context.GetDeviceContext(), m_textures[1]);

@@ -26,16 +26,6 @@ void IShader::ApplyShader(ID3DDeviceContext& context, RasterType rasterType)
 {
 }
 
-void IShader::MemCpyConstants(ID3DDeviceContext& context, void* dest, void* src, unsigned int size)
-{
-#if defined(XCGRAPHICS_DX11)
-    D3D11_MAPPED_SUBRESOURCE mappedResource;
-    context.Map((ID3D11Buffer*)dest, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-    std::memcpy(mappedResource.pData, src, size);
-    context.Unmap((ID3D11Buffer*)dest, 0);
-#endif
-}
-
 D3DConstantBuffer* IShader::CreateBuffer(BufferType bufferType, int sizeOfType)
 {
     D3DConstantBuffer* constantBuff = nullptr;

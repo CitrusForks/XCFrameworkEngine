@@ -46,7 +46,7 @@ void WorldSceneLoader::Run()
     LoadBuffer<const flatbuffers::Vector<flatbuffers::Offset<FBCar>>*>(fbWorld->FBPCCars(), "PCCar");
     LoadBuffer<const flatbuffers::Vector<flatbuffers::Offset<FBCar>>*>(fbWorld->FBNPCCars(), "NPCCar");
     LoadBuffer<const flatbuffers::Vector<flatbuffers::Offset<FBTexturePlane>>*>(fbWorld->FBTexturePlanes(), "TexturedPlane");
-#if defined(XCGRAPHICS_DX11)
+#if defined(LIVE_DRIVE_ENABLED)
     LoadBuffer<const flatbuffers::Vector<flatbuffers::Offset<FBLiveDriveTexturePlane>>*>(fbWorld->FBLiveDriveTexturePlanes(), "LiveDriveTexturePlane");
 #endif
     LoadBuffer<const flatbuffers::Vector<flatbuffers::Offset<FBMultiTexturedTerrain>>*>(fbWorld->FBMultiTexturedTerrains(), "Terrain");

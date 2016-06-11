@@ -52,10 +52,8 @@ void SimpleSkyBox::PreLoad(const void* fbBuffer)
 
     m_rasterType = (RasterType) skyBoxBuff->RasterizerType();
 
-#if defined(XCGRAPHICS_DX12)
     SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
     m_CBwvp = heap.CreateBufferView(D3DBufferDesc(BUFFERTYPE_CBV, sizeof(cbWVP)));
-#endif
 
     SimpleActor::PreLoad(fbBuffer);
 }
@@ -145,6 +143,7 @@ void SimpleSkyBox::Draw(RenderContext& context)
     ICamera& cam = context.GetShaderManagerSystem().GetGlobalShaderData().m_camera;
 
     cbWVP wbuffer = { ToXCMatrix4Unaligned(XMMatrixTranspose(m_World * cam.GetViewMatrix() * cam.GetProjectionMatrix())) };
+    m_CBwvp->UploadDataOnGPU(context.GetDeviceContext(), &wbuffer, sizeof(cbWVP));
 
     // Set constants
     XCShaderHandle* cubeMapShader = (XCShaderHandle*) context.GetShaderManagerSystem().GetShader(ShaderType_SimpleCubeMap);
@@ -152,7 +151,6 @@ void SimpleSkyBox::Draw(RenderContext& context)
     cubeMapShader->SetVertexBuffer(context.GetDeviceContext(), &m_vertexBuffer);
     cubeMapShader->SetIndexBuffer(context.GetDeviceContext(), m_indexBuffer);
 
-    memcpy(m_CBwvp->m_cbDataBegin, &wbuffer, sizeof(cbWVP));
     cubeMapShader->SetConstantBuffer("cbWVP", context.GetDeviceContext(), *m_CBwvp);
     cubeMapShader->SetResource("gCubeMap", context.GetDeviceContext(), m_cubeMapTexture);
     
