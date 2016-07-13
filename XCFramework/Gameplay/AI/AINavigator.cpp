@@ -55,8 +55,7 @@ void AINavigator::ResetNavigation()
     m_targetPosition = m_bindedActor->GetPosition();
     m_chaseActor = nullptr;
 
-    XCVec3 vec = XCVec3(0, 0, 0);
-    m_path = XMLoadFloat3(&vec);
+    m_path = XCFloat4::XCFloat4ZeroVector;
 
     SetNavigationState(NAVIGATE_IDLE);
 }
@@ -95,19 +94,19 @@ bool AINavigator::IsLookingAtTarget()
 {
     //If the angle between the look and path is within absolute range, then it's looking
     //Calculate the angle
-    XCVecIntrinsic4 path = m_path;
-    XCVecIntrinsic4 look = m_bindedActor->GetLook();
+    XCVec4 path = m_path;
+    XCVec4 look = m_bindedActor->GetLook();
 
     //We do not want to consider y component, as the target can have varied y component.
-    path = XMVectorSetY(path, 0.0f);
-    look = XMVectorSetY(look, 0.0f);
+    path.Set<Y>(0.0f);
+    look.Set<Y>(0.0f);
 
-    path = XMVector3Normalize(path);
-    look = XMVector3Normalize(look);
+    path = VectorNormalize<3>(path);
+    look = VectorNormalize<3>(look);
 
-    float angle = XMVec3CosineDot(path, look);
+    float angle = CosineVectorDot(path, look);
 
-    if (angle <= XM_2PI && angle >= -XM_2PI)
+    if (angle <= XC_2PI && angle >= -XC_2PI)
     {
         if (angle <= LOOK_TARGET_ANGLE_ABS && angle >= -LOOK_TARGET_ANGLE_ABS)
         {
@@ -140,12 +139,12 @@ void AINavigator::MoveOnLook()
 
 void AINavigator::MoveOnPath()
 {
-    XCVecIntrinsic4 pathNormal = XMVector3Normalize(m_path);
+    XCVec4 pathNormal = VectorNormalize<3>(m_path);
 
     m_bindedActor->AddForce(pathNormal * 10);
 }
 
-void AINavigator::SetStaticTargetNavigation(XCVecIntrinsic4 target)
+void AINavigator::SetStaticTargetNavigation(XCVec4& target)
 {
     SetNavigationState(NAVIGATE_STATIC_TARGET);
     m_targetPosition = target;
@@ -167,11 +166,11 @@ void AINavigator::SetChaseNavigation(PhysicsActor* actor)
 bool AINavigator::HasArrivedAtTarget()
 {
     //Calculate distance of Path vector
-    XCVecIntrinsic4 pathDistance = XMVector3Length(m_path);
+    float pathDistance = VectorLength<3>(m_path);
 
     //Logger("[Distance] %f %f %f \n", XMVectorGetX(pathDistance), XMVectorGetY(pathDistance), XMVectorGetZ(pathDistance));
 
-    if (XMVectorGetY(pathDistance) < DISTANCE_ABS)
+    if (pathDistance < DISTANCE_ABS)
     {
         return true;
     }
@@ -179,10 +178,10 @@ bool AINavigator::HasArrivedAtTarget()
     return false;
 }
 
-XCVecIntrinsic4 AINavigator::ComputePathToTarget()
+XCVec4 AINavigator::ComputePathToTarget()
 {
     //Get current position A and minus from Target Position T
-    XCVecIntrinsic4 currentPosition = m_bindedActor->GetPosition();
+    XCVec4 currentPosition = m_bindedActor->GetPosition();
     m_path = m_targetPosition - currentPosition;
 
     return m_path;

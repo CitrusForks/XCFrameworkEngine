@@ -11,7 +11,7 @@ ParticleContact::~ParticleContact(void)
 {
 }
 
-void ParticleContact::ContactResolve(PhysicsActor* p1, PhysicsActor* p2, float restitution, float penetration, XCVecIntrinsic4 contactNormal)
+void ParticleContact::ContactResolve(PhysicsActor* p1, PhysicsActor* p2, float restitution, float penetration, XCVec4& contactNormal)
 {
     m_pParticle1 = p1;
     m_pParticle2 = p2;
@@ -24,10 +24,10 @@ void ParticleContact::ContactResolve(PhysicsActor* p1, PhysicsActor* p2, float r
 
 float ParticleContact::CalculateSeparatingVelocity()
 {
-    XCVecIntrinsic4 relativeVelocity =	m_pParticle1->GetVelocity();
+    XCVec4 relativeVelocity =	m_pParticle1->GetVelocity();
 
     //This is required, when the particle 1 is stationary and non movable, reverse the particles and calculate separating velocity based on particle 2.
-    if (IsVectorEqual(relativeVelocity, XMVectorZero()) && m_pParticle2 != nullptr)
+    if (IsVectorEqual(relativeVelocity, XCVec4()) && m_pParticle2 != nullptr)
     {
         relativeVelocity = m_pParticle2->GetVelocity();
 
@@ -37,13 +37,13 @@ float ParticleContact::CalculateSeparatingVelocity()
         m_pParticle2 = temp;
     }
 
-    return XMVectorGetX(XMVector3Dot(relativeVelocity, m_contactNormal));
+    return VectorDot(relativeVelocity, m_contactNormal);
 }
 
-void ParticleContact::ApplyImpulse(PhysicsActor* p1, XCVecIntrinsic4 impulse)
+void ParticleContact::ApplyImpulse(PhysicsActor* p1, XCVec4& impulse)
 {
-    XCVecIntrinsic4 currentPos = p1->GetTransformedPosition();
-    currentPos = XMVectorSetY(currentPos, XMVectorGetY(impulse));
+    XCVec4 currentPos = p1->GetTransformedPosition();
+    currentPos.Set<Y>(impulse.Get<Y>());
     p1->SetTransformedPosition(currentPos);
     //Not necessary, calculating now from ResolveVelocity() itself.
     //p1->AddForce(XMLoadFloat3(&XMFLOAT3(0, (float)5.0001, 0)));
@@ -74,11 +74,11 @@ void ParticleContact::ResolveVelocity()
 
     float impulse = deltaVelocity / totalInverseMass;
 
-    XCVecIntrinsic4 impulsePerIMass = m_contactNormal * impulse;
+    XCVec4 impulsePerIMass = m_contactNormal * impulse;
 
-    XCVecIntrinsic4 particle1Velocity = m_pParticle1->GetVelocity();
+    XCVec4 particle1Velocity = m_pParticle1->GetVelocity();
 
-    XCVecIntrinsic4 particle2Velocity;
+    XCVec4 particle2Velocity;
     if (m_pParticle2 != nullptr)
     {
         particle2Velocity = m_pParticle2->GetVelocity();
@@ -103,7 +103,7 @@ void ParticleContact::ResolvePenetration()
         return;
 }
 
-void ParticleContact::ResolveDragging(PhysicsActor* p1, PhysicsActor* p2, float restitution, float penetration, XCVecIntrinsic4 contactNormal)
+void ParticleContact::ResolveDragging(PhysicsActor* p1, PhysicsActor* p2, float restitution, float penetration, XCVec4& contactNormal)
 {
     m_pParticle1        =   p1;
     m_pParticle2        =   p2;

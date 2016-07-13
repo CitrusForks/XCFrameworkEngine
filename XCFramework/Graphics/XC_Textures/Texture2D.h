@@ -34,7 +34,7 @@ public:
     void                         SetSRV(D3DConstantBuffer* srv)     { m_diffuseMapTextureSRV = srv; }
     
     XCMatrix4*                   GetTextureCoordinateMatrix() { return &m_textureCoordinateMatrix; }
-    void                         SetTextureCoordinateMatrix(XCMatrix4 matrix) { m_textureCoordinateMatrix = matrix; }
+    void                         SetTextureCoordinateMatrix(const XCMatrix4& matrix) { m_textureCoordinateMatrix = matrix; }
 
 protected:
 

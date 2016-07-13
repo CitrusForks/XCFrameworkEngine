@@ -20,7 +20,7 @@ public:
     virtual ~Terrain(void);
  
     virtual void                        PreLoad(const void* fbBuffer);
-    virtual void                        PreLoad(const char* _pHeightMapFileName, std::string terrainTexture, std::string terrainTexture1, std::string terrainTexture2, std::string blendMap, XCVec3 _initialPosition, int _rows, int _column, float _rowSpacing, float _colSpacing);
+    virtual void                        PreLoad(const char* _pHeightMapFileName, std::string terrainTexture, std::string terrainTexture1, std::string terrainTexture2, std::string blendMap, XCVec3& _initialPosition, int _rows, int _column, float _rowSpacing, float _colSpacing);
     virtual void                        UpdateState();
     virtual void                        Load();
     virtual void                        GenerateVertices();
@@ -34,9 +34,9 @@ public:
 
     char                                GetHeightAt(int _index) const;
     XCVec3                              GetTerrainNormal(float x, float z) const;
-    XCVecIntrinsic4                     GetPointAtIndex(int pointIndex) const;
+    XCVec4                              GetPointAtIndex(int pointIndex) const;
 
-    XCVecIntrinsic4                     CheckTerrainCollisionFromPoint(OrientedBoundingBox* bbox);
+    XCVec4                              CheckTerrainCollisionFromPoint(OrientedBoundingBox* bbox);
 
 protected:
     std::string                         m_pHeightMapFileName;    //Height Map Filename

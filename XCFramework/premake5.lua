@@ -25,4 +25,8 @@ print("Project Generation done...")
 
 print("Building C++ Win32 Project XCGameplay")
 include "Gameplay"
+
+print("Building C++ UniTest Project XCUnitTest")
+include "UnitTests"
+
 print("Project Generation done...")

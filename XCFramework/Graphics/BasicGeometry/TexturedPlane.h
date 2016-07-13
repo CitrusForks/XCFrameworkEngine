@@ -24,12 +24,12 @@ public:
     DECLARE_OBJECT_CREATION(TexturedPlane)
 
     TexturedPlane();
-    TexturedPlane(XCVecIntrinsic4 p1, XCVecIntrinsic4 p2, XCVecIntrinsic4 p3);
+    TexturedPlane(XCVec4& p1, XCVec4& p2, XCVec4& p3);
     virtual ~TexturedPlane();
 
-    virtual void                     Init(int actorId);
+    virtual void                     Init(int actorId) override;
     virtual void                     PreLoad(const void* fbBuffer);
-    virtual void                     PreLoad(XCVecIntrinsic4 initialPosition, XCVecIntrinsic4 initialRotation, XCVecIntrinsic4 initialScaling, BasicMaterial material, std::string texture, RasterType rasterType);
+    virtual void                     PreLoad(XCVec4& initialPosition, XCVec4& initialRotation, XCVec4& initialScaling, BasicMaterial& material, std::string texture, RasterType rasterType);
     virtual void                     Load();
     virtual void                     Update(float dt);
     virtual void                     Draw(RenderContext& renderContext);
@@ -37,6 +37,7 @@ public:
     virtual void                     BuildGeometryBuffers();
 
 protected:
+
     ShaderType                        m_useShaderType;
     BasicMaterial                     m_material;
     ResourceHandle*                   m_texture;

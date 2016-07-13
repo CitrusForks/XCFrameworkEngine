@@ -12,158 +12,108 @@
 
 #else
 
+//#define USE_DIRECTX_MATH
+
+#if defined(USE_DIRECTX_MATH)
 #define _XM_NO_INTRINSICS_
 #include <DirectXMath.h>
+#else
+
+#include <DirectXMath.h>
+
+#include "XCIntrincis.inl"
+#include "XCFloat2.h"
+#include "XCFloat3.h"
+#include "XCFloat4.h"
+#include "XCMatrix.h"
+#endif
+
 #include "Assimp/include/assimp/matrix4x4.h"
+#endif
+
+#if defined(USE_DIRECTX_MATH)
 
 typedef DirectX::XMFLOAT2    XCVec2;
 typedef DirectX::XMFLOAT3    XCVec3;
 typedef DirectX::XMFLOAT4    XCVec4;
 typedef DirectX::XMMATRIX    XCMatrix4;
 typedef DirectX::XMMATRIX    XCMatrix4Unaligned;
-typedef DirectX::XMVECTOR    XCVecIntrinsic4;
+typedef DirectX::XMVECTOR    XCVec4;
 typedef XCMatrix4            XCMatrix4Unaligned;
 typedef XCVec3               XCVec3Unaligned;
 typedef XCVec4               XCVec4Unaligned;
 typedef XCVec2               XCVec2Unaligned;
 
-inline XCMatrix4Unaligned ToXCMatrix4Unaligned(const XCMatrix4& r)
-{
-    return r;
-}
+#else
 
-inline XCVecIntrinsic4 XMLoadFloat3(const XCVec3 pSource)
-{
-    XCVecIntrinsic4 out = DirectX::XMLoadFloat3(&pSource);
-    return out;
-}
+//Common types aligned with 16bytes
+typedef XCMath::XCFloat2              XCVec2;
+typedef XCMath::XCFloat3              XCVec3;
+typedef XCMath::XCFloat4              XCVec4;
+typedef XCMath::XCMatrix              XCMatrix4;
 
-inline XCVec4Unaligned ToXCVec4Unaligned(const XCVec4& r)
-{
-    return r;
-}
+//Unaligned versions for gpu structures which are 4byte aligned and not 16-byte aligned.
+typedef XCMath::XCFloat2Unaligned     XCVec2Unaligned;
+typedef XCMath::XCFloat3Unaligned     XCVec3Unaligned;
+typedef XCMath::XCFloat4Unaligned     XCVec4Unaligned;
+typedef XCMath::XCMatrixUnaligned     XCMatrix4Unaligned;
 
+static const float XC_PI        = 3.141592654f;
+static const float XC_2PI       = 6.283185307f;
+static const float XC_1DIVPI    = 0.318309886f;
+static const float XC_1DIV2PI   = 0.159154943f;
+static const float XC_PIDIV2    = 1.570796327f;
+static const float XC_PIDIV4    = 0.785398163f;
 
-inline XCVec3Unaligned ToXCVec3Unaligned(const XCVec3& r)
-{
-    return r;
-}
+using namespace XCMath;
 
-inline XCVec3Unaligned ToXCVec3Unaligned(const XCVec4& r)
-{
-    const XCVec3Unaligned result = { r.x, r.y, r.z };
-    return result;
-}
-
-inline XCVec3 ToXCVec3(const XCVec3Unaligned& r)
-{
-    return XCVec3(r.x, r.y, r.z);
-}
-
-inline XCVec4 ToXCVec4(const XCVec4Unaligned& r)
-{
-    return XCVec4(r.x, r.y, r.z, r.w);
-}
-
-inline float XMVec3CosineDot(XCVecIntrinsic4& vec1, XCVecIntrinsic4& vec2)
-{
-    XCVec3 v1, v2;
-    XMStoreFloat3(&v1, vec1);
-    XMStoreFloat3(&v2, vec2);
-
-#if defined(WIN32)
-    return acosf(XMVectorGetY(XMVector3Dot(vec1, vec2)) / (sqrt(((v1.x*v1.x) + (v1.y*v1.y) + (v1.z*v1.z))*((v2.x*v2.x) + (v2.y*v2.y) + (v2.z*v2.z)))));
-#elif defined(XC_ORBIS)
-    return acosf(XMVectorGetY(XMVector3Dot(vec1, vec2)) / (sqrt(((v1.getX()*v1.getX()) + (v1.getY()*v1.getY()) + (v1.getZ()*v1.getZ()))*((v2.getX()*v2.getX()) + (v2.getY()*v2.getY()) + (v2.getZ()*v2.getZ())))));
 #endif
-}
 
-inline XCVecIntrinsic4 CreatePlaneFromPoints(XCVecIntrinsic4 p1, XCVecIntrinsic4 p2, XCVecIntrinsic4 p3)
+//Complex operations
+inline XCVec4 CreatePlaneFromPoints(XCVec4& p1, XCVec4& p2, XCVec4& p3)
 {
-    XCVecIntrinsic4 v1 = XMVector3Normalize(p1);
-    XCVecIntrinsic4 v2 = XMVector3Normalize(p2);
-    XCVecIntrinsic4 v3 = XMVector3Normalize(p3);
+    XCVec4 v1(VectorNormalize<3>(p1.GetData()));
+    XCVec4 v2(VectorNormalize<3>(p2.GetData()));
+    XCVec4 v3(VectorNormalize<3>(p3.GetData()));
 
-    XCVecIntrinsic4 axis1 = v1 - v2; // from 1 to 0
-    XCVecIntrinsic4 axis2 = v3 - v2; // from 1 to 2
+    XCVec4 axis1 = v1 - v2; // from 1 to 0
+    XCVec4 axis2 = v3 - v2; // from 1 to 2
 
-    return XMVector3Normalize(XMVector3Cross(axis1, axis2));
+    return XCVec4(VectorNormalize<3>(VectorCross(axis1, axis2).GetData()));
 }
 
-inline XCVecIntrinsic4 GetNormalFromPoints(XCVecIntrinsic4 v1, XCVecIntrinsic4 v2, XCVecIntrinsic4 v3)
+inline XCVec4 GetNormalFromPoints(XCVec4& v1, XCVec4& v2, XCVec4& v3)
 {
     //Find the 2 axis for v1 vertex
-    XCVecIntrinsic4 axis1 = v2 - v1;
-    XCVecIntrinsic4 axis2 = v3 - v1;
+    XCVec4 axis1 = v2 - v1;
+    XCVec4 axis2 = v3 - v1;
 
     //Normalize the axis
-    XMVector3Normalize(axis1);
-    XMVector3Normalize(axis2);
+    VectorNormalize<3>(axis1.GetData());
+    VectorNormalize<3>(axis2.GetData());
 
     //Now find the cross product of both the axis
-    return XMVector3Normalize(XMVector3Cross(axis1, axis2));
+    return XCVec4(VectorNormalize<3>(VectorCross(axis1, axis2).GetData()));
 }
 
-inline bool IsVectorEqual(XCVecIntrinsic4 v1, XCVecIntrinsic4 v2)
+inline XCMatrix4Unaligned aiMatrixToMatrix4Unaligned(const aiMatrix4x4& matrix)
 {
-    if (XMVectorGetX(v1) > XMVectorGetX(v2) || XMVectorGetX(v1) < XMVectorGetX(v2)) return false;
-    if (XMVectorGetY(v1) > XMVectorGetY(v2) || XMVectorGetY(v1) < XMVectorGetY(v2)) return false;
-    if (XMVectorGetZ(v1) > XMVectorGetZ(v2) || XMVectorGetZ(v1) < XMVectorGetZ(v2)) return false;
+    XCMatrix4Unaligned transformation = XCMatrix4().GetUnaligned();
+    transformation.r1.x = matrix.a1; transformation.r1.y = matrix.a2; transformation.r1.z = matrix.a3; transformation.r1.w = matrix.a4;
+    transformation.r2.x = matrix.b1; transformation.r2.y = matrix.b2; transformation.r2.z = matrix.b3; transformation.r2.w = matrix.b4;
+    transformation.r3.x = matrix.c1; transformation.r3.y = matrix.c2; transformation.r3.z = matrix.c3; transformation.r3.w = matrix.c4;
+    transformation.r4.x = matrix.d1; transformation.r4.y = matrix.d2; transformation.r4.z = matrix.d3; transformation.r4.w = matrix.d4;
 
-    return true;
+    return transformation;
 }
 
-#endif
-
-using namespace DirectX;
-
-inline XCVecIntrinsic4 Float3ToVec(XCVec3 value)
+inline XCMatrix4 aiMatrixToMatrix4(const aiMatrix4x4& matrix)
 {
-    XCVecIntrinsic4 out = XMLoadFloat3(&value);
-    return out;
-}
-
-inline XCVecIntrinsic4 toXMVECTOR(float x, float y, float z, float w)
-{
-    XCVecIntrinsic4 t = XMVectorSet(x, y, z, w);
-    return t;
-}
-
-inline XCVec3 XMVectorToXMFloat3(XCVecIntrinsic4* value)
-{
-    XCVec3 out;
-    XMStoreFloat3(&out, *value);
-    return out;
-}
-
-inline XCMatrix4 InverseTranspose(CXMMATRIX M)
-{
-    // Inverse-transpose is just applied to normals.  So zero out 
-    // translation row so that it doesn't get into our inverse-transpose
-    // calculation--we don't want the inverse-transpose of the translation.
-    XCMatrix4 A = M;
-
-#if defined(WIN32)
-    A.r[3] = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
-#elif defined(XC_ORBIS)
-    A.setCol3(XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f));
-#endif
-
-    XCVecIntrinsic4 det = XMMatrixDeterminant(A);
-    return XMMatrixTranspose(DirectX::XMMatrixInverse(&det, A));
-}
-
-
-inline XCMatrix4Unaligned aiMatrixToMatrix4Unaligned(const aiMatrix4x4 matrix)
-{
-    XCMatrix4Unaligned transformation = XMMatrixIdentity();
-    transformation._11 = matrix.a1; transformation._12 = matrix.a2; transformation._13 = matrix.a3; transformation._14 = matrix.a4;
-
-    transformation._21 = matrix.b1; transformation._22 = matrix.b2; transformation._23 = matrix.b3; transformation._24 = matrix.b4;
-    
-    transformation._31 = matrix.c1; transformation._32 = matrix.c2; transformation._33 = matrix.c3; transformation._34 = matrix.c4;
-    
-    transformation._41 = matrix.d1; transformation._42 = matrix.d2; transformation._43 = matrix.d3; transformation._44 = matrix.d4;
+    XCMatrix4 transformation;
+    transformation[0][0] = matrix.a1; transformation[0][1] = matrix.a2; transformation[0][2] = matrix.a3; transformation[0][3] = matrix.a4;
+    transformation[1][0] = matrix.b1; transformation[1][1] = matrix.b2; transformation[1][2] = matrix.b3; transformation[1][3] = matrix.b4;
+    transformation[2][0] = matrix.c1; transformation[2][1] = matrix.c2; transformation[2][2] = matrix.c3; transformation[2][3] = matrix.c4;
+    transformation[3][0] = matrix.d1; transformation[3][1] = matrix.d2; transformation[3][2] = matrix.d3; transformation[3][3] = matrix.d4;
 
     return transformation;
 }

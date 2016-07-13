@@ -26,15 +26,15 @@ public:
     CollisionDetection();
     ~CollisionDetection();
 
-    static XCVecIntrinsic4                     getContactNormalFromBoundBoxContainedPoints(OrientedBoundingBox* bbox, XCVec3* points, int noOfPoints);
-    static XCVecIntrinsic4                     getContactNormalFromBoundBoxContainedBoundBox(OrientedBoundingBox* bbox1, OrientedBoundingBox* bbox2);
-    static XCVecIntrinsic4                     getContactNormalFromBoundBoxContainedPlane(OrientedBoundingBox* bbox1, OrientedBoundingBox* bbox2);
-    static XCVecIntrinsic4                     getTerrainPointOfContactWithBoundBox(PhysicsActor* bboxActor, PhysicsActor* terrain);
-    static XCVecIntrinsic4                     getContactNormalFromOBBToOBBTriangleTest(OrientedBoundingBox* bbox1, OrientedBoundingBox* bbox2);
+    static XCVec4                     GetContactNormalFromBoundBoxContainedPoints(OrientedBoundingBox* bbox, XCVec4* points, int noOfPoints);
+    static XCVec4                     GetContactNormalFromBoundBoxContainedBoundBox(OrientedBoundingBox* bbox1, OrientedBoundingBox* bbox2);
+    static XCVec4                     GetContactNormalFromBoundBoxContainedPlane(OrientedBoundingBox* bbox1, OrientedBoundingBox* bbox2);
+    static XCVec4                     GetTerrainPointOfContactWithBoundBox(PhysicsActor* bboxActor, PhysicsActor* terrain);
+    static XCVec4                     GetContactNormalFromOBBToOBBTriangleTest(OrientedBoundingBox* bbox1, OrientedBoundingBox* bbox2);
     
     //Primitive Intersection tests
-    static int                                 checkOBBTriangleIntersection(XCVecIntrinsic4 v1, XCVecIntrinsic4 v2, XCVecIntrinsic4 v3, OrientedBoundingBox* bbox);
-    static int                                 checkOBBPlaneIntersection(OrientedBoundingBox* bbox, Plane* p);
+    static int                        CheckOBBTriangleIntersection(XCVec4& v1, XCVec4& v2, XCVec4& v3, OrientedBoundingBox* bbox);
+    static int                        CheckOBBPlaneIntersection(OrientedBoundingBox* bbox, Plane* p);
 
-    static EOrderingType                       determineOrderOfTriangle(XCVecIntrinsic4 v1, XCVecIntrinsic4 v2, XCVecIntrinsic4 v3, XCVecIntrinsic4 viewPoint);
+    static EOrderingType              DetermineOrderOfTriangle(XCVec4& v1, XCVec4& v2, XCVec4& v3, XCVec4& viewPoint);
 };

@@ -11,14 +11,14 @@
 
 TPCChaseableActor::TPCChaseableActor(void)
 {
-    m_distanceFromTarget = XMVectorZero();
+    m_distanceFromTarget = XCFloat4::XCFloat4ZeroVector;
 }
 
 TPCChaseableActor::~TPCChaseableActor(void)
 {
 }
 
-void TPCChaseableActor::SetChasingAxis(XCVecIntrinsic4& look, XCVecIntrinsic4& right, XCVecIntrinsic4& up)
+void TPCChaseableActor::SetChasingAxis(XCVec4& look, XCVec4& right, XCVec4& up)
 {
     m_look = &look;
     m_right = &right;

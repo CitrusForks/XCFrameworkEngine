@@ -24,7 +24,7 @@ PistolBullet::~PistolBullet(void)
 {
 }
 
-PistolBullet::PistolBullet(IActor* parentActor, XCVec3 initialPosition, std::string pMesh)
+PistolBullet::PistolBullet(IActor* parentActor, XCVec3& initialPosition, std::string pMesh)
 {
     ResourceManager& resMgr = (ResourceManager&)SystemLocator::GetInstance()->RequestSystem("ResourceManager");
     m_pMesh = &resMgr.AcquireResource(pMesh.c_str());
@@ -35,24 +35,24 @@ PistolBullet::PistolBullet(IActor* parentActor, XCVec3 initialPosition, std::str
 
 
     //Get initial position
-    m_currentPosition = XMLoadFloat3(&initialPosition);
+    m_currentPosition = initialPosition;
 
     m_useShaderType = ShaderType_LightTexture;
     m_useRenderWorkerType = WorkerType_XCMesh;
 
-    m_secondaryLookAxis = XMVectorZero();
-    m_secondaryUpAxis = XMVectorZero();
-    m_secondaryRightAxis = XMVectorZero();
+    m_secondaryLookAxis  = XCFloat4::XCFloat4ZeroVector;
+    m_secondaryUpAxis    = XCFloat4::XCFloat4ZeroVector;
+    m_secondaryRightAxis = XCFloat4::XCFloat4ZeroVector;
 }
 
 void PistolBullet::Init(int actorId)
 {
     m_currentPosition += GetOffsetPosition();
 
-    m_MTranslation = XMMatrixTranslation(XMVectorGetX(m_currentPosition), XMVectorGetY(m_currentPosition), XMVectorGetZ(m_currentPosition));
+    m_MTranslation = MatrixTranslate(m_currentPosition);
 
-    m_MInitialRotation = XMMatrixRotationY(XM_PIDIV2);
-    m_MInitialRotation *= XMMatrixRotationZ(XM_PIDIV2);
+    m_MInitialRotation  = MatrixRotationY(XC_PIDIV2);
+    m_MInitialRotation *= MatrixRotationZ(XC_PIDIV2);
 
     m_transformedRotation = m_MRotation;
     m_MRotation = m_transformedRotation * m_MInitialRotation;
@@ -68,7 +68,7 @@ void PistolBullet::Update(float dt)
 {
     UpdateOffsets(dt);
 
-    m_MTranslation = XMMatrixTranslation(XMVectorGetX(m_currentPosition), XMVectorGetY(m_currentPosition), XMVectorGetZ(m_currentPosition));
+    m_MTranslation = MatrixTranslate(m_currentPosition);
 
     m_MRotation = m_MInitialRotation * m_transformedRotation;
 
@@ -91,9 +91,9 @@ void PistolBullet::UpdateOffsets(float dt)
 
     m_currentPosition = m_bindedActor->GetPosition();
 
-    m_currentPosition += (XMVectorGetX(m_offsetPosition) * m_right);
-    m_currentPosition += (XMVectorGetY(m_offsetPosition) * m_secondaryUpAxis);
-    m_currentPosition += (XMVectorGetZ(m_offsetPosition) * m_secondaryLookAxis);
+    m_currentPosition += (m_offsetPosition.Get<X>() * m_right);
+    m_currentPosition += (m_offsetPosition.Get<Y>() * m_secondaryUpAxis);
+    m_currentPosition += (m_offsetPosition.Get<Z>() * m_secondaryLookAxis);
 
     //m_transformedRotation *= GetOffsetRotation();
 }
@@ -116,10 +116,10 @@ void PistolBullet::Draw(RenderContext& context)
     // Set constants
     ICamera& cam = context.GetShaderManagerSystem().GetGlobalShaderData().m_camera;
     PerObjectBuffer perObject = {
-        ToXCMatrix4Unaligned(XMMatrixTranspose(m_World)),
-        ToXCMatrix4Unaligned(XMMatrixTranspose(m_World * cam.GetViewMatrix() * cam.GetProjectionMatrix())),
-        ToXCMatrix4Unaligned(InverseTranspose(m_World)),
-        ToXCMatrix4Unaligned(XMMatrixIdentity()),
+        MatrixTranspose(m_World).GetUnaligned(),
+        MatrixTranspose(m_World * cam.GetViewMatrix() * cam.GetProjectionMatrix()).GetUnaligned(),
+        MatrixInverseTranspose(m_World).GetUnaligned(),
+        XCMatrix4::XCMatrixIdentity.GetUnaligned(),
         m_material
     };
   

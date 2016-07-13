@@ -85,7 +85,7 @@ void RenderableOBB::Draw(RenderContext& context)
     perObject = {
         ToXCMatrix4Unaligned(XMMatrixTranspose(m_World)),
         ToXCMatrix4Unaligned(XMMatrixTranspose(m_World * cam->GetViewMatrix() * cam->GetProjMatrix())),
-        ToXCMatrix4Unaligned(InverseTranspose(m_World)),
+        ToXCMatrix4Unaligned(MatrixInverseTranspose(m_World)),
         ToXCMatrix4Unaligned(XMMatrixTranspose(XMMatrixIdentity())),
         m_material
     };

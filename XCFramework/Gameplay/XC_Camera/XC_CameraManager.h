@@ -23,24 +23,24 @@ public:
     XC_CameraManager();
     ~XC_CameraManager();
 
-    void                            InitializeCameras(XC_Graphics& graphicsSystem, int clientWidth, int clientHeight);
-    void                            Update(float dt);
-    void                            Draw();
-    void                            Destroy();
+    void                   InitializeCameras(XC_Graphics& graphicsSystem, int clientWidth, int clientHeight);
+    void                   Update(float dt);
+    void                   Draw();
+    void                   Destroy();
 
-    void                            SetCameraType(ECameraType type) { m_currentCameraType = type; }
-    ICamera*                        GetCurrentCamera()  { return m_Cameras[m_currentCameraType].get(); }
+    void                   SetCameraType(ECameraType type) { m_currentCameraType = type; }
+    ICamera*               GetCurrentCamera() { return m_Cameras[m_currentCameraType].get(); }
 
-    void                            onResize(int clientWidth, int clientHeight);
+    void                   onResize(int clientWidth, int clientHeight);
 
-    void                            AttachCameraToActor(IActor* actor);
-    void                            AttachCameraToActor(IActor* actor, XCVecIntrinsic4 distanceFromTarget);
+    void                   AttachCameraToActor(IActor* actor);
+    void                   AttachCameraToActor(IActor* actor, XCVec4& distanceFromTarget);
 
 protected:
-    XCMatrix4                       GetViewMatrix() { return m_Cameras[m_currentCameraType]->GetViewMatrix(); }
-    XCMatrix4                       GetProjMatrix() { return m_Cameras[m_currentCameraType]->GetProjectionMatrix(); }
-    XCVecIntrinsic4                 GetCameraPosition() { return m_Cameras[m_currentCameraType]->GetPosition(); }
-    XCVecIntrinsic4                 GetCameraTarget() { return m_Cameras[m_currentCameraType]->GetTarget(); }
+    XCMatrix4              GetViewMatrix() { return m_Cameras[m_currentCameraType]->GetViewMatrix(); }
+    XCMatrix4              GetProjMatrix() { return m_Cameras[m_currentCameraType]->GetProjectionMatrix(); }
+    XCVec4                 GetCameraPosition() { return m_Cameras[m_currentCameraType]->GetPosition(); }
+    XCVec4                 GetCameraTarget() { return m_Cameras[m_currentCameraType]->GetTarget(); }
 
 private:
     std::map<ECameraType, std::unique_ptr<ICamera>>     m_Cameras;

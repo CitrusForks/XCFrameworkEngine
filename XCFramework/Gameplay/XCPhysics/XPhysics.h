@@ -14,33 +14,33 @@ public:
     XPhysics();
     ~XPhysics();
 
-    void                InitXPhysics(XCVecIntrinsic4 _position, XCVecIntrinsic4 _velocity, XCVecIntrinsic4 _acceleration, float _mass, float _damping);
+    void                InitXPhysics(XCVec4& position, XCVec4& velocity, XCVec4& acceleration, float mass, float damping);
     void                Integrator(float dtS);
     void                ClearForce();
     void                ClearVelocity();
-    void                AddForce(XCVecIntrinsic4 _newForce);
+    void                AddForce(XCVec4& newForce);
     bool                HasFiniteMass();
 
     float               GetMass();
     float               GetInverseMass() { return m_InverseMass; }
-    XCVecIntrinsic4     GetVelocity() { return m_Velocity; }
+    XCVec4              GetVelocity() { return m_Velocity; }
 
-    XCVecIntrinsic4     GetTransformedPosition() { return m_Position; }
-    void                SetTransformedPosition(XCVecIntrinsic4 pos) { m_Position = pos; }
+    XCVec4              GetTransformedPosition() { return m_Position; }
+    void                SetTransformedPosition(XCVec4& pos) { m_Position = pos; }
 
-    XCVecIntrinsic4     GetContactNormal() { return m_ContactNormal; }
+    XCVec4              GetContactNormal() { return m_ContactNormal; }
 
     void                SetInverseMass(float _inverseMass) { m_InverseMass = _inverseMass; }
-    void                SetVelocity(XCVecIntrinsic4 _newValue) { m_Velocity = _newValue; }
-    void                SetContactNormal(XCVecIntrinsic4 _newValue) { m_ContactNormal = _newValue; }
+    void                SetVelocity(XCVec4& _newValue) { m_Velocity = _newValue; }
+    void                SetContactNormal(XCVec4& _newValue) { m_ContactNormal = _newValue; }
 
 protected:
-    XCVecIntrinsic4     m_Velocity;
-    XCVecIntrinsic4     m_Position;
-    XCVecIntrinsic4     m_Acceleration;
-    XCVecIntrinsic4     m_ForceAccumulator;
-    XCVecIntrinsic4     m_GAcceleration;
-    XCVecIntrinsic4     m_ContactNormal;
+    XCVec4     m_Velocity;
+    XCVec4     m_Position;
+    XCVec4     m_Acceleration;
+    XCVec4     m_ForceAccumulator;
+    XCVec4     m_GAcceleration;
+    XCVec4     m_ContactNormal;
 
     float               m_Damping;
     float               m_InverseMass;

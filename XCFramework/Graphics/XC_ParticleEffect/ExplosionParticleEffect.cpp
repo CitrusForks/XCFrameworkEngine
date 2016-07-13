@@ -39,9 +39,9 @@ void ExplosionParticleEffect::AssignParticleLocations()
         initialVelocity.y = (float) randomNegDirection * (rand() % 10) / 10;
         initialVelocity.z = (float) randomNegDirection * (rand() % 10) / 10;
 
-        XCVecIntrinsic4 norm = XMVector3Normalize(toXMVECTOR(initialVelocity.x, initialVelocity.z, initialVelocity.z, 0.0f));
+        XCVec4 norm = VectorNormalize<3>(XCVec4(initialVelocity.x, initialVelocity.z, initialVelocity.z, 0.0f));
 
-        ParticlePhysics particle = { toXMVECTOR(initialVelocity.x, initialVelocity.y, initialVelocity.z, 0.0f), (float)(rand() % 5)};
+        ParticlePhysics particle = { XCVec4(initialVelocity.x, initialVelocity.y, initialVelocity.z, 0.0f), (float)(rand() % 5)};
         m_particlesPhysics.push_back(particle);
     }
 }
@@ -59,13 +59,13 @@ void ExplosionParticleEffect::Update(float dt)
         ParticlePhysics& particle = m_particlesPhysics[particleIndex];
         VertexPosNormTex& pointVertex = m_pointVertices[particleIndex];
 
-        XCVecIntrinsic4 particlePosition = toXMVECTOR(pointVertex.Pos.x, pointVertex.Pos.y, pointVertex.Pos.z, 0.0f);
+        XCVec4 particlePosition(pointVertex.Pos.x, pointVertex.Pos.y, pointVertex.Pos.z, 0.0f);
 
         particlePosition += (particle.velocity * particle.acceleration);
 
-        pointVertex.Pos.x = particlePosition.vector4_f32[0];
-        pointVertex.Pos.y = particlePosition.vector4_f32[1];
-        pointVertex.Pos.z = particlePosition.vector4_f32[2];
+        pointVertex.Pos.x = particlePosition[0];
+        pointVertex.Pos.y = particlePosition[1];
+        pointVertex.Pos.z = particlePosition[2];
 
         if (particle.acceleration > 0)
         {

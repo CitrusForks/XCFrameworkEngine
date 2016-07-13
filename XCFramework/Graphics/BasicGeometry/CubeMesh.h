@@ -32,7 +32,7 @@ public:
     virtual void                    Destroy();
     virtual void                    BuildBuffers();
 
-    void                            PreLoad(XCVecIntrinsic4 initialPosition, XCVecIntrinsic4 initialRotation, XCVecIntrinsic4 initialScaling, BasicMaterial material, Texture2D* texture, RasterType rasterType);
+    void                            PreLoad(XCVec4 initialPosition, XCVec4 initialRotation, XCVec4 initialScaling, BasicMaterial material, Texture2D* texture, RasterType rasterType);
     void                            CreateMeshBuffer();
 
 protected:

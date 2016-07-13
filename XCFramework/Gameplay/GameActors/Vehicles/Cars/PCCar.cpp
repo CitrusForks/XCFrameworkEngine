@@ -35,8 +35,8 @@ void PCCar::PreLoad(const void* fbBuffer)
 
 void PCCar::Load()
 {
-    XCVec3 distance = XCVec3(0.0f, 7.0f, 25.0f);
-    TPCChaseableActor::setDistanceFromTarget(XMLoadFloat3(&distance));
+    XCVec4 distance(0.0f, 7.0f, 25.0f, 0.0f);
+    TPCChaseableActor::SetDistanceFromTarget(distance);
     TPCChaseableActor::SetChasingAxis(IActor::m_look, IActor::m_right, IActor::m_up);
 
     Car::Load();
@@ -70,10 +70,7 @@ void PCCar::Update(float dt)
     Integrator(dt);
     ClearForce();
 
-    XCVec3 pos;
-    XMStoreFloat3(&pos, m_Position);
-
-    m_MTranslation = XMMatrixTranslation(pos.x, pos.y, pos.z);
+    m_MTranslation = MatrixTranslate(m_Position);
 
     m_currentPosition = m_Position;
 

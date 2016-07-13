@@ -23,34 +23,34 @@ public:
     Gun(void);
     virtual ~Gun(void);
 
-    virtual void                 PreLoad(IActor* parentActor, XCVec3 initialPosition, std::string pMesh);
-    virtual void                 Load();
-    virtual void                 Update(float dt);
-    virtual void                 Draw(RenderContext& renderContext);
-    virtual void                 Destroy();
+    virtual void       PreLoad(IActor* parentActor, XCVec3& initialPosition, std::string pMesh);
+    virtual void       Load();
+    virtual void       Update(float dt);
+    virtual void       Draw(RenderContext& renderContext);
+    virtual void       Destroy();
 
-    virtual void                 UpdateOffsets(float dt);
-    virtual void                 ApplyOffsetRotation();
-    
-    void                         CheckInput();
-    void                         UpdateGunRecoil(float dt);
-    void                         ShootBullet(std::string bulletActorType, XCVec3 startPosition, XCVec3 target);
-    SubActor*                    GetSubActor() { return (SubActor*)this; }
+    virtual void       UpdateOffsets(float dt);
+    virtual void       ApplyOffsetRotation();
+
+    void               CheckInput();
+    void               UpdateGunRecoil(float dt);
+    void               ShootBullet(std::string bulletActorType, XCVec3& startPosition, XCVec3& target);
+    SubActor*          GetSubActor() { return (SubActor*)this; }
 
 protected:
-    ShaderType                   m_useShaderType;
+    ShaderType         m_useShaderType;
 
-    BasicMaterial                m_material;
+    BasicMaterial      m_material;
 
-    XCVecIntrinsic4              m_secondaryLookAxis;
-    XCVecIntrinsic4              m_secondaryUpAxis;
-    XCVecIntrinsic4              m_secondaryRightAxis;
+    XCVec4             m_secondaryLookAxis;
+    XCVec4             m_secondaryUpAxis;
+    XCVec4             m_secondaryRightAxis;
 
-    unsigned int                 m_noOfBullets;
-    float                        m_recoilDelta;
+    unsigned int       m_noOfBullets;
+    float              m_recoilDelta;
 
-    float                        m_recoilMaxTime;
-    bool                         m_canShootBullet;
+    float              m_recoilMaxTime;
+    bool               m_canShootBullet;
 
-    DirectInput*                 m_directInput;
+    DirectInput*       m_directInput;
 };

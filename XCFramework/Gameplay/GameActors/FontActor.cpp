@@ -24,9 +24,6 @@ void FontActor::Init(int actorId)
 {
     IActor::Init(actorId);
 
-    m_MTranslation = XMMatrixIdentity();
-    m_MRotation = XMMatrixIdentity();
-    m_MScaling = XMMatrixIdentity();
     m_transformedRotation = m_MRotation;
 
     m_World = m_MScaling * m_MRotation * m_MTranslation;

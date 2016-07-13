@@ -10,12 +10,9 @@
 
 ICamera::ICamera(void)
 {
-    m_projectionMatrix = XMMatrixIdentity();
-    m_viewMatrix = XMMatrixIdentity();
-
-    m_position  = XMVectorSet(0, 0, 0, 0);
-    m_target    = XMVectorSet(0, 0, -1, 0);
-    m_up        = XMVectorSet(0, 1, 0, 0);
+    m_position.SetValues(0, 0, 0, 0);
+    m_target.SetValues(0, 0, -1, 0);
+    m_up.SetValues(0, 1, 0, 0);
 
     m_aspectRatio   = 16/9;
     m_nearPlane     = 1.0f;
@@ -23,7 +20,7 @@ ICamera::ICamera(void)
     m_fov           = (float) (0.25 * 3.14);
 }
 
-ICamera::ICamera(XCVecIntrinsic4 _pos, XCVecIntrinsic4 _target, XCVecIntrinsic4 _up, float _aspectRatio, float _fov, float _near, float _far)
+ICamera::ICamera(XCVec4& _pos, XCVec4& _target, XCVec4& _up, float _aspectRatio, float _fov, float _near, float _far)
     : m_position(_pos)
     , m_target(_target)
     , m_up(_up)
@@ -32,10 +29,6 @@ ICamera::ICamera(XCVecIntrinsic4 _pos, XCVecIntrinsic4 _target, XCVecIntrinsic4 
     , m_nearPlane(_near)
     , m_farPlane(_far)
 {
-    XCMatrix4 I =  XMMatrixIdentity();
-    m_projectionMatrix = XMMatrixIdentity();
-    m_viewMatrix = XMMatrixIdentity();
-
     BuildViewMatrix();
     BuildProjectionMatrix();
 }
@@ -63,12 +56,12 @@ void ICamera::OnResize(int clientWidth, int clientHeight)
 
 void ICamera::BuildProjectionMatrix()
 {
-    m_projectionMatrix = XMMatrixPerspectiveFovLH(m_fov, m_aspectRatio, m_nearPlane, m_farPlane);
+    m_projectionMatrix = MatrixPerspective(m_fov, m_aspectRatio, m_nearPlane, m_farPlane);
 }
 
 void ICamera::BuildViewMatrix()
 {
-    m_viewMatrix = XMMatrixLookAtLH(m_position, m_target, m_up);
+    m_viewMatrix = MatrixLookAtLH(m_position, m_target, m_up);
 }
 
 void ICamera::Destroy()

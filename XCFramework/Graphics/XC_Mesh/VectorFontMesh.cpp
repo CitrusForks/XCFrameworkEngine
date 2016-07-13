@@ -31,7 +31,7 @@ void VectorFontMesh::Init(int resourceId, std::string userFriendlyName)
     graphicsSystem.GetRenderingPool().AddResourceDrawable((IResource*) this);
 }
 
-void VectorFontMesh::DrawText(std::string text, XCVec3Unaligned position, RenderContext& context)
+void VectorFontMesh::DrawText(std::string text, XCVec3Unaligned& position, RenderContext& context)
 {
     //Decrypt the text and fill up the FontData Buffer to draw
     //Calculate start world for every character
@@ -63,21 +63,21 @@ void VectorFontMesh::DrawText(std::string text, XCVec3Unaligned position, Render
                 return fontData.submeshId == subMeshId;
             });
 
-            XCMatrix4Unaligned world =  XMMatrixScaling(scale, scale, scale) * XMMatrixTranslation(position.x + computePos /*(charPosition * CharacterSpacing)*/, position.y, position.z);
+            XCMatrix4 world =  MatrixScale(scale, scale, scale) * MatrixTranslate(position.x + computePos /*(charPosition * CharacterSpacing)*/, position.y, position.z);
             computePos += (scale * (*findSubMesh)->m_width);
 
             if (subMeshExists != m_subMeshesIdBuffer.end())
             {
                 FontData& existingFontData = (*subMeshExists);
                 m_vectorFontInstanceBuffers[subMeshId].m_instanceBuffer.gWVP[existingFontData.instanceCount++]
-                    = XCMatrix4Unaligned(ToXCMatrix4Unaligned(XMMatrixTranspose(world * cam.GetViewMatrix() * cam.GetProjectionMatrix())));
+                    = MatrixTranspose(world * cam.GetViewMatrix() * cam.GetProjectionMatrix()).GetUnaligned();
             }
             else
             {
                 FontData newFontData = {};
                 newFontData.submeshId = subMeshId;
                 m_vectorFontInstanceBuffers[subMeshId].m_instanceBuffer.gWVP[newFontData.instanceCount++]
-                    = XCMatrix4Unaligned(ToXCMatrix4Unaligned(XMMatrixTranspose(world * cam.GetViewMatrix() * cam.GetProjectionMatrix())));
+                    = MatrixTranspose(world * cam.GetViewMatrix() * cam.GetProjectionMatrix()).GetUnaligned();
                 m_subMeshesIdBuffer.push_back(newFontData);
             }
         }

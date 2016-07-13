@@ -10,10 +10,6 @@
 
 IActor::IActor(void)
 {
-    m_look = XMVectorZero();
-    m_right = XMVectorZero();
-    m_up = XMVectorZero();
-
     m_worldReady = false;
     m_invalidated = false;
     m_isRenderable = false;

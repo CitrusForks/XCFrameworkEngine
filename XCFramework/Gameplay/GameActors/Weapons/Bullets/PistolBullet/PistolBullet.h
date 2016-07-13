@@ -20,24 +20,24 @@ public:
     DECLARE_OBJECT_CREATION(PistolBullet)
 
     PistolBullet(void);
-    PistolBullet(IActor* parentActor, XCVec3 initialPosition, std::string pMesh);
+    PistolBullet(IActor* parentActor, XCVec3& initialPosition, std::string pMesh);
     
     virtual ~PistolBullet(void);
     
-    virtual void                        Init(int actorId);
-    virtual void                        Update(float dt);
-    virtual void                        UpdateOffsets(float dt);
-    virtual void                        Draw(RenderContext& renderContext);
-    virtual void                        Destroy();
-    virtual void                        ApplyOffsetRotation();
+    virtual void               Init(int actorId);
+    virtual void               Update(float dt);
+    virtual void               UpdateOffsets(float dt);
+    virtual void               Draw(RenderContext& renderContext);
+    virtual void               Destroy();
+    virtual void               ApplyOffsetRotation();
 
-    SubActor*                           GetSubActor()                       { return (SubActor*)this;  }
+    SubActor*                  GetSubActor() { return (SubActor*)this; }
 
 protected:
 
-    ShaderType                          m_useShaderType;
-    BasicMaterial                       m_material;
-    XCVecIntrinsic4                     m_secondaryLookAxis;
-    XCVecIntrinsic4                     m_secondaryUpAxis;
-    XCVecIntrinsic4                     m_secondaryRightAxis;
+    ShaderType                 m_useShaderType;
+    BasicMaterial              m_material;
+    XCVec4                     m_secondaryLookAxis;
+    XCVec4                     m_secondaryUpAxis;
+    XCVec4                     m_secondaryRightAxis;
 };

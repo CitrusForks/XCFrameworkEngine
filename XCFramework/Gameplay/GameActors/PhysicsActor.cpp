@@ -26,15 +26,11 @@ void PhysicsActor::Init(int actorId)
 {
     IActor::Init(actorId);
 
-    XCVec3 look = XCVec3(0, 0, 1);
-    m_look = XMLoadFloat3(&look);
-    XCVec3 up = XCVec3(0, 1, 0);
-    m_up = XMLoadFloat3(&up);
-    m_right = XMVector3Cross(m_up, m_look);
+    m_look = XCVec4(0, 0, 1, 0);
+    XCVec3 up(0, 1, 0);
+    m_up = XCVec4(0, 1, 0, 0);
+    m_right = VectorCross(m_up, m_look);
 
-    m_MTranslation = XMMatrixIdentity();
-    m_MRotation = XMMatrixIdentity();
-    m_MScaling = XMMatrixIdentity();
     m_transformedRotation = m_MRotation;
 
     m_World = m_MScaling * m_MRotation * m_MTranslation;

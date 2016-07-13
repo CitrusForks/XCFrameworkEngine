@@ -19,8 +19,6 @@
 Texture2D::Texture2D()
 {
     m_resourceType = RESOURCETYPE_TEXTURE2D;
-    m_textureCoordinateMatrix = XMMatrixIdentity();
-
     m_diffuseMapTextureSRV = nullptr;
 
 #if defined(XCGRAPHICS_DX12)
@@ -32,7 +30,6 @@ Texture2D::Texture2D(D3DConstantBuffer* srv)
 {
     m_diffuseMapTextureSRV = srv;
     m_resourceType = RESOURCETYPE_TEXTURE2D;
-    m_textureCoordinateMatrix = XMMatrixIdentity();
 }
 
 Texture2D::~Texture2D()

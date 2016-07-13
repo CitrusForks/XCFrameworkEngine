@@ -25,7 +25,7 @@ Gun::~Gun(void)
 {
 }
 
-void Gun::PreLoad(IActor* parentActor, XCVec3 initialPosition, std::string pMesh)
+void Gun::PreLoad(IActor* parentActor, XCVec3& initialPosition, std::string pMesh)
 {
     SubActor::Init(parentActor);
 
@@ -34,19 +34,19 @@ void Gun::PreLoad(IActor* parentActor, XCVec3 initialPosition, std::string pMesh
 
     m_directInput = (DirectInput*)&SystemLocator::GetInstance()->RequestSystem("InputSystem");
 
-    m_material.Ambient = XCVec4(1.0f, 1.0f, 1.0f, 1.0f);
-    m_material.Diffuse = XCVec4(0.5f, 0.8f, 0.0f, 1.0f);
+    m_material.Ambient  = XCVec4(1.0f, 1.0f, 1.0f, 1.0f);
+    m_material.Diffuse  = XCVec4(0.5f, 0.8f, 0.0f, 1.0f);
     m_material.Specular = XCVec4(0.2f, 0.2f, 0.2f, 16.0f);
 
     //Get initial position
-    m_currentPosition = XMLoadFloat3(&initialPosition);
+    m_currentPosition = initialPosition;
 
     m_useShaderType = ShaderType_LightTexture;
     m_useRenderWorkerType = WorkerType_XCMesh;
 
-    m_secondaryLookAxis = XMVectorZero();
-    m_secondaryUpAxis = XMVectorZero();
-    m_secondaryRightAxis = XMVectorZero();
+    m_secondaryLookAxis  = XCVec4(0, 0, 0, 0);
+    m_secondaryUpAxis    = XCVec4(0, 0, 0, 0);
+    m_secondaryRightAxis = XCVec4(0, 0, 0, 0);
 
     //Bullets
     m_noOfBullets = 100;
@@ -59,10 +59,10 @@ void Gun::Load()
 {
     m_currentPosition += GetOffsetPosition();
 
-    m_MTranslation = XMMatrixTranslation(XMVectorGetX(m_currentPosition), XMVectorGetY(m_currentPosition), XMVectorGetZ(m_currentPosition));
+    m_MTranslation = MatrixTranslate(m_currentPosition);
 
-    m_MInitialRotation = XMMatrixRotationY(XM_PIDIV2);
-    m_MInitialRotation *= XMMatrixRotationZ(XM_PIDIV2);
+    m_MInitialRotation  = MatrixRotationY(XC_PIDIV2);
+    m_MInitialRotation *= MatrixRotationZ(XC_PIDIV2);
 
     m_transformedRotation = m_MRotation;
     m_MRotation = m_transformedRotation * m_MInitialRotation;
@@ -80,7 +80,7 @@ void Gun::Update(float dt)
 
     UpdateOffsets(dt);
 
-    m_MTranslation = XMMatrixTranslation(XMVectorGetX(m_currentPosition), XMVectorGetY(m_currentPosition), XMVectorGetZ(m_currentPosition));
+    m_MTranslation = MatrixTranslate(m_currentPosition);
 
     m_MRotation = m_MInitialRotation * m_transformedRotation;
 
@@ -117,9 +117,9 @@ void Gun::UpdateOffsets(float dt)
 
     m_currentPosition = m_bindedActor->GetPosition();
 
-    m_currentPosition += (XMVectorGetX(m_offsetPosition) * m_right);
-    m_currentPosition += (XMVectorGetY(m_offsetPosition) * m_secondaryUpAxis);
-    m_currentPosition += (XMVectorGetZ(m_offsetPosition) * m_secondaryLookAxis);
+    m_currentPosition += (m_offsetPosition.Get<X>() * m_right);
+    m_currentPosition += (m_offsetPosition.Get<Y>() * m_secondaryUpAxis);
+    m_currentPosition += (m_offsetPosition.Get<Z>() * m_secondaryLookAxis);
 }
 
 void Gun::ApplyOffsetRotation()
@@ -132,10 +132,10 @@ void Gun::Draw(RenderContext& context)
     // Set constants
     ICamera& cam = context.GetShaderManagerSystem().GetGlobalShaderData().m_camera;
     PerObjectBuffer perObject = {
-        ToXCMatrix4Unaligned(XMMatrixTranspose(m_World)),
-        ToXCMatrix4Unaligned(XMMatrixTranspose(m_World * cam.GetViewMatrix() * cam.GetProjectionMatrix())),
-        ToXCMatrix4Unaligned(InverseTranspose(m_World)),
-        ToXCMatrix4Unaligned(XMMatrixIdentity()),
+        MatrixTranspose(m_World).GetUnaligned(),
+        MatrixTranspose(m_World * cam.GetViewMatrix() * cam.GetProjectionMatrix()).GetUnaligned(),
+        MatrixInverseTranspose(m_World).GetUnaligned(),
+        XCMatrix4().GetUnaligned(),
         m_material
     };
 
@@ -151,15 +151,11 @@ void Gun::CheckInput()
 
         //Left click
         //Spawn new bullet and shoot
-        XCVec3 position, target;
-        XMStoreFloat3(&position, m_currentPosition);
-        XMStoreFloat3(&target, m_secondaryLookAxis);
-
-        ShootBullet("Bullet", position, target);
+        ShootBullet("Bullet", m_currentPosition, m_secondaryLookAxis);
     }
 }
 
-void Gun::ShootBullet(std::string bulletActorType, XCVec3 startPosition, XCVec3 target)
+void Gun::ShootBullet(std::string bulletActorType, XCVec3& startPosition, XCVec3& target)
 {
     GameActorsFactory& actorFactory = SystemLocator::GetInstance()->RequestSystem<GameActorsFactory>("GameActorsFactory");
     ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");

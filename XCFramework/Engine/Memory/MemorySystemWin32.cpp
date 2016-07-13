@@ -194,3 +194,36 @@ MemorySystemWin32::~MemorySystemWin32()
 {
     free(m_pChunkFront);
 }
+
+
+//default new and delete overrides
+void* operator new(size_t classSize)
+{
+    if (0/*MemorySystemWin32::ms_pMemorySystem*/)
+    {
+        //TODO : Support 16byte alignment in custom allocator.
+        return MemorySystemWin32::ms_pMemorySystem->newAlloc(classSize);
+    }
+    else
+    {
+        //Memory System not initialized yet.
+        return _aligned_malloc(classSize, 16);
+        //return malloc(classSize);
+    }
+
+}
+
+void operator delete(void* p)
+{
+    if (0/*MemorySystemWin32::ms_pMemorySystem*/)
+    {
+        //TODO : Support 16byte alignment in custom allocator.
+        return MemorySystemWin32::ms_pMemorySystem->deleteAlloc(&p);
+    }
+    else
+    {
+        //Memory System not initialized yet.
+        return _aligned_free(p);
+        //return free(p);
+    }
+}

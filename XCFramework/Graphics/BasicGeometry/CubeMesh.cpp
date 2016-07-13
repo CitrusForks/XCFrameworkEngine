@@ -39,7 +39,7 @@ void CubeMesh::Init()
     Logger("[CubeMesh] Init done");
 }
 
-void CubeMesh::PreLoad(XCVecIntrinsic4 initialPosition, XCVecIntrinsic4 initialRotation, XCVecIntrinsic4 initialScaling, BasicMaterial material, Texture2D* texture, RasterType rasterType)
+void CubeMesh::PreLoad(XCVec4 initialPosition, XCVec4 initialRotation, XCVec4 initialScaling, BasicMaterial material, Texture2D* texture, RasterType rasterType)
 {
     m_currentPosition = initialPosition;
     m_MTranslation = XMMatrixTranslation(XMVectorGetX(initialPosition), XMVectorGetY(initialPosition), XMVectorGetZ(initialPosition));
@@ -151,7 +151,7 @@ void CubeMesh::Draw(RenderContext& context)
 
     // Set constants
     cbWorld wbuffer = { XMMatrixTranspose(m_World) };
-    cbInvTransposeWorld invTransWorld = { InverseTranspose(m_World) };
+    cbInvTransposeWorld invTransWorld = { MatrixInverseTranspose(m_World) };
     cbMatTexPerObject matTexPerObject = { *m_texture->GetTextureCoordinateMatrix(), m_material };
 
     if (m_useShaderType == ShaderType_LightTexture)

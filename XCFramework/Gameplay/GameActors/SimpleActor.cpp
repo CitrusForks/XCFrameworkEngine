@@ -19,12 +19,6 @@ SimpleActor::~SimpleActor(void)
 void SimpleActor::Init(int actorId)
 {
     IActor::Init(actorId);
-
-    m_currentPosition = XMVectorZero();
-
-    m_MTranslation = XMMatrixIdentity();
-    m_MRotation = XMMatrixIdentity();
-    m_MScaling = XMMatrixIdentity();
 }
 
 void SimpleActor::Update(float dt)

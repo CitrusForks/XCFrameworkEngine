@@ -15,7 +15,7 @@
 
 #include "Gameplay/GameActors/GameActorsFactory.h"
 
-const float Soldier::MAX_PITCH_ANGLE = XM_PIDIV4;
+const float Soldier::MAX_PITCH_ANGLE = XC_PIDIV4;
 
 Soldier::Soldier(void)
 {
@@ -33,19 +33,19 @@ void Soldier::PreLoad(const void* fbBuffer)
     m_pMesh = &resMgr.AcquireResource(soldierBuff->XCMeshResourceName()->c_str());
 
     //Get initial position
-    m_currentPosition = XMLoadFloat3(&XCVec3(soldierBuff->Position()->x(), soldierBuff->Position()->y(), soldierBuff->Position()->z()));
+    m_currentPosition.SetValues(soldierBuff->Position()->x(), soldierBuff->Position()->y(), soldierBuff->Position()->z(), 0.0f);
 
-    m_material.Ambient = XCVec4(1.0f, 1.0f, 1.0f, 1.0f);
-    m_material.Diffuse = XCVec4(0.5f, 0.8f, 0.0f, 1.0f);
+    m_material.Ambient  = XCVec4(1.0f, 1.0f, 1.0f, 1.0f);
+    m_material.Diffuse  = XCVec4(0.5f, 0.8f, 0.0f, 1.0f);
     m_material.Specular = XCVec4(0.2f, 0.2f, 0.2f, 16.0f);
 
     m_useShaderType = m_pMesh->GetResource<XCMesh>()->IsSkinnedMesh()? ShaderType_SkinnedCharacter : ShaderType_LightTexture;
     m_useRenderWorkerType = WorkerType_XCMesh;
     m_collisionDetectionType = COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX;
 
-    m_secondaryLookAxis = XMVectorZero();
-    m_secondaryUpAxis = XMVectorZero();
-    m_secondaryRightAxis = XMVectorZero();
+    m_secondaryLookAxis  = XCVec4();
+    m_secondaryUpAxis    = XCVec4();
+    m_secondaryRightAxis = XCVec4();
 
     m_totalPitchAngle = 0.0f;
 
@@ -53,14 +53,14 @@ void Soldier::PreLoad(const void* fbBuffer)
     GameActorsFactory& actorFactory = (GameActorsFactory&)SystemLocator::GetInstance()->RequestSystem("GameActorsFactory");
 
     m_gun = ((Gun*) actorFactory.CreateActor("Gun"));
-    m_gun->PreLoad(this, XMVectorToXMFloat3(&m_currentPosition), "Gun");
+    m_gun->PreLoad(this, m_currentPosition, "Gun");
 
     PhysicsActor::PreLoad(fbBuffer);
 }
 
 void Soldier::Load()
 {
-    m_MTranslation = XMMatrixTranslation(XMVectorGetX(m_currentPosition), XMVectorGetY(m_currentPosition), XMVectorGetZ(m_currentPosition));
+    m_MTranslation = MatrixTranslate(m_currentPosition);
 
     m_MRotation = m_transformedRotation;
 
@@ -72,8 +72,9 @@ void Soldier::Load()
 
     //Call the sub actors methods
     m_gun->Load();
-    XCVec3 pos = XCVec3(1.0f, 3.0f, 2.0f);
-    m_gun->GetSubActor()->InitOffsets(XMLoadFloat3(&pos), m_secondaryLookAxis, m_secondaryRightAxis, m_secondaryUpAxis);
+
+    XCVec4 pos = XCVec4(1.0f, 3.0f, 2.0f, 0.0f);
+    m_gun->GetSubActor()->InitOffsets(pos, m_secondaryLookAxis, m_secondaryRightAxis, m_secondaryUpAxis);
 
     PhysicsActor::Load();
 }
@@ -81,8 +82,7 @@ void Soldier::Load()
 void Soldier::SetInitialPhysicsProperties()
 {
     PhysicsActor::SetInitialPhysicsProperties();
-    XCVec3 vec = XCVec3(0, 0, 0);
-    InitXPhysics(m_currentPosition, XMLoadFloat3(&vec), XMLoadFloat3(&vec), 10, (float)0.8);
+    InitXPhysics(m_currentPosition, XCVec4(), XCVec4(), 10, (float)0.8);
 }
 
 void Soldier::UpdateState()
@@ -127,16 +127,16 @@ void Soldier::Jump(float scalarForce)
 void Soldier::Yaw(float angle, float scalarForce)
 {
     //Total RotationOffset will be applied from Pitch. So remember to always YAW AND PITCH together. ApplyOffsetRotation will be applied from Pitch()
-    XCVecIntrinsic4 quaternionAxis = XMQuaternionRotationAxis(toXMVECTOR(0, 1, 0, 0), angle);
-    XCMatrix4 rotation = XMMatrixRotationQuaternion(quaternionAxis);
+    XCVec4 quaternionAxis = QuaternionRotationAxis(XCVec4(0, 1, 0, 0), angle);
+    XCMatrix4 rotation = MatrixRotationQuaternion(quaternionAxis);
 
-    m_look = XMVector3TransformNormal(m_look, rotation);
-    m_right = XMVector3TransformNormal(m_right, rotation);
-    m_up = XMVector3TransformNormal(m_up, rotation);
+    m_look  = VectorTransformNormal(m_look, rotation);
+    m_right = VectorTransformNormal(m_right, rotation);
+    m_up    = VectorTransformNormal(m_up, rotation);
 
-    m_secondaryLookAxis = XMVector3TransformNormal(m_secondaryLookAxis, rotation);
-    m_secondaryRightAxis = XMVector3TransformNormal(m_secondaryRightAxis, rotation);
-    m_secondaryUpAxis = XMVector3TransformNormal(m_secondaryUpAxis, rotation);
+    m_secondaryLookAxis  = VectorTransformNormal(m_secondaryLookAxis, rotation);
+    m_secondaryRightAxis = VectorTransformNormal(m_secondaryRightAxis, rotation);
+    m_secondaryUpAxis    = VectorTransformNormal(m_secondaryUpAxis, rotation);
 
     //Rotate the soldier with it's initial rotations.
     m_transformedRotation *= rotation;
@@ -152,21 +152,21 @@ void Soldier::Yaw(float angle, float scalarForce)
 void Soldier::Pitch(float angle, float scalarForce)
 {
     //Total RotationOffset will be applied from Pitch. So remember to always YAW AND PITCH together. ApplyOffsetRotation will be applied from Pitch()
-    XCVecIntrinsic4 quaternionAxis = XMQuaternionRotationAxis(m_secondaryRightAxis, angle);
-    XCMatrix4 rotation = XMMatrixRotationAxis(m_secondaryRightAxis, angle);
+    XCVec4 quaternionAxis = QuaternionRotationAxis(m_secondaryRightAxis, angle);
+    XCMatrix4 rotation    = MatrixRotationAxis(m_secondaryRightAxis, angle);
 
-    rotation = XMMatrixRotationQuaternion(quaternionAxis);
+    rotation = MatrixRotationQuaternion(quaternionAxis);
     //Compare if the look is within the bound looks
-    XCVecIntrinsic4 tempLook = XMVector3TransformNormal(m_secondaryLookAxis, rotation);
+    XCVec4 tempLook = VectorTransformNormal(m_secondaryLookAxis, rotation);
     
     //The upper limit and lower limit should be with respect to the parent object look axis, which is constant in the sense without pitch (m_look), 45 degree pitch angle
-    XCVecIntrinsic4 lookUB = XMVector3TransformNormal(m_look, XMMatrixRotationAxis(m_secondaryRightAxis, MAX_PITCH_ANGLE / 2));
-    XCVecIntrinsic4 lookLB = XMVector3TransformNormal(m_look, XMMatrixRotationAxis(m_secondaryRightAxis, -MAX_PITCH_ANGLE / 2));
+    XCVec4 lookUB = VectorTransformNormal(m_look, MatrixRotationAxis(m_secondaryRightAxis, MAX_PITCH_ANGLE / 2));
+    XCVec4 lookLB = VectorTransformNormal(m_look, MatrixRotationAxis(m_secondaryRightAxis, -MAX_PITCH_ANGLE / 2));
     
-    if (XMVectorGetY(lookLB) >= XMVectorGetY(tempLook) && XMVectorGetY(lookUB) <= XMVectorGetY(tempLook))
+    if (lookLB.Get<Y>() >= tempLook.Get<Y>() && lookUB.Get<Y>() <= tempLook.Get<Y>())
     {
-        m_secondaryUpAxis = XMVector3TransformNormal(m_secondaryUpAxis, rotation);
-        m_secondaryLookAxis = XMVector3TransformNormal(m_secondaryLookAxis, rotation);
+        m_secondaryUpAxis   = VectorTransformNormal(m_secondaryUpAxis, rotation);
+        m_secondaryLookAxis = VectorTransformNormal(m_secondaryLookAxis, rotation);
     
         m_gun->SetOffsetLook(m_secondaryLookAxis);
         m_gun->SetOffsetUp(m_secondaryUpAxis);
@@ -179,7 +179,7 @@ void Soldier::Pitch(float angle, float scalarForce)
     m_gun->ApplyOffsetRotation();
 }
 
-void Soldier::ApplyRotation(XCMatrix4 rotation)
+void Soldier::ApplyRotation(XCMatrix4& rotation)
 {
     //This method makes sure that the rotation is applied to parent and it's sub actors.
     m_MRotation *= rotation;
@@ -197,26 +197,26 @@ void Soldier::Draw(RenderContext& context)
     if (m_useShaderType == ShaderType_LightTexture)
     {
         perObject = {
-            ToXCMatrix4Unaligned(XMMatrixTranspose(m_World)),
-            ToXCMatrix4Unaligned(XMMatrixTranspose(m_World * cam.GetViewMatrix() * cam.GetProjectionMatrix())),
-            ToXCMatrix4Unaligned(InverseTranspose(m_World)),
-            ToXCMatrix4Unaligned(XMMatrixTranspose(XMMatrixIdentity())),
+            MatrixTranspose(m_World).GetUnaligned(),
+            MatrixTranspose(m_World * cam.GetViewMatrix() * cam.GetProjectionMatrix()).GetUnaligned(),
+            MatrixInverseTranspose(m_World).GetUnaligned(),
+            XCMatrix4::XCMatrixIdentity.GetUnaligned(),
             m_material
         };
     }
     else if(m_useShaderType == ShaderType_SkinnedCharacter)
     {
-        static XCMatrix4Unaligned scaling = XMMatrixScaling(1.0f, 1.0f, 1.0f);
-        static XCMatrix4Unaligned rotation = XMMatrixRotationX(XM_PI);
+        static XCMatrix4 scaling  = MatrixScale(1.0f, 1.0f, 1.0f);
+        static XCMatrix4 rotation = MatrixRotationX(XC_PI);
 
-        XCMatrix4Unaligned transform = m_pMesh->GetResource<XCMesh>()->GetRootTransform();
+        XCMatrix4 transform(m_pMesh->GetResource<XCMesh>()->GetRootTransform());
         //transform = scaling * transform;
 
         perObject = {
-            ToXCMatrix4Unaligned(XMMatrixTranspose(transform)),
-            ToXCMatrix4Unaligned(XMMatrixTranspose(transform * cam.GetViewMatrix() * cam.GetProjectionMatrix())),
-            ToXCMatrix4Unaligned(InverseTranspose(transform)),
-            ToXCMatrix4Unaligned(XMMatrixTranspose(XMMatrixIdentity())),
+            MatrixTranspose(transform).GetUnaligned(),
+            MatrixTranspose(transform * cam.GetViewMatrix() * cam.GetProjectionMatrix()).GetUnaligned(),
+            MatrixInverseTranspose(transform).GetUnaligned(),
+            XCMatrix4::XCMatrixIdentity.GetUnaligned(),
             m_material
         };
     }

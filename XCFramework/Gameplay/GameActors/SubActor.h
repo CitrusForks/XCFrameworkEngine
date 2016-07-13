@@ -14,30 +14,33 @@ public:
     SubActor();
     virtual ~SubActor(void);
 
-    virtual void                    Init(IActor* bindedParentActor);
-    void                            InitOffsets(XCVecIntrinsic4 position, XCVecIntrinsic4 look, XCVecIntrinsic4 right, XCVecIntrinsic4 up);
-    virtual void                    UpdateOffsets(float dt);
+    virtual void           Init(IActor* bindedParentActor);
+    virtual void           UpdateOffsets(float dt);
 
-    XCVecIntrinsic4                 GetOffsetPosition()                      { return m_offsetPosition; }
-    void                            SetOffsetPosition(XCVecIntrinsic4 pos)   { m_offsetPosition = pos; }
+    void                   InitOffsets(XCVec4& position, XCVec4& look, XCVec4& right, XCVec4& up);
 
-    XCVecIntrinsic4                 GetOffsetLook()                          { return m_offsetLook; }
-    XCVecIntrinsic4                 GetOffsetRight()                         { return m_offsetRight; }
-    XCVecIntrinsic4                 GetOffsetUp()                            { return m_offsetUp; }
+    XCVec4                 GetOffsetPosition() { return m_offsetPosition; }
+    void                   SetOffsetPosition(XCVec4& pos) { m_offsetPosition = pos; }
 
-    void                            SetOffsetLook(XCVecIntrinsic4 look)      { m_offsetLook = look; }
-    void                            SetOffsetRight(XCVecIntrinsic4 right)    { m_offsetRight = right; }
-    void                            SetOffsetUp(XCVecIntrinsic4 up)          { m_offsetUp = up; }
+    XCVec4                 GetOffsetLook() { return m_offsetLook; }
+    XCVec4                 GetOffsetRight() { return m_offsetRight; }
+    XCVec4                 GetOffsetUp() { return m_offsetUp; }
 
-    void                            SetOffsetRotation(XCMatrix4 rotation)    { m_offsetRotation = rotation; }
-    XCMatrix4                       GetOffsetRotation()                      { return m_offsetRotation;     }
+    void                   SetOffsetLook(XCVec4& look) { m_offsetLook = look; }
+    void                   SetOffsetRight(XCVec4& right) { m_offsetRight = right; }
+    void                   SetOffsetUp(XCVec4& up) { m_offsetUp = up; }
+
+    void                   SetOffsetRotation(XCMatrix4& rotation) { m_offsetRotation = rotation; }
+    XCMatrix4              GetOffsetRotation() { return m_offsetRotation; }
+
 protected:
-    XCVecIntrinsic4                 m_offsetLook;
-    XCVecIntrinsic4                 m_offsetRight;
-    XCVecIntrinsic4                 m_offsetUp;
-    XCVecIntrinsic4                 m_offsetPosition;
 
-    XCMatrix4                       m_offsetRotation;
+    XCVec4                 m_offsetLook;
+    XCVec4                 m_offsetRight;
+    XCVec4                 m_offsetUp;
+    XCVec4                 m_offsetPosition;
 
-    IActor*                         m_bindedActor;
+    XCMatrix4              m_offsetRotation;
+
+    IActor*                m_bindedActor;
 };

@@ -43,8 +43,8 @@ public:
 
     int                         m_channelIndex;
 
-    XCMatrix4Unaligned          m_worldTransform;
-    XCMatrix4Unaligned          m_localTransform;
+    XCMatrix4                   m_worldTransform;
+    XCMatrix4                   m_localTransform;
 
     std::vector<AnimNode*>      m_childNodes;
     AnimNode*                   m_parentNode;
@@ -74,10 +74,11 @@ protected:
     AnimNode*                        GenerateNodeStructure(const MeshNode* pNode, AnimNode* pParent);
     void                             CalculateWorldTransform(AnimNode* node);
 
-    XCMatrix4Unaligned               GetWorldTransform(MeshNode* meshNode);
-    XCMatrix4Unaligned               GetLocalTransform(MeshNode* meshNode);
+    XCMatrix4                        GetWorldTransform(MeshNode* meshNode);
+    XCMatrix4                        GetLocalTransform(MeshNode* meshNode);
 
 private:
+
     unsigned int                    m_currentAnimationIndex;
     const MeshNode*                 m_rootNode;
     AnimNode*                       m_currentNodeStructure;

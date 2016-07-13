@@ -18,7 +18,7 @@ struct BasicMaterial
         Specular(0, 0, 0, 0)
     { }
 
-    BasicMaterial(XCVec4 ambient, XCVec4 diffuse, XCVec4 specular) :
+    BasicMaterial(const XCVec4& ambient, const XCVec4& diffuse, const XCVec4& specular) :
         Ambient(ambient),
         Diffuse(diffuse),
         Specular(specular)

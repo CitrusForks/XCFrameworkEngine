@@ -41,14 +41,7 @@ void NPCSoldier::Update(float dt)
     Integrator(dt);
     ClearForce();
 
-    XCVec3 pos;
-    XMStoreFloat3(&pos, m_Position);
-
-#if defined(WIN32)
-    m_MTranslation = XMMatrixTranslation(pos.x, pos.y, pos.z);
-#elif defined(XC_ORBIS)
-    m_MTranslation = XMMatrixTranslation(pos.getX(), pos.getY(), pos.getZ());
-#endif
+    m_MTranslation = MatrixTranslate(m_Position);
 
     m_currentPosition = m_Position;
 

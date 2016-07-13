@@ -17,42 +17,38 @@
 class XUserInterface
 {
 private:
-    static XUserInterface				*ms_pXUserInterface;
-#ifdef XBOX
-    HXUIDC								m_hDC;
-#endif
-    //std::vector<HXUIFONT>				m_hFonts;
-    float								m_alphaFactor;
-    float								m_startTime;
+    static XUserInterface*  ms_pXUserInterface;
+                            
+    float                   m_alphaFactor;
+    float                   m_startTime;
 
 #if defined(WIN32)
-    ID2D1HwndRenderTarget*				m_pIRenderTarget;
-    IDWriteTextFormat*					m_pITextFormat;
-    IDWriteFactory*						m_pIDWriteFactory;
-    ID2D1SolidColorBrush*				m_pIRedBrush;
-    ID2D1Factory*						m_pDirect2dFactory;
+    ID2D1HwndRenderTarget*  m_pIRenderTarget;
+    IDWriteTextFormat*      m_pITextFormat;
+    IDWriteFactory*         m_pIDWriteFactory;
+    ID2D1SolidColorBrush*   m_pIRedBrush;
+    ID2D1Factory*           m_pDirect2dFactory;
 
-    HWND								m_hWnd;
+    HWND                    m_hWnd;
 #endif
 
     XUserInterface()
     {
-
     }
 
 public:
     ~XUserInterface(void);
 
-    static XUserInterface*				GetInstance();
-    void								InitXui(HWND hWnd);
-    void								XCreateFont(float fontSize);
-    void								Destroy();
-    void								Update();
-    void								UIRenderBeginScene();
-    void								UIRenderEndScene();
-    void								XDrawText();
-    void								XDrawText(int _fontTypeIndex, XCVec4 _color, float _x, float _y, LPCWSTR _text);
-    void								DrawAnimatedText(int _fontTypeIndex, XCVec4 _color, float _x, float _y, LPCWSTR _text, float _animSpeed);
+    static XUserInterface*  GetInstance();
+    void                    InitXui(HWND hWnd);
+    void                    XCreateFont(float fontSize);
+    void                    Destroy();
+    void                    Update();
+    void                    UIRenderBeginScene();
+    void                    UIRenderEndScene();
+    void                    XDrawText();
+    void                    XDrawText(int _fontTypeIndex, XCVec4& _color, float _x, float _y, LPCWSTR _text);
+    void                    DrawAnimatedText(int _fontTypeIndex, XCVec4& _color, float _x, float _y, LPCWSTR _text, float _animSpeed);
 };
 
-#define XUSERINTERFACE					XUserInterface::GetInstance()
+#define XUSERINTERFACE      XUserInterface::GetInstance()

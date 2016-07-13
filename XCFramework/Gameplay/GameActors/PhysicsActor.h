@@ -38,9 +38,9 @@ public:
     OrientedBoundingBox*        GetBoundBox()                            { return (OrientedBoundingBox*)m_boundBox; }
     ECollisionDetectionType     GetCollisionDetectionType()              { return m_collisionDetectionType; }
 
-    void                        SetSecondaryLook(XCVecIntrinsic4 look)   { m_secondaryLookAxis = look; }
-    void                        SetSecondaryUp(XCVecIntrinsic4 up)       { m_secondaryLookAxis = up; }
-    void                        SetSecondaryRight(XCVecIntrinsic4 right) { m_secondaryLookAxis = right; }
+    void                        SetSecondaryLook(XCVec4& look)   { m_secondaryLookAxis = look; }
+    void                        SetSecondaryUp(XCVec4& up)       { m_secondaryLookAxis = up; }
+    void                        SetSecondaryRight(XCVec4& right) { m_secondaryLookAxis = right; }
 
 protected:
     ResourceHandle*             m_pMesh;
@@ -48,7 +48,7 @@ protected:
 
     RenderableOBB*              m_boundBox;
 
-    XCVecIntrinsic4             m_secondaryLookAxis;
-    XCVecIntrinsic4             m_secondaryUpAxis;
-    XCVecIntrinsic4             m_secondaryRightAxis;
+    XCVec4                      m_secondaryLookAxis;
+    XCVec4                      m_secondaryUpAxis;
+    XCVec4                      m_secondaryRightAxis;
 };

@@ -21,7 +21,7 @@ Car::~Car(void)
 {
 }
 
-void Car::PreLoad(XCVec3 initialPosition, std::string pMesh)
+void Car::PreLoad(XCVec3& initialPosition, std::string pMesh)
 {
     ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
     m_pMesh = &resMgr.AcquireResource(pMesh.c_str());
@@ -31,7 +31,7 @@ void Car::PreLoad(XCVec3 initialPosition, std::string pMesh)
     m_material.Specular = XCVec4(0.2f, 0.2f, 0.2f, 16.0f);
     
     //Get initial position
-    m_currentPosition = XMLoadFloat3(&initialPosition);
+    m_currentPosition = initialPosition;
     
     m_useShaderType = ShaderType_LightTexture;
     m_useRenderWorkerType = WorkerType_XCMesh;
@@ -40,9 +40,9 @@ void Car::PreLoad(XCVec3 initialPosition, std::string pMesh)
 
 void Car::Load()
 {
-    m_MTranslation = XMMatrixTranslation(XMVectorGetX(m_currentPosition), XMVectorGetY(m_currentPosition), XMVectorGetZ(m_currentPosition));
+    m_MTranslation = MatrixTranslate(m_currentPosition);
     
-    m_MRotation= XMMatrixRotationX(-XM_PIDIV2);
+    m_MRotation= MatrixRotationX(-XC_PIDIV2);
     
     m_World = m_MScaling * m_MRotation * m_MTranslation;
     
@@ -51,8 +51,7 @@ void Car::Load()
 
 void Car::SetInitialPhysicsProperties()
 {
-    XCVec3 vec = XCVec3(0, 0, 0);
-    InitXPhysics(m_currentPosition, XMLoadFloat3(&vec), XMLoadFloat3(&vec), 10, (float)0.8);
+    InitXPhysics(m_currentPosition, XCFloat4::XCFloat4ZeroVector, XCFloat4::XCFloat4ZeroVector, 10, (float)0.8);
     PhysicsActor::SetInitialPhysicsProperties();
 }
 
@@ -72,11 +71,11 @@ void Car::Accelerate(float distance)
 
 void Car::Steer(float angle, float scalarForce)
 {
-    XCVecIntrinsic4 quaternionAxis = XMQuaternionRotationAxis(toXMVECTOR(0, 1, 0, 0), angle);
-    XCMatrix4 rotation = XMMatrixRotationQuaternion(quaternionAxis);
+    XCVec4 quaternionAxis = QuaternionRotationAxis(XCVec4(0, 1, 0, 0), angle);
+    XCMatrix4 rotation = MatrixRotationQuaternion(quaternionAxis);
 
-    m_look = XMVector3TransformNormal(m_look, rotation);
-    m_right = XMVector3TransformNormal(m_right, rotation);
+    m_look = VectorTransformNormalMatrix(m_look, rotation);
+    m_right = VectorTransformNormalMatrix(m_right, rotation);
 
     //Rotate the car with it's initial rotations.
     m_MRotation *= rotation;
@@ -89,10 +88,10 @@ void Car::Draw(RenderContext& context)
     // Set constants
     ICamera& cam = context.GetShaderManagerSystem().GetGlobalShaderData().m_camera;
     PerObjectBuffer perObject = {
-        ToXCMatrix4Unaligned(XMMatrixTranspose(m_World)),
-        ToXCMatrix4Unaligned(XMMatrixTranspose(m_World * cam.GetViewMatrix() * cam.GetProjectionMatrix())),
-        ToXCMatrix4Unaligned(InverseTranspose(m_World)),
-        ToXCMatrix4Unaligned(XMMatrixIdentity()),
+       MatrixTranspose(m_World).GetUnaligned(),
+       MatrixTranspose(m_World * cam.GetViewMatrix() * cam.GetProjectionMatrix()).GetUnaligned(),
+       MatrixInverseTranspose(m_World).GetUnaligned(),
+       XCMatrix::XCMatrixIdentity.GetUnaligned(),
         m_material
     };
 

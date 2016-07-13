@@ -476,21 +476,22 @@ void XCMeshFBX::ParseMesh(FbxNode* pNode)
 
         //Get the geometry transform
         FbxVector4 translation = pNode->GetGeometricTranslation(FbxNode::eSourcePivot);
-        XCVecIntrinsic4 trans = toXMVECTOR(translation[0], translation[1], translation[2], translation[3]);
+        XCVec4 trans(translation[0], translation[1], translation[2], translation[3]);
 
-        Logger("[XCMeshFBX] Located @ %f %f %f", trans.vector4_f32[0], trans.vector4_f32[1], trans.vector4_f32[2]);
+        Logger("[XCMeshFBX] Located @ %f %f %f", trans[0], trans[1], trans[2]);
         
-        XCVecIntrinsic4 originTranslate = toXMVECTOR(0.0f, 0.0f, 0.0f, 1.0f) - trans;
-        originTranslate.vector4_f32[1] = 0.0f; originTranslate.vector4_f32[2] = 0.0f; originTranslate.vector4_f32[3] = 1.0f;
+        XCVec4 originTranslate = XCVec4(0.0f, 0.0f, 0.0f, 1.0f) - trans;
+        originTranslate[1] = 0.0f; originTranslate[2] = 0.0f; originTranslate[3] = 1.0f;
 
-        if(trans.vector4_f32[0] < 0)
-            originTranslate = -XMVector3Length(originTranslate);
+        float vecLength = 0.0f;
+        if(trans[0] < 0)
+            vecLength = -VectorLength<3>(originTranslate);
         else
-            originTranslate = XMVector3Length(originTranslate);
+            vecLength =  VectorLength<3>(originTranslate);
 
-        Logger("[XCMeshFBX] Translating with a distance of : %f ", originTranslate.vector4_f32[0]);
+        Logger("[XCMeshFBX] Translating with a distance of : %f ", vecLength);
 
-        submesh->SetGeometryTranslation(XCVec3Unaligned((XMVectorGetX(originTranslate)), 0.0f, 0.0f));
+        submesh->SetGeometryTranslation(XCVec3Unaligned(vecLength, 0.0f, 0.0f));
 
         //fill the vertices & uv coords
         for (int polygonIndex = 0; polygonIndex < lMesh->GetPolygonCount(); ++polygonIndex)

@@ -21,7 +21,7 @@ public:
             m_parentNode = parentNode;
         }
 
-        m_transformation = aiMatrixToMatrix4Unaligned(node->mTransformation);
+        m_transformation = aiMatrixToMatrix4(node->mTransformation);
         
 
         if (tranverse)
@@ -56,7 +56,7 @@ public:
 
     std::string             m_nodeName;
     const MeshNode*         m_parentNode;
-    XCMatrix4Unaligned      m_transformation;
+    XCMatrix4               m_transformation;
     std::vector<MeshNode*>  m_childNodes;
 
     MeshNode* FindNode(std::string nodeName)

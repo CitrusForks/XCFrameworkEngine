@@ -77,23 +77,23 @@ void MeshAnimator::CalculateWorldTransform(AnimNode* inNode)
 
 std::vector<XCMatrix4Unaligned>& MeshAnimator::GetBoneMatrices(MeshNode* meshNode, BoneHierarchy* boneHierarchy, std::vector<BoneNode>& boneNodes)
 {
-    m_boneTransforms.resize(boneHierarchy->m_boneNodes.size(), XMMatrixTranspose(XMMatrixIdentity()));
+    m_boneTransforms.resize(boneHierarchy->m_boneNodes.size(), MatrixTranspose(XCMatrix4::XCMatrixIdentity).GetUnaligned());
 
-    XCMatrix4Unaligned worldInvTransform = GetWorldTransform(meshNode);
-    worldInvTransform = XMMatrixInverse(nullptr, worldInvTransform);
+    XCMatrix4 worldInvTransform(GetWorldTransform(meshNode));
+    worldInvTransform = MatrixInverse(worldInvTransform);
 
     // Bone matrices transform from mesh coordinates in bind pose to mesh coordinates in skinned pose
     // Therefore the formula is offsetMatrix * currentGlobalTransform * inverseCurrentMeshTransform
     for (unsigned int boneIndex = 0; boneIndex < boneHierarchy->m_boneNodes.size(); ++boneIndex)
     {
-        const XCMatrix4Unaligned& currentGlobalTransform = GetWorldTransform(boneHierarchy->m_boneNodes[boneNodes[boneIndex].m_boneName]);
-        m_boneTransforms[boneIndex] = XMMatrixTranspose(worldInvTransform * currentGlobalTransform * boneNodes[boneIndex].m_offsetMatrix);
+        const XCMatrix4& currentGlobalTransform(GetWorldTransform(boneHierarchy->m_boneNodes[boneNodes[boneIndex].m_boneName]));
+        m_boneTransforms[boneIndex] = (MatrixTranspose(worldInvTransform * currentGlobalTransform * XCMatrix4(boneNodes[boneIndex].m_offsetMatrix))).GetUnaligned();
     }
 
     return m_boneTransforms;
 }
 
-XCMatrix4Unaligned MeshAnimator::GetWorldTransform(MeshNode* meshNode)
+XCMatrix4 MeshAnimator::GetWorldTransform(MeshNode* meshNode)
 {
     auto it = m_mappedMeshNodeAnimNodes.find(meshNode);
     if (it != m_mappedMeshNodeAnimNodes.end())
@@ -101,10 +101,10 @@ XCMatrix4Unaligned MeshAnimator::GetWorldTransform(MeshNode* meshNode)
         return it->second->m_worldTransform;
     }
 
-    return XMMatrixIdentity();
+    return XCMatrix4::XCMatrixIdentity;
 }
 
-XCMatrix4Unaligned MeshAnimator::GetLocalTransform(MeshNode* meshNode)
+XCMatrix4 MeshAnimator::GetLocalTransform(MeshNode* meshNode)
 {
     auto it = m_mappedMeshNodeAnimNodes.find(meshNode);
     if (it != m_mappedMeshNodeAnimNodes.end())
@@ -112,5 +112,5 @@ XCMatrix4Unaligned MeshAnimator::GetLocalTransform(MeshNode* meshNode)
         return it->second->m_localTransform;
     }
 
-    return XMMatrixIdentity();
+    return XCMatrix4::XCMatrixIdentity;
 }

@@ -433,7 +433,7 @@ void XC_GraphicsDx12::ClearRTVAndDSV(ID3D12GraphicsCommandList* cmdList)
 {
     //Clear screen
     float variadic = 1.0f /*+ (float)(0.5 * (float)(rand() % 5) / 10)*/;
-    const float clearColor[] = { variadic * m_clearColor.x, variadic * m_clearColor.y, variadic * m_clearColor.z, m_clearColor.w };
+    const float clearColor[] = { variadic * m_clearColor.Get<X>(), variadic * m_clearColor.Get<Y>(), variadic * m_clearColor.Get<Z>(), m_clearColor.Get<W>() };
 
     cmdList->ClearRenderTargetView(GetRTVCPUDescHandler(), clearColor, 0, nullptr);
     cmdList->ClearDepthStencilView(m_pDSVDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);

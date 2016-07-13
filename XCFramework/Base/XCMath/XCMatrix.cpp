@@ -5,3 +5,10 @@
  * For complete license, read License.txt in source root directory. */
 
 #include "BasePrecompiledHeader.h"
+
+#include "XCMatrix.h"
+
+namespace XCMath
+{
+    XCMatrix XCMatrix::XCMatrixIdentity = XCMatrix();
+}

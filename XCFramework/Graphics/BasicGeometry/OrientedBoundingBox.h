@@ -6,9 +6,7 @@
 
 #pragma once
 
-#if !defined(XC_ORBIS)
 #include <DirectXCollision.h>
-#endif
 
 class OrientedBoundingBox
 {
@@ -21,14 +19,14 @@ public:
     virtual void               Init();
 
     void                       CreateBoundBox();
-    void                       CreateBoundBox(XCVecIntrinsic4 min, XCVecIntrinsic4 max);
+    void                       CreateBoundBox(XCVec4& min, XCVec4& max);
     void                       CreateBoundBox(OrientedBoundingBox* const boundBox);
-    void                       Transform(XCMatrix4 translateMat, XCMatrix4 rotateMatrix);
+    void                       Transform(XCMatrix4& translateMat, XCMatrix4& rotateMatrix);
 
     //Oriented Bounding Box
-    BoundingOrientedBox        m_bBox;
-    BoundingOrientedBox        m_TransformedBox;
+    DirectX::BoundingOrientedBox  m_bBox;
+    DirectX::BoundingOrientedBox  m_TransformedBox;
 
-    XCVecIntrinsic4            m_boxCenter;
-    XCVecIntrinsic4            m_boxExtends;
+    XCVec4                        m_boxCenter;
+    XCVec4                        m_boxExtends;
 };

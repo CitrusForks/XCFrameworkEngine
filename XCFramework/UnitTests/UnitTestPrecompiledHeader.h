@@ -4,11 +4,11 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
-#include "BasePrecompiledHeader.h"
+#pragma once
 
-#include "XCFloat4.h"
+#include <CppUnitTest.h>
+#include <CppUnitTestAssert.h>
 
-namespace XCMath
-{
-    XCFloat4 XCFloat4::XCFloat4ZeroVector = XCVec4(0.0f, 0.0f, 0.0f, 0.0f);
-}
+#include "Base/BaseCommonIncludes.h"
+#include "Engine/EngineCommonIncludes.h"
+#include "Graphics/GraphicsCommonIncludes.h"

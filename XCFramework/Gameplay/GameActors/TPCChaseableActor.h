@@ -15,17 +15,17 @@ public:
     TPCChaseableActor(void);
     virtual ~TPCChaseableActor(void);
     
-    XCVecIntrinsic4             getDistanceFromTarget()                 { return m_distanceFromTarget;  }
-    void                        setDistanceFromTarget(XCVecIntrinsic4 value)   { m_distanceFromTarget = value; }
-    
-    void                        SetChasingAxis(XCVecIntrinsic4& look, XCVecIntrinsic4& right, XCVecIntrinsic4& up);
-    XCVecIntrinsic4             GetLook()                               { return *m_look; }
-    XCVecIntrinsic4             GetRight()                              { return *m_right; }
-    XCVecIntrinsic4             GetUp()                                 { return *m_up; }
+    XCVec4             GetDistanceFromTarget()                 { return m_distanceFromTarget;  }
+    void               SetDistanceFromTarget(XCVec4& value)    { m_distanceFromTarget = value; }
+
+    void               SetChasingAxis(XCVec4& look, XCVec4& right, XCVec4& up);
+    XCVec4             GetLook()                               { return *m_look; }
+    XCVec4             GetRight()                              { return *m_right; }
+    XCVec4             GetUp()                                 { return *m_up; }
 
 private:
-    XCVecIntrinsic4             m_distanceFromTarget;
-    XCVecIntrinsic4*            m_look;
-    XCVecIntrinsic4*            m_right;
-    XCVecIntrinsic4*            m_up;
+    XCVec4             m_distanceFromTarget;
+    XCVec4*            m_look;
+    XCVec4*            m_right;
+    XCVec4*            m_up;
 };

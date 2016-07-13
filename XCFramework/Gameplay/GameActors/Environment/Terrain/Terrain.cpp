@@ -53,7 +53,7 @@ void Terrain::PreLoad(const void* fbBuffer)
     m_textures.push_back(&resMgr.AcquireResource(fbTerrainBuff->Texture2DBlendResourceName3()->c_str()));
 
     m_initialPosition = XCVec3(fbTerrainBuff->Position()->x(), fbTerrainBuff->Position()->y(), fbTerrainBuff->Position()->z());
-    m_currentPosition = XMLoadFloat3(&m_initialPosition);
+    m_currentPosition = m_initialPosition;
     
     m_rows = fbTerrainBuff->Rows();
     m_cols = fbTerrainBuff->Column();
@@ -74,7 +74,7 @@ void Terrain::PreLoad(const char* _pHeightMapFileName,
     std::string terrainTexture1,
     std::string terrainTexture2,
     std::string blendMap,
-    XCVec3 initialPosition, 
+    XCVec3& initialPosition, 
     int _rows, 
     int _column, 
     float _rowSpacing, 
@@ -88,7 +88,7 @@ void Terrain::PreLoad(const char* _pHeightMapFileName,
     m_textures.push_back(&resMgr.AcquireResource(terrainTexture2.c_str()));
     m_textures.push_back(&resMgr.AcquireResource(blendMap.c_str()));
     
-    m_currentPosition = XMLoadFloat3(&initialPosition);
+    m_currentPosition = initialPosition;
     m_rows = _rows;
     m_cols = _column;
     m_rowSpacing = _rowSpacing;
@@ -110,7 +110,7 @@ void Terrain::Load()
     UnloadHeightMap();
 
     XCVec3 vec = XCVec3(0, 0, 0);
-    InitXPhysics(XMLoadFloat3(&m_initialPosition), XMLoadFloat3(&vec), XMLoadFloat3(&vec), 1000, (float)0.2); //Immovable
+    InitXPhysics(XCVec4(m_initialPosition), XCVec4(vec), XCVec4(vec), 1000, (float)0.2); //Immovable
     
     //Terrain is loaded, so fire up the world ready event
     Event_World event(EventType_WorldReady);
@@ -142,8 +142,8 @@ void Terrain::GenerateVertices()
     int verticesIndex = 0;
     int bitmapRGBIndex = 0;
 
-    XCVecIntrinsic4 vMin = toXMVECTOR(Infinity, Infinity, Infinity, 1);
-    XCVecIntrinsic4 vMax = toXMVECTOR(-Infinity, -Infinity, -Infinity, 1);
+    XCVec4 vMin(Infinity, Infinity, Infinity, 1);
+    XCVec4 vMax(-Infinity, -Infinity, -Infinity, 1);
     
     int noOfQuads = 4;
     
@@ -189,8 +189,8 @@ void Terrain::GenerateVertices()
     {
         for (int colIndex = 0; colIndex < m_cols; colIndex++)
         {
-            float x = m_initialPosition.x - (colIndex * m_rowSpacing);
-            float z = m_initialPosition.z + (rowIndex * m_colSpacing);
+            float x = m_initialPosition.Get<X>() - (colIndex * m_rowSpacing);
+            float z = m_initialPosition.Get<Z>() + (rowIndex * m_colSpacing);
       
             //float y = m_initialPosition.y + (float)GetHeightAt( (m_rows * rowIndex) + colIndex)/15.0f;
             //float y = m_initialPosition.y + ((float) GetHeightAt(k) / 10.0f);
@@ -206,7 +206,7 @@ void Terrain::GenerateVertices()
                     {
                         XCVec3 pos(x, y, z);
                         m_vertexPosNormTexBuffer.m_vertexData[verticesIndex++] = VertexPosNormTex(XCVec3Unaligned(x, y, z), XCVec3Unaligned(0.0f, 1.0f, 0.0f), XCVec2Unaligned(0.0f, 1.0f));
-                        m_OBBHierarchy->ComputeQuad(rowIndex, colIndex, pos);
+                        m_OBBHierarchy->ComputeQuad(rowIndex, colIndex, XCVec4(pos));
                         break;
                     }
             }
@@ -221,25 +221,26 @@ void Terrain::GenerateVerticesNormal()
 
     for(unsigned int vertexIndex = 0; vertexIndex < m_indexBuffer.m_indexData.size() - 3; vertexIndex += 3)
     {
-        XCVecIntrinsic4 v1 = XMLoadFloat3(ToXCVec3(m_vertexPosNormTexBuffer.m_vertexData[m_indexBuffer.m_indexData[vertexIndex]].Pos));
-        XCVecIntrinsic4 v2 = XMLoadFloat3(ToXCVec3(m_vertexPosNormTexBuffer.m_vertexData[m_indexBuffer.m_indexData[vertexIndex + 1]].Pos));
-        XCVecIntrinsic4 v3 = XMLoadFloat3(ToXCVec3(m_vertexPosNormTexBuffer.m_vertexData[m_indexBuffer.m_indexData[vertexIndex + 2]].Pos));
+        XCVec4 v1(m_vertexPosNormTexBuffer.m_vertexData[m_indexBuffer.m_indexData[vertexIndex]].Pos);
+        XCVec4 v2(m_vertexPosNormTexBuffer.m_vertexData[m_indexBuffer.m_indexData[vertexIndex + 1]].Pos);
+        XCVec4 v3(m_vertexPosNormTexBuffer.m_vertexData[m_indexBuffer.m_indexData[vertexIndex + 2]].Pos);
 
-        XCVecIntrinsic4 vertexNormal = GetNormalFromPoints(v1, v2, v3);
-        XMStoreFloat3(&m_vertexPosNormTexBuffer.m_vertexData[m_indexBuffer.m_indexData[vertexIndex]].Norm, vertexNormal);
+        XCVec4 vertexNormal = GetNormalFromPoints(v1, v2, v3);
+
+        m_vertexPosNormTexBuffer.m_vertexData[m_indexBuffer.m_indexData[vertexIndex]].Norm = vertexNormal.GetUnaligned3();
 
         vertexNormal = GetNormalFromPoints(v2, v1, v3);
-        XMStoreFloat3(&m_vertexPosNormTexBuffer.m_vertexData[m_indexBuffer.m_indexData[vertexIndex + 1]].Norm, vertexNormal);
+        m_vertexPosNormTexBuffer.m_vertexData[m_indexBuffer.m_indexData[vertexIndex + 1]].Norm = vertexNormal.GetUnaligned3();
 
         vertexNormal = GetNormalFromPoints(v3, v1, v2);
-        XMStoreFloat3(&m_vertexPosNormTexBuffer.m_vertexData[m_indexBuffer.m_indexData[vertexIndex + 2]].Norm, vertexNormal);
+        m_vertexPosNormTexBuffer.m_vertexData[m_indexBuffer.m_indexData[vertexIndex + 2]].Norm, vertexNormal.GetUnaligned3();
     }
 }
 
-XCVecIntrinsic4 Terrain::CheckTerrainCollisionFromPoint(OrientedBoundingBox* bbox)
+XCVec4 Terrain::CheckTerrainCollisionFromPoint(OrientedBoundingBox* bbox)
 {
     TerrainQuad* quad = m_OBBHierarchy->GetQuadCollidingWithOBB(bbox);
-    XCVecIntrinsic4 vertexPos = XMVectorZero();
+    XCVec4 vertexPos;
 
     if (quad != nullptr)
     {
@@ -248,10 +249,10 @@ XCVecIntrinsic4 Terrain::CheckTerrainCollisionFromPoint(OrientedBoundingBox* bbo
         {
             for (int colIndex = quad->m_colStart; colIndex < quad->m_colEnd; colIndex++)
             {
-                vertexPos = XMLoadFloat3(ToXCVec3(m_vertexPosNormTexBuffer.m_vertexData[quad->m_totalWidth * rowIndex + colIndex].Pos));
+                vertexPos = XCVec4(m_vertexPosNormTexBuffer.m_vertexData[quad->m_totalWidth * rowIndex + colIndex].Pos);
 
-                ContainmentType contain = bbox->m_TransformedBox.Contains(vertexPos);
-                if (contain == CONTAINS || contain == INTERSECTS)
+                DirectX::ContainmentType contain = bbox->m_TransformedBox.Contains(vertexPos.GetPlatformIntrinsic());
+                if (contain == DirectX::CONTAINS || contain == DirectX::INTERSECTS)
                 {
                     return vertexPos;
                 }
@@ -260,7 +261,7 @@ XCVecIntrinsic4 Terrain::CheckTerrainCollisionFromPoint(OrientedBoundingBox* bbo
     }
 
     //If we come here that means no collision with any terrain vertex. So return nothing
-    return XMVectorZero();
+    return XCVec4();
 }
 
 
@@ -339,16 +340,17 @@ char Terrain::GetHeightAt(int _index) const
     return m_pBitmapImage[_index];
 }
 
-XCVecIntrinsic4 Terrain::GetPointAtIndex(int pointIndex) const
+XCVec4 Terrain::GetPointAtIndex(int pointIndex) const
 {
-    return XMLoadFloat3(ToXCVec3(m_vertexPosNormTexBuffer.m_vertexData[pointIndex].Pos));
+    XCVec3Unaligned vec = m_vertexPosNormTexBuffer.m_vertexData[pointIndex].Pos;
+    return XCVec4(vec);
 }
 
 void Terrain::Update(float dt)
 {
     SimpleTerrain::Update(dt);
 
-    m_OBBHierarchy->Transform(XMMatrixIdentity(), XMMatrixIdentity());
+    m_OBBHierarchy->Transform(XCMatrix(), XCMatrix());
     m_OBBHierarchy->Update(dt);
 }
 
@@ -363,10 +365,10 @@ void Terrain::Draw(RenderContext& context)
     // Set constants
     ICamera& cam = context.GetShaderManagerSystem().GetGlobalShaderData().m_camera;
     PerObjectBuffer perObject = {
-        ToXCMatrix4Unaligned(XMMatrixTranspose(m_World)),
-        ToXCMatrix4Unaligned(XMMatrixTranspose(m_World * cam.GetViewMatrix() * cam.GetProjectionMatrix())),
-        ToXCMatrix4Unaligned(InverseTranspose(m_World)),
-        ToXCMatrix4Unaligned(XMMatrixIdentity()),
+        MatrixTranspose(m_World).GetUnaligned(),
+        MatrixTranspose(m_World * cam.GetViewMatrix() * cam.GetProjectionMatrix()).GetUnaligned(),
+        MatrixInverseTranspose(m_World).GetUnaligned(),
+        XCMatrix().GetUnaligned(),
         m_material
     };
     m_pCBPerObject->UploadDataOnGPU(context.GetDeviceContext(), &perObject, sizeof(PerObjectBuffer));

@@ -30,7 +30,7 @@ public:
 private:
 
     std::map<ELightType, ILight*>   m_Lights;
-    XCVec3                          m_eyePos;
+    XCVec4                          m_eyePos;
 
     D3DConstantBuffer*              m_pCBLightsPerFrame;
 };

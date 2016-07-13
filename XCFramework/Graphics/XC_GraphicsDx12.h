@@ -40,7 +40,7 @@ public:
     void                        EndScene();
     
     void                        OnResize(int _width, int _height);
-    void                        SetClearColor(XCVec4 color)           { m_clearColor = color; }
+    void                        SetClearColor(XCVec4& color)    { m_clearColor = color; }
 
     void                        CreateDescriptorHeaps();
     void                        CreateGraphicPipelineStateObjects();

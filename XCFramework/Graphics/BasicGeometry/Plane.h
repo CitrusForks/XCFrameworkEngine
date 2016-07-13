@@ -10,17 +10,18 @@ class Plane
 {
 public:
     Plane();
-    Plane(XCVecIntrinsic4 p1, XCVecIntrinsic4 p2, XCVecIntrinsic4 p3);
+    Plane(XCVec4& p1, XCVec4& p2, XCVec4& p3);
     ~Plane();
 
-    void                SetPlaneNormal(XCVecIntrinsic4 norm) { m_planeNormal = norm; }
-    void                SetDConstant(XCVecIntrinsic4 value) { m_dVector = value; }
+    void       SetPlaneNormal(XCVec4& norm) { m_planeNormal = norm; }
+    void       SetDConstant(XCVec4& value) { m_dVector = value; }
 
-    XCVecIntrinsic4     GetPlaneNormal() { return m_planeNormal; }
+    XCVec4     GetPlaneNormal() { return m_planeNormal; }
 
 protected:
-    XCVecIntrinsic4     m_planeNormal;
-    XCVecIntrinsic4     m_dVector;
 
-    XCVecIntrinsic4     m_vertices[4];
+    XCVec4     m_planeNormal;
+    XCVec4     m_dVector;
+
+    XCVec4     m_vertices[4];
 };

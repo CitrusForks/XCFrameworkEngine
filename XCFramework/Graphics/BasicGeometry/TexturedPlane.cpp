@@ -21,7 +21,7 @@ TexturedPlane::TexturedPlane()
 {
 }
 
-TexturedPlane::TexturedPlane(XCVecIntrinsic4 p1, XCVecIntrinsic4 p2, XCVecIntrinsic4 p3)
+TexturedPlane::TexturedPlane(XCVec4& p1, XCVec4& p2, XCVec4& p3)
     : Plane(p1, p2, p3)
 {
     m_texture = nullptr;
@@ -40,9 +40,9 @@ void TexturedPlane::Init(int actorId)
 void TexturedPlane::PreLoad(const void* fbBuffer)
 {
     const FBTexturePlane* texPlaneBuff = (FBTexturePlane*)fbBuffer;
-    m_currentPosition = toXMVECTOR(texPlaneBuff->Position()->x(), texPlaneBuff->Position()->y(), texPlaneBuff->Position()->z(), texPlaneBuff->Position()->w());
-    m_initialRotation = toXMVECTOR(texPlaneBuff->Rotation()->x(), texPlaneBuff->Rotation()->y(), texPlaneBuff->Rotation()->z(), texPlaneBuff->Rotation()->w());
-    m_initialScaling  = toXMVECTOR(texPlaneBuff->Scaling()->x(), texPlaneBuff->Scaling()->y(), texPlaneBuff->Scaling()->z(), texPlaneBuff->Scaling()->w());
+    m_currentPosition.SetValues(texPlaneBuff->Position()->x(), texPlaneBuff->Position()->y(), texPlaneBuff->Position()->z(), texPlaneBuff->Position()->w());
+    m_initialRotation.SetValues(texPlaneBuff->Rotation()->x(), texPlaneBuff->Rotation()->y(), texPlaneBuff->Rotation()->z(), texPlaneBuff->Rotation()->w());
+    m_initialScaling.SetValues(texPlaneBuff->Scaling()->x(), texPlaneBuff->Scaling()->y(), texPlaneBuff->Scaling()->z(), texPlaneBuff->Scaling()->w());
 
     m_material.Ambient  = XCVec4(texPlaneBuff->Material()->Ambient()->x(), texPlaneBuff->Material()->Ambient()->y(), texPlaneBuff->Material()->Ambient()->z(), texPlaneBuff->Material()->Ambient()->w());
     m_material.Diffuse  = XCVec4(texPlaneBuff->Material()->Diffuse()->x(), texPlaneBuff->Material()->Diffuse()->y(), texPlaneBuff->Material()->Diffuse()->z(), texPlaneBuff->Material()->Diffuse()->w());
@@ -57,7 +57,7 @@ void TexturedPlane::PreLoad(const void* fbBuffer)
     m_pCBPerObject = heap.CreateBufferView(D3DBufferDesc(BUFFERTYPE_CBV, sizeof(PerObjectBuffer)));
 }
 
-void TexturedPlane::PreLoad(XCVecIntrinsic4 initialPosition, XCVecIntrinsic4 initialRotation, XCVecIntrinsic4 initialScaling, BasicMaterial material, std::string texture, RasterType rasterType)
+void TexturedPlane::PreLoad(XCVec4& initialPosition, XCVec4& initialRotation, XCVec4& initialScaling, BasicMaterial& material, std::string texture, RasterType rasterType)
 {
     m_currentPosition = initialPosition;
     m_initialRotation = initialRotation;
@@ -72,9 +72,9 @@ void TexturedPlane::PreLoad(XCVecIntrinsic4 initialPosition, XCVecIntrinsic4 ini
 
 void TexturedPlane::Load()
 {
-    m_MTranslation = XMMatrixTranslation(XMVectorGetX(m_currentPosition), XMVectorGetY(m_currentPosition), XMVectorGetZ(m_currentPosition));
+    m_MTranslation = MatrixTranslate(m_currentPosition);
     ApplyRotation(m_initialRotation);
-    m_MScaling = XMMatrixScaling(XMVectorGetX(m_initialScaling), XMVectorGetY(m_initialScaling), XMVectorGetZ(m_initialScaling));
+    m_MScaling = MatrixScale(m_initialScaling);
     m_World = m_MScaling * m_MRotation * m_MTranslation;
 
     BuildGeometryBuffers();
@@ -110,10 +110,10 @@ void TexturedPlane::Draw(RenderContext& context)
     //TODO: Remove all the overrides from here. Need to create a texture planeactor from gameplay that will inherit this and then make it renderable
    ICamera& cam = context.GetShaderManagerSystem().GetGlobalShaderData().m_camera;
     PerObjectBuffer perObject = {
-        ToXCMatrix4Unaligned(XMMatrixTranspose(m_World)),
-        ToXCMatrix4Unaligned(XMMatrixTranspose(m_World * cam.GetViewMatrix() * cam.GetProjectionMatrix())),
-        ToXCMatrix4Unaligned(InverseTranspose(m_World)),
-        ToXCMatrix4Unaligned(XMMatrixIdentity()),
+        MatrixTranspose(m_World).GetUnaligned(),
+        MatrixTranspose(m_World * cam.GetViewMatrix() * cam.GetProjectionMatrix()).GetUnaligned(),
+        MatrixInverseTranspose(m_World).GetUnaligned(),
+        XCMatrix4::XCMatrixIdentity.GetUnaligned(),
         m_material
     };
 

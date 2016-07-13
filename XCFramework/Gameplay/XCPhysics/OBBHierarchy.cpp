@@ -27,7 +27,7 @@ void OBBHierarchy::Update(float dt)
     }
 }
 
-void OBBHierarchy::Transform(XCMatrix4 translateMat, XCMatrix4 rotateMatrix)
+void OBBHierarchy::Transform(XCMatrix4& translateMat, XCMatrix4& rotateMatrix)
 {
     for(unsigned int index = 0; index < m_Quads.size(); index++)
     {
@@ -37,7 +37,6 @@ void OBBHierarchy::Transform(XCMatrix4 translateMat, XCMatrix4 rotateMatrix)
         {
             m_Quads[index]->GetChildNode()->Transform(translateMat, rotateMatrix);
         }
-
     }
 
 }
@@ -79,16 +78,16 @@ void OBBHierarchy::CreateTerrainOBBHierarchy(int levels, int rowStart, int total
     int colMid = totalColumns / noOfDividedCols;
 
 
-    XCVecIntrinsic4 vMin = toXMVECTOR(Infinity, Infinity, Infinity, 1);
-    XCVecIntrinsic4 vMax = toXMVECTOR(-Infinity, -Infinity, -Infinity, 1);
+    XCVec4 vMin(Infinity, Infinity, Infinity, 1);
+    XCVec4 vMax(-Infinity, -Infinity, -Infinity, 1);
 
     std::unique_ptr<TerrainQuad> quad;
 
-        //For each level, we will have a OBBH, so create it here
-        //Before that create noOfQuadsEachLevel this level
-        //Also here we will loop through the current m_quads and divide them further.
-        
-        //m_Quads.back()->setChildNodeOBB(childNodeOBB);
+    //For each level, we will have a OBBH, so create it here
+    //Before that create noOfQuadsEachLevel this level
+    //Also here we will loop through the current m_quads and divide them further.
+
+    //m_Quads.back()->setChildNodeOBB(childNodeOBB);
 
     for(unsigned int quadIndex = 0; quadIndex < m_Quads.size(); quadIndex++)
     {
@@ -131,15 +130,15 @@ void OBBHierarchy::CreateTerrainOBBHierarchy(int levels, int rowStart, int total
     }
 }
 
-void OBBHierarchy::ComputeQuad(int row, int col, XCVec3 pos)
+void OBBHierarchy::ComputeQuad(int row, int col, XCVec4& pos)
 {
     for(unsigned int quadIndex = 0; quadIndex < m_Quads.size(); quadIndex++)
     {
         if (row >= m_Quads[quadIndex]->m_rowStart && row < m_Quads[quadIndex]->m_rowEnd && col >= m_Quads[quadIndex]->m_colStart && col < m_Quads[quadIndex]->m_colEnd)
         {
             //Found the respective quad. Insert into the quad data and return
-            m_Quads[quadIndex]->m_vMin = XMVectorMin(m_Quads[quadIndex]->m_vMin, XMLoadFloat3(&pos));
-            m_Quads[quadIndex]->m_vMax = XMVectorMax(m_Quads[quadIndex]->m_vMax, XMLoadFloat3(&pos));
+            m_Quads[quadIndex]->m_vMin = VectorMin(m_Quads[quadIndex]->m_vMin, pos);
+            m_Quads[quadIndex]->m_vMax = VectorMax(m_Quads[quadIndex]->m_vMax, pos);
 
             if (m_Quads[quadIndex]->HasChildNode())
             {
@@ -171,8 +170,8 @@ TerrainQuad* OBBHierarchy::GetQuadCollidingWithOBB(OrientedBoundingBox* bbox)
     //Check if colliding with current quads
     for(unsigned int quadIndex = 0; quadIndex < m_Quads.size(); quadIndex++)
     {
-        ContainmentType type = m_Quads[quadIndex]->m_bbox->m_TransformedBox.Contains(bbox->m_TransformedBox);
-        if (type == CONTAINS || type == INTERSECTS)
+        DirectX::ContainmentType type = m_Quads[quadIndex]->m_bbox->m_TransformedBox.Contains(bbox->m_TransformedBox);
+        if (type == DirectX::CONTAINS || type == DirectX::INTERSECTS)
         {
             //If Collided, check if we have child node, then return from that child TerrainQuad
             if (m_Quads[quadIndex]->HasChildNode())

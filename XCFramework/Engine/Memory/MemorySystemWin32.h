@@ -69,7 +69,7 @@ template<class Type>
 Type* MemorySystemWin32::newAlloc(Type t)
 {
     //Calc the size of obj
-    int sizeOfObj = sizeof(t);
+    unsigned int sizeOfObj = sizeof(t);
 
     if (sizeOfObj > m_freeSize)
     {
@@ -149,7 +149,7 @@ Type* MemorySystemWin32::newAlloc(size_t size)
         memset(ptrToBlock, NEW_MEM_PATTERN, size);
 
         //Placement new here in the location
-        Type* newedPtr = new(ptrToBlock) Type();
+        //Type* newedPtr = new(ptrToBlock) Type();
         m_freeSize = m_freeSize - size;
 
         return (Type*)newedPtr;
@@ -167,3 +167,6 @@ Type* MemorySystemWin32::newAlloc(size_t size)
 
 #define XCNEW(x)        new x
 #define XCDELETE(x)     delete x
+
+void* operator new(size_t classSize);
+void operator delete(void* p);

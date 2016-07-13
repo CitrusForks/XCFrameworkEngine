@@ -21,7 +21,7 @@ public:
     SimpleTerrain(void);
     virtual ~SimpleTerrain(void);
  
-    virtual void                        PreLoad(XCVec3 _initialPosition, int _rows, int _column, float _rowSpacing, float _colSpacing);
+    virtual void                        PreLoad(XCVec3& _initialPosition, int _rows, int _column, float _rowSpacing, float _colSpacing);
     virtual void                        Load();
     virtual void                        GenerateVertices();
     virtual void                        GenerateIndicesWithTextureMapping();

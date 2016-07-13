@@ -20,15 +20,13 @@ void SubActor::Init(IActor* bindedActor)
     m_offsetLook = m_bindedActor->GetLook();
     m_offsetRight = m_bindedActor->GetRight();
     m_offsetUp = m_bindedActor->GetUp();
-
-    m_offsetRotation = XMMatrixIdentity();
 }
 
 SubActor::~SubActor(void)
 {
 }
 
-void SubActor::InitOffsets(XCVecIntrinsic4 position, XCVecIntrinsic4 look, XCVecIntrinsic4 right, XCVecIntrinsic4 up)
+void SubActor::InitOffsets(XCVec4& position, XCVec4& look, XCVec4& right, XCVec4& up)
 {
     m_offsetPosition = position;
     m_offsetLook = look;

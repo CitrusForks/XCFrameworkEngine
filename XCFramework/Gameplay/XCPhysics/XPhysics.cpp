@@ -11,19 +11,18 @@ bool XPhysics::s_enableGravity = false;
 
 XPhysics::XPhysics()
 {
-    XCVec3 direction = XCVec3(0, -5, 0);
-    m_GAcceleration = XMLoadFloat3(&direction);
+    m_GAcceleration = XCVec4(0, -5, 0, 0);
 }
 
-void XPhysics::InitXPhysics(XCVecIntrinsic4 _position, XCVecIntrinsic4 _velocity, XCVecIntrinsic4 _acceleration, float _mass, float _damping)
+void XPhysics::InitXPhysics(XCVec4& position, XCVec4& velocity, XCVec4& acceleration, float mass, float damping)
 {
-    m_Position = _position;
-    m_Velocity = _velocity;
-    m_Acceleration = _acceleration;
-    m_Mass = _mass;
-    m_Damping = _damping;
+    m_Position = position;
+    m_Velocity = velocity;
+    m_Acceleration = acceleration;
+    m_Mass = mass;
+    m_Damping = damping;
 
-    if(_mass >= 999)
+    if(mass >= 999)
     {
         SetInverseMass(0);
         m_Mass = 1;
@@ -33,15 +32,15 @@ void XPhysics::InitXPhysics(XCVecIntrinsic4 _position, XCVecIntrinsic4 _velocity
         m_InverseMass = 1 / m_Mass;
     }
 
-    m_ForceAccumulator   = Float3ToVec(XCVec3(0, 0, 0));
-    m_ContactNormal      = Float3ToVec(XCVec3(0, 0, 0));
+    m_ForceAccumulator   = XCVec3(0, 0, 0);
+    m_ContactNormal      = XCVec3(0, 0, 0);
 }
 
 XPhysics::~XPhysics()
 {
 }
 
-void XPhysics::AddForce(XCVecIntrinsic4 _newForce)
+void XPhysics::AddForce(XCVec4& _newForce)
 {
     m_ForceAccumulator += _newForce;
 }
@@ -52,7 +51,7 @@ void XPhysics::Integrator(float dt)
     if (s_enableGravity)
         m_ForceAccumulator += m_GAcceleration;
 
-    XCVecIntrinsic4 currentAcceleration = m_Acceleration;
+    XCVec4 currentAcceleration = m_Acceleration;
 
     //Update the position
     m_Position += (m_Velocity * dt);
@@ -69,14 +68,12 @@ void XPhysics::Integrator(float dt)
 
 void XPhysics::ClearForce()
 {
-    XCVec3 vec = XCVec3(0, 0, 0);
-    m_ForceAccumulator = XMLoadFloat3(&vec);
+    m_ForceAccumulator = XCVec3(0, 0, 0);
 }
 
 void XPhysics::ClearVelocity()
 {
-    XCVec3 vec = XCVec3(0, 0, 0);
-    m_Velocity = XMLoadFloat3(&vec);
+    m_Velocity = XCVec3(0, 0, 0);
 }
 
 bool XPhysics::HasFiniteMass()

@@ -28,11 +28,11 @@ public:
     virtual void                        Draw(RenderContext& context);
     virtual void                        Destroy();
 
-    void                                PreLoad(XCVec3 initialPosition, XCVec3 target, std::string pMeshName);
+    void                                PreLoad(XCVec3& initialPosition, XCVec3& target, std::string pMeshName);
     void                                Shoot(float scalarForce);
 
 protected:
     ShaderType                          m_useShaderType;
     BasicMaterial                       m_material;
-    XCVecIntrinsic4                     m_target;
+    XCVec4                              m_target;
 };

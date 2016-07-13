@@ -22,7 +22,7 @@ Bullet::~Bullet(void)
 {
 }
 
-void Bullet::PreLoad(XCVec3 initialPosition, XCVec3 target, std::string pMeshName)
+void Bullet::PreLoad(XCVec3& initialPosition, XCVec3& target, std::string pMeshName)
 {
     ResourceManager& resMgr = (ResourceManager&)SystemLocator::GetInstance()->RequestSystem("ResourceManager");
     m_pMesh     = &resMgr.AcquireResource(pMeshName.c_str());
@@ -32,14 +32,14 @@ void Bullet::PreLoad(XCVec3 initialPosition, XCVec3 target, std::string pMeshNam
     m_material.Specular = XCVec4(0.2f, 0.2f, 0.2f, 16.0f);
 
     //Get initial position
-    m_currentPosition = XMLoadFloat3(&initialPosition);
+    m_currentPosition = initialPosition;
 
     m_useShaderType = ShaderType_LightTexture;
     m_useRenderWorkerType = WorkerType_XCMesh;
     m_collisionDetectionType = COLLISIONDETECTIONTYPE_BULLET;
 
     //Assign the look
-    m_target = XMLoadFloat3(&target);
+    m_target = target;
 
     Logger("[Bullet] Preload done");
     PhysicsActor::PreLoad(nullptr);
@@ -47,10 +47,10 @@ void Bullet::PreLoad(XCVec3 initialPosition, XCVec3 target, std::string pMeshNam
 
 void Bullet::Load()
 {
-    m_MTranslation = XMMatrixTranslation(XMVectorGetX(m_currentPosition), XMVectorGetY(m_currentPosition), XMVectorGetZ(m_currentPosition));
+    m_MTranslation = MatrixTranslate(m_currentPosition.Get<X>(), m_currentPosition.Get<Y>(), m_currentPosition.Get<Z>());
 
-    m_MInitialRotation = XMMatrixRotationY(XM_PIDIV2);
-    m_MInitialRotation *= XMMatrixRotationZ(XM_PIDIV2);
+    m_MInitialRotation  = MatrixRotationY(XC_PIDIV2);
+    m_MInitialRotation *= MatrixRotationZ(XC_PIDIV2);
 
     m_transformedRotation = m_MRotation;
     m_MRotation = m_MInitialRotation * m_transformedRotation;
@@ -68,8 +68,7 @@ void Bullet::Load()
 void Bullet::SetInitialPhysicsProperties()
 {
     PhysicsActor::SetInitialPhysicsProperties();
-    XCVec3 vec = XCVec3(0, 0, 0);
-    InitXPhysics(m_currentPosition, XMLoadFloat3(&vec), XMLoadFloat3(&vec), 1, (float)0.2);
+    InitXPhysics(m_currentPosition, XCVec4(), XCVec4(), 1, (float)0.2);
 
     //Load done. Shoot the bullet
     Shoot(5000.0f);
@@ -86,10 +85,7 @@ void Bullet::Update(float dt)
 
     Integrator(dt);
 
-    XCVec3 pos;
-    XMStoreFloat3(&pos, m_Position);
-
-    m_MTranslation = XMMatrixTranslation(pos.x, pos.y, pos.z);
+    m_MTranslation = MatrixTranslate(m_Position.Get<X>(), m_Position.Get<Y>(), m_Position.Get<Z>());
 
     m_currentPosition = m_Position;
 
@@ -101,7 +97,7 @@ void Bullet::Update(float dt)
 
     m_pMesh->GetResource<XCMesh>()->Update(dt);
 
-    if (XMVectorGetY(m_currentPosition) < -10.0f)
+    if (m_currentPosition.Get<Y>() < -10.0f)
     {
         Invalidate();
     }
@@ -118,10 +114,10 @@ void Bullet::Draw(RenderContext& context)
     // Set constants
     ICamera& cam = context.GetShaderManagerSystem().GetGlobalShaderData().m_camera;
     PerObjectBuffer perObject = {
-        ToXCMatrix4Unaligned(XMMatrixTranspose(m_World)),
-        ToXCMatrix4Unaligned(XMMatrixTranspose(m_World * cam.GetViewMatrix() * cam.GetProjectionMatrix())),
-        ToXCMatrix4Unaligned(InverseTranspose(m_World)),
-        ToXCMatrix4Unaligned(XMMatrixIdentity()),
+        MatrixTranspose(m_World).GetUnaligned(),
+        MatrixTranspose(m_World * cam.GetViewMatrix() * cam.GetProjectionMatrix()).GetUnaligned(),
+        MatrixInverseTranspose(m_World).GetUnaligned(),
+        XCMatrix4().GetUnaligned(),
         m_material
     };
 

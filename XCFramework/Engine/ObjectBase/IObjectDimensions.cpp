@@ -9,22 +9,9 @@
 
 IObjectDimensions::IObjectDimensions()
 {
-    m_World               = XMMatrixIdentity();
-    m_MScaling            = m_World;
-    m_MRotation           = m_World;
-    m_MTranslation        = m_World;
-    m_MInitialRotation    = m_World;
-    m_transformedRotation = m_World;
-
-    m_currentPosition = XMVectorZero();
-    m_initialRotation = XMVectorZero();
-    m_initialScaling  = XMVectorZero();
-    m_up              = XMVectorZero();
-    m_look            = XMVectorZero();
-    m_right           = XMVectorZero();
 }
 
-void IObjectDimensions::ApplyRotation(XCVecIntrinsic4 axis)
+void IObjectDimensions::ApplyRotation(XCVec4& axis)
 {
-    m_MInitialRotation *= XMMatrixRotationRollPitchYawFromVector(axis);
+    m_MInitialRotation *= MatrixRotationRollPitchYawFromAxis(axis);
 }

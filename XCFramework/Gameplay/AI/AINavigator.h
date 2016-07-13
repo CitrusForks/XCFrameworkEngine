@@ -20,41 +20,41 @@ enum ENavigationType
 class AINavigator
 {
 public:
-    static const float                  DISTANCE_ABS;
-    static const float                  LOOK_TARGET_ANGLE_ABS;
+    static const float DISTANCE_ABS;
+    static const float LOOK_TARGET_ANGLE_ABS;
 
     AINavigator(PhysicsActor* actor);
     virtual ~AINavigator(void);
 
-    void                                SetNavigationState(ENavigationType type) { m_navigateType = type; }
-    void                                SetStaticTargetNavigation(XCVecIntrinsic4 target);
-    void                                SetChaseNavigation(PhysicsActor* actor);
+    void                      SetNavigationState(ENavigationType type) { m_navigateType = type; }
+    void                      SetStaticTargetNavigation(XCVec4& target);
+    void                      SetChaseNavigation(PhysicsActor* actor);
 
-    XCVecIntrinsic4                     GetTarget() { return m_targetPosition; }
+    XCVec4                    GetTarget() { return m_targetPosition; }
 
-    void                                Update(float dt);
+    void                      Update(float dt);
 
-    void                                RotateTowardsTarget(float angle);
-    bool                                IsLookingAtTarget();
-    void                                MoveOnLook();
-    void                                MoveOnPath();
-    bool                                HasArrivedAtTarget();
+    void                      RotateTowardsTarget(float angle);
+    bool                      IsLookingAtTarget();
+    void                      MoveOnLook();
+    void                      MoveOnPath();
+    bool                      HasArrivedAtTarget();
 
-    XCVecIntrinsic4                     ComputePathToTarget();
+    XCVec4                    ComputePathToTarget();
 
-    void                                ResetNavigation();
+    void                      ResetNavigation();
 
 protected:
-    void                                NavigateByChasing();
-    void                                NavigateByTarget();
+    void                      NavigateByChasing();
+    void                      NavigateByTarget();
 
 private:
-    XCVecIntrinsic4                     m_path;
-    XCVecIntrinsic4                     m_targetPosition;
+    XCVec4                    m_path;
+    XCVec4                    m_targetPosition;
 
-    PhysicsActor*                       m_bindedActor;
-    PhysicsActor*                       m_chaseActor;
-
-    ENavigationType                     m_navigateType;
-    float                               m_currentDelta;
+    PhysicsActor*             m_bindedActor;
+    PhysicsActor*             m_chaseActor;
+                              
+    ENavigationType           m_navigateType;
+    float                     m_currentDelta;
 };

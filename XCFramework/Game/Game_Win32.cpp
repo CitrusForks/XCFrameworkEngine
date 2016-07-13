@@ -186,6 +186,23 @@ void Game_Win32::Destroy()
     SystemLocator::GetInstance()->Destroy();
 }
 
+class A
+{
+public:
+    A()
+    {
+        Logger("Constructed");
+    }
+
+    ~A()
+    {
+        Logger("Destructed");
+    }
+
+private:
+    int     m_member;
+};
+
 int WINAPI WinMain(__in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, __in LPSTR lpCmdLine, __in int nShowCmd)
 {
     // Enable run-time memory check for debug builds.
@@ -196,6 +213,9 @@ int WINAPI WinMain(__in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, _
     //Initialize memory System
     MemorySystemWin32 memorySystem(1024 * 1024);
     memorySystem.allocateChunk();
+
+    A* a = new A();
+    delete a;
 
     Game_Win32 app(hInstance, "", true);
     app.Run();

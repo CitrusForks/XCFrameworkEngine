@@ -9,16 +9,15 @@
 #include "Gameplay/XC_Camera/BasicCamera.h"
 #include "Engine/Input/Directinput.h"
 
-BasicCamera::BasicCamera(XCVecIntrinsic4 _pos, XCVecIntrinsic4 _target, XCVecIntrinsic4 _up, float _aspectRatio, float _fov, float _near, float _far)
-    :ICamera(_pos, _target, _up, _aspectRatio, _fov, _near, _far)
+BasicCamera::BasicCamera(XCVec4& pos, XCVec4& target, XCVec4& up, float aspectRatio, float fov, float nearPlane, float farPlane)
+    :ICamera(pos, target, up, aspectRatio, fov, nearPlane, farPlane)
 {
-    m_CameraHeight = XMVectorGetY(_pos);
+    m_CameraHeight = pos.Get<Y>();
     m_CameraRotationY = 0.0f;
     m_CameraRadius = 0.0f;
 
     m_directInput = &SystemLocator::GetInstance()->RequestSystem<DirectInput>("InputSystem");
 }
-
 
 BasicCamera::~BasicCamera(void)
 {
@@ -49,7 +48,7 @@ void BasicCamera::SetHeight(float dt)
         m_CameraHeight -= 2.0f;
     }
 
-    m_position = XMVectorSetY(m_position, m_CameraHeight);
+    m_position.Set<Y>(m_CameraHeight);
 }
 
 void BasicCamera::SetRotation()
@@ -68,7 +67,7 @@ void BasicCamera::SetRotation()
     m_CameraRotationY += (float)(x / 25.0f);
     m_CameraRadius += (float)(y / 25.0f);
 
-    if (fabs(m_CameraRotationY) >= 2 * XM_PI)
+    if (fabs(m_CameraRotationY) >= 2 * XC_PI)
     {
         m_CameraRotationY = 0.0f;
     }
@@ -77,10 +76,9 @@ void BasicCamera::SetRotation()
     {
         m_CameraRadius = 5.0f;
     }
-#if !defined(XC_ORBIS)
-    m_position = XMVectorSetX(m_position, m_CameraRadius * cosf(m_CameraRotationY));
-    m_position = XMVectorSetZ(m_position, m_CameraRadius * sinf(m_CameraRotationY));
-#endif
+ 
+    m_position.Set<X>(m_CameraRadius * cosf(m_CameraRotationY));
+    m_position.Set<Z>(m_CameraRadius * sinf(m_CameraRotationY));
 }
 
 void BasicCamera::BuildProjectionMatrix()

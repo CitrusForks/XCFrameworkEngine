@@ -14,7 +14,7 @@ class FirstPersonCamera : public ICamera
 {
 public:
     FirstPersonCamera();
-    FirstPersonCamera(XCVecIntrinsic4 _pos, XCVecIntrinsic4 _target, XCVecIntrinsic4 _up, float _aspectRatio, float _fov, float _near, float _far);
+    FirstPersonCamera(XCVec4& pos, XCVec4& target, XCVec4& up, float aspectRatio, float fov, float nearPlane, float farPlane);
 
     virtual ~FirstPersonCamera();
 
@@ -27,8 +27,9 @@ public:
     void                    Pitch(float angle);
 
 private:
-    XCVecIntrinsic4         m_look;
-    XCVecIntrinsic4         m_right;
+
+    XCVec4                  m_look;
+    XCVec4                  m_right;
 
     //m_up and m_position is in ICamera
     float                   m_lockYUnit;

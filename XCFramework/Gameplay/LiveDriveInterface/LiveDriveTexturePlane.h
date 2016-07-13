@@ -16,7 +16,7 @@ public:
     DECLARE_OBJECT_CREATION(LiveDriveTexturePlane)
 
     LiveDriveTexturePlane();
-    LiveDriveTexturePlane(XCVecIntrinsic4 p1, XCVecIntrinsic4 p2, XCVecIntrinsic4 p3);
+    LiveDriveTexturePlane(XCVec4& p1, XCVec4& p2, XCVec4& p3);
     virtual ~LiveDriveTexturePlane();
 
     virtual void                     PreLoad(const void* fbBuffer);

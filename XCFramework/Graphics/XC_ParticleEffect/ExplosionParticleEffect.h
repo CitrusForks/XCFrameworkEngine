@@ -24,7 +24,7 @@ private:
 
     struct ParticlePhysics
     {
-        XCVecIntrinsic4     velocity;
+        XCVec4     velocity;
         float               acceleration;
     };
     

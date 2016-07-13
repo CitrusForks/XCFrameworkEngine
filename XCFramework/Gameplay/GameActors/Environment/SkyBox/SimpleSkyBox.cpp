@@ -39,9 +39,9 @@ void SimpleSkyBox::Init(int actorId)
 void SimpleSkyBox::PreLoad(const void* fbBuffer)
 {
     const FBSimpleSkyBox* skyBoxBuff = (FBSimpleSkyBox*)fbBuffer;
-    m_currentPosition = toXMVECTOR(skyBoxBuff->Position()->x(), skyBoxBuff->Position()->y(), skyBoxBuff->Position()->z(), skyBoxBuff->Position()->w());
-    m_initialRotation = toXMVECTOR(skyBoxBuff->Rotation()->x(), skyBoxBuff->Rotation()->y(), skyBoxBuff->Rotation()->z(), skyBoxBuff->Rotation()->w());
-    m_initialScaling  = toXMVECTOR(skyBoxBuff->Scaling()->x(),  skyBoxBuff->Scaling()->y(),  skyBoxBuff->Scaling()->z(),  skyBoxBuff->Scaling()->w());
+    m_currentPosition.SetValues(skyBoxBuff->Position()->x(), skyBoxBuff->Position()->y(), skyBoxBuff->Position()->z(), skyBoxBuff->Position()->w());
+    m_initialRotation.SetValues(skyBoxBuff->Rotation()->x(), skyBoxBuff->Rotation()->y(), skyBoxBuff->Rotation()->z(), skyBoxBuff->Rotation()->w());
+    m_initialScaling.SetValues(skyBoxBuff->Scaling()->x(),  skyBoxBuff->Scaling()->y(),  skyBoxBuff->Scaling()->z(),  skyBoxBuff->Scaling()->w());
 
     m_material.Ambient = XCVec4(skyBoxBuff->Material()->Ambient()->x(), skyBoxBuff->Material()->Ambient()->y(), skyBoxBuff->Material()->Ambient()->z(), skyBoxBuff->Material()->Ambient()->w());
     m_material.Diffuse = XCVec4(skyBoxBuff->Material()->Diffuse()->x(), skyBoxBuff->Material()->Diffuse()->y(), skyBoxBuff->Material()->Diffuse()->z(), skyBoxBuff->Material()->Diffuse()->w());
@@ -60,9 +60,9 @@ void SimpleSkyBox::PreLoad(const void* fbBuffer)
 
 void SimpleSkyBox::Load()
 {
-    m_MTranslation = XMMatrixTranslation(XMVectorGetX(m_currentPosition), XMVectorGetY(m_currentPosition), XMVectorGetZ(m_currentPosition));
+    m_MTranslation = MatrixTranslate(m_currentPosition);
     ApplyRotation(m_initialRotation);
-    m_MScaling = XMMatrixScaling(XMVectorGetX(m_initialScaling), XMVectorGetY(m_initialScaling), XMVectorGetZ(m_initialScaling));
+    m_MScaling = MatrixScale(m_initialScaling);
     m_World = m_MScaling * m_MRotation * m_MTranslation;
 
     BuildBuffers();
@@ -142,7 +142,7 @@ void SimpleSkyBox::Draw(RenderContext& context)
     //Calculate wvp and set it to the constant.
     ICamera& cam = context.GetShaderManagerSystem().GetGlobalShaderData().m_camera;
 
-    cbWVP wbuffer = { ToXCMatrix4Unaligned(XMMatrixTranspose(m_World * cam.GetViewMatrix() * cam.GetProjectionMatrix())) };
+    cbWVP wbuffer = { MatrixTranspose(m_World * cam.GetViewMatrix() * cam.GetProjectionMatrix()).GetUnaligned() };
     m_CBwvp->UploadDataOnGPU(context.GetDeviceContext(), &wbuffer, sizeof(cbWVP));
 
     // Set constants

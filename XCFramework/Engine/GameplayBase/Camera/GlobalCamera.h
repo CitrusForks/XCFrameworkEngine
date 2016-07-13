@@ -12,7 +12,7 @@ class GlobalCamera : public ICamera
 {
 public:
 
-    void    SetViewMatrix(XCMatrix4 view) { m_viewMatrix = view; }
-    void    SetProjectionMatrix(XCMatrix4 proj) { m_projectionMatrix = proj; }
+    void    SetViewMatrix(const XCMatrix4& view)       { m_viewMatrix = view; }
+    void    SetProjectionMatrix(const XCMatrix4& proj) { m_projectionMatrix = proj; }
 
 };

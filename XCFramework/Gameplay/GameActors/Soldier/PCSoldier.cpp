@@ -22,8 +22,8 @@ void PCSoldier::Init(int actorId)
 
     m_directInput = (DirectInput*) &SystemLocator::GetInstance()->RequestSystem("InputSystem");
 
-    XCVec3 distance = XCVec3(1.5f, 5.0f, 10.0f);
-    TPCChaseableActor::setDistanceFromTarget(XMLoadFloat3(&distance));
+    XCVec4 distance(1.5f, 5.0f, 10.0f, 0.0f);
+    TPCChaseableActor::SetDistanceFromTarget(distance);
     TPCChaseableActor::SetChasingAxis(m_secondaryLookAxis, m_secondaryRightAxis, m_secondaryUpAxis);
 }
 
@@ -77,14 +77,7 @@ void PCSoldier::Update(float dt)
     Integrator(dt);
     ClearForce();
 
-    XCVec3 pos;
-    XMStoreFloat3(&pos, m_Position);
-
-#if defined(WIN32)
-    m_MTranslation = XMMatrixTranslation(pos.x, pos.y, pos.z);
-#else
-    m_MTranslation = XMMatrixTranslation(pos.getX(), pos.getY(), pos.getZ());
-#endif
+    m_MTranslation = MatrixTranslate(m_Position);
 
     m_currentPosition = m_Position;
 

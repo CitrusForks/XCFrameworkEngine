@@ -34,7 +34,7 @@ public:
     virtual ~VectorFontMesh();
 
     void            Init(int resourceId, std::string userFriendlyName) override;
-    void            DrawText(std::string text, XCVec3Unaligned position, RenderContext& context);
+    void            DrawText(std::string text, XCVec3Unaligned& position, RenderContext& context);
     void            Destroy() override;
 
 protected:

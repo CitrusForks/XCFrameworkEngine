@@ -408,12 +408,12 @@ bool World::CheckCollision(PhysicsActor* obj1, PhysicsActor* obj2)
             if (obj1->GetBoundBox()->m_TransformedBox.Intersects(obj2->GetBoundBox()->m_TransformedBox))
             {
                 //Before resolving know which corner point was hit
-                XCVec3 points[8];
+                DirectX::XMFLOAT3 points[8];
                 obj1->GetBoundBox()->m_TransformedBox.GetCorners(points);
 
-                XCVecIntrinsic4 contactNormal;
+                XCVec4 contactNormal;
 
-                contactNormal = CollisionDetection::getContactNormalFromOBBToOBBTriangleTest(obj1->GetBoundBox(), obj2->GetBoundBox());
+                contactNormal = CollisionDetection::GetContactNormalFromOBBToOBBTriangleTest(obj1->GetBoundBox(), obj2->GetBoundBox());
                 //contactNormal = getContactNormalFromBoundBoxContainedPlane(obj2->getMesh()->getAABoundBox(), obj1->getMesh()->getAABoundBox());
                 //Resolve the collision
                 m_particleContact.ContactResolve(obj1, obj2, 1.0f, 0.0f, contactNormal);
@@ -432,19 +432,19 @@ bool World::CheckCollision(PhysicsActor* obj1, PhysicsActor* obj2)
                 PhysicsActor* terrainActor = obj1->GetCollisionDetectionType() == COLLISIONDETECTIONTYPE_TERRAIN ? obj1 : obj2;
 
                 //XMVECTOR contactPoint = getTerrainPointOfContactWithBoundBox(bboxActor, terrainActor);
-                XCVecIntrinsic4 contactPoint = ((Terrain*)terrainActor)->CheckTerrainCollisionFromPoint(bboxActor->GetBoundBox());
+                XCVec4 contactPoint = ((Terrain*)terrainActor)->CheckTerrainCollisionFromPoint(bboxActor->GetBoundBox());
 
                 //Resolve the collision
                 //PARTICLE_CONTACT->ContactResolve(bboxActor, terrainActor, 1.0f, 0.2f, contactNormal);
-                if (!IsVectorEqual(contactPoint, XMVectorZero()))
+                if (!IsVectorEqual(contactPoint, XCVec4::XCFloat4ZeroVector))
                 {
                     //This is a impulse particle contact resolver, it actually first puts an object on a vertex
-                    XCVec3 direction = XCVec3(0, (float)XMVectorGetY(contactPoint) + (float)0.1, 0);
-                    m_particleContact.ApplyImpulse(bboxActor, XMLoadFloat3(&direction));
+                    XCVec4 direction = XCVec4(0.0f, (float)(contactPoint.Get<Y>()) + (float)0.1, 0.0f, 0.0f);
+                    m_particleContact.ApplyImpulse(bboxActor, direction);
 
                     //This I am trying now to make it work with existing collision resolver, works perfectly.
-                    XCVec3 up = XCVec3(0, 1, 0);
-                    m_particleContact.ContactResolve(bboxActor, terrainActor, 1.0f, 0.2f, XMLoadFloat3(&up));
+                    XCVec4 up = XCVec4(0.0f, 1.0f, 0.0f, 0.0f);
+                    m_particleContact.ContactResolve(bboxActor, terrainActor, 1.0f, 0.2f, up);
 
                     //Logger("[Terrain Collision] Hit with %s with contact point %f \n", bboxActor->getMesh()->getUserFriendlyName().c_str(), XMVectorGetY(contactPoint));
                 }
@@ -458,17 +458,17 @@ bool World::CheckCollision(PhysicsActor* obj1, PhysicsActor* obj2)
                 PhysicsActor* objectActor = obj1->GetCollisionDetectionType() == COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX ? obj1 : obj2;
                 PhysicsActor* bulletActor = obj1->GetCollisionDetectionType() == COLLISIONDETECTIONTYPE_BULLET ? obj1 : obj2;
 
-                ContainmentType type = objectActor->GetBoundBox()->m_TransformedBox.Contains(bulletActor->GetBoundBox()->m_TransformedBox);
+                DirectX::ContainmentType type = objectActor->GetBoundBox()->m_TransformedBox.Contains(bulletActor->GetBoundBox()->m_TransformedBox);
 
-                if (type == CONTAINS || type == INTERSECTS)
+                if (type == DirectX::CONTAINS || type == DirectX::INTERSECTS)
                 {
                     //Before resolving know which corner point was hit
-                    XCVec3 points[8];
+                    DirectX::XMFLOAT3 points[8];
                     obj1->GetBoundBox()->m_TransformedBox.GetCorners(points);
 
-                    XCVecIntrinsic4 contactNormal;
+                    XCVec4 contactNormal;
 
-                    contactNormal = CollisionDetection::getContactNormalFromOBBToOBBTriangleTest(obj1->GetBoundBox(), obj2->GetBoundBox());
+                    contactNormal = CollisionDetection::GetContactNormalFromOBBToOBBTriangleTest(obj1->GetBoundBox(), obj2->GetBoundBox());
 
                     //Resolve the collision
                     m_particleContact.ContactResolve(obj1, obj2, 1.0f, 0.5f, contactNormal);

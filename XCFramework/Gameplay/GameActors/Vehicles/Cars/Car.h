@@ -19,7 +19,7 @@ public:
     Car(void);
     virtual  ~Car(void);
 
-    virtual void        PreLoad(XCVec3 initialPosition, std::string pMesh);
+    virtual void        PreLoad(XCVec3& initialPosition, std::string pMesh);
     virtual void        Load() override;
     virtual void        Update(float dt) override;
     virtual void        Draw(RenderContext& context) override;

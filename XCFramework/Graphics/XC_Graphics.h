@@ -51,7 +51,7 @@ public:
     void                        SetSecondaryDrawCall(bool isSecondary) { m_secondaryDrawCall = isSecondary; }
     
     virtual void                OnResize(int _width, int _height);
-    virtual void                SetClearColor(XCVec4 color)           { m_clearColor = color; }
+    virtual void                SetClearColor(const XCVec4& color)           { m_clearColor = color; }
 
     virtual void                TurnOffZ();
     virtual void                TurnOnZ();

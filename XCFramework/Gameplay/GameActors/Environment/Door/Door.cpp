@@ -38,7 +38,7 @@ void Door::PreLoad(const void* fbBuffer)
     PhysicsActor::PreLoad(fbBuffer);
 }
 
-void Door::PreLoad(XCVec3 _initialPosition, std::string pMesh)
+void Door::PreLoad(XCVec3& _initialPosition, std::string pMesh)
 {
     ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
     m_pMesh = &resMgr.AcquireResource(pMesh.c_str());
@@ -53,8 +53,7 @@ void Door::Load()
 void Door::SetInitialPhysicsProperties()
 {
     PhysicsActor::SetInitialPhysicsProperties();
-    XCVec3 vec = XCVec3(0, 0, 0);
-    InitXPhysics(XMLoadFloat3(&m_initialPosition), XMLoadFloat3(&vec), XMLoadFloat3(&vec), 1000, (float)0.2);
+    InitXPhysics(XCVec4(m_initialPosition), XCVec4(), XCVec4(), 1000, (float)0.2);
 }
 
 void Door::Update(float dt)
@@ -72,7 +71,7 @@ void Door::Update(float dt)
     Integrator(dt);
     ClearForce();
 
-    m_MTranslation = XMMatrixTranslation(m_initialPosition.x, m_initialPosition.y, m_initialPosition.z);
+    m_MTranslation = MatrixTranslate(XCVec4(m_initialPosition));
 
     m_World = m_MScaling * m_MRotation * m_MTranslation;
 
@@ -87,10 +86,10 @@ void Door::Draw(RenderContext& context)
     ICamera& cam = context.GetShaderManagerSystem().GetGlobalShaderData().m_camera;
 
     PerObjectBuffer perObject = {
-        ToXCMatrix4Unaligned(XMMatrixTranspose(m_World)),
-        ToXCMatrix4Unaligned(XMMatrixTranspose(m_World * cam.GetViewMatrix() * cam.GetProjectionMatrix())),
-        ToXCMatrix4Unaligned(InverseTranspose(m_World)),
-        ToXCMatrix4Unaligned(XMMatrixIdentity()),
+        MatrixTranspose(m_World).GetUnaligned(),
+        MatrixTranspose(m_World * cam.GetViewMatrix() * cam.GetProjectionMatrix()).GetUnaligned(),
+        MatrixInverseTranspose(m_World).GetUnaligned(),
+        XCMatrix4().GetUnaligned(),
         m_material
     };
 

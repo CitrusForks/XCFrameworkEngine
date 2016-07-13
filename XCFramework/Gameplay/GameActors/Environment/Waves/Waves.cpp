@@ -20,7 +20,7 @@ Waves::~Waves(void)
 void Waves::Preload(const void* fbBuffer)
 {
     const FBWaves* fbWavesBuff = (FBWaves*)fbBuffer;
-    m_currentPosition = toXMVECTOR(fbWavesBuff->Position()->x(), fbWavesBuff->Position()->y(), fbWavesBuff->Position()->z(), 0);
+    m_currentPosition.SetValues(fbWavesBuff->Position()->x(), fbWavesBuff->Position()->y(), fbWavesBuff->Position()->z(), 0);
     m_rows = fbWavesBuff->Rows();
     m_cols = fbWavesBuff->Column();
     m_rowSpacing = (float)fbWavesBuff->RowSpacing();
@@ -29,7 +29,7 @@ void Waves::Preload(const void* fbBuffer)
     ComputeVertices();
 }
 
-void Waves::PreLoad(XCVec3 _initialPosition, int _rows, int _column, float _rowSpacing, float _colSpacing)
+void Waves::PreLoad(XCVec3& _initialPosition, int _rows, int _column, float _rowSpacing, float _colSpacing)
 {
     SimpleTerrain::PreLoad(_initialPosition, _rows, _column, _rowSpacing, _colSpacing);
 

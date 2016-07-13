@@ -28,11 +28,10 @@
 #include <WinSock2.h>
 #include <WS2tcpip.h>
 
-#define _XM_NO_INTRINSICS_
-#include <DirectXMath.h>
-
 #include <memory>
 #include <windowsx.h>
+
+#include "Base/ErrorHandling/ErrorHandler.h"
 
 //Engine Memory includes. To remove this
 #include "Engine/Memory/MemorySystemWin32.h"
@@ -41,5 +40,3 @@
 #include "Base/Serializer/IBase.h"
 #include "Base/BaseTypes.h"
 #include "Base/XCMath/XCMathIncludes.h"
-#include "Base/ErrorHandling/ErrorHandler.h"
-#include "ErrorHandling/ErrorHandler.h"

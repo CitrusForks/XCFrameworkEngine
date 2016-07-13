@@ -24,7 +24,7 @@ SimpleTerrain::~SimpleTerrain(void)
 {
 }
 
-void SimpleTerrain::PreLoad(XCVec3 _initialPosition, int _rows, int _column, float _rowSpacing, float _colSpacing)
+void SimpleTerrain::PreLoad(XCVec3& _initialPosition, int _rows, int _column, float _rowSpacing, float _colSpacing)
 {
     //Get initial position
     m_initialPosition = _initialPosition;
@@ -63,13 +63,8 @@ void SimpleTerrain::GenerateVertices()
     {
         for (int colIndex = 0; colIndex < m_cols; colIndex++)
         {
-#if defined(WIN32)
-            float x = m_initialPosition.x - (colIndex * m_rowSpacing);
-            float z = m_initialPosition.z + (rowIndex * m_colSpacing);
-#elif defined(XC_ORBIS)
-            float x = m_initialPosition.getX() - (colIndex * m_rowSpacing);
-            float z = m_initialPosition.getZ() + (rowIndex * m_colSpacing);
-#endif
+            float x = m_initialPosition.Get<X>() - (colIndex * m_rowSpacing);
+            float z = m_initialPosition.Get<Z>() + (rowIndex * m_colSpacing);
             float y = GetHeight(x, z);
 
             XCVec4 color;
@@ -106,7 +101,7 @@ void SimpleTerrain::GenerateVertices()
                 // White snow.
                 color = XCVec4(1.0f, 1.0f, 1.0f, 1.0f);
             }
-            m_vertexPosColorBuffer.m_vertexData[verticesIndex++] = VertexPosColor(XCVec3Unaligned(x, y, z), ToXCVec4Unaligned(color));
+            m_vertexPosColorBuffer.m_vertexData[verticesIndex++] = VertexPosColor(XCVec3Unaligned(x, y, z), color.GetUnaligned4());
             //(const float*)&Colors::Red);
         }
     }
@@ -182,11 +177,11 @@ void SimpleTerrain::Draw(RenderContext& context)
     context.ApplyShader(m_useShaderType);
     
     // Set constants
-    cbWorld wbuffer = { ToXCMatrix4Unaligned(XMMatrixTranspose(m_World)) };
+    cbWorld wbuffer = { MatrixTranspose(m_World).GetUnaligned() };
     ICamera& cam = context.GetShaderManagerSystem().GetGlobalShaderData().m_camera;
     
     cbWVP perObject = {
-        ToXCMatrix4Unaligned(XMMatrixTranspose(cam.GetViewMatrix() * cam.GetProjectionMatrix() * m_World)),
+        MatrixTranspose(cam.GetViewMatrix() * cam.GetProjectionMatrix() * m_World).GetUnaligned(),
     };
     m_pCBPerObject->UploadDataOnGPU(context.GetDeviceContext(), &perObject, sizeof(PerObjectBuffer));
     

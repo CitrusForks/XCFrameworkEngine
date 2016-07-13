@@ -31,10 +31,7 @@ void NPCCar::Update(float dt)
     Integrator(dt);
     ClearForce();
 
-    XCVec3 pos;
-    XMStoreFloat3(&pos, m_Position);
-
-    m_MTranslation = XMMatrixTranslation(pos.x, pos.y, pos.z);
+    m_MTranslation = MatrixTranslate(m_Position);
 
     m_currentPosition = m_Position;
 

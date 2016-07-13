@@ -18,11 +18,9 @@ bool Thread::CreateThread(runFunction asyncFunction, void* params)
     return true;
 }
 
-
 Thread::Thread(void)
 {
 }
-
 
 Thread::~Thread(void)
 {
@@ -49,5 +47,4 @@ void Thread::Destroy()
 
 void Thread::SetThreadPriority(unsigned int priority)
 {
-
 }

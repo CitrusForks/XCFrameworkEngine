@@ -14,7 +14,7 @@ class BasicCamera : public ICamera
 {
 public:
     BasicCamera(void){}
-    BasicCamera(XCVecIntrinsic4 _pos, XCVecIntrinsic4 _target, XCVecIntrinsic4 _up, float _aspectRatio, float _fov, float _near, float _far);
+    BasicCamera(XCVec4& pos, XCVec4& target, XCVec4& up, float aspectRatio, float fov, float nearPlane, float farPlane);
 
     virtual ~BasicCamera(void);
 

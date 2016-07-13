@@ -55,7 +55,7 @@ void XC_LightManager::InitializeLights()
     spotLight->Range = 10000.0f;
     m_Lights[LIGHTTYPE_SPOT] = (ILight*)spotLight;
 
-    m_eyePos = XCVec3(0, 0, 0);
+    m_eyePos = XCVec4(0, 0, 0, 0);
 }
 
 void XC_LightManager::Update(float dt)
@@ -64,13 +64,13 @@ void XC_LightManager::Update(float dt)
     XC_Graphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XC_Graphics>("GraphicsSystem");
     XC_ShaderManager& shaderSystem = graphicsSystem.GetShaderManagerSystem();
 
-    XCVecIntrinsic4 camPos = shaderSystem.GetGlobalShaderData().m_camera.GetPosition();
+    XCVec4 camPos = shaderSystem.GetGlobalShaderData().m_camera.GetPosition();
 
-    m_eyePos                = XCVec3(XMVectorGetX(camPos), XMVectorGetY(camPos), XMVectorGetZ(camPos));
-    XCVecIntrinsic4 pos     = XMVectorSet(XMVectorGetX(camPos), XMVectorGetY(camPos), XMVectorGetZ(camPos), 1.0f);
-    XCVecIntrinsic4 target  = shaderSystem.GetGlobalShaderData().m_camera.GetTarget();
-    XCVecIntrinsic4 up      = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-
+    m_eyePos       = camPos;
+    
+    XCVec4 target  = shaderSystem.GetGlobalShaderData().m_camera.GetTarget();
+    XCVec4 up(0.0f, 1.0f, 0.0f, 0.0f);
+    XCVec4 direction = VectorNormalize<3>(target - m_eyePos);
     // Circle light over the land surface.
     PointLight* pointLight  = (PointLight*)m_Lights[LIGHTTYPE_POINT];
     pointLight->Position    = XCVec3Unaligned(70.0f*cosf(0.2f), 10.0f, 70.0f*sinf(0.2f));
@@ -79,11 +79,11 @@ void XC_LightManager::Update(float dt)
     // same direction the camera is looking. In this way, it looks
     // like we are holding a flashlight.
     SpotLight* spotLight = (SpotLight*)m_Lights[LIGHTTYPE_SPOT];
-    spotLight->Position  = ToXCVec3Unaligned(m_eyePos);
+    spotLight->Position  = m_eyePos.GetUnaligned3();
+    spotLight->Direction = direction.GetUnaligned3();
 
     DirectionalLight* directionalLight = (DirectionalLight*)m_Lights[LIGHTTYPE_DIRECTIONAL];
-    XMStoreFloat3(&spotLight->Direction, XMVector3Normalize(target - pos));
-    XMStoreFloat3(&directionalLight->Direction, XMVector3Normalize(target - pos));
+    directionalLight->Direction        = direction.GetUnaligned3();
 }
 
 void XC_LightManager::Draw(XC_Graphics& graphicsSystem)
@@ -92,7 +92,7 @@ void XC_LightManager::Draw(XC_Graphics& graphicsSystem)
                                         *(DirectionalLight*)m_Lights[LIGHTTYPE_DIRECTIONAL], 
                                         *(PointLight*)m_Lights[LIGHTTYPE_POINT], 
                                         *(SpotLight*)m_Lights[LIGHTTYPE_SPOT], 
-                                        ToXCVec3Unaligned(m_eyePos), 
+                                        m_eyePos.GetUnaligned3(), 
                                       };
 
     m_pCBLightsPerFrame->UploadDataOnGPU(*graphicsSystem.GetDeviceContext(), &lightsPerFrame, sizeof(cbLightsPerFrame));

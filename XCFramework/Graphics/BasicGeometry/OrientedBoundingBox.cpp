@@ -22,13 +22,13 @@ void OrientedBoundingBox::Init()
 
 void OrientedBoundingBox::CreateBoundBox()
 {
-    XCVecIntrinsic4 orientation = XMQuaternionRotationMatrix(XMMatrixIdentity());
-    XCVec4 orient;
-    XMStoreFloat4(&orient, orientation);
-    m_bBox = BoundingOrientedBox(XMVectorToXMFloat3(&m_boxCenter), XMVectorToXMFloat3(&m_boxExtends), orient);
+    XCVec4 orientation = QuaternionRotationMatrix(XCMatrix());
+    m_bBox = DirectX::BoundingOrientedBox(DirectX::XMFLOAT3(m_boxCenter.Get<X>(), m_boxCenter.Get<Y>(), m_boxCenter.Get<Z>()),
+        DirectX::XMFLOAT3(m_boxExtends.Get<X>(), m_boxExtends.Get<Y>(), m_boxExtends.Get<Z>()),
+        DirectX::XMFLOAT4(orientation.Get<X>(), orientation.Get<Y>(), orientation.Get<Z>(), orientation.Get<W>()));
 }
 
-void OrientedBoundingBox::CreateBoundBox(XCVecIntrinsic4 min, XCVecIntrinsic4 max)
+void OrientedBoundingBox::CreateBoundBox(XCVec4& min, XCVec4& max)
 {
     m_boxCenter = 0.5f * (min + max);
     m_boxExtends = 0.5f * (max - min);
@@ -42,14 +42,10 @@ void OrientedBoundingBox::CreateBoundBox(OrientedBoundingBox* const boundBox)
     CreateBoundBox();
 }
 
-void OrientedBoundingBox::Transform(XCMatrix4 translateMat, XCMatrix4 rotateMatrix)
+void OrientedBoundingBox::Transform(XCMatrix4& translateMat, XCMatrix4& rotateMatrix)
 {
-    BoundingOrientedBox box;
-    XCVecIntrinsic4 rotate = XMQuaternionRotationMatrix(rotateMatrix);
+    DirectX::BoundingOrientedBox box;
+    XCVec4 rotate = QuaternionRotationMatrix(rotateMatrix);
 
-#if defined(XC_ORBIS)
-    m_bBox.Transform(m_TransformedBox, 1.0f, rotate, translateMat.getRow(3));
-#else
-    m_bBox.Transform(m_TransformedBox, 1.0f, rotate, translateMat.r[3]);
-#endif
+    m_bBox.Transform(m_TransformedBox, 1.0f, rotate.GetPlatformIntrinsic(), translateMat[3].GetPlatformIntrinsic());
 }

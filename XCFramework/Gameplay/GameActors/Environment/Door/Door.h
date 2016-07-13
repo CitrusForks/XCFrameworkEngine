@@ -21,7 +21,7 @@ public:
     virtual ~Door(void);
     
     virtual void                        PreLoad(const void* fbBuffer);
-    virtual void                        PreLoad(XCVec3 _initialPosition, std::string pMesh);
+    virtual void                        PreLoad(XCVec3& _initialPosition, std::string pMesh);
     virtual void                        Load();
     virtual void                        SetInitialPhysicsProperties();
     virtual void                        Update(float dt);

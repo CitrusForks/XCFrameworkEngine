@@ -27,37 +27,37 @@ void XC_CameraManager::InitializeCameras(XC_Graphics& graphicsSystem, int client
 
     //Basic Camera
     m_Cameras[CAMERATYPE_BASIC] = std::make_unique<BasicCamera>(
-                                                    toXMVECTOR(3, 5, -2.0f, 1.0f), //Position
-                                                    toXMVECTOR(0, 0, 0, 0), //Target
-                                                    toXMVECTOR(0, 1, 0, 0), //Up
-                                                    (float)clientWidth / clientHeight, //Aspect Ratio
-                                                    XM_PIDIV2, //FOV
-                                                    0.01f, //Near plane
-                                                    5000.0f //Far plane
-                                                 );
+        XCVec4(3, 5, -2.0f, 1.0f), //Position
+        XCVec4(0, 0, 0, 0), //Target
+        XCVec4(0, 1, 0, 0), //Up
+        (float)clientWidth / clientHeight, //Aspect Ratio
+        XC_PIDIV2, //FOV
+        0.01f, //Near plane
+        5000.0f //Far plane
+        );
     
     //FPS Camera
     m_Cameras[CAMERATYPE_FPS] = std::make_unique<FirstPersonCamera>(
-                                                    toXMVECTOR(3, 2, -2.0f, 1.0f), //Position
-                                                    toXMVECTOR(0, 0, 1, 0), //Target
-                                                    toXMVECTOR(0, 1, 0, 0), //Up
-                                                    (float)clientWidth / clientHeight, //Aspect Ratio
-                                                    XM_PIDIV2, //FOV
-                                                    0.01f, //Near plane
-                                                    5000.0f //Far plane
-                                                    );
+        XCVec4(3, 2, -2.0f, 1.0f), //Position
+        XCVec4(0, 0, 1, 0), //Target
+        XCVec4(0, 1, 0, 0), //Up
+        (float)clientWidth / clientHeight, //Aspect Ratio
+        XC_PIDIV2, //FOV
+        0.01f, //Near plane
+        5000.0f //Far plane
+        );
 
     //TPS Camera
     m_Cameras[CAMERATYPE_TPS] = std::make_unique<ThirdPersonCamera>(
-                                                    nullptr,
-                                                    toXMVECTOR(3, 5, -2.0f, 1.0f), //Position
-                                                    toXMVECTOR(0, 0, 1, 0), //Target
-                                                    toXMVECTOR(0, 1, 0, 0), //Up
-                                                    (float)clientWidth / clientHeight, //Aspect Ratio
-                                                    XM_PIDIV2, //FOV
-                                                    0.01f, //Near plane
-                                                    5000.0f //Far plane
-                                                    );
+        nullptr,
+        XCVec4(3, 5, -2.0f, 1.0f), //Position
+        XCVec4(0, 0, 1, 0), //Target
+        XCVec4(0, 1, 0, 0), //Up
+        (float)clientWidth / clientHeight, //Aspect Ratio
+        XC_PIDIV2, //FOV
+        0.01f, //Near plane
+        5000.0f //Far plane
+        );
 
     //Set default camera
     m_currentCameraType = CAMERATYPE_BASIC;
@@ -72,15 +72,15 @@ void XC_CameraManager::AttachCameraToActor(IActor* actor)
     
     if (tpcActor != nullptr)
     {
-        ((ThirdPersonCamera*) m_Cameras[CAMERATYPE_TPS].get())->SetDistanceFromTarget(tpcActor->getDistanceFromTarget());
+        ((ThirdPersonCamera*) m_Cameras[CAMERATYPE_TPS].get())->SetDistanceFromTarget(tpcActor->GetDistanceFromTarget());
     }
     else
     {
-        AttachCameraToActor(actor, XMVectorZero());
+        AttachCameraToActor(actor, XCVec4());
     }
 }
 
-void XC_CameraManager::AttachCameraToActor(IActor* actor, XCVecIntrinsic4 distanceFromTarget)
+void XC_CameraManager::AttachCameraToActor(IActor* actor, XCVec4& distanceFromTarget)
 {
     ((ThirdPersonCamera*) m_Cameras[CAMERATYPE_TPS].get())->AttachTo(actor);
     ((ThirdPersonCamera*) m_Cameras[CAMERATYPE_TPS].get())->SetDistanceFromTarget(distanceFromTarget);

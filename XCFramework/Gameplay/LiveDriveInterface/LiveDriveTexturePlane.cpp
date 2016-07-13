@@ -15,7 +15,7 @@ LiveDriveTexturePlane::LiveDriveTexturePlane()
 {
 }
 
-LiveDriveTexturePlane::LiveDriveTexturePlane(XCVecIntrinsic4 p1, XCVecIntrinsic4 p2, XCVecIntrinsic4 p3)
+LiveDriveTexturePlane::LiveDriveTexturePlane(XCVec4& p1, XCVec4& p2, XCVec4& p3)
     : TexturedPlane(p1, p2, p3)
 {
     m_texture = nullptr;
@@ -30,9 +30,9 @@ LiveDriveTexturePlane::~LiveDriveTexturePlane()
 void LiveDriveTexturePlane::PreLoad(const void* fbBuffer)
 {
     const FBLiveDriveTexturePlane* texPlaneBuff = (FBLiveDriveTexturePlane*)fbBuffer;
-    m_currentPosition = toXMVECTOR(texPlaneBuff->Position()->x(), texPlaneBuff->Position()->y(), texPlaneBuff->Position()->z(), texPlaneBuff->Position()->w());
-    m_initialRotation = toXMVECTOR(texPlaneBuff->Rotation()->x(), texPlaneBuff->Rotation()->y(), texPlaneBuff->Rotation()->z(), texPlaneBuff->Rotation()->w());
-    m_initialScaling  = toXMVECTOR(texPlaneBuff->Scaling()->x(), texPlaneBuff->Scaling()->y(), texPlaneBuff->Scaling()->z(), texPlaneBuff->Scaling()->w());
+    m_currentPosition.SetValues(texPlaneBuff->Position()->x(), texPlaneBuff->Position()->y(), texPlaneBuff->Position()->z(), texPlaneBuff->Position()->w());
+    m_initialRotation.SetValues(texPlaneBuff->Rotation()->x(), texPlaneBuff->Rotation()->y(), texPlaneBuff->Rotation()->z(), texPlaneBuff->Rotation()->w());
+    m_initialScaling.SetValues(texPlaneBuff->Scaling()->x(), texPlaneBuff->Scaling()->y(), texPlaneBuff->Scaling()->z(), texPlaneBuff->Scaling()->w());
 
     m_material.Ambient  = XCVec4(texPlaneBuff->Material()->Ambient()->x(), texPlaneBuff->Material()->Ambient()->y(), texPlaneBuff->Material()->Ambient()->z(), texPlaneBuff->Material()->Ambient()->w());
     m_material.Diffuse  = XCVec4(texPlaneBuff->Material()->Diffuse()->x(), texPlaneBuff->Material()->Diffuse()->y(), texPlaneBuff->Material()->Diffuse()->z(), texPlaneBuff->Material()->Diffuse()->w());

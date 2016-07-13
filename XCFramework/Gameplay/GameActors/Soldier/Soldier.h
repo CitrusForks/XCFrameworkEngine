@@ -22,33 +22,32 @@ public:
     Soldier(void);
     virtual ~Soldier(void);
  
-    virtual void                        PreLoad(const void* fbBuffer)   override;
-    virtual void                        Load()                          override;
-    virtual void                        UpdateState()                   override;
-    virtual void                        Update(float dt)                override;
-    virtual void                        Draw(RenderContext& context)    override;
-    virtual void                        Destroy()                       override;
+    virtual void           PreLoad(const void* fbBuffer)   override;
+    virtual void           Load()                          override;
+    virtual void           UpdateState()                   override;
+    virtual void           Update(float dt)                override;
+    virtual void           Draw(RenderContext& context)    override;
+    virtual void           Destroy()                       override;
+    virtual void           ApplyRotation(XCMatrix4& rotation);
 
-    void                                SetInitialPhysicsProperties()   override final;
-
-    virtual void                        ApplyRotation(XCMatrix4 rotation);
+    void                   SetInitialPhysicsProperties()   override final;
 
     //Depreciated. Don't use this. Only for testing non axis movement
-    void                                AccelerateCar(float dt);
+    void                   AccelerateCar(float dt);
 
-    virtual void                        Walk(float scalarForce);
-    virtual void                        Jump(float scalarForce);
-    virtual void                        Strafe(float scalarForce);
-    virtual void                        Yaw(float angle, float scalarForce);
-    virtual void                        Pitch(float angle, float scalarForce);
+    virtual void           Walk(float scalarForce);
+    virtual void           Jump(float scalarForce);
+    virtual void           Strafe(float scalarForce);
+    virtual void           Yaw(float angle, float scalarForce);
+    virtual void           Pitch(float angle, float scalarForce);
 
 protected:
 
-    ShaderType                          m_useShaderType;
+    ShaderType             m_useShaderType;
 
-    BasicMaterial                       m_material;
-    bool                                m_isMainCharacter;
+    BasicMaterial          m_material;
+    bool                   m_isMainCharacter;
 
-    float                               m_totalPitchAngle;
-    Gun*                                m_gun;
+    float                  m_totalPitchAngle;
+    Gun*                   m_gun;
 };

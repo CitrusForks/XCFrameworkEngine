@@ -18,7 +18,7 @@ FirstPersonCamera::~FirstPersonCamera()
 {
 }
 
-FirstPersonCamera::FirstPersonCamera(XCVecIntrinsic4 pos, XCVecIntrinsic4 target, XCVecIntrinsic4 up, float aspectRatio, float fov, float nearPlane, float farPlane)
+FirstPersonCamera::FirstPersonCamera(XCVec4& pos, XCVec4& target, XCVec4& up, float aspectRatio, float fov, float nearPlane, float farPlane)
     : ICamera(pos, target, up, aspectRatio, fov, nearPlane, farPlane)
 {
     m_isSetLockY = false;
@@ -27,9 +27,9 @@ FirstPersonCamera::FirstPersonCamera(XCVecIntrinsic4 pos, XCVecIntrinsic4 target
     m_position = pos;
     m_target = target;
     
-    m_look = XMVector3Normalize(target);
-    m_up = XMVector3Normalize(up);
-    m_right = XMVector3Cross(m_up, m_look);
+    m_look = VectorNormalize<3>(target);
+    m_up = VectorNormalize<3>(up);
+    m_right = VectorCross(m_up, m_look);
     
     m_aspectRatio = aspectRatio;
     m_nearPlane = nearPlane;
@@ -70,58 +70,36 @@ void FirstPersonCamera::Update(float dt)
 void FirstPersonCamera::BuildViewMatrix()
 {
     //Build view matrix
-    m_look = XMVector3Normalize(m_look);
+    m_look = VectorNormalize<3>(m_look);
     
-    m_up = XMVector3Normalize(XMVector3Cross(m_look, m_right));
+    m_up = VectorNormalize<3>(VectorCross(m_look, m_right));
     
-    m_right = XMVector3Cross(m_up, m_look);
+    m_right = VectorCross(m_up, m_look);
     
     //Get origin x, y, z
-    float x = -XMVectorGetX(XMVector3Dot(m_position, m_right));
-    float y = -XMVectorGetY(XMVector3Dot(m_position, m_up));
-    float z = -XMVectorGetZ(XMVector3Dot(m_position, m_look));
+    float x = - VectorDot(m_position, m_right);
+    float y = - VectorDot(m_position, m_up);
+    float z = - VectorDot(m_position, m_look);
     
-#if defined(WIN32)
-    m_viewMatrix._11 = XMVectorGetX(m_right);
-    m_viewMatrix._21 = XMVectorGetY(m_right);
-    m_viewMatrix._31 = XMVectorGetZ(m_right);
-    m_viewMatrix._41 = x;
+    m_viewMatrix[0][0] = m_right.Get<X>();
+    m_viewMatrix[1][0] = m_right.Get<Y>();
+    m_viewMatrix[2][0] = m_right.Get<Z>();
+    m_viewMatrix[3][0] = x;
     
-    m_viewMatrix._12 = XMVectorGetX(m_up);
-    m_viewMatrix._22 = XMVectorGetY(m_up);
-    m_viewMatrix._32 = XMVectorGetZ(m_up);
-    m_viewMatrix._42 = y;
+    m_viewMatrix[0][1] = m_up.Get<X>();
+    m_viewMatrix[1][1] = m_up.Get<Y>();
+    m_viewMatrix[2][1] = m_up.Get<Z>();
+    m_viewMatrix[3][1] = y;
     
-    m_viewMatrix._13 = XMVectorGetX(m_look);
-    m_viewMatrix._23 = XMVectorGetY(m_look);
-    m_viewMatrix._33 = XMVectorGetZ(m_look);
-    m_viewMatrix._43 = z;
+    m_viewMatrix[0][2] = m_look.Get<X>();
+    m_viewMatrix[1][2] = m_look.Get<Y>();
+    m_viewMatrix[2][2] = m_look.Get<Z>();
+    m_viewMatrix[3][2] = z;
     
-    m_viewMatrix._14 = 0.0f;
-    m_viewMatrix._24 = 0.0f;
-    m_viewMatrix._34 = 0.0f;
-    m_viewMatrix._44 = 1;
-#elif defined(XC_ORBIS)
-    m_viewMatrix.setElem(0, 0, XMVectorGetX(m_right));
-    m_viewMatrix.setElem(1, 0, XMVectorGetY(m_right));
-    m_viewMatrix.setElem(2, 0, XMVectorGetZ(m_right));
-    m_viewMatrix.setElem(3, 0, x);
-
-    m_viewMatrix.setElem(0, 1,  XMVectorGetX(m_up));
-    m_viewMatrix.setElem(1, 1,  XMVectorGetY(m_up));
-    m_viewMatrix.setElem(2, 1,  XMVectorGetZ(m_up));
-    m_viewMatrix.setElem(3, 1,  y);
-
-    m_viewMatrix.setElem(0, 2, XMVectorGetX(m_look));
-    m_viewMatrix.setElem(1, 2, XMVectorGetY(m_look));
-    m_viewMatrix.setElem(2, 2, XMVectorGetZ(m_look));
-    m_viewMatrix.setElem(3, 2, z);
-
-    m_viewMatrix.setElem(0, 3, 0.0f);
-    m_viewMatrix.setElem(1, 3, 0.0f);
-    m_viewMatrix.setElem(2, 3, 0.0f);
-    m_viewMatrix.setElem(3, 3, 1);
-#endif
+    m_viewMatrix[0][3] = 0.0f;
+    m_viewMatrix[1][3] = 0.0f;
+    m_viewMatrix[2][3] = 0.0f;
+    m_viewMatrix[3][3] = 1;
 }
 
 void FirstPersonCamera::Walk(float distance)
@@ -130,7 +108,7 @@ void FirstPersonCamera::Walk(float distance)
     
     if (m_isSetLockY)
     {
-        m_position = XMVectorSetY(m_position, m_lockYUnit);
+        m_position.Set<Y>(m_lockYUnit);
     }
 }
 
@@ -141,17 +119,17 @@ void FirstPersonCamera::Strafe(float distance)
 
 void FirstPersonCamera::Yaw(float angle)
 {
-    XCMatrix4 rotation = XMMatrixRotationY(angle);
+    XCMatrix4 rotation = MatrixRotationY(angle);
     
-    m_right = XMVector3TransformNormal(m_right, rotation);
-    m_up = XMVector3TransformNormal(m_up, rotation);
-    m_look = XMVector3TransformNormal(m_look, rotation);
+    m_right = VectorTransformNormal(m_right, rotation);
+    m_up    = VectorTransformNormal(m_up, rotation);
+    m_look  = VectorTransformNormal(m_look, rotation);
 }
 
 void FirstPersonCamera::Pitch(float angle)
 {
-    XCMatrix4 rotation = XMMatrixRotationAxis(m_right, angle);
+    XCMatrix4 rotation = MatrixRotationAxis(m_right, angle);
     
-    m_up = XMVector3TransformNormal(m_up, rotation);
-    m_look = XMVector3TransformNormal(m_look, rotation);
+    m_up    = VectorTransformNormal(m_up, rotation);
+    m_look  = VectorTransformNormal(m_look, rotation);
 }

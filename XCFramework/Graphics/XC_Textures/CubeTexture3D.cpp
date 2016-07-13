@@ -13,7 +13,6 @@
 CubeTexture3D::CubeTexture3D()
 {
     m_resourceType = RESOURCETYPE_CUBETEXTURE3D;
-    m_textureCoordinateMatrix = XMMatrixIdentity();
 }
 
 CubeTexture3D::~CubeTexture3D()
