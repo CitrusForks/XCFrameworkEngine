@@ -30,7 +30,7 @@ namespace XCMath
             SetValues(0.0f, 0.0f, 0.0f);
         }
 
-        explicit XCFloat3(PackedVector4& vector)
+        explicit XCFloat3(const PackedVector4& vector)
             : XCFloat2(vector)
         {}
 
@@ -39,19 +39,19 @@ namespace XCMath
             SetValues(x, y, z);
         }
 
-        explicit XCFloat3(DirectX::XMVECTOR& vector)
+        explicit XCFloat3(const DirectX::XMVECTOR& vector)
             : XCFloat2(vector)
         {
             Set<Z>(DirectX::XMVectorGetZ(vector));
         }
 
-        explicit XCFloat3(DirectX::XMFLOAT3& vector)
+        explicit XCFloat3(const DirectX::XMFLOAT3& vector)
             : XCFloat2(vector)
         {
             Set<Z>(vector.z);
         }
 
-        explicit XCFloat3(DirectX::XMFLOAT4& vector)
+        explicit XCFloat3(const DirectX::XMFLOAT4& vector)
             : XCFloat2(vector)
         {
             Set<Z>(vector.z);
@@ -68,47 +68,47 @@ namespace XCMath
         }
 
         //Operations
-        inline XCFloat3 operator +(XCFloat3& otherObj)
+        inline const XCFloat3 operator +(const XCFloat3& otherObj)
         {
             return XCFloat3(Add(m_vector, otherObj.GetData()));
         }
 
-        inline void operator +=(XCFloat3& otherObj)
+        inline void operator +=(const XCFloat3& otherObj)
         {
             (*this) = (*this) + otherObj;
         }
 
-        inline XCFloat3 operator -(XCFloat3& otherObj)
+        inline const XCFloat3 operator -(const XCFloat3& otherObj)
         {
             return XCFloat3(Sub(m_vector, otherObj.GetData()));
         }
 
-        inline void operator -=(XCFloat3& otherObj)
+        inline void operator -=(const XCFloat3& otherObj)
         {
             (*this) = (*this) - otherObj;
         }
 
-        inline XCFloat3 operator *(XCFloat3& otherObj)
+        inline const XCFloat3 operator *(const XCFloat3& otherObj)
         {
             return XCFloat3(Mul(m_vector, otherObj.GetData()));
         }
 
-        inline XCFloat3 operator *(float value)
+        inline const XCFloat3 operator *(float value)
         {
             return XCFloat3(Get<X>() * value, Get<Y>() * value, Get<Z>() * value);
         }
 
-        inline void operator *=(XCFloat3& otherObj)
+        inline void operator *=(const XCFloat3& otherObj)
         {
             (*this) = (*this) * otherObj;
         }
 
-        inline XCFloat3 operator /(XCFloat3& otherObj)
+        inline const XCFloat3 operator /(const XCFloat3& otherObj)
         {
             return XCFloat3(Div(m_vector, otherObj.GetData()));
         }
 
-        inline void operator /=(XCFloat3& otherObj)
+        inline void operator /=(const XCFloat3& otherObj)
         {
             (*this) = (*this) / otherObj;
         }
@@ -119,15 +119,4 @@ namespace XCMath
             return XCFloat3Unaligned(Get<X>(), Get<Y>(), Get<Z>());
         }
     };
-
-    inline XCFloat3 operator *(float& value, XCFloat3& obj)
-    {
-        return XCFloat3(obj.Get<X>() * value, obj.Get<Y>() * value, obj.Get<Z>() * value);
-    }
-
-    inline XCFloat3 operator /(float& value, XCFloat3& obj)
-    {
-        float divvalue = 1 / value;
-        return divvalue * obj;
-    }
 }

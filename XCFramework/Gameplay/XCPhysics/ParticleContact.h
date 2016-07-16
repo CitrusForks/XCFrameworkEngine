@@ -15,12 +15,12 @@ public:
     ParticleContact() {}
     ~ParticleContact(void);
 
-    void                        ContactResolve(PhysicsActor* p1, PhysicsActor* p2, float restitution, float penetration, XCVec4& contactNormal);
+    void                        ContactResolve(PhysicsActor* p1, PhysicsActor* p2, float restitution, float penetration, const XCVec4& contactNormal);
     float                       CalculateSeparatingVelocity();
     void                        ResolveVelocity();
     void                        ResolvePenetration();
-    void                        ResolveDragging(PhysicsActor* p1, PhysicsActor* p2, float restitution, float penetration, XCVec4& contactNormal);
-    void                        ApplyImpulse(PhysicsActor* p1, XCVec4& units);
+    void                        ResolveDragging(PhysicsActor* p1, PhysicsActor* p2, float restitution, float penetration, const XCVec4& contactNormal);
+    void                        ApplyImpulse(PhysicsActor* p1, const XCVec4& units);
 
 private:
 

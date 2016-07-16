@@ -14,7 +14,7 @@ XPhysics::XPhysics()
     m_GAcceleration = XCVec4(0, -5, 0, 0);
 }
 
-void XPhysics::InitXPhysics(XCVec4& position, XCVec4& velocity, XCVec4& acceleration, float mass, float damping)
+void XPhysics::InitXPhysics(const XCVec4& position, const XCVec4& velocity, const XCVec4& acceleration, float mass, float damping)
 {
     m_Position = position;
     m_Velocity = velocity;
@@ -40,7 +40,7 @@ XPhysics::~XPhysics()
 {
 }
 
-void XPhysics::AddForce(XCVec4& _newForce)
+void XPhysics::AddForce(const XCVec4& _newForce)
 {
     m_ForceAccumulator += _newForce;
 }
@@ -76,12 +76,12 @@ void XPhysics::ClearVelocity()
     m_Velocity = XCVec3(0, 0, 0);
 }
 
-bool XPhysics::HasFiniteMass()
+bool XPhysics::HasFiniteMass() const
 {
     return m_InverseMass >= 0.0f;
 }
 
-float XPhysics::GetMass()
+float XPhysics::GetMass() const
 {
     if (m_InverseMass == 0)
     {

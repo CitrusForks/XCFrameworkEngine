@@ -73,10 +73,10 @@ namespace XCFrameworkUnitTest
             TEST_METHOD(Operations)
             {
                 XCVec4 vec1, vec2, expected;
-                expected = XCVec4(1.0f, 2.0f, 0.0f, 0.0f);
+                expected = XCVec4(1.0f, 2.0f, 3.0f, 4.0f);
 
-                vec1.SetValues(0.5f, 1.0f, 0.0f, 0.0f);
-                vec2.SetValues(0.5f, 1.0f, 0.0f, 0.0f);
+                vec1.SetValues(0.5f, 1.0f, 1.5f, 2.0f);
+                vec2.SetValues(0.5f, 1.0f, 1.5f, 2.0f);
 
                 vec1 += vec2;
                 Assert::IsTrue(vec1 == expected);
@@ -94,6 +94,17 @@ namespace XCFrameworkUnitTest
                 Assert::IsTrue(vec1 == expected);
             }
 
+        };
+
+        TEST_CLASS(XCMatrix)
+        {
+        public:
+
+            TEST_METHOD(Operations)
+            {
+                XCMatrix matrix, expected;
+                //matrix = matrix * matrix;
+            }
         };
     }
 }

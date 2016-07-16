@@ -22,15 +22,15 @@
         memset(&m_intrData, 0, sizeof(__m128));
     }
 
-    PackedVector4(__m128& intr)
+    PackedVector4(const __m128& intr)
     {
         m_intrData = intr;
     }
 
-    //Getters
-    inline __m128& GetAlignedData()
+    inline const float operator [](unsigned int index) const
     {
-        return m_intrData;
+        assert(index < 4);
+        return m_floatData[index];
     }
 
     inline float& operator [](unsigned int index)
@@ -43,56 +43,56 @@
 namespace XCMath
 {
     //Operations
-    inline PackedVector4 Add(PackedVector4& val1, PackedVector4& val2)
+    inline PackedVector4 Add(const PackedVector4& val1, const PackedVector4& val2)
     {
         PackedVector4 result = _mm_add_ps(val1.m_intrData, val2.m_intrData);
         return result;
     }
 
-    inline PackedVector4 Sub(PackedVector4& val1, PackedVector4& val2)
+    inline PackedVector4 Sub(const PackedVector4& val1, const PackedVector4& val2)
     {
         return _mm_sub_ps(val1.m_intrData, val2.m_intrData);
     }
 
-    inline PackedVector4 Mul(PackedVector4& val1, PackedVector4& val2)
+    inline PackedVector4 Mul(const PackedVector4& val1, const PackedVector4& val2)
     {
         return _mm_mul_ps(val1.m_intrData, val2.m_intrData);
     }
 
-    inline PackedVector4 Div(PackedVector4& val1, PackedVector4& val2)
+    inline PackedVector4 Div(const PackedVector4& val1, const PackedVector4& val2)
     {
         return _mm_div_ps(val1.m_intrData, val2.m_intrData);
     }
 
-    inline PackedVector4 Min(PackedVector4& val1, PackedVector4& val2)
+    inline PackedVector4 Min(const PackedVector4& val1, const PackedVector4& val2)
     {
         return _mm_min_ps(val1.m_intrData, val2.m_intrData);
     }
 
-    inline PackedVector4 Max(PackedVector4& val1, PackedVector4& val2)
+    inline PackedVector4 Max(const PackedVector4& val1, const PackedVector4& val2)
     {
         return _mm_max_ps(val1.m_intrData, val2.m_intrData);
     }
 
     //Complex Operations
     template<unsigned int Components>
-    inline float VectorLength(PackedVector4& vec)
+    inline float VectorLength(const PackedVector4& vec)
     {
         float length = 0.0f;
         for (unsigned int componentIndex = 0; componentIndex < Components; ++componentIndex)
         {
-            length += (vec[componentIndex] * vec[componentIndex]);
+            length = length + (vec[componentIndex] * vec[componentIndex]);
         }
-        return length;
+        return std::sqrt(length);
     }
 
     template<unsigned int Components>
-    inline PackedVector4 VectorNormalize(PackedVector4& vec)
+    inline PackedVector4 VectorNormalize(const PackedVector4& vec)
     {
         PackedVector4 outVector;
 
         //Find the length of the vector.
-        float length = 1 / VectorLength<Components>(vec);
+        float length = 1.0f / VectorLength<Components>(vec);
 
         if (length > 0)
         {
@@ -103,8 +103,8 @@ namespace XCMath
         }
         else
         {
-            //Divide by 0 length
-            assert(false);
+            //Divide by 0 length?
+            //assert(false);
         }
 
         return outVector;

@@ -22,7 +22,7 @@ namespace XCMath
         XCFloat4Unaligned r4;
 
         XCMatrixUnaligned() {}
-        XCMatrixUnaligned(XCFloat4& row1, XCFloat4& row2, XCFloat4& row3, XCFloat4& row4)
+        XCMatrixUnaligned(const XCFloat4& row1, const XCFloat4& row2, const XCFloat4& row3, const XCFloat4& row4)
         {
             r1 = row1.GetUnaligned4();
             r2 = row2.GetUnaligned4();
@@ -51,7 +51,7 @@ namespace XCMath
             m_matrix[3] = matrix.r[3];
         }
 
-        XCMatrix(XCMatrixUnaligned& matrix)
+        XCMatrix(const XCMatrixUnaligned& matrix)
         {
             SetIdentity();
 
@@ -69,29 +69,33 @@ namespace XCMath
             m_matrix[3].SetValues(0.0f, 0.0f, 0.0f, 1.0f);
         }
 
+        inline const XCFloat4 operator[](unsigned int rowIndex) const
+        {
+            return m_matrix[rowIndex];
+        }
+
         inline XCFloat4& operator[](unsigned int rowIndex)
         {
             return m_matrix[rowIndex];
         }
 
         //Operations
-        //Operators
-        inline XCMatrix operator *(XCMatrix& M2)
+        inline const XCMatrix operator *(const XCMatrix& M2)
         {
             return MatrixMultiply((*this), M2);
         }
 
-        inline XCMatrix operator *=(XCMatrix& M2)
+        inline void operator *=(const XCMatrix& M2)
         {
-            return (*this) * M2;
+            (*this) = (*this) * M2;
         }
 
-        XCMatrixUnaligned GetUnaligned()
+        inline XCMatrixUnaligned GetUnaligned()
         {
             return XCMatrixUnaligned(m_matrix[0], m_matrix[1], m_matrix[2], m_matrix[3]);
         }
 
-        DirectX::XMMATRIX GetPlatformIntrinsic()
+        inline DirectX::XMMATRIX GetPlatformIntrinsic() const
         {
             DirectX::XMMATRIX matrix;
 
@@ -154,17 +158,17 @@ namespace XCMath
         return mResult;
     }
 
-    inline XCMatrix operator *(const XCMatrix& M1, const XCMatrix& M2)
+    inline const XCMatrix operator *(const XCMatrix& M1, const XCMatrix& M2)
     {
         return MatrixMultiply(M1, M2);
     }
 
-    inline void MatrixDeterminant(XCMatrix& matrix, float& outDeterminantValue)
+    inline void MatrixDeterminant(const XCMatrix& matrix, float& outDeterminantValue)
     {
-        //TODO
+        outDeterminantValue = DirectX::XMVectorGetX(DirectX::XMMatrixDeterminant(matrix.GetPlatformIntrinsic()));
     }
 
-    inline XCMatrix MatrixTranspose(XCMatrix& matrix)
+    inline XCMatrix MatrixTranspose(const XCMatrix& matrix)
     {
         XCMatrix result;
 
@@ -179,13 +183,12 @@ namespace XCMath
         return result;
     }
 
-    inline XCMatrix MatrixInverse(XCMatrix& matrix)
+    inline XCMatrix MatrixInverse(const XCMatrix& matrix)
     {
-        //TODO
-        return XCMatrix();
+        return XCMatrix(DirectX::XMMatrixInverse(nullptr, matrix.GetPlatformIntrinsic()));
     }
 
-    inline XCMatrix MatrixInverseTranspose(XCMatrix& M)
+    inline XCMatrix MatrixInverseTranspose(const XCMatrix& M)
     {
         // Inverse-transpose is just applied to normals.  So zero out 
         // translation row so that it doesn't get into our inverse-transpose
@@ -232,10 +235,10 @@ namespace XCMath
         return M;
     }
 
-    inline XCMatrix MatrixLookAtLH(XCFloat4& EyePosition, XCFloat4& FocusPosition, XCFloat4& UpDirection)
+    inline XCMatrix MatrixLookAtLH(const XCFloat4& EyePosition, const XCFloat4& FocusPosition, const XCFloat4& UpDirection)
     {
         XCFloat4 EyeDirection = EyePosition - FocusPosition;
-        XCFloat4 R2 = VectorNormalize<3>(EyeDirection);
+        XCFloat4 R2 = VectorNormalize<4>(EyeDirection);
 
         XCFloat4 R0 = VectorCross(UpDirection, R2);
         R0 = VectorNormalize<3>(R0);
@@ -267,7 +270,7 @@ namespace XCMath
         return result;
     }
 
-    inline XCMatrix MatrixTranslate(XCFloat4& vec)
+    inline XCMatrix MatrixTranslate(const XCFloat4& vec)
     {
         return MatrixTranslate(vec.Get<X>(), vec.Get<Y>(), vec.Get<Z>());
     }
@@ -283,7 +286,7 @@ namespace XCMath
         return result;
     }
 
-    inline XCMatrix MatrixScale(XCFloat4& vec)
+    inline XCMatrix MatrixScale(const XCFloat4& vec)
     {
         return MatrixScale(vec.Get<X>(), vec.Get<Y>(), vec.Get<Z>());
     }
@@ -303,39 +306,38 @@ namespace XCMath
         return XCMatrix(DirectX::XMMatrixRotationZ(angle));
     }
 
-    inline XCMatrix MatrixRotationAxis(XCFloat4& axis, float angle)
+    inline XCMatrix MatrixRotationAxis(const XCFloat4& axis, float angle)
     {
         return XCMatrix(DirectX::XMMatrixRotationAxis(axis.GetPlatformIntrinsic(), angle));
     }
 
-    inline XCMatrix MatrixRotationRollPitchYawFromAxis(XCFloat4& axis)
+    inline XCMatrix MatrixRotationRollPitchYawFromAxis(const XCFloat4& axis)
     {
         return XCMatrix(DirectX::XMMatrixRotationRollPitchYawFromVector(axis.GetPlatformIntrinsic()));
     }
 
-    inline XCMatrix MatrixRotationQuaternion(XCFloat4& vector)
+    inline XCMatrix MatrixRotationQuaternion(const XCFloat4& vector)
     {
         return XCMatrix(DirectX::XMMatrixRotationQuaternion(vector.GetPlatformIntrinsic()));
     }
 
-    inline XCFloat4 VectorTransformNormal(XCFloat4& vec1, XCMatrix& mat)
+    inline XCFloat4 VectorTransformNormal(const XCFloat4& vec1, const XCMatrix& mat)
     {
         return XCFloat4(DirectX::XMVector3TransformNormal(vec1.GetPlatformIntrinsic(), mat.GetPlatformIntrinsic()));
     }
 
-    inline XCFloat4 QuaternionRotationMatrix(XCMatrix& matrix)
+    inline XCFloat4 QuaternionRotationMatrix(const XCMatrix& matrix)
     {
         return XCFloat4(DirectX::XMQuaternionRotationMatrix(matrix.GetPlatformIntrinsic()));
     }
 
-    inline XCFloat4 VectorTransformNormalMatrix(XCFloat4& vec, XCMatrix& matrix)
+    inline XCFloat4 VectorTransformNormalMatrix(const XCFloat4& vec, const XCMatrix& matrix)
     {
         return XCFloat4(DirectX::XMVector3TransformNormal(vec.GetPlatformIntrinsic(), matrix.GetPlatformIntrinsic()));
     }
 
-    inline XCFloat4 VectorTransformMatrix(XCFloat4& vec, XCMatrix& matrix)
+    inline XCFloat4 VectorTransformMatrix(const XCFloat4& vec, const XCMatrix& matrix)
     {
         return XCFloat4(DirectX::XMVector3Transform(vec.GetPlatformIntrinsic(), matrix.GetPlatformIntrinsic()));
     }
-
 }

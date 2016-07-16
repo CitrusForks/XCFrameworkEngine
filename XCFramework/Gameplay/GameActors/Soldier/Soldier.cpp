@@ -156,6 +156,7 @@ void Soldier::Pitch(float angle, float scalarForce)
     XCMatrix4 rotation    = MatrixRotationAxis(m_secondaryRightAxis, angle);
 
     rotation = MatrixRotationQuaternion(quaternionAxis);
+
     //Compare if the look is within the bound looks
     XCVec4 tempLook = VectorTransformNormal(m_secondaryLookAxis, rotation);
     
@@ -185,7 +186,6 @@ void Soldier::ApplyRotation(XCMatrix4& rotation)
     m_MRotation *= rotation;
     m_gun->SetOffsetRotation(m_gun->GetOffsetRotation() * rotation);
 }
-
 
 void Soldier::Draw(RenderContext& context)
 {

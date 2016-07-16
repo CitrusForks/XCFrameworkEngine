@@ -11,7 +11,7 @@ ParticleContact::~ParticleContact(void)
 {
 }
 
-void ParticleContact::ContactResolve(PhysicsActor* p1, PhysicsActor* p2, float restitution, float penetration, XCVec4& contactNormal)
+void ParticleContact::ContactResolve(PhysicsActor* p1, PhysicsActor* p2, float restitution, float penetration, const XCVec4& contactNormal)
 {
     m_pParticle1 = p1;
     m_pParticle2 = p2;
@@ -40,7 +40,7 @@ float ParticleContact::CalculateSeparatingVelocity()
     return VectorDot(relativeVelocity, m_contactNormal);
 }
 
-void ParticleContact::ApplyImpulse(PhysicsActor* p1, XCVec4& impulse)
+void ParticleContact::ApplyImpulse(PhysicsActor* p1, const XCVec4& impulse)
 {
     XCVec4 currentPos = p1->GetTransformedPosition();
     currentPos.Set<Y>(impulse.Get<Y>());
@@ -103,7 +103,7 @@ void ParticleContact::ResolvePenetration()
         return;
 }
 
-void ParticleContact::ResolveDragging(PhysicsActor* p1, PhysicsActor* p2, float restitution, float penetration, XCVec4& contactNormal)
+void ParticleContact::ResolveDragging(PhysicsActor* p1, PhysicsActor* p2, float restitution, float penetration, const XCVec4& contactNormal)
 {
     m_pParticle1        =   p1;
     m_pParticle2        =   p2;

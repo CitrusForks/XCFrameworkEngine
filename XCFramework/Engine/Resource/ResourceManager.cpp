@@ -123,8 +123,6 @@ int ResourceManager::LoadResourcesFromPackage(char* filePath)
 
 int ResourceManager::LoadResourcesFromPackageFB(const char* dataPath)
 {
-
-
     return true;
 }
 

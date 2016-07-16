@@ -47,10 +47,10 @@ typedef XCVec2               XCVec2Unaligned;
 #else
 
 //Common types aligned with 16bytes
-typedef XCMath::XCFloat2              XCVec2;
-typedef XCMath::XCFloat3              XCVec3;
-typedef XCMath::XCFloat4              XCVec4;
-typedef XCMath::XCMatrix              XCMatrix4;
+using XCVec2    = XCMath::XCFloat2;
+using XCVec3    = XCMath::XCFloat3;
+using XCVec4    = XCMath::XCFloat4;
+using XCMatrix4 = XCMath::XCMatrix;
 
 //Unaligned versions for gpu structures which are 4byte aligned and not 16-byte aligned.
 typedef XCMath::XCFloat2Unaligned     XCVec2Unaligned;
@@ -70,7 +70,7 @@ using namespace XCMath;
 #endif
 
 //Complex operations
-inline XCVec4 CreatePlaneFromPoints(XCVec4& p1, XCVec4& p2, XCVec4& p3)
+inline XCVec4 CreatePlaneFromPoints(const XCVec4& p1, const XCVec4& p2, const XCVec4& p3)
 {
     XCVec4 v1(VectorNormalize<3>(p1.GetData()));
     XCVec4 v2(VectorNormalize<3>(p2.GetData()));
@@ -82,18 +82,18 @@ inline XCVec4 CreatePlaneFromPoints(XCVec4& p1, XCVec4& p2, XCVec4& p3)
     return XCVec4(VectorNormalize<3>(VectorCross(axis1, axis2).GetData()));
 }
 
-inline XCVec4 GetNormalFromPoints(XCVec4& v1, XCVec4& v2, XCVec4& v3)
+inline XCVec4 GetNormalFromPoints(const XCVec4& v1, const XCVec4& v2, const XCVec4& v3)
 {
     //Find the 2 axis for v1 vertex
     XCVec4 axis1 = v2 - v1;
     XCVec4 axis2 = v3 - v1;
 
     //Normalize the axis
-    VectorNormalize<3>(axis1.GetData());
-    VectorNormalize<3>(axis2.GetData());
+    axis1 = VectorNormalize<4>(axis1);
+    axis2 = VectorNormalize<4>(axis2);
 
     //Now find the cross product of both the axis
-    return XCVec4(VectorNormalize<3>(VectorCross(axis1, axis2).GetData()));
+    return XCVec4(VectorNormalize<3>(VectorCross(axis1, axis2)));
 }
 
 inline XCMatrix4Unaligned aiMatrixToMatrix4Unaligned(const aiMatrix4x4& matrix)

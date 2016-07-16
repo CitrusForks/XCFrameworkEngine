@@ -300,6 +300,8 @@ void XCMesh::CreateBuffers()
                 XCVec4 v2(vertices[indices[vertexIndex + 1]].Pos);
                 XCVec4 v3(vertices[indices[vertexIndex + 2]].Pos);
 
+                v1.Set<W>(1.0f); v2.Set<W>(1.0f); v3.Set<W>(1.0f);
+
                 XCVec4 vertexNormal = GetNormalFromPoints(v1, v2, v3);
                 vertices[indices[vertexIndex]].Norm = vertexNormal.GetUnaligned3();
 
@@ -418,6 +420,8 @@ void XCMesh::CreateBuffers()
                 XCVec4 v2(vertices[indices[vertexIndex + 1]].Pos);
                 XCVec4 v3(vertices[indices[vertexIndex + 2]].Pos);
 
+                v1.Set<W>(1.0f); v2.Set<W>(1.0f); v3.Set<W>(1.0f);
+
                 XCVec4 vertexNormal = GetNormalFromPoints(v1, v2, v3);
                 vertices[indices[vertexIndex]].Norm = vertexNormal.GetUnaligned3();
 
@@ -500,7 +504,7 @@ void XCMesh::CreateBuffers()
     }
 
     //Got the min max, compute the centre and extends
-    m_computedBoundBox->m_boxCenter = 0.5f * (vMin + vMax);
+    m_computedBoundBox->m_boxCenter  = 0.5f * (vMin + vMax);
     m_computedBoundBox->m_boxExtends = 0.5f * (vMax - vMin);
     m_computedBoundBox->CreateBoundBox();
 

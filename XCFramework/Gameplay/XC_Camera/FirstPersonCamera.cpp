@@ -27,8 +27,8 @@ FirstPersonCamera::FirstPersonCamera(XCVec4& pos, XCVec4& target, XCVec4& up, fl
     m_position = pos;
     m_target = target;
     
-    m_look = VectorNormalize<3>(target);
-    m_up = VectorNormalize<3>(up);
+    m_look  = VectorNormalize<3>(target);
+    m_up    = VectorNormalize<3>(up);
     m_right = VectorCross(m_up, m_look);
     
     m_aspectRatio = aspectRatio;
