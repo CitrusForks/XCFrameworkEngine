@@ -19,8 +19,8 @@ public:
     NPCSoldier(void);
     virtual ~NPCSoldier(void);
 
-    virtual void                        Init(int actorId);
-    virtual void                        Update(float dt);
+    virtual void                        Init(i32 actorId);
+    virtual void                        Update(f32 dt);
 
 protected:
     std::unique_ptr<AIBrain>            m_AIBrain;

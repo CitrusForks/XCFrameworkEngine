@@ -20,13 +20,13 @@ namespace GameState
         virtual ~LoadingState(void);
 
         void                    Init();
-        void                    Update(float dt);
+        void                    Update(f32 dt);
         void                    Draw(XC_Graphics& graphicsSystem);
         void                    Destroy();
 
     private:                    
-        unsigned long           m_taskId;
-        std::future<int>        m_futurePackageLoaded;
+        u64           m_taskId;
+        std::future<i32>        m_futurePackageLoaded;
         ITask*                  m_loadPackageTask;
     };
 }

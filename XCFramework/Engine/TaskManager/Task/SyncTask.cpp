@@ -29,7 +29,7 @@ void SyncTask::Run()
     //Do the task assigned to this process
     Logger("Doing the task :");
 
-    for(unsigned int i=0; i < 1000; i++)
+    for(u32 i=0; i < 1000; i++)
         Logger("Sync Process %d", i);
 
     Logger("Done with the Task");

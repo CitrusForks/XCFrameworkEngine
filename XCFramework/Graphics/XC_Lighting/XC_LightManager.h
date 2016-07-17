@@ -21,7 +21,7 @@ public:
     ~XC_LightManager();
 
     void                            InitializeLights();
-    void                            Update(float dt);
+    void                            Update(f32 dt);
     void                            Draw(XC_Graphics& graphicsSystem);
     void                            Destroy();
 

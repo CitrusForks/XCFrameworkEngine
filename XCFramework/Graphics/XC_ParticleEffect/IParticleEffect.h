@@ -15,16 +15,16 @@ public:
     IParticleEffect();
     virtual ~IParticleEffect();
 
-    virtual void         Update(float dt);
-    virtual void         Draw(RenderContext& renderContext) {}
-
-    virtual bool         isAlive() const                        { return m_isAlive; }
-    virtual void         setAlive(bool alive)                   { m_isAlive = alive; }
+    virtual void       Update(f32 dt);
+    virtual void       Draw(RenderContext& renderContext) {}
+                       
+    virtual bool       IsAlive() const                        { return m_isAlive; }
+    virtual void       SetAlive(bool alive)                   { m_isAlive = alive; }
 
 protected:
 
-    bool                 m_isAlive;
-    float                m_lifeSpan;
-    float                m_timeFromSpawn;
+    bool               m_isAlive;
+    f32                m_lifeSpan;
+    f32                m_timeFromSpawn;
 };
 

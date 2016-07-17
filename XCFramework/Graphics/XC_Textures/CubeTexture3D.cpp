@@ -19,7 +19,7 @@ CubeTexture3D::~CubeTexture3D()
 {
 }
 
-void CubeTexture3D::Init(int resourceId, std::string userFriendlyName)
+void CubeTexture3D::Init(i32 resourceId, std::string userFriendlyName)
 {
     Texture2D::Init(resourceId, userFriendlyName);
 }
@@ -83,7 +83,7 @@ void CubeTexture3D::LoadTexture()
     SharedDescriptorHeap& heap = SystemLocator::GetInstance()->RequestSystem<SharedDescriptorHeap>("SharedDescriptorHeap");
     m_diffuseMapTextureSRV = heap.CreateShaderResourceView(m_textureDesc, desc);
 
-    const unsigned int subResCount = m_textureDesc.DepthOrArraySize * m_textureDesc.MipLevels;
+    const u32 subResCount = m_textureDesc.DepthOrArraySize * m_textureDesc.MipLevels;
     UINT64 intermediateUploadBufferSize = GetRequiredIntermediateSize(m_diffuseMapTextureSRV->m_cbResource, 0, subResCount);
     ValidateResult(graphicsSystem.GetDevice()->CreateCommittedResource(
         &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
@@ -118,7 +118,7 @@ void CubeTexture3D::CreateRenderTargets()
     rtvDesc.Texture2DArray.MipSlice = 0;
     rtvDesc.Texture2DArray.ArraySize = 1;
 
-    for (unsigned int texIndex = 0; texIndex < 6; ++texIndex)
+    for (u32 texIndex = 0; texIndex < 6; ++texIndex)
     {
         rtvDesc.Texture2DArray.FirstArraySlice = texIndex;
         ValidateResult(graphicsSystem.GetDevice()->CreateRenderTargetView(m_texture2D, &rtvDesc, &m_cubeMapRTV[texIndex]));

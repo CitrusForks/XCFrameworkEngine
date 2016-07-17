@@ -18,7 +18,7 @@ PCCar::~PCCar(void)
 {
 }
 
-void PCCar::Init(int actorId)
+void PCCar::Init(i32 actorId)
 {
     Car::Init(actorId);
 
@@ -42,7 +42,7 @@ void PCCar::Load()
     Car::Load();
 }
 
-void PCCar::Update(float dt)
+void PCCar::Update(f32 dt)
 {
     if (getIsControlled())
     {

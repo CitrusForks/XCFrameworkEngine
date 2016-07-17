@@ -7,7 +7,7 @@
 #include "GraphicsPrecompiledHeader.h"
 #include "PointParticleEffect.h"
 
-PointParticleEffect::PointParticleEffect(XCVec3Unaligned& position, const float lifeSpan)
+PointParticleEffect::PointParticleEffect(XCVec3Unaligned& position, const f32 lifeSpan)
 {
     m_particlePosition = position;
     m_lifeSpan = lifeSpan;
@@ -25,7 +25,7 @@ PointParticleEffect::~PointParticleEffect()
     m_pointVertex = { 0 };
 }
 
-void PointParticleEffect::Update(float dt)
+void PointParticleEffect::Update(f32 dt)
 {
     IParticleEffect::Update(dt);
 }

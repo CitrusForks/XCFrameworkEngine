@@ -135,11 +135,11 @@ struct VertexPos
 
 typedef struct VertexPosColorTex
 {
-    float x, y, z;	// Position
-    float r, g, b;	// Color
-    float u, v;		// UVs
+    f32 x, y, z;	// Position
+    f32 r, g, b;	// Color
+    f32 u, v;		// UVs
 
-    VertexPosColorTex(float _x, float _y, float _z, float _r, float _g, float _b, float _u, float _v)
+    VertexPosColorTex(f32 _x, f32 _y, f32 _z, f32 _r, f32 _g, f32 _b, f32 _u, f32 _v)
         : x(_x), y(_y), z(_z), r(_r), g(_g), b(_b), u(_u), v(_v)
     {
     }

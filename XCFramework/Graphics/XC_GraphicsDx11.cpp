@@ -50,7 +50,7 @@ void XC_GraphicsDx11::Destroy()
     ReleaseCOM(m_pSwapChain);
 }
 
-void XC_GraphicsDx11::InitGraphicsWindow(HWND _mainWnd, int _width, int _height, bool _enable4xMsaa)
+void XC_GraphicsDx11::InitGraphicsWindow(HWND _mainWnd, i32 _width, i32 _height, bool _enable4xMsaa)
 {
     XC_Graphics::InitGraphicsWindow(_mainWnd, _width, _height, _enable4xMsaa);
 
@@ -73,7 +73,7 @@ void XC_GraphicsDx11::SetupPipeline()
 
 void XC_GraphicsDx11::SetupDevice()
 {
-    unsigned int createDeviceFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
+    u32 createDeviceFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
     D3D_FEATURE_LEVEL featureLevel[] = { D3D_FEATURE_LEVEL_11_0 };
     D3D_DRIVER_TYPE driverType;
 
@@ -295,7 +295,7 @@ void XC_GraphicsDx11::SetupViewPort()
     XC_Graphics::SetupViewPort();
 }
 
-void XC_GraphicsDx11::Update(float dt)
+void XC_GraphicsDx11::Update(f32 dt)
 {
     m_renderTargets[RENDERTARGET_LIVEDRIVE]->Update();
 }
@@ -358,7 +358,7 @@ void XC_GraphicsDx11::GoFullscreen(bool go)
     m_pSwapChain->SetFullscreenState(go, nullptr);
 }
 
-void XC_GraphicsDx11::OnResize(int _width, int _height)
+void XC_GraphicsDx11::OnResize(i32 _width, i32 _height)
 {
     if (m_initDone)
     {

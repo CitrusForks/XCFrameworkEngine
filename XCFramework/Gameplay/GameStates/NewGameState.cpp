@@ -25,7 +25,7 @@ void NewGameState::Init()
     IGameState::Init();
 }
 
-void NewGameState::Update(float dt)
+void NewGameState::Update(f32 dt)
 {
     Event_GameStateChange event("LoadingState", STATE_DESTROY);
     EventBroadcaster& broadcaster = (EventBroadcaster&)SystemLocator::GetInstance()->RequestSystem("EventBroadcaster");

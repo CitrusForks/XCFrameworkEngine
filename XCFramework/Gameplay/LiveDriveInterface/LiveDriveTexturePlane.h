@@ -20,7 +20,7 @@ public:
     virtual ~LiveDriveTexturePlane();
 
     virtual void                     PreLoad(const void* fbBuffer);
-    virtual void                     Update(float dt);
+    virtual void                     Update(f32 dt);
     virtual void                     Draw(RenderContext& renderContext);
     virtual void                     Destroy();
 

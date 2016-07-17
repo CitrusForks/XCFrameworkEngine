@@ -23,7 +23,7 @@ namespace GameState
         virtual ~IGameState(void);
 
         virtual void            Init();
-        virtual void            Update(float dt) = 0;
+        virtual void            Update(f32 dt) = 0;
         virtual void            Draw(XC_Graphics& graphicsSystem);
         virtual void            Destroy();
 

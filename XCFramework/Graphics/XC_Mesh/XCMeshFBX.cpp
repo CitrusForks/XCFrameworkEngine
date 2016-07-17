@@ -74,7 +74,7 @@ void XCMeshFBX::Draw(RenderContext & context)
     XCMesh::Draw(context);
 }
 
-void DisplayString(const char* pHeader, const char* pValue = "", const char* pSuffix = "")
+void DisplayString(const c8* pHeader, const c8* pValue = "", const c8* pSuffix = "")
 {
     FbxString lString;
 
@@ -86,7 +86,7 @@ void DisplayString(const char* pHeader, const char* pValue = "", const char* pSu
 }
 
 
-void DisplayBool(const char* pHeader, bool pValue, const char* pSuffix = "")
+void DisplayBool(const c8* pHeader, bool pValue, const c8* pSuffix = "")
 {
     FbxString lString;
 
@@ -98,7 +98,7 @@ void DisplayBool(const char* pHeader, bool pValue, const char* pSuffix = "")
 }
 
 
-void DisplayInt(const char* pHeader, int pValue, const char* pSuffix = "")
+void DisplayInt(const c8* pHeader, i32 pValue, const c8* pSuffix = "")
 {
     FbxString lString;
 
@@ -110,10 +110,10 @@ void DisplayInt(const char* pHeader, int pValue, const char* pSuffix = "")
 }
 
 
-void DisplayDouble(const char* pHeader, double pValue, const char* pSuffix = "")
+void DisplayDouble(const c8* pHeader, f64 pValue, const c8* pSuffix = "")
 {
     FbxString lString;
-    FbxString lFloatValue = (float)pValue;
+    FbxString lFloatValue = (f32)pValue;
 
     lFloatValue = pValue <= -HUGE_VAL ? "-INFINITY" : lFloatValue.Buffer();
     lFloatValue = pValue >= HUGE_VAL ? "INFINITY" : lFloatValue.Buffer();
@@ -126,11 +126,11 @@ void DisplayDouble(const char* pHeader, double pValue, const char* pSuffix = "")
 }
 
 
-void Display2DVector(const char* pHeader, FbxVector2 pValue, const char* pSuffix = "")
+void Display2DVector(const c8* pHeader, FbxVector2 pValue, const c8* pSuffix = "")
 {
     FbxString lString;
-    FbxString lFloatValue1 = (float)pValue[0];
-    FbxString lFloatValue2 = (float)pValue[1];
+    FbxString lFloatValue1 = (f32)pValue[0];
+    FbxString lFloatValue2 = (f32)pValue[1];
 
     lFloatValue1 = pValue[0] <= -HUGE_VAL ? "-INFINITY" : lFloatValue1.Buffer();
     lFloatValue1 = pValue[0] >= HUGE_VAL ? "INFINITY" : lFloatValue1.Buffer();
@@ -147,12 +147,12 @@ void Display2DVector(const char* pHeader, FbxVector2 pValue, const char* pSuffix
 }
 
 
-void Display3DVector(const char* pHeader, FbxVector4 pValue, const char* pSuffix = "")
+void Display3DVector(const c8* pHeader, FbxVector4 pValue, const c8* pSuffix = "")
 {
     FbxString lString;
-    FbxString lFloatValue1 = (float)pValue[0];
-    FbxString lFloatValue2 = (float)pValue[1];
-    FbxString lFloatValue3 = (float)pValue[2];
+    FbxString lFloatValue1 = (f32)pValue[0];
+    FbxString lFloatValue2 = (f32)pValue[1];
+    FbxString lFloatValue3 = (f32)pValue[2];
 
     lFloatValue1 = pValue[0] <= -HUGE_VAL ? "-INFINITY" : lFloatValue1.Buffer();
     lFloatValue1 = pValue[0] >= HUGE_VAL ? "INFINITY" : lFloatValue1.Buffer();
@@ -172,13 +172,13 @@ void Display3DVector(const char* pHeader, FbxVector4 pValue, const char* pSuffix
     Logger(lString);
 }
 
-void Display4DVector(const char* pHeader, FbxVector4 pValue, const char* pSuffix = "")
+void Display4DVector(const c8* pHeader, FbxVector4 pValue, const c8* pSuffix = "")
 {
     FbxString lString;
-    FbxString lFloatValue1 = (float)pValue[0];
-    FbxString lFloatValue2 = (float)pValue[1];
-    FbxString lFloatValue3 = (float)pValue[2];
-    FbxString lFloatValue4 = (float)pValue[3];
+    FbxString lFloatValue1 = (f32)pValue[0];
+    FbxString lFloatValue2 = (f32)pValue[1];
+    FbxString lFloatValue3 = (f32)pValue[2];
+    FbxString lFloatValue4 = (f32)pValue[3];
 
     lFloatValue1 = pValue[0] <= -HUGE_VAL ? "-INFINITY" : lFloatValue1.Buffer();
     lFloatValue1 = pValue[0] >= HUGE_VAL ? "INFINITY" : lFloatValue1.Buffer();
@@ -203,7 +203,7 @@ void Display4DVector(const char* pHeader, FbxVector4 pValue, const char* pSuffix
 }
 
 
-void DisplayColor(const char* pHeader, FbxPropertyT<FbxDouble3> pValue, const char* pSuffix = "")
+void DisplayColor(const c8* pHeader, FbxPropertyT<FbxDouble3> pValue, const c8* pSuffix = "")
 
 {
     FbxString lString;
@@ -224,18 +224,18 @@ void DisplayColor(const char* pHeader, FbxPropertyT<FbxDouble3> pValue, const ch
 }
 
 
-void DisplayColor(const char* pHeader, FbxColor pValue, const char* pSuffix = "")
+void DisplayColor(const c8* pHeader, FbxColor pValue, const c8* pSuffix = "")
 {
     FbxString lString;
 
     lString = pHeader;
-    lString += (float)pValue.mRed;
+    lString += (f32)pValue.mRed;
 
     lString += " (red), ";
-    lString += (float)pValue.mGreen;
+    lString += (f32)pValue.mGreen;
 
     lString += " (green), ";
-    lString += (float)pValue.mBlue;
+    lString += (f32)pValue.mBlue;
 
     lString += " (blue)";
     lString += pSuffix;
@@ -243,12 +243,12 @@ void DisplayColor(const char* pHeader, FbxColor pValue, const char* pSuffix = ""
     Logger(lString);
 }
 
-bool XCMeshFBX::LoadScene(FbxManager* pManager, FbxDocument* pScene, const char* pFilename)
+bool XCMeshFBX::LoadScene(FbxManager* pManager, FbxDocument* pScene, const c8* pFilename)
 {
-    int lFileMajor, lFileMinor, lFileRevision;
-    int lSDKMajor, lSDKMinor, lSDKRevision;
+    i32 lFileMajor, lFileMinor, lFileRevision;
+    i32 lSDKMajor, lSDKMinor, lSDKRevision;
     //int lFileFormat = -1;
-    int i, lAnimStackCount;
+    i32 i, lAnimStackCount;
     bool lStatus;
 
     // Get the file version number generate by the FBX SDK.
@@ -384,7 +384,7 @@ void XCMeshFBX::DisplayMetaData(FbxScene* pScene)
 
 void XCMeshFBX::DisplayHierarchy(FbxScene* pScene)
 {
-    int i;
+    i32 i;
     FbxNode* lRootNode = pScene->GetRootNode();
 
     for (i = 0; i < lRootNode->GetChildCount(); i++)
@@ -393,10 +393,10 @@ void XCMeshFBX::DisplayHierarchy(FbxScene* pScene)
     }
 }
 
-void XCMeshFBX::DisplayHierarchy(FbxNode* pNode, int pDepth)
+void XCMeshFBX::DisplayHierarchy(FbxNode* pNode, i32 pDepth)
 {
     FbxString lString;
-    int i;
+    i32 i;
 
     for (i = 0; i < pDepth; i++)
     {
@@ -416,7 +416,7 @@ void XCMeshFBX::DisplayHierarchy(FbxNode* pNode, int pDepth)
 
 void XCMeshFBX::DisplayContent(FbxScene* pScene)
 {
-    int i;
+    i32 i;
     FbxNode* lNode = pScene->GetRootNode();
 
     if (lNode)
@@ -431,7 +431,7 @@ void XCMeshFBX::DisplayContent(FbxScene* pScene)
 void XCMeshFBX::DisplayContent(FbxNode* pNode)
 {
     FbxNodeAttribute::EType lAttributeType;
-    int i;
+    i32 i;
 
     if (pNode->GetNodeAttribute() == NULL)
     {
@@ -464,7 +464,7 @@ void XCMeshFBX::ParseMesh(FbxNode* pNode)
     FbxMesh* lMesh = (FbxMesh*)pNode->GetNodeAttribute();
     FbxVector4* lControlPoints = lMesh->GetControlPoints();
 
-    DisplayString("Mesh Name: ", (char *)pNode->GetName());
+    DisplayString("Mesh Name: ", (c8 *)pNode->GetName());
 
     MeshData* submesh = CreateAndGetSubMesh();
     {
@@ -483,7 +483,7 @@ void XCMeshFBX::ParseMesh(FbxNode* pNode)
         XCVec4 originTranslate = XCVec4(0.0f, 0.0f, 0.0f, 1.0f) - trans;
         originTranslate[1] = 0.0f; originTranslate[2] = 0.0f; originTranslate[3] = 1.0f;
 
-        float vecLength = 0.0f;
+        f32 vecLength = 0.0f;
         if(trans[0] < 0)
             vecLength = -VectorLength<3>(originTranslate);
         else
@@ -494,13 +494,13 @@ void XCMeshFBX::ParseMesh(FbxNode* pNode)
         submesh->SetGeometryTranslation(XCVec3Unaligned(vecLength, 0.0f, 0.0f));
 
         //fill the vertices & uv coords
-        for (int polygonIndex = 0; polygonIndex < lMesh->GetPolygonCount(); ++polygonIndex)
+        for (i32 polygonIndex = 0; polygonIndex < lMesh->GetPolygonCount(); ++polygonIndex)
         {
-            int faceValue[] = { -1, -1, -1, -1 };
+            i32 faceValue[] = { -1, -1, -1, -1 };
 
-            for (int faceVertexIndex = 0; faceVertexIndex < lMesh->GetPolygonSize(polygonIndex); ++faceVertexIndex)
+            for (i32 faceVertexIndex = 0; faceVertexIndex < lMesh->GetPolygonSize(polygonIndex); ++faceVertexIndex)
             {
-                int vIndex = lMesh->GetPolygonVertex(polygonIndex, faceVertexIndex);
+                i32 vIndex = lMesh->GetPolygonVertex(polygonIndex, faceVertexIndex);
 
                 FbxVector4 v1Data = lControlPoints[vIndex];
                 MeshData::Vertex vertex = { v1Data[0], v1Data[1], v1Data[2] };
@@ -531,7 +531,7 @@ void XCMeshFBX::ParseMesh(FbxNode* pNode)
             XCASSERT(faceValue[0] != -1);
 
             //Add the face to our submesh
-            MeshData::Face face = { (unsigned short)faceValue[0], (unsigned short)faceValue[1], (unsigned short)faceValue[2], (unsigned short)faceValue[3] };
+            MeshData::Face face = { (u16)faceValue[0], (u16)faceValue[1], (u16)faceValue[2], (u16)faceValue[3] };
             submesh->AddFace(face);
             //Logger("Face : %d %d %d", face.a, face.b, face.c);
         }
@@ -542,17 +542,17 @@ void XCMeshFBX::ParseMesh(FbxNode* pNode)
 
 void XCMeshFBX::DisplayAndGeneratePolygons(FbxMesh* pMesh, MeshData* submesh)
 {
-    int i, j, lPolygonCount = pMesh->GetPolygonCount();
+    i32 i, j, lPolygonCount = pMesh->GetPolygonCount();
     FbxVector4* lControlPoints = pMesh->GetControlPoints();
-    char header[100];
+    c8 header[100];
 
     DisplayString("    Polygons");
 
-    int vertexId = 0;
+    i32 vertexId = 0;
     for (i = 0; i < lPolygonCount; i++)
     {
         DisplayInt("        Polygon ", i);
-        int l;
+        i32 l;
 
         for (l = 0; l < pMesh->GetElementPolygonGroupCount(); l++)
         {
@@ -563,7 +563,7 @@ void XCMeshFBX::DisplayAndGeneratePolygons(FbxMesh* pMesh, MeshData* submesh)
                 if (lePolgrp->GetReferenceMode() == FbxGeometryElement::eIndex)
                 {
                     FBXSDK_sprintf(header, 100, "        Assigned to group: ");
-                    int polyGroupId = lePolgrp->GetIndexArray().GetAt(i);
+                    i32 polyGroupId = lePolgrp->GetIndexArray().GetAt(i);
                     DisplayInt(header, polyGroupId);
                     break;
                 }
@@ -574,11 +574,11 @@ void XCMeshFBX::DisplayAndGeneratePolygons(FbxMesh* pMesh, MeshData* submesh)
             }
         }
 
-        int lPolygonSize = pMesh->GetPolygonSize(i);
+        i32 lPolygonSize = pMesh->GetPolygonSize(i);
 
         for (j = 0; j < lPolygonSize; j++)
         {
-            int lControlPointIndex = pMesh->GetPolygonVertex(i, j);
+            i32 lControlPointIndex = pMesh->GetPolygonVertex(i, j);
 
             Display3DVector("            Coordinates: ", lControlPoints[lControlPointIndex]);
 
@@ -599,7 +599,7 @@ void XCMeshFBX::DisplayAndGeneratePolygons(FbxMesh* pMesh, MeshData* submesh)
                         break;
                     case FbxGeometryElement::eIndexToDirect:
                     {
-                        int id = leVtxc->GetIndexArray().GetAt(lControlPointIndex);
+                        i32 id = leVtxc->GetIndexArray().GetAt(lControlPointIndex);
                         DisplayColor(header, leVtxc->GetDirectArray().GetAt(id));
                     }
                     break;
@@ -617,7 +617,7 @@ void XCMeshFBX::DisplayAndGeneratePolygons(FbxMesh* pMesh, MeshData* submesh)
                         break;
                     case FbxGeometryElement::eIndexToDirect:
                     {
-                        int id = leVtxc->GetIndexArray().GetAt(vertexId);
+                        i32 id = leVtxc->GetIndexArray().GetAt(vertexId);
                         DisplayColor(header, leVtxc->GetDirectArray().GetAt(id));
                     }
                     break;
@@ -650,7 +650,7 @@ void XCMeshFBX::DisplayAndGeneratePolygons(FbxMesh* pMesh, MeshData* submesh)
                         break;
                     case FbxGeometryElement::eIndexToDirect:
                     {
-                        int id = leUV->GetIndexArray().GetAt(lControlPointIndex);
+                        i32 id = leUV->GetIndexArray().GetAt(lControlPointIndex);
                         Display2DVector(header, leUV->GetDirectArray().GetAt(id));
                     }
                     break;
@@ -661,7 +661,7 @@ void XCMeshFBX::DisplayAndGeneratePolygons(FbxMesh* pMesh, MeshData* submesh)
 
                 case FbxGeometryElement::eByPolygonVertex:
                 {
-                    int lTextureUVIndex = pMesh->GetTextureUVIndex(i, j);
+                    i32 lTextureUVIndex = pMesh->GetTextureUVIndex(i, j);
                     switch (leUV->GetReferenceMode())
                     {
                     case FbxGeometryElement::eDirect:
@@ -696,7 +696,7 @@ void XCMeshFBX::DisplayAndGeneratePolygons(FbxMesh* pMesh, MeshData* submesh)
                         break;
                     case FbxGeometryElement::eIndexToDirect:
                     {
-                        int id = leNormal->GetIndexArray().GetAt(vertexId);
+                        i32 id = leNormal->GetIndexArray().GetAt(vertexId);
                         Display3DVector(header, leNormal->GetDirectArray().GetAt(id));
                     }
                     break;
@@ -720,7 +720,7 @@ void XCMeshFBX::DisplayAndGeneratePolygons(FbxMesh* pMesh, MeshData* submesh)
                         break;
                     case FbxGeometryElement::eIndexToDirect:
                     {
-                        int id = leTangent->GetIndexArray().GetAt(vertexId);
+                        i32 id = leTangent->GetIndexArray().GetAt(vertexId);
                         Display3DVector(header, leTangent->GetDirectArray().GetAt(id));
                     }
                     break;
@@ -745,7 +745,7 @@ void XCMeshFBX::DisplayAndGeneratePolygons(FbxMesh* pMesh, MeshData* submesh)
                         break;
                     case FbxGeometryElement::eIndexToDirect:
                     {
-                        int id = leBinormal->GetIndexArray().GetAt(vertexId);
+                        i32 id = leBinormal->GetIndexArray().GetAt(vertexId);
                         Display3DVector(header, leBinormal->GetDirectArray().GetAt(id));
                     }
                     break;
@@ -760,7 +760,7 @@ void XCMeshFBX::DisplayAndGeneratePolygons(FbxMesh* pMesh, MeshData* submesh)
 
 
       //check visibility for the edges of the mesh
-    for (int l = 0; l < pMesh->GetElementVisibilityCount(); ++l)
+    for (i32 l = 0; l < pMesh->GetElementVisibilityCount(); ++l)
     {
         FbxGeometryElementVisibility* leVisibility = pMesh->GetElementVisibility(l);
         FBXSDK_sprintf(header, 100, "    Edge Visibility : ");

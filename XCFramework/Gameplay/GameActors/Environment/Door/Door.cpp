@@ -53,10 +53,10 @@ void Door::Load()
 void Door::SetInitialPhysicsProperties()
 {
     PhysicsActor::SetInitialPhysicsProperties();
-    InitXPhysics(XCVec4(m_initialPosition), XCVec4(), XCVec4(), 1000, (float)0.2);
+    InitXPhysics(XCVec4(m_initialPosition), XCVec4(), XCVec4(), 1000, (f32)0.2);
 }
 
-void Door::Update(float dt)
+void Door::Update(f32 dt)
 {
     if (m_directInput->KeyDown(INPUT_KEY_I))
     {

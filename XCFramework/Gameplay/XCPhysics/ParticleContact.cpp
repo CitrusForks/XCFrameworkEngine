@@ -11,7 +11,7 @@ ParticleContact::~ParticleContact(void)
 {
 }
 
-void ParticleContact::ContactResolve(PhysicsActor* p1, PhysicsActor* p2, float restitution, float penetration, const XCVec4& contactNormal)
+void ParticleContact::ContactResolve(PhysicsActor* p1, PhysicsActor* p2, f32 restitution, f32 penetration, const XCVec4& contactNormal)
 {
     m_pParticle1 = p1;
     m_pParticle2 = p2;
@@ -22,7 +22,7 @@ void ParticleContact::ContactResolve(PhysicsActor* p1, PhysicsActor* p2, float r
     ResolvePenetration();
 }
 
-float ParticleContact::CalculateSeparatingVelocity()
+f32 ParticleContact::CalculateSeparatingVelocity()
 {
     XCVec4 relativeVelocity =	m_pParticle1->GetVelocity();
 
@@ -51,18 +51,18 @@ void ParticleContact::ApplyImpulse(PhysicsActor* p1, const XCVec4& impulse)
 
 void ParticleContact::ResolveVelocity()
 {
-    float separatingVelocity = CalculateSeparatingVelocity();
+    f32 separatingVelocity = CalculateSeparatingVelocity();
 
     if(separatingVelocity > 0)
     {
         return;
     }
 
-    float newSeparatingVelocity = -separatingVelocity * m_restitution;
+    f32 newSeparatingVelocity = -separatingVelocity * m_restitution;
 
-    float deltaVelocity = newSeparatingVelocity - separatingVelocity;
+    f32 deltaVelocity = newSeparatingVelocity - separatingVelocity;
 
-    float totalInverseMass = m_pParticle1->GetInverseMass();
+    f32 totalInverseMass = m_pParticle1->GetInverseMass();
 
     if (m_pParticle2 != nullptr)
     {
@@ -72,7 +72,7 @@ void ParticleContact::ResolveVelocity()
     if(totalInverseMass <= 0)
         return;
 
-    float impulse = deltaVelocity / totalInverseMass;
+    f32 impulse = deltaVelocity / totalInverseMass;
 
     XCVec4 impulsePerIMass = m_contactNormal * impulse;
 
@@ -103,7 +103,7 @@ void ParticleContact::ResolvePenetration()
         return;
 }
 
-void ParticleContact::ResolveDragging(PhysicsActor* p1, PhysicsActor* p2, float restitution, float penetration, const XCVec4& contactNormal)
+void ParticleContact::ResolveDragging(PhysicsActor* p1, PhysicsActor* p2, f32 restitution, f32 penetration, const XCVec4& contactNormal)
 {
     m_pParticle1        =   p1;
     m_pParticle2        =   p2;

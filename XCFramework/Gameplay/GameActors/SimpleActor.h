@@ -14,10 +14,10 @@ public:
     SimpleActor();
     virtual ~SimpleActor(void);
 
-    virtual void                    Init(int actorId) override;
+    virtual void                    Init(i32 actorId) override;
     virtual void                    PreLoad(const void* fbBuffer) override { IActor::PreLoad(fbBuffer); }
     virtual void                    UpdateState() override { IActor::UpdateState(); }
-    virtual void                    Update(float dt) override;
+    virtual void                    Update(f32 dt) override;
     virtual void                    Draw(RenderContext& renderContext) override;
     virtual void                    Destroy() override;
 };

@@ -14,15 +14,15 @@ public:
     Server(void);
     virtual ~Server(void);
     
-    void            Init(const char *ip, int port);
+    void            Init(const char *ip, i32 port);
 
     void            ClientSocket();
     void            Set_fd();
-    void            SendData(const char* msg, int size = -1);
+    void            SendData(const char* msg, i32 size = -1);
     char*           ReceiveData();
 
 protected:
-    void            CreateSocket(const char *ip, int port);
+    void            CreateSocket(const char *ip, i32 port);
     void            BindSocket();
 
 private:

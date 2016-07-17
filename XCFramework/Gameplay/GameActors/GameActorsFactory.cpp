@@ -88,7 +88,7 @@ void GameActorsFactory::DestroyFactory()
 
 void GameActorsFactory::GetAllActorTypes(GameActorsInfo* actorTypes)
 {
-    int index = 0;
+    i32 index = 0;
     for (auto& actor : m_registeredActors)
     {
         strcpy_s(actorTypes[index].m_actorName, actor.second.c_str());
@@ -103,7 +103,7 @@ extern "C" __declspec(dllexport) void GetAllActorTypes(GameActorsInfo* info)
     GAMEACTORS_FACTORY->GetAllActorTypes(info);
 }
 
-extern "C" __declspec(dllexport) int GetNoOfActorTypes()
+extern "C" __declspec(dllexport) i32 GetNoOfActorTypes()
 {
     return GAMEACTORS_FACTORY->GetNoOfActorTypes();
 }

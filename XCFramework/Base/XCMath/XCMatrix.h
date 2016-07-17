@@ -69,12 +69,12 @@ namespace XCMath
             m_matrix[3].SetValues(0.0f, 0.0f, 0.0f, 1.0f);
         }
 
-        inline const XCFloat4 operator[](unsigned int rowIndex) const
+        inline const XCFloat4 operator[](u32 rowIndex) const
         {
             return m_matrix[rowIndex];
         }
 
-        inline XCFloat4& operator[](unsigned int rowIndex)
+        inline XCFloat4& operator[](u32 rowIndex)
         {
             return m_matrix[rowIndex];
         }
@@ -119,10 +119,10 @@ namespace XCMath
         M2 = mat2;
 
         // Cache the invariants in registers
-        float x = M1[0][0];
-        float y = M1[0][1];
-        float z = M1[0][2];
-        float w = M1[0][3];
+        f32 x = M1[0][0];
+        f32 y = M1[0][1];
+        f32 z = M1[0][2];
+        f32 w = M1[0][3];
 
         // Perform the operation on the first row
         mResult[0][0] = (M2[0][0] * x) + (M2[1][0] * y) + (M2[2][0] * z) + (M2[3][0] * w);
@@ -163,7 +163,7 @@ namespace XCMath
         return MatrixMultiply(M1, M2);
     }
 
-    inline void MatrixDeterminant(const XCMatrix& matrix, float& outDeterminantValue)
+    inline void MatrixDeterminant(const XCMatrix& matrix, f32& outDeterminantValue)
     {
         outDeterminantValue = DirectX::XMVectorGetX(DirectX::XMMatrixDeterminant(matrix.GetPlatformIntrinsic()));
     }
@@ -172,9 +172,9 @@ namespace XCMath
     {
         XCMatrix result;
 
-        for (unsigned int rowIndex = 0; rowIndex < 4; ++rowIndex)
+        for (u32 rowIndex = 0; rowIndex < 4; ++rowIndex)
         {
-            for (unsigned int colIndex = 0; colIndex < 4; ++colIndex)
+            for (u32 colIndex = 0; colIndex < 4; ++colIndex)
             {
                 result[rowIndex][colIndex] = matrix[colIndex][rowIndex];
             }
@@ -197,19 +197,19 @@ namespace XCMath
 
         A[3] = XCMath::XCFloat4(0.0f, 0.0f, 0.0f, 1.0f);
 
-        float determinantValue = 0.0f;
+        f32 determinantValue = 0.0f;
         MatrixDeterminant(A, determinantValue);
         return MatrixTranspose(MatrixInverse(M));
     }
 
-    inline XCMatrix MatrixPerspective(float FovAngleY, float AspectHByW, float NearZ, float FarZ)
+    inline XCMatrix MatrixPerspective(f32 FovAngleY, f32 AspectHByW, f32 NearZ, f32 FarZ)
     {
-        float    SinFov = sinf(0.5f * FovAngleY);
-        float    CosFov = cosf(0.5f * FovAngleY);
+        f32    SinFov = sinf(0.5f * FovAngleY);
+        f32    CosFov = cosf(0.5f * FovAngleY);
 
-        float Height = CosFov / SinFov;
-        float Width = Height / AspectHByW;
-        float fRange = FarZ / (FarZ - NearZ);
+        f32 Height = CosFov / SinFov;
+        f32 Width = Height / AspectHByW;
+        f32 fRange = FarZ / (FarZ - NearZ);
 
         XCMatrix M;
         M[0][0] = Width;
@@ -247,9 +247,9 @@ namespace XCMath
 
         XCFloat4 NegEyePosition = XCFloat4(0, 0, 0, 0) - EyePosition;
 
-        float D0 = VectorDot(R0, NegEyePosition);
-        float D1 = VectorDot(R1, NegEyePosition);
-        float D2 = VectorDot(R2, NegEyePosition);
+        f32 D0 = VectorDot(R0, NegEyePosition);
+        f32 D1 = VectorDot(R1, NegEyePosition);
+        f32 D2 = VectorDot(R2, NegEyePosition);
 
         XCMatrix M;
         M[0].Set<W>(D0);
@@ -262,7 +262,7 @@ namespace XCMath
         return M;
     }
 
-    inline XCMatrix MatrixTranslate(float x, float y, float z)
+    inline XCMatrix MatrixTranslate(f32 x, f32 y, f32 z)
     {
         XCMatrix result;
         result[3].SetValues(x, y, z, 1.0f);
@@ -275,7 +275,7 @@ namespace XCMath
         return MatrixTranslate(vec.Get<X>(), vec.Get<Y>(), vec.Get<Z>());
     }
 
-    inline XCMatrix MatrixScale(float x, float y, float z)
+    inline XCMatrix MatrixScale(f32 x, f32 y, f32 z)
     {
         XCMatrix result;
         result[0].SetValues(x, 0, 0, 0);
@@ -291,22 +291,22 @@ namespace XCMath
         return MatrixScale(vec.Get<X>(), vec.Get<Y>(), vec.Get<Z>());
     }
 
-    inline XCMatrix MatrixRotationX(float angle)
+    inline XCMatrix MatrixRotationX(f32 angle)
     {
         return XCMatrix(DirectX::XMMatrixRotationX(angle));
     }
 
-    inline XCMatrix MatrixRotationY(float angle)
+    inline XCMatrix MatrixRotationY(f32 angle)
     {
         return XCMatrix(DirectX::XMMatrixRotationY(angle));
     }
 
-    inline XCMatrix MatrixRotationZ(float angle)
+    inline XCMatrix MatrixRotationZ(f32 angle)
     {
         return XCMatrix(DirectX::XMMatrixRotationZ(angle));
     }
 
-    inline XCMatrix MatrixRotationAxis(const XCFloat4& axis, float angle)
+    inline XCMatrix MatrixRotationAxis(const XCFloat4& axis, f32 angle)
     {
         return XCMatrix(DirectX::XMMatrixRotationAxis(axis.GetPlatformIntrinsic(), angle));
     }

@@ -31,7 +31,7 @@ TexturedPlane::~TexturedPlane()
 {
 }
 
-void TexturedPlane::Init(int actorId)
+void TexturedPlane::Init(i32 actorId)
 {
     m_useShaderType = ShaderType_LightTexture;
     m_rasterType = RasterType_FillSolid;
@@ -94,14 +94,14 @@ void TexturedPlane::BuildGeometryBuffers()
     m_vertexBuffer.BuildVertexBuffer();
 }
 
-void TexturedPlane::Update(float dt)
+void TexturedPlane::Update(f32 dt)
 {
 }
 
 void TexturedPlane::Draw(RenderContext& context)
 {
-    unsigned int stride = sizeof(VertexPosNormTex);
-    unsigned int offset = 0;
+    u32 stride = sizeof(VertexPosNormTex);
+    u32 offset = 0;
 
     context.SetRasterizerState(m_rasterType);
     context.ApplyShader(m_useShaderType);

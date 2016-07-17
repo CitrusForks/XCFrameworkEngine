@@ -24,7 +24,7 @@ XCMesh::XCMesh()
     m_instanceCount = 0;
 }
 
-void XCMesh::Init(int resourceId, std::string userFriendlyName)
+void XCMesh::Init(i32 resourceId, std::string userFriendlyName)
 {
     IResource::Init(resourceId, userFriendlyName);
 
@@ -47,7 +47,7 @@ XCMesh::~XCMesh(void)
     }
 }
 
-void XCMesh::Load(std::string fileName, float initialScaling /* = 1.0f */)
+void XCMesh::Load(std::string fileName, f32 initialScaling /* = 1.0f */)
 {
     IResource::Load(fileName);
 
@@ -199,7 +199,7 @@ void XCMesh::CreateBuffers()
             mesh = m_scene->mMeshes;
     }
     
-    for (unsigned int objIndex = 0; objIndex < m_subMeshes.size(); objIndex++)
+    for (u32 objIndex = 0; objIndex < m_subMeshes.size(); objIndex++)
     {
         MeshData* submesh = m_subMeshes[objIndex];
 
@@ -220,8 +220,8 @@ void XCMesh::CreateBuffers()
         XCVec4 transformedVertex;
         //XCVec3Unaligned vertexPos = { 0.0f, 0.0f, 0.0f };
 
-        float min = 0.0f;
-        float max = 0.0f;
+        f32 min = 0.0f;
+        f32 max = 0.0f;
 
         switch (m_shaderHandler->GetVertexFormat())
         {
@@ -231,7 +231,7 @@ void XCMesh::CreateBuffers()
             VertexPosColor vertex;
 
             //Vertex Buffer
-            for (int vertIndex = 0; vertIndex < submesh->GetNoOfVertices(); vertIndex++)
+            for (i32 vertIndex = 0; vertIndex < submesh->GetNoOfVertices(); vertIndex++)
             {
                 transformedVertex = XCVec4(submesh->m_vertices[vertIndex].x, submesh->m_vertices[vertIndex].y, submesh->m_vertices[vertIndex].z, 0.0f);
                 vertex = VertexPosColor(transformedVertex.GetUnaligned3(),
@@ -240,9 +240,9 @@ void XCMesh::CreateBuffers()
             }
 
             //Index Buffer
-            std::vector<unsigned int> indices;
+            std::vector<u32> indices;
 
-            for (int index = 0; index < submesh->GetNoOfFaces(); index++)
+            for (i32 index = 0; index < submesh->GetNoOfFaces(); index++)
             {
                 indices.push_back(submesh->m_faces[index].a);
                 indices.push_back(submesh->m_faces[index].b);
@@ -260,7 +260,7 @@ void XCMesh::CreateBuffers()
             XCVec2Unaligned mapCoord = { 0.0f, 0.0f };
 
             //Vertex Buffer
-            for (unsigned int vertIndex = 0; vertIndex < submesh->m_vertices.size(); vertIndex++)
+            for (u32 vertIndex = 0; vertIndex < submesh->m_vertices.size(); vertIndex++)
             {
                 mapCoord = vertIndex < submesh->m_mapCoord.size() ?
                     XCVec2Unaligned(submesh->m_mapCoord[vertIndex].u, submesh->m_mapCoord[vertIndex].v)
@@ -282,9 +282,9 @@ void XCMesh::CreateBuffers()
                 vMax = VectorMax(vMax, transformedVertex);
             }
 
-            std::vector<unsigned int>& indices = submesh->GetIndexBuffer().m_indexData;
+            std::vector<u32>& indices = submesh->GetIndexBuffer().m_indexData;
 
-            for (unsigned int index = 0; index < submesh->m_faces.size(); index++)
+            for (u32 index = 0; index < submesh->m_faces.size(); index++)
             {
                 indices.push_back(submesh->m_faces[index].a);
                 indices.push_back(submesh->m_faces[index].b);
@@ -294,7 +294,7 @@ void XCMesh::CreateBuffers()
             }
 
             //Traverse through the vertices
-            for (unsigned int vertexIndex = 0; vertexIndex < indices.size() - 3; vertexIndex += 3)
+            for (u32 vertexIndex = 0; vertexIndex < indices.size() - 3; vertexIndex += 3)
             {
                 XCVec4 v1(vertices[indices[vertexIndex]].Pos);
                 XCVec4 v2(vertices[indices[vertexIndex + 1]].Pos);
@@ -324,8 +324,8 @@ void XCMesh::CreateBuffers()
             VertexPosNormTexBIndexBWeight vertex;
             std::vector<std::vector<aiVertexWeight> > weightsPerVertex;
             
-            float boneIndex[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-            float boneWeight[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+            f32 boneIndex[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+            f32 boneWeight[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
             XCVec2Unaligned mapCoord = { 0.0f, 0.0f };
             XCVec4Unaligned blendIndices, vertexWeight;
@@ -343,20 +343,20 @@ void XCMesh::CreateBuffers()
                 weightsPerVertex.resize(mesh[objIndex]->mNumVertices);
 
                 //Tranverse every bone and calculate the weight of every vertex in that bone
-                for (unsigned int boneIdx = 0; boneIdx < mesh[objIndex]->mNumBones; ++boneIdx)
+                for (u32 boneIdx = 0; boneIdx < mesh[objIndex]->mNumBones; ++boneIdx)
                 {
                     const aiBone* bone = mesh[objIndex]->mBones[boneIdx];
 
-                    for (unsigned int weightIndex = 0; weightIndex < bone->mNumWeights; ++weightIndex)
+                    for (u32 weightIndex = 0; weightIndex < bone->mNumWeights; ++weightIndex)
                     {
                         weightsPerVertex[bone->mWeights[weightIndex].mVertexId].push_back(aiVertexWeight(boneIdx, bone->mWeights[weightIndex].mWeight));
-                        fprintf(fp, "Pushing in weightsPerVertex @ mVertexId %d : boneIndex %d  bone->mWeights[weightIndex].mWeight : %d\n", bone->mWeights[weightIndex].mVertexId, boneIdx, (int)bone->mWeights[weightIndex].mWeight);
+                        fprintf(fp, "Pushing in weightsPerVertex @ mVertexId %d : boneIndex %d  bone->mWeights[weightIndex].mWeight : %d\n", bone->mWeights[weightIndex].mVertexId, boneIdx, (i32)bone->mWeights[weightIndex].mWeight);
                     }
                 }
             }
 
             //Vertex Buffer
-            for (unsigned int vertIndex = 0; vertIndex < submesh->m_vertices.size(); vertIndex++)
+            for (u32 vertIndex = 0; vertIndex < submesh->m_vertices.size(); vertIndex++)
             {
                 mapCoord = vertIndex < submesh->m_mapCoord.size() ?
                     XCVec2Unaligned(submesh->m_mapCoord[vertIndex].u, submesh->m_mapCoord[vertIndex].v)
@@ -371,18 +371,18 @@ void XCMesh::CreateBuffers()
                 {
                     XCASSERT(weightsPerVertex[objIndex].size() <= 4);
 
-                    for (unsigned int weightIndex = 0; weightIndex < weightsPerVertex[vertIndex].size(); ++weightIndex)
+                    for (u32 weightIndex = 0; weightIndex < weightsPerVertex[vertIndex].size(); ++weightIndex)
                     {
-                        boneIndex[weightIndex] = (float)weightsPerVertex[vertIndex][weightIndex].mVertexId;
-                        boneWeight[weightIndex] = (float)(weightsPerVertex[vertIndex][weightIndex].mWeight /** 255.0f*/);
+                        boneIndex[weightIndex] = (f32)weightsPerVertex[vertIndex][weightIndex].mVertexId;
+                        boneWeight[weightIndex] = (f32)(weightsPerVertex[vertIndex][weightIndex].mWeight /** 255.0f*/);
                     }
 
                     blendIndices = XCVec4Unaligned(boneIndex[0], boneIndex[1], boneIndex[2], boneIndex[3]);
                     vertexWeight = XCVec4Unaligned(boneWeight[0], boneWeight[1], boneWeight[2], boneWeight[3]);
 
                     fprintf(fp, "Vertex : %d  BlendIndx %d %d %d %d  Weight %d %d %d %d\n",
-                        vertIndex, (int)blendIndices.x, (int)blendIndices.y, (int)blendIndices.z, (int)blendIndices.w,
-                        (int)vertexWeight.x, (int)vertexWeight.y, (int)vertexWeight.z, (int)vertexWeight.w);
+                        vertIndex, (i32)blendIndices.x, (i32)blendIndices.y, (i32)blendIndices.z, (i32)blendIndices.w,
+                        (i32)vertexWeight.x, (i32)vertexWeight.y, (i32)vertexWeight.z, (i32)vertexWeight.w);
                 }
 
                 transformedVertex = VectorTransformNormal(transformedVertex, transformMatrix);
@@ -402,9 +402,9 @@ void XCMesh::CreateBuffers()
                 vertexWeight = XCVec4Unaligned(0.0f, 0.0f, 0.0f, 0.0f);
             }
 
-            std::vector<unsigned int>& indices = submesh->GetIndexBuffer().m_indexData;
+            std::vector<u32>& indices = submesh->GetIndexBuffer().m_indexData;
 
-            for (unsigned int index = 0; index < submesh->m_faces.size(); index++)
+            for (u32 index = 0; index < submesh->m_faces.size(); index++)
             {
                 indices.push_back(submesh->m_faces[index].a);
                 indices.push_back(submesh->m_faces[index].b);
@@ -414,7 +414,7 @@ void XCMesh::CreateBuffers()
             }
 
             //Traverse through the vertices
-            for (unsigned int vertexIndex = 0; vertexIndex < indices.size() - 3; vertexIndex += 3)
+            for (u32 vertexIndex = 0; vertexIndex < indices.size() - 3; vertexIndex += 3)
             {
                 XCVec4 v1(vertices[indices[vertexIndex]].Pos);
                 XCVec4 v2(vertices[indices[vertexIndex + 1]].Pos);
@@ -452,7 +452,7 @@ void XCMesh::CreateBuffers()
             VertexPosColorInstanceIndex vertex;
 
             //Vertex Buffer
-            for (unsigned int vertIndex = 0; vertIndex < submesh->m_vertices.size(); vertIndex++)
+            for (u32 vertIndex = 0; vertIndex < submesh->m_vertices.size(); vertIndex++)
             {
                 vertexPos = XCVec4Unaligned(submesh->m_vertices[vertIndex].x,
                     submesh->m_vertices[vertIndex].y,
@@ -482,9 +482,9 @@ void XCMesh::CreateBuffers()
                 //instanceData.push_back(sampleData);
             }
 
-            std::vector<unsigned int>& indices = submesh->GetIndexBuffer().m_indexData;
+            std::vector<u32>& indices = submesh->GetIndexBuffer().m_indexData;
 
-            for (unsigned int index = 0; index < submesh->m_faces.size(); index++)
+            for (u32 index = 0; index < submesh->m_faces.size(); index++)
             {
                 indices.push_back(submesh->m_faces[index].a);
                 indices.push_back(submesh->m_faces[index].b);
@@ -533,7 +533,7 @@ void XCMesh::CreateConstantBuffer()
             if (m_isSkinnedMesh)
             {
                 BoneBuffer boneBuffer = {};
-                for (unsigned int meshIndex = 0; meshIndex < m_subMeshes.size(); ++meshIndex)
+                for (u32 meshIndex = 0; meshIndex < m_subMeshes.size(); ++meshIndex)
                 {
                     boneBuffer.m_cbBoneBufferGPU = m_shaderHandler->CreateConstantBuffer("cbBoneBuffer");
                     m_boneBuffers.push_back(boneBuffer);
@@ -549,7 +549,7 @@ void XCMesh::CreateConstantBuffer()
 
 void XCMesh::FilterSubMeshes()
 {
-    unsigned int index = 0;
+    u32 index = 0;
 
     while (index < m_subMeshes.size())
     {
@@ -566,7 +566,7 @@ void XCMesh::FilterSubMeshes()
     }
 }
 
-void XCMesh::Update(float dt)
+void XCMesh::Update(f32 dt)
 {
     //Need not update. Update the clone of this of every actor
     //m_computedBoundBox.Update(dt);
@@ -576,18 +576,18 @@ void XCMesh::Update(float dt)
         {
             aiAnimation* anim = m_sceneAnimator->CurrentAnim();
 
-            static double g_dCurrent = 0.0f;
-            g_dCurrent += clock() / double(CLOCKS_PER_SEC) - m_lastPlayedAnimTime;
+            static f64 g_dCurrent = 0.0f;
+            g_dCurrent += clock() / f64(CLOCKS_PER_SEC) - m_lastPlayedAnimTime;
 
-            double time = g_dCurrent;
+            f64 time = g_dCurrent;
 
             if (anim && anim->mDuration > 0.0) {
-                double tps = anim->mTicksPerSecond ? anim->mTicksPerSecond : 25.f;
+                f64 tps = anim->mTicksPerSecond ? anim->mTicksPerSecond : 25.f;
                 time = fmod(time, anim->mDuration / tps);
             }
 
             m_sceneAnimator->Calculate(time);
-            m_lastPlayedAnimTime = (float)g_dCurrent;
+            m_lastPlayedAnimTime = (f32)g_dCurrent;
             /*
             if (m_lastPlayedAnimTime > anim->mDuration)
             {
@@ -637,7 +637,7 @@ void XCMesh::Draw(RenderContext& context)
     }
 }
 
-void XCMesh::DrawSubMesh(RenderContext& renderContext, unsigned int meshIndex)
+void XCMesh::DrawSubMesh(RenderContext& renderContext, u32 meshIndex)
 {
     //For instance based
     switch (m_shaderType)
@@ -656,15 +656,15 @@ void XCMesh::DrawSubMesh(RenderContext& renderContext, unsigned int meshIndex)
 
         std::vector<aiMatrix4x4> boneMatrix = m_sceneAnimator->GetBoneMatrices(m_scene->mRootNode, meshIndex);
 
-        for (unsigned int index = 0; index < 60; ++index)
+        for (u32 index = 0; index < 60; ++index)
         {
             m_boneBuffers[meshIndex].m_cbBoneBuffer.gBoneMatrix[index] = aiMatrixToMatrix4Unaligned(boneMatrix[index]);
         }
 
-        static float matrices[4 * 4 * 60];
-        float* tempmat = matrices;
+        static f32 matrices[4 * 4 * 60];
+        f32* tempmat = matrices;
 
-        for (unsigned int matIndex = 0; matIndex < boneMatrix.size(); ++matIndex)
+        for (u32 matIndex = 0; matIndex < boneMatrix.size(); ++matIndex)
         {
             aiMatrix4x4& mat = boneMatrix[matIndex];
             mat.Transpose();
@@ -696,7 +696,7 @@ void XCMesh::DrawSubMeshes(RenderContext& renderContext)
 {
     if (m_resourceState)
     {
-        for (unsigned int index = 0; index < m_subMeshes.size(); index++)
+        for (u32 index = 0; index < m_subMeshes.size(); index++)
         {
             DrawSubMesh(renderContext, index);
         }

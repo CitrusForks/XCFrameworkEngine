@@ -16,10 +16,10 @@ public:
     HWND                    GetMainWnd();
 
     //Framework Methods
-    virtual int             Init()                 = 0;
+    virtual i32             Init()                 = 0;
     virtual void            OnResize()             = 0;
     virtual void            Run()                  = 0;
-    virtual void            Update(float dt)       = 0;
+    virtual void            Update(f32 dt)       = 0;
     virtual void            Draw( )                = 0;
     virtual void            Destroy()              = 0;
     
@@ -28,7 +28,7 @@ public:
 
 protected:
     //Override these methods, if you need to change working
-    virtual void            CalculateFramesPerSecond(float dt) {}	//Call from update method
+    virtual void            CalculateFramesPerSecond(f32 dt) {}	//Call from update method
     
     //Customized data members
     std::string             m_MainWndCaption;
@@ -40,6 +40,6 @@ protected:
 
     bool                    m_AppPaused;
 
-    int                     m_clientWidth;
-    int                     m_clientHeight;
+    i32                     m_clientWidth;
+    i32                     m_clientHeight;
 };

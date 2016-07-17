@@ -14,15 +14,15 @@ public:
     XPhysics();
     ~XPhysics();
 
-    void                InitXPhysics(const XCVec4& position, const XCVec4& velocity, const XCVec4& acceleration, float mass, float damping);
-    void                Integrator(float dtS);
+    void                InitXPhysics(const XCVec4& position, const XCVec4& velocity, const XCVec4& acceleration, f32 mass, f32 damping);
+    void                Integrator(f32 dtS);
     void                ClearForce();
     void                ClearVelocity();
     void                AddForce(const XCVec4& newForce);
     bool                HasFiniteMass() const;
 
-    float               GetMass() const;
-    float               GetInverseMass() const { return m_InverseMass; }
+    f32               GetMass() const;
+    f32               GetInverseMass() const { return m_InverseMass; }
     XCVec4              GetVelocity() { return m_Velocity; }
 
     XCVec4              GetTransformedPosition() const { return m_Position; }
@@ -30,7 +30,7 @@ public:
 
     XCVec4              GetContactNormal() const { return m_ContactNormal; }
 
-    void                SetInverseMass(float _inverseMass) { m_InverseMass = _inverseMass; }
+    void                SetInverseMass(f32 _inverseMass) { m_InverseMass = _inverseMass; }
     void                SetVelocity(XCVec4& _newValue) { m_Velocity = _newValue; }
     void                SetContactNormal(XCVec4& _newValue) { m_ContactNormal = _newValue; }
 
@@ -42,7 +42,7 @@ protected:
     XCVec4              m_GAcceleration;
     XCVec4              m_ContactNormal;
 
-    float               m_Damping;
-    float               m_InverseMass;
-    float               m_Mass;
+    f32               m_Damping;
+    f32               m_InverseMass;
+    f32               m_Mass;
 };

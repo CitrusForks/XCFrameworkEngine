@@ -62,7 +62,7 @@ void RenderableTexture::OnResize()
 #endif
 }
 
-bool RenderableTexture::PreLoad(int msaaQuality, int texWidth, int texHeight)
+bool RenderableTexture::PreLoad(i32 msaaQuality, i32 texWidth, i32 texHeight)
 {
 #if defined(XCGRAPHICS_DX11)
     D3D_TEXTURE2D_DESC textureDesc;
@@ -123,7 +123,7 @@ bool RenderableTexture::PreLoad(int msaaQuality, int texWidth, int texHeight)
     ValidateResult(m_device.CreateShaderResourceView(m_pRenderTargetTextureStaged, &shaderResourceViewDesc, &m_pSRV->m_cbResource));
 
     // RGB Texture for transferring over the network
-    m_renderableTexture->m_texData = new unsigned char[texWidth * texHeight * 3];
+    m_renderableTexture->m_texData = new u8[texWidth * texHeight * 3];
     m_renderableTexture->m_texSize = texWidth * texHeight * 3;
 #endif
 
@@ -164,7 +164,7 @@ void RenderableTexture::SetRenderableTarget(ID3DDeviceContext& context, ID3DDept
 void RenderableTexture::ClearRenderTarget(ID3DDeviceContext& context, ID3DDepthStencilView* depthView, const XCVec4& xmColor)
 {
 #if defined(XCGRAPHICS_DX11)
-    const float color[] = { xmColor.x, xmColor.y, xmColor.z, xmColor.w };
+    const f32 color[] = { xmColor.x, xmColor.y, xmColor.z, xmColor.w };
 
     context.ClearRenderTargetView(m_pRenderTargetView, color);
     context.ClearDepthStencilView(depthView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
@@ -185,7 +185,7 @@ void RenderableTexture::DumpTextureToFile()
 
     ValidateResult(m_deviceContext.Map(m_pSingleSampledTex, 0, D3D11_MAP_READ, 0, &subResource));
 
-    unsigned char* pData = (unsigned char*)subResource.pData;
+    u8* pData = (u8*)subResource.pData;
 
     DirectX::Image image;
     image.format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -198,7 +198,7 @@ void RenderableTexture::DumpTextureToFile()
     DirectX::SaveToDDSFile(image, 0, L"Output.dds");
 
     FILE* fp = fopen("Out.bmp", "wb");
-    fwrite(pData, sizeof(unsigned char), texDesc.Height * texDesc.Width * 4, fp);
+    fwrite(pData, sizeof(u8), texDesc.Height * texDesc.Width * 4, fp);
     fclose(fp);
 
     m_deviceContext.Unmap(m_pSingleSampledTex, 0);
@@ -219,12 +219,12 @@ RenderableTexture::RenderedTextureInfo* RenderableTexture::GetRenderToTexture()
 
     ValidateResult(m_deviceContext.Map(m_pSingleSampledTex, 0, D3D11_MAP_READ, 0, &subResource));
 
-    unsigned char* pData = (unsigned char*)subResource.pData;
+    u8* pData = (u8*)subResource.pData;
 
     memcpy(m_renderableTexture->m_texData, subResource.pData, texDesc.Height * texDesc.Width * 4);
     
-    /*unsigned int rgbImageIndex = 0;
-    for (unsigned int pixelIndex = 0; pixelIndex < texDesc.Height * texDesc.Width * 4; pixelIndex += 4)
+    /*u32 rgbImageIndex = 0;
+    for (u32 pixelIndex = 0; pixelIndex < texDesc.Height * texDesc.Width * 4; pixelIndex += 4)
     {
         m_renderableTexture->m_texData[rgbImageIndex++] = pData[pixelIndex];
         m_renderableTexture->m_texData[rgbImageIndex++] = pData[pixelIndex + 1];

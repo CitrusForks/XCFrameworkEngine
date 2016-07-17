@@ -18,15 +18,15 @@ AnimEvaluator::AnimEvaluator( const aiAnimation* pAnim)
 
 // ------------------------------------------------------------------------------------------------
 // Evaluates the animation tracks for a given time stamp.
-void AnimEvaluator::Evaluate( double pTime)
+void AnimEvaluator::Evaluate( f64 pTime)
 {
     // extract ticks per second. Assume default value if not given
-    double ticksPerSecond = mAnim->mTicksPerSecond != 0.0 ? mAnim->mTicksPerSecond : 25.0;
+    f64 ticksPerSecond = mAnim->mTicksPerSecond != 0.0 ? mAnim->mTicksPerSecond : 25.0;
     // every following time calculation happens in ticks
     pTime *= ticksPerSecond;
 
     // map into anim's duration
-    double time = 0.0f;
+    f64 time = 0.0f;
     if( mAnim->mDuration > 0.0)
         time = fmod( pTime, mAnim->mDuration);
 
@@ -34,7 +34,7 @@ void AnimEvaluator::Evaluate( double pTime)
         mTransforms.resize( mAnim->mNumChannels);
 
     // calculate the transformations for each animation channel
-    for( unsigned int a = 0; a < mAnim->mNumChannels; a++)
+    for( u32 a = 0; a < mAnim->mNumChannels; a++)
     {
         const aiNodeAnim* channel = mAnim->mChannels[a];
 
@@ -44,7 +44,7 @@ void AnimEvaluator::Evaluate( double pTime)
         {
             // Look for present frame number. Search from last position if time is after the last time, else from beginning
             // Should be much quicker than always looking from start for the average use case.
-            unsigned int frame = (time >= mLastTime) ? mLastPositions[a].get<0>() : 0;
+            u32 frame = (time >= mLastTime) ? mLastPositions[a].get<0>() : 0;
             while( frame < channel->mNumPositionKeys - 1)
             {
                 if( time < channel->mPositionKeys[frame+1].mTime)
@@ -53,15 +53,15 @@ void AnimEvaluator::Evaluate( double pTime)
             }
 
             // interpolate between this frame's value and next frame's value
-            unsigned int nextFrame = (frame + 1) % channel->mNumPositionKeys;
+            u32 nextFrame = (frame + 1) % channel->mNumPositionKeys;
             const aiVectorKey& key = channel->mPositionKeys[frame];
             const aiVectorKey& nextKey = channel->mPositionKeys[nextFrame];
-            double diffTime = nextKey.mTime - key.mTime;
+            f64 diffTime = nextKey.mTime - key.mTime;
             if( diffTime < 0.0)
                 diffTime += mAnim->mDuration;
             if( diffTime > 0)
             {
-                float factor = float( (time - key.mTime) / diffTime);
+                f32 factor = f32( (time - key.mTime) / diffTime);
                 presentPosition = key.mValue + (nextKey.mValue - key.mValue) * factor;
             } else
             {
@@ -75,7 +75,7 @@ void AnimEvaluator::Evaluate( double pTime)
         aiQuaternion presentRotation( 1, 0, 0, 0);
         if( channel->mNumRotationKeys > 0)
         {
-            unsigned int frame = (time >= mLastTime) ? mLastPositions[a].get<1>() : 0;
+            u32 frame = (time >= mLastTime) ? mLastPositions[a].get<1>() : 0;
             while( frame < channel->mNumRotationKeys - 1)
             {
                 if( time < channel->mRotationKeys[frame+1].mTime)
@@ -84,15 +84,15 @@ void AnimEvaluator::Evaluate( double pTime)
             }
 
             // interpolate between this frame's value and next frame's value
-            unsigned int nextFrame = (frame + 1) % channel->mNumRotationKeys;
+            u32 nextFrame = (frame + 1) % channel->mNumRotationKeys;
             const aiQuatKey& key = channel->mRotationKeys[frame];
             const aiQuatKey& nextKey = channel->mRotationKeys[nextFrame];
-            double diffTime = nextKey.mTime - key.mTime;
+            f64 diffTime = nextKey.mTime - key.mTime;
             if( diffTime < 0.0)
                 diffTime += mAnim->mDuration;
             if( diffTime > 0)
             {
-                float factor = float( (time - key.mTime) / diffTime);
+                f32 factor = f32( (time - key.mTime) / diffTime);
                 aiQuaternion::Interpolate( presentRotation, key.mValue, nextKey.mValue, factor);
             } else
             {
@@ -106,7 +106,7 @@ void AnimEvaluator::Evaluate( double pTime)
         aiVector3D presentScaling( 1, 1, 1);
         if( channel->mNumScalingKeys > 0)
         {
-            unsigned int frame = (time >= mLastTime) ? mLastPositions[a].get<2>() : 0;
+            u32 frame = (time >= mLastTime) ? mLastPositions[a].get<2>() : 0;
             while( frame < channel->mNumScalingKeys - 1)
             {
                 if( time < channel->mScalingKeys[frame+1].mTime)

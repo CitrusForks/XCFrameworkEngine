@@ -23,12 +23,12 @@ namespace GameState
         virtual ~RunningState(void);
 
         void                    Init();
-        void                    Update(float dt);
+        void                    Update(f32 dt);
         void                    Draw(XC_Graphics& graphicsSystem);
         void                    Destroy();
 
     private:
-        int                     m_currentMainPlayableActor;
+        i32                     m_currentMainPlayableActor;
         bool                    m_bMainPlayerSet;
 
         XC_LightManager*        m_lightManagerSystem;

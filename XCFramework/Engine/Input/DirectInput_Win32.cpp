@@ -19,7 +19,7 @@ DirectInput_Win32::DirectInput_Win32()
     m_pMouse = nullptr;
 }
 
-void DirectInput_Win32::Init(HINSTANCE _hAppInstance, HWND _hAppWnd, unsigned long keyboardCoopFlags,unsigned long mouseCoopFlags)
+void DirectInput_Win32::Init(HINSTANCE _hAppInstance, HWND _hAppWnd, u64 keyboardCoopFlags,u64 mouseCoopFlags)
 {
 #if !defined(EDITOR)
     ValidateResult(DirectInput8Create(  _hAppInstance,
@@ -112,7 +112,7 @@ void DirectInput_Win32::SetFakeKeyDown(char key)
     }
 }
 
-void DirectInput_Win32::SetFakeMouseInput(FakeMouseInputType type, float value)
+void DirectInput_Win32::SetFakeMouseInput(FakeMouseInputType type, f32 value)
 {
     auto it = m_fakeMouseInputsMap.find(type);
     if (it != m_fakeMouseInputsMap.end())
@@ -132,7 +132,7 @@ bool DirectInput_Win32::KeyDown(char key)
     return (m_KeyboardState[key]&0x80) != 0;
 }
 
-bool DirectInput_Win32::MouseButtonDown(int button)
+bool DirectInput_Win32::MouseButtonDown(i32 button)
 {
     if (m_MouseState.rgbButtons[0])
     {
@@ -141,7 +141,7 @@ bool DirectInput_Win32::MouseButtonDown(int button)
     return (m_MouseState.rgbButtons[button]&0x80)!=0;
 }
 
-float DirectInput_Win32::MouseDX()
+f32 DirectInput_Win32::MouseDX()
 {
     auto it = m_fakeMouseInputsMap.find(MOUSEINPUT_DX);
     if (it != m_fakeMouseInputsMap.end() && it->second != 0.0f)
@@ -149,10 +149,10 @@ float DirectInput_Win32::MouseDX()
         return it->second;
     }
 
-    return (float)m_MouseState.lX;
+    return (f32)m_MouseState.lX;
 }
 
-float DirectInput_Win32::MouseDY()
+f32 DirectInput_Win32::MouseDY()
 {
     auto it = m_fakeMouseInputsMap.find(MOUSEINPUT_DY);
     if (it != m_fakeMouseInputsMap.end() && it->second != 0.0f)
@@ -160,12 +160,12 @@ float DirectInput_Win32::MouseDY()
         return it->second;
     }
 
-    return (float)m_MouseState.lY;
+    return (f32)m_MouseState.lY;
 }
 
-float DirectInput_Win32::MouseDZ()
+f32 DirectInput_Win32::MouseDZ()
 {
-    return (float)m_MouseState.lZ;
+    return (f32)m_MouseState.lZ;
 }
 
 #endif

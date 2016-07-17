@@ -17,7 +17,7 @@ NPCSoldier::~NPCSoldier(void)
 {
 }
 
-void NPCSoldier::Init(int actorId)
+void NPCSoldier::Init(i32 actorId)
 {
     Soldier::Init(actorId);
 
@@ -32,7 +32,7 @@ void NPCSoldier::Init(int actorId)
     m_AIBrain->SetState(ACTIONSTATE_WALK);
 }
 
-void NPCSoldier::Update(float dt)
+void NPCSoldier::Update(f32 dt)
 {
     //Update Brain with current scenarios.
     m_AIBrain->Update(dt);

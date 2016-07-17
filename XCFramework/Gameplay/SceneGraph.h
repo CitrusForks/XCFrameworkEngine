@@ -17,7 +17,7 @@ public:
     virtual ~SceneGraph();
 
     virtual void            Init() {}
-    virtual void            Update(float dt) {}
+    virtual void            Update(f32 dt) {}
     virtual void            Draw(XC_Graphics& graphics) {}
     virtual void            Destroy() {}
 

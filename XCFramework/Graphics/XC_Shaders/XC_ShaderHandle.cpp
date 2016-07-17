@@ -113,7 +113,7 @@ void XCShaderHandle::ReadShaderDescription()
     D3D_SHADER_DESC psShaderDesc = {};
     m_psShaderReflection->GetDesc(&psShaderDesc);
 
-    for (unsigned int cbIndex = 0; cbIndex < vsShaderDesc.ConstantBuffers; ++cbIndex)
+    for (u32 cbIndex = 0; cbIndex < vsShaderDesc.ConstantBuffers; ++cbIndex)
     {
         D3D_SHADER_BUFFER_DESC desc = {};
         m_vsShaderReflection->GetConstantBufferByIndex(cbIndex)->GetDesc(&desc);
@@ -130,7 +130,7 @@ void XCShaderHandle::ReadShaderDescription()
 #endif
     }
 
-    for (unsigned int cbIndex = 0; cbIndex < psShaderDesc.ConstantBuffers; ++cbIndex)
+    for (u32 cbIndex = 0; cbIndex < psShaderDesc.ConstantBuffers; ++cbIndex)
     {
         D3D_SHADER_BUFFER_DESC desc = {};
         m_psShaderReflection->GetConstantBufferByIndex(cbIndex)->GetDesc(&desc);
@@ -148,7 +148,7 @@ void XCShaderHandle::ReadShaderDescription()
     }
 
     //Read the resource slots from vs.
-    for (unsigned int resBoundIndex = 0; resBoundIndex < vsShaderDesc.BoundResources; ++resBoundIndex)
+    for (u32 resBoundIndex = 0; resBoundIndex < vsShaderDesc.BoundResources; ++resBoundIndex)
     {
         D3D_SHADER_INPUT_BIND_DESC inputDesc = {};
         m_vsShaderReflection->GetResourceBindingDesc(resBoundIndex, &inputDesc);
@@ -164,7 +164,7 @@ void XCShaderHandle::ReadShaderDescription()
     }
 
     //Read the resource slots from ps.
-    for (unsigned int resBoundIndex = 0; resBoundIndex < psShaderDesc.BoundResources; ++resBoundIndex)
+    for (u32 resBoundIndex = 0; resBoundIndex < psShaderDesc.BoundResources; ++resBoundIndex)
     {
         D3D_SHADER_INPUT_BIND_DESC inputDesc = {};
         m_psShaderReflection->GetResourceBindingDesc(resBoundIndex, &inputDesc);
@@ -182,7 +182,7 @@ void XCShaderHandle::ReadShaderDescription()
     //Sort the slots according to a priority
     SortSlots();
 
-    for (unsigned int slotIndex = 0; slotIndex < m_shaderSlots.size(); ++slotIndex)
+    for (u32 slotIndex = 0; slotIndex < m_shaderSlots.size(); ++slotIndex)
     {
         Logger("Slot [ %d ]  : Variable : %s", slotIndex, m_shaderSlots[slotIndex].GetBufferName().c_str());
     }
@@ -192,7 +192,7 @@ void XCShaderHandle::ReadShaderDescription()
     std::vector<std::string> semanticNames;
 
     //Input parameters are suppose to be of vertex shader.
-    for (unsigned int ipParamIndex = 0; ipParamIndex < vsShaderDesc.InputParameters; ++ipParamIndex)
+    for (u32 ipParamIndex = 0; ipParamIndex < vsShaderDesc.InputParameters; ++ipParamIndex)
     {
         D3D_SIGNATURE_PARAMETER_DESC desc = {};
         m_vsShaderReflection->GetInputParameterDesc(ipParamIndex, &desc);
@@ -204,9 +204,9 @@ void XCShaderHandle::ReadShaderDescription()
     m_inputLayoutDesc = GetInputLayoutFromVertexFormat(m_vertexFormat);
 }
 
-unsigned int XCShaderHandle::GetSizeOfConstantBuffer(std::string& cbName)
+u32 XCShaderHandle::GetSizeOfConstantBuffer(std::string& cbName)
 {
-    unsigned int cbSize = 0;
+    u32 cbSize = 0;
     auto shaderSlot = std::find_if(m_shaderSlots.begin(), m_shaderSlots.end(), [&cbName](ShaderSlot it) -> bool { return strcmp(it.GetBufferName().c_str(), cbName.c_str()) == 0; });
         
     if (shaderSlot != m_shaderSlots.end())
@@ -225,11 +225,11 @@ void XCShaderHandle::GenerateRootSignature()
     std::vector<CD3DX12_DESCRIPTOR_RANGE> descRanges(m_shaderSlots.size(), CD3DX12_DESCRIPTOR_RANGE());
     std::vector<CD3DX12_ROOT_PARAMETER>   rootParams(m_shaderSlots.size(), CD3DX12_ROOT_PARAMETER());
 
-    unsigned int cbCt = 0;
-    unsigned int texCt = 0;
-    unsigned int samCt = 0;
+    u32 cbCt = 0;
+    u32 texCt = 0;
+    u32 samCt = 0;
 
-    for (unsigned int slotIndex = 0; slotIndex < m_shaderSlots.size(); ++slotIndex)
+    for (u32 slotIndex = 0; slotIndex < m_shaderSlots.size(); ++slotIndex)
     {
         //What type?
         BufferType type = m_shaderSlots[slotIndex].m_bufferType;
@@ -338,19 +338,19 @@ void XCShaderHandle::GeneratePSO()
 
 void XCShaderHandle::SortSlots()
 {
-    for (unsigned int slotIndex = 0; slotIndex < m_shaderSlots.size() - 1; ++slotIndex)
+    for (u32 slotIndex = 0; slotIndex < m_shaderSlots.size() - 1; ++slotIndex)
     {
         std::string bufferName = m_shaderSlots[slotIndex].GetBufferName();
 
-        unsigned int priorityValue = GetSlotPriority(bufferName);
-        int swapIndex = -1;
+        u32 priorityValue = GetSlotPriority(bufferName);
+        i32 swapIndex = -1;
 
-        for (unsigned int cmpSlotIndex = slotIndex + 1; cmpSlotIndex < m_shaderSlots.size(); ++cmpSlotIndex)
+        for (u32 cmpSlotIndex = slotIndex + 1; cmpSlotIndex < m_shaderSlots.size(); ++cmpSlotIndex)
         {
             //Find priority of the current compare slot.
             std::string bufferName = m_shaderSlots[cmpSlotIndex].GetBufferName();
 
-            unsigned int comparePrioritySlot = GetSlotPriority(bufferName);
+            u32 comparePrioritySlot = GetSlotPriority(bufferName);
 
             if (priorityValue > comparePrioritySlot)
             {
@@ -369,9 +369,9 @@ void XCShaderHandle::SortSlots()
     }
 }
 
-unsigned int XCShaderHandle::GetSlotPriority(std::string bufferName)
+u32 XCShaderHandle::GetSlotPriority(std::string bufferName)
 {
-    for (unsigned int bufferIndex = 0; bufferIndex < gs_slotPriority.size(); ++bufferIndex)
+    for (u32 bufferIndex = 0; bufferIndex < gs_slotPriority.size(); ++bufferIndex)
     {
         if (strcmp(bufferName.c_str(), gs_slotPriority[bufferIndex].c_str()) == 0)
         {
@@ -412,7 +412,7 @@ void XCShaderHandle::SetConstantBuffer(std::string bufferName, ID3DDeviceContext
 
     if (bufferRes != m_shaderSlots.end())
     {
-        unsigned int slotNb = bufferRes - m_shaderSlots.begin();
+        u32 slotNb = bufferRes - m_shaderSlots.begin();
 
 #if defined(XCGRAPHICS_DX12)
         context.SetGraphicsRootDescriptorTable(slotNb, constantBuffer.m_gpuHandle);
@@ -445,7 +445,7 @@ void XCShaderHandle::SetSampler(std::string bufferName, ID3DDeviceContext& conte
     if (bufferRes != m_shaderSlots.end())
     {
 #if defined(XCGRAPHICS_DX12)
-        unsigned int slotNb = bufferRes - m_shaderSlots.begin();
+        u32 slotNb = bufferRes - m_shaderSlots.begin();
 
         context.SetGraphicsRootDescriptorTable(slotNb, gpuHandle);
 #elif defined(XCGRAPHICS_DX11)
@@ -474,7 +474,7 @@ void XCShaderHandle::SetResource(std::string bufferName, ID3DDeviceContext& cont
 
     if (tex && bufferRes != m_shaderSlots.end())
     {
-        unsigned int slotNb = bufferRes - m_shaderSlots.begin();
+        u32 slotNb = bufferRes - m_shaderSlots.begin();
 
         switch (tex->m_Resource->GetResourceType())
         {

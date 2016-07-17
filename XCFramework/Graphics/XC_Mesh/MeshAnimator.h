@@ -41,7 +41,7 @@ public:
         }
     }
 
-    int                         m_channelIndex;
+    i32                         m_channelIndex;
 
     XCMatrix4                   m_worldTransform;
     XCMatrix4                   m_localTransform;
@@ -65,8 +65,8 @@ public:
         PlayAnimation(0);
     }
 
-    void                             PlayAnimation(unsigned int animIndex);
-    void                             Update(float dt);
+    void                             PlayAnimation(u32 animIndex);
+    void                             Update(f32 dt);
     std::vector<XCMatrix4Unaligned>& GetBoneMatrices(MeshNode* meshNode, BoneHierarchy* boneHierarchy, std::vector<BoneNode>& boneNodes);
 
 protected:
@@ -79,12 +79,12 @@ protected:
 
 private:
 
-    unsigned int                    m_currentAnimationIndex;
+    u32                    m_currentAnimationIndex;
     const MeshNode*                 m_rootNode;
     AnimNode*                       m_currentNodeStructure;
     std::map<const MeshNode*, AnimNode*>  m_mappedMeshNodeAnimNodes;
     std::vector<XCMatrix4Unaligned> m_boneTransforms;
-    unsigned int                    m_nbOfAnimations;
+    u32                    m_nbOfAnimations;
 
     //TODO : For now using aiScene for aiAnimation.
     const aiScene*                  m_scene;

@@ -23,7 +23,7 @@ public:
     XC_GraphicsDx11(void);
     ~XC_GraphicsDx11(void);
     
-    void                        InitGraphicsWindow(HWND _mainWnd, int _width, int _height, bool _enable4xMsaa);
+    void                        InitGraphicsWindow(HWND _mainWnd, i32 _width, i32 _height, bool _enable4xMsaa);
     IDXGISwapChain*             GetSwapChain()      { return m_pSwapChain;   }
 
     ID3DDeviceContext*          GetDeviceContext() { return m_pD3DDeviceContext; }
@@ -44,13 +44,13 @@ public:
     void                        SetupViewPort();
 
     void                        Destroy();
-    void                        Update(float dt);
+    void                        Update(f32 dt);
     void                        BeginScene();
     void                        EndScene();
     void                        BeginSecondaryScene();
     void                        EndSecondaryScene();
     void                        GoFullscreen(bool go);
-    void                        OnResize(int _width, int _height);
+    void                        OnResize(i32 _width, i32 _height);
     void                        TurnOffZ();
     void                        TurnOnZ();
     void                        SetLessEqualDepthStencilView(ID3DDeviceContext& context, bool turnOn);

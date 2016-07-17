@@ -25,15 +25,15 @@ public:
 
     virtual void       PreLoad(IActor* parentActor, XCVec3& initialPosition, std::string pMesh);
     virtual void       Load();
-    virtual void       Update(float dt);
+    virtual void       Update(f32 dt);
     virtual void       Draw(RenderContext& renderContext);
     virtual void       Destroy();
 
-    virtual void       UpdateOffsets(float dt);
+    virtual void       UpdateOffsets(f32 dt);
     virtual void       ApplyOffsetRotation();
 
     void               CheckInput();
-    void               UpdateGunRecoil(float dt);
+    void               UpdateGunRecoil(f32 dt);
     void               ShootBullet(std::string bulletActorType, XCVec3& startPosition, XCVec3& target);
     SubActor*          GetSubActor() { return (SubActor*)this; }
 
@@ -46,10 +46,10 @@ protected:
     XCVec4             m_secondaryUpAxis;
     XCVec4             m_secondaryRightAxis;
 
-    unsigned int       m_noOfBullets;
-    float              m_recoilDelta;
+    u32       m_noOfBullets;
+    f32              m_recoilDelta;
 
-    float              m_recoilMaxTime;
+    f32              m_recoilMaxTime;
     bool               m_canShootBullet;
 
     DirectInput*       m_directInput;

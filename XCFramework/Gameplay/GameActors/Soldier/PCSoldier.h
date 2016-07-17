@@ -18,8 +18,8 @@ public:
     PCSoldier(void);
     virtual ~PCSoldier(void);
 
-    virtual void                        Init(int actorId);
-    virtual void                        Update(float dt);
+    virtual void                        Init(i32 actorId);
+    virtual void                        Update(f32 dt);
 
 protected:
     DirectInput*                        m_directInput;

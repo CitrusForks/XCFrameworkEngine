@@ -73,7 +73,7 @@ void Texture2D::LoadTexture()
     SharedDescriptorHeap& heap = SystemLocator::GetInstance()->RequestSystem<SharedDescriptorHeap>("SharedDescriptorHeap");
     m_diffuseMapTextureSRV = heap.CreateShaderResourceView(m_textureDesc, desc);
 
-    const unsigned int subResCount = m_textureDesc.DepthOrArraySize * m_textureDesc.MipLevels;
+    const u32 subResCount = m_textureDesc.DepthOrArraySize * m_textureDesc.MipLevels;
     UINT64 intermediateUploadBufferSize = GetRequiredIntermediateSize(m_diffuseMapTextureSRV->m_cbResource, 0, subResCount);
     ValidateResult(graphicsSystem.GetDevice()->CreateCommittedResource(
         &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
@@ -108,7 +108,7 @@ void Texture2D::RenderContextCallback(RenderContext& renderContext)
     
     D3D12_SUBRESOURCE_DATA textureData[6];  //Max 6 subResources counts required by cube maps.
 
-    for (unsigned int imageIndex = 0; imageIndex < m_scratchImage.GetImageCount(); ++imageIndex)
+    for (u32 imageIndex = 0; imageIndex < m_scratchImage.GetImageCount(); ++imageIndex)
     {
         const DirectX::Image* image = m_scratchImage.GetImage(0, imageIndex, 0);
 
@@ -117,7 +117,7 @@ void Texture2D::RenderContextCallback(RenderContext& renderContext)
         textureData[imageIndex].SlicePitch = image->slicePitch;
     }
 
-    const unsigned int subResCount = m_scratchImage.GetMetadata().arraySize;
+    const u32 subResCount = m_scratchImage.GetMetadata().arraySize;
     UpdateSubresources(&context, m_diffuseMapTextureSRV->m_cbResource, m_diffuseMapTextureSRVUpload->m_cbResource, 0, 0, subResCount, &textureData[0]);
 
     context.ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_diffuseMapTextureSRV->m_cbResource, D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE));

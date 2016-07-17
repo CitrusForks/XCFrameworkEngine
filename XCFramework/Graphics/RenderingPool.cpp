@@ -28,7 +28,7 @@ void RenderingPool::Init()
     m_ppCmdList[0] = &m_FrameCommandList[0].GetDeviceContext();
 #endif
 
-    for (unsigned int workerIndex = 0; workerIndex < NbRenderWorkerThreads; ++workerIndex)
+    for (u32 workerIndex = 0; workerIndex < NbRenderWorkerThreads; ++workerIndex)
     {
         //Create worker threads and initialize their render context
         m_renderWorkers[workerIndex].Init();
@@ -55,7 +55,7 @@ void RenderingPool::Destroy()
     }
 }
 
-void RenderingPool::AddRenderableObject(IRenderableObject* obj, int baseObjId)
+void RenderingPool::AddRenderableObject(IRenderableObject* obj, i32 baseObjId)
 {
     //Add from main thread only.
     RenderWorkerType workerType = obj->GetRenderOnWorkerType();
@@ -64,7 +64,7 @@ void RenderingPool::AddRenderableObject(IRenderableObject* obj, int baseObjId)
     m_renderWorkers[workerType].m_renderableObjectRefList[baseObjId] = obj;
 }
 
-void RenderingPool::RemoveRenderableObject(IRenderableObject* obj, int baseObjId)
+void RenderingPool::RemoveRenderableObject(IRenderableObject* obj, i32 baseObjId)
 {
     RenderWorkerType workerType = obj->GetRenderOnWorkerType();
     workerType = workerType < WorkerType_Max ? workerType : WorkerType_Misc;
@@ -223,7 +223,7 @@ void RenderingPool::RenderWorker::Init()
     m_finishRender.CreateEvent();
 }
 
-int RenderingPool::RenderWorker::WorkerThreadFunc(void* param)
+i32 RenderingPool::RenderWorker::WorkerThreadFunc(void* param)
 {
     RenderWorker* worker = (RenderWorker*)param;
 

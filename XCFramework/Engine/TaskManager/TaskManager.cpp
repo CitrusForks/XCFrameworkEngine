@@ -14,7 +14,7 @@ TaskManager::~TaskManager(void)
 }
 
 #if defined(WIN32)
-unsigned long WINAPI RunProcess(void* lpParam)
+u64 WINAPI RunProcess(void* lpParam)
 #elif defined(XC_ORBIS)
 void* RunProcess(void* lpParam)
 #endif
@@ -33,7 +33,7 @@ void* RunProcess(void* lpParam)
 #endif
 }
 
-std::future<int> TaskManager::RegisterTask(ITask *_pTask)
+std::future<i32> TaskManager::RegisterTask(ITask *_pTask)
 {
     m_taskQueue.push_back(_pTask);
 
@@ -54,7 +54,7 @@ std::future<int> TaskManager::RegisterTask(ITask *_pTask)
     return m_taskQueue.back()->GetFuture();
 }
 
-bool TaskManager::UnregisterTask(unsigned int _id)
+bool TaskManager::UnregisterTask(u32 _id)
 {
     m_taskQueue[_id]->GetThreadHandle()->Join();
 
@@ -68,21 +68,21 @@ bool TaskManager::UnregisterTask(unsigned int _id)
     return true;
 }
 
-bool TaskManager::UnregisterTask(unsigned long threadId)
+bool TaskManager::UnregisterTask(u64 threadId)
 {
-    int index = GetTaskIndex(threadId);
+    i32 index = GetTaskIndex(threadId);
 
     if (index != -1)
     {
-        UnregisterTask((unsigned int) index);
+        UnregisterTask((u32) index);
     }
 
     return false;
 }
 
-ETaskState TaskManager::GetTaskState(unsigned long threadId)
+ETaskState TaskManager::GetTaskState(u64 threadId)
 {
-    int index = GetTaskIndex(threadId);
+    i32 index = GetTaskIndex(threadId);
 
     if (index != -1)
     {
@@ -91,10 +91,10 @@ ETaskState TaskManager::GetTaskState(unsigned long threadId)
     return TASKSTATE_INVALID;
 }
 
-int TaskManager::GetTaskIndex(unsigned long threadId)
+i32 TaskManager::GetTaskIndex(u64 threadId)
 {
     //Find the task with the thread Id
-    for (unsigned int index = 0; index < m_taskQueue.size(); index++)
+    for (u32 index = 0; index < m_taskQueue.size(); index++)
     {
         if (m_taskQueue[index]->GetThreadId() == threadId)
         {
@@ -108,7 +108,7 @@ int TaskManager::GetTaskIndex(unsigned long threadId)
 
 void TaskManager::UnregisterAllTasks()
 {
-    for (unsigned int i = 0; i < m_taskQueue.size(); i++)
+    for (u32 i = 0; i < m_taskQueue.size(); i++)
     {
         m_taskQueue.erase(m_taskQueue.begin() + i);
     }
@@ -116,7 +116,7 @@ void TaskManager::UnregisterAllTasks()
 
 void TaskManager::Update()
 {
-        for(unsigned int i=0; i < m_taskQueue.size(); i++)
+        for(u32 i=0; i < m_taskQueue.size(); i++)
         {
             switch(m_taskQueue[i]->GetState())
             {
@@ -150,7 +150,7 @@ void TaskManager::Update()
 bool TaskManager::CreateAsyncThread()
 {
     //Create a new Thread and init the process
-    unsigned long threadID = 0;
+    u64 threadID = 0;
     
     Thread* threadHandle = XCNEW(Thread); 
     threadHandle->CreateThread((runFunction)RunProcess, m_taskQueue.back());

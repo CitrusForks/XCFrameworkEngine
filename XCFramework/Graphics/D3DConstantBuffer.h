@@ -22,13 +22,13 @@ enum BufferType
 class D3DBufferDesc
 {
 public:
-    D3DBufferDesc(BufferType type, unsigned int size)
+    D3DBufferDesc(BufferType type, u32 size)
         : m_bufferType(type), m_bufferSize(size)
     {
     }
 
     BufferType   m_bufferType;
-    unsigned int m_bufferSize;
+    u32 m_bufferSize;
 };
 
 class D3DConstantBuffer
@@ -37,8 +37,8 @@ public:
 
     explicit D3DConstantBuffer(BufferType type);
 
-    void UploadZeroMemoryDataOnGPU(ID3DDeviceContext& context, unsigned int sizeOfBuffer);
-    void UploadDataOnGPU(ID3DDeviceContext& context, void* buffer, unsigned int sizeOfBuffer);
+    void UploadZeroMemoryDataOnGPU(ID3DDeviceContext& context, u32 sizeOfBuffer);
+    void UploadDataOnGPU(ID3DDeviceContext& context, void* buffer, u32 sizeOfBuffer);
     void Release();
 
 #if defined(XCGRAPHICS_DX12)
@@ -52,8 +52,8 @@ public:
     D3DShaderResourceView*      m_cbResource;   //SRV
 #endif
     
-    unsigned int*               m_cbDataBegin;
+    u32*               m_cbDataBegin;
     BufferType                  m_bufferType;
     bool                        m_isInUse;
-    unsigned int                m_sizeOfBuffer;
+    u32                m_sizeOfBuffer;
 };

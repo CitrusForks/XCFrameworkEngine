@@ -35,7 +35,7 @@ protected:
     bool                    LoadScene(FbxManager* pManager, FbxDocument* pScene, const char* pFilename);
     void                    DisplayMetaData(FbxScene* pScene);
     void                    DisplayHierarchy(FbxScene* pScene);
-    void                    DisplayHierarchy(FbxNode* pNode, int pDepth);
+    void                    DisplayHierarchy(FbxNode* pNode, i32 pDepth);
     void                    DisplayContent(FbxScene* pScene);
     void                    DisplayContent(FbxNode* pNode);
     void                    ParseMesh(FbxNode* pNode);

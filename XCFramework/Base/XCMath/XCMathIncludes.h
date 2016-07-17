@@ -12,13 +12,6 @@
 
 #else
 
-//#define USE_DIRECTX_MATH
-
-#if defined(USE_DIRECTX_MATH)
-#define _XM_NO_INTRINSICS_
-#include <DirectXMath.h>
-#else
-
 #include <DirectXMath.h>
 
 #include "XCIntrincis.inl"
@@ -26,25 +19,8 @@
 #include "XCFloat3.h"
 #include "XCFloat4.h"
 #include "XCMatrix.h"
-#endif
 
 #include "Assimp/include/assimp/matrix4x4.h"
-#endif
-
-#if defined(USE_DIRECTX_MATH)
-
-typedef DirectX::XMFLOAT2    XCVec2;
-typedef DirectX::XMFLOAT3    XCVec3;
-typedef DirectX::XMFLOAT4    XCVec4;
-typedef DirectX::XMMATRIX    XCMatrix4;
-typedef DirectX::XMMATRIX    XCMatrix4Unaligned;
-typedef DirectX::XMVECTOR    XCVec4;
-typedef XCMatrix4            XCMatrix4Unaligned;
-typedef XCVec3               XCVec3Unaligned;
-typedef XCVec4               XCVec4Unaligned;
-typedef XCVec2               XCVec2Unaligned;
-
-#else
 
 //Common types aligned with 16bytes
 using XCVec2    = XCMath::XCFloat2;
@@ -58,12 +34,12 @@ typedef XCMath::XCFloat3Unaligned     XCVec3Unaligned;
 typedef XCMath::XCFloat4Unaligned     XCVec4Unaligned;
 typedef XCMath::XCMatrixUnaligned     XCMatrix4Unaligned;
 
-static const float XC_PI        = 3.141592654f;
-static const float XC_2PI       = 6.283185307f;
-static const float XC_1DIVPI    = 0.318309886f;
-static const float XC_1DIV2PI   = 0.159154943f;
-static const float XC_PIDIV2    = 1.570796327f;
-static const float XC_PIDIV4    = 0.785398163f;
+static const f32 XC_PI        = 3.141592654f;
+static const f32 XC_2PI       = 6.283185307f;
+static const f32 XC_1DIVPI    = 0.318309886f;
+static const f32 XC_1DIV2PI   = 0.159154943f;
+static const f32 XC_PIDIV2    = 1.570796327f;
+static const f32 XC_PIDIV4    = 0.785398163f;
 
 using namespace XCMath;
 

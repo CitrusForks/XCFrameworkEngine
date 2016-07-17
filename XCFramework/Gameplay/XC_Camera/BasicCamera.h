@@ -14,23 +14,23 @@ class BasicCamera : public ICamera
 {
 public:
     BasicCamera(void){}
-    BasicCamera(XCVec4& pos, XCVec4& target, XCVec4& up, float aspectRatio, float fov, float nearPlane, float farPlane);
+    BasicCamera(XCVec4& pos, XCVec4& target, XCVec4& up, f32 aspectRatio, f32 fov, f32 nearPlane, f32 farPlane);
 
     virtual ~BasicCamera(void);
 
     void            Init();
-    void            Update(float dt);
+    void            Update(f32 dt);
     void            Destroy();
 
     void            BuildViewMatrix();
     void            BuildProjectionMatrix();
-    void            SetHeight(float dt);
+    void            SetHeight(f32 dt);
     void            SetRotation();
 
 private:
-    float           m_CameraHeight;
-    float           m_CameraRotationY;
-    float           m_CameraRadius;
+    f32           m_CameraHeight;
+    f32           m_CameraRotationY;
+    f32           m_CameraRadius;
 
     DirectInput*    m_directInput;
 };

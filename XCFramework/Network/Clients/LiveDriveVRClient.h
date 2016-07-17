@@ -16,7 +16,7 @@
 class DirectInput;
 
 static const char* IP_ADDRESS = "192.168.1.101";
-static const int   DEFAULT_PORT = 38300;
+static const i32   DEFAULT_PORT = 38300;
 
 enum EAccelerometerInputType
 {
@@ -36,7 +36,7 @@ public:
     LiveDriveVRClient();
     virtual ~LiveDriveVRClient();
 
-    virtual void     Init(const char *ip, int port);
+    virtual void     Init(const char *ip, i32 port);
     virtual void     update();
 
     void             sendTexture();

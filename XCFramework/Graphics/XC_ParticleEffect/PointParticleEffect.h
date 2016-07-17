@@ -11,17 +11,17 @@
 class PointParticleEffect : public IParticleEffect
 {
 public:
-    PointParticleEffect(XCVec3Unaligned& position, const float lifeSpan);
+    PointParticleEffect(XCVec3Unaligned& position, const f32 lifeSpan);
     ~PointParticleEffect();
 
-    void                            Update(float dt);
+    void                            Update(f32 dt);
     void                            Draw(RenderContext& context);
 
 private:
     
     struct PointVertexColor
     {
-        float       x, y, z;
+        f32       x, y, z;
     };
 
     XCVec3Unaligned                 m_particlePosition;

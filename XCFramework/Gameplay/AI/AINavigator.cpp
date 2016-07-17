@@ -8,8 +8,8 @@
 
 #include "AINavigator.h"
 
-const float AINavigator::DISTANCE_ABS          = 5.0f;
-const float AINavigator::LOOK_TARGET_ANGLE_ABS = 0.2f;
+const f32 AINavigator::DISTANCE_ABS          = 5.0f;
+const f32 AINavigator::LOOK_TARGET_ANGLE_ABS = 0.2f;
 
 AINavigator::AINavigator(PhysicsActor* bindActor)
 {
@@ -25,7 +25,7 @@ AINavigator::~AINavigator(void)
 {
 }
 
-void AINavigator::Update(float dt)
+void AINavigator::Update(f32 dt)
 {
     m_currentDelta = dt;
 
@@ -104,7 +104,7 @@ bool AINavigator::IsLookingAtTarget()
     path = VectorNormalize<3>(path);
     look = VectorNormalize<3>(look);
 
-    float angle = CosineVectorDot(path, look);
+    f32 angle = CosineVectorDot(path, look);
 
     if (angle <= XC_2PI && angle >= -XC_2PI)
     {
@@ -121,7 +121,7 @@ bool AINavigator::IsLookingAtTarget()
     return false;
 }
 
-void AINavigator::RotateTowardsTarget(float angle)
+void AINavigator::RotateTowardsTarget(f32 angle)
 {
     //TODO: Require computation of angle in actor's local space, the problem is of the inverse matrix that contains existing rotation.
     //and the rotation axis changes accordingly, giving unexpected results.
@@ -166,7 +166,7 @@ void AINavigator::SetChaseNavigation(PhysicsActor* actor)
 bool AINavigator::HasArrivedAtTarget()
 {
     //Calculate distance of Path vector
-    float pathDistance = VectorLength<3>(m_path);
+    f32 pathDistance = VectorLength<3>(m_path);
 
     //Logger("[Distance] %f %f %f \n", XMVectorGetX(pathDistance), XMVectorGetY(pathDistance), XMVectorGetZ(pathDistance));
 

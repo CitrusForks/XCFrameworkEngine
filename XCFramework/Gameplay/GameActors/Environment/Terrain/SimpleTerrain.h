@@ -21,31 +21,31 @@ public:
     SimpleTerrain(void);
     virtual ~SimpleTerrain(void);
  
-    virtual void                        PreLoad(XCVec3& _initialPosition, int _rows, int _column, float _rowSpacing, float _colSpacing);
+    virtual void                        PreLoad(XCVec3& _initialPosition, i32 _rows, i32 _column, f32 _rowSpacing, f32 _colSpacing);
     virtual void                        Load();
     virtual void                        GenerateVertices();
     virtual void                        GenerateIndicesWithTextureMapping();
     virtual void                        BuildGeometryBuffer();
-    virtual void                        Update(float dt);
+    virtual void                        Update(f32 dt);
     virtual void                        Draw(RenderContext& context);
     virtual void                        Destroy();
 
     void                                ComputeVertices();
-    float                               GetHeight(float _x, float _z); //Builds a hill height
-    virtual int                         GetNoOfVertices() const         { return m_totalVertices;  }
+    f32                               GetHeight(f32 _x, f32 _z); //Builds a hill height
+    virtual i32                         GetNoOfVertices() const         { return m_totalVertices;  }
 
 protected:
     XCVec3                              m_initialPosition;
-    int                                 m_rows;
-    int                                 m_cols;
-    int                                 m_totalVertices;
-    int                                 m_totalIndices;
-    float                               m_rowSpacing;
-    float                               m_colSpacing;
+    i32                                 m_rows;
+    i32                                 m_cols;
+    i32                                 m_totalVertices;
+    i32                                 m_totalIndices;
+    f32                               m_rowSpacing;
+    f32                               m_colSpacing;
 
     VertexBuffer<VertexPosColor>        m_vertexPosColorBuffer;
     VertexBuffer<VertexPosNormTex>      m_vertexPosNormTexBuffer;
-    IndexBuffer<unsigned int>           m_indexBuffer;
+    IndexBuffer<u32>           m_indexBuffer;
 
     ShaderType                          m_useShaderType;
 

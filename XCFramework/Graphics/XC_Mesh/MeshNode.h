@@ -26,7 +26,7 @@ public:
 
         if (tranverse)
         {
-            for (unsigned int childIndex = 0; childIndex < node->mNumChildren; ++childIndex)
+            for (u32 childIndex = 0; childIndex < node->mNumChildren; ++childIndex)
             {
                 if (node->mChildren[childIndex])
                 {

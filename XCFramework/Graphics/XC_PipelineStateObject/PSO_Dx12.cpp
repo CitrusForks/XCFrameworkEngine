@@ -26,7 +26,7 @@ ID3D12RootSignature& PSO_Dx12::GetRootSignature(PSOType type)
     return *m_psos[type].m_rootSignature; 
 }
 
-bool PSO_Dx12::CreateRootSignature(ID3DDevice& device, void* bufferPtr, unsigned int bufferSize, PSOType type)
+bool PSO_Dx12::CreateRootSignature(ID3DDevice& device, void* bufferPtr, u32 bufferSize, PSOType type)
 {
     bool result = ValidateResult(device.CreateRootSignature(0, bufferPtr, bufferSize, IID_PPV_ARGS(&m_psos[type].m_rootSignature))) == S_OK;
     m_psos[type].m_psoDesc.pRootSignature = m_psos[type].m_rootSignature;

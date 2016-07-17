@@ -26,7 +26,7 @@ void IShader::ApplyShader(ID3DDeviceContext& context, RasterType rasterType)
 {
 }
 
-D3DConstantBuffer* IShader::CreateBuffer(BufferType bufferType, int sizeOfType)
+D3DConstantBuffer* IShader::CreateBuffer(BufferType bufferType, i32 sizeOfType)
 {
     D3DConstantBuffer* constantBuff = nullptr;
     if (bufferType == BUFFERTYPE_CBV)

@@ -7,7 +7,7 @@
 #include "GraphicsPrecompiledHeader.h"
 #include "ExplosionParticleEffect.h"
 
-ExplosionParticleEffect::ExplosionParticleEffect(XCVec3Unaligned explosionCentre, unsigned int noOfParticles, float lifeSpan)
+ExplosionParticleEffect::ExplosionParticleEffect(XCVec3Unaligned explosionCentre, u32 noOfParticles, f32 lifeSpan)
 {
     m_explosionCentre = explosionCentre;
     m_lifeSpan = lifeSpan;
@@ -27,32 +27,32 @@ void ExplosionParticleEffect::AssignParticleLocations()
 {
     XCVec3Unaligned initialVelocity = XCVec3Unaligned(0.0f, 0.0f, 0.0f);
 
-    for (unsigned int particleIndex = 0; particleIndex < m_noOfParticles; ++particleIndex)
+    for (u32 particleIndex = 0; particleIndex < m_noOfParticles; ++particleIndex)
     {
         VertexPosNormTex point(m_explosionCentre, XCVec3Unaligned(0.33f, 0.33f, 0.33f), XCVec2Unaligned(0.0f, 0.0f));
         m_pointVertices.push_back(point);
 
         //Compute random velocity for a particle.
-        float randomNegDirection = rand() % 2 ? -1.0f : 1.0f;
+        f32 randomNegDirection = rand() % 2 ? -1.0f : 1.0f;
 
-        initialVelocity.x = (float) randomNegDirection * (rand() % 10) / 10;
-        initialVelocity.y = (float) randomNegDirection * (rand() % 10) / 10;
-        initialVelocity.z = (float) randomNegDirection * (rand() % 10) / 10;
+        initialVelocity.x = (f32) randomNegDirection * (rand() % 10) / 10;
+        initialVelocity.y = (f32) randomNegDirection * (rand() % 10) / 10;
+        initialVelocity.z = (f32) randomNegDirection * (rand() % 10) / 10;
 
         XCVec4 norm = VectorNormalize<3>(XCVec4(initialVelocity.x, initialVelocity.z, initialVelocity.z, 0.0f));
 
-        ParticlePhysics particle = { XCVec4(initialVelocity.x, initialVelocity.y, initialVelocity.z, 0.0f), (float)(rand() % 5)};
+        ParticlePhysics particle = { XCVec4(initialVelocity.x, initialVelocity.y, initialVelocity.z, 0.0f), (f32)(rand() % 5)};
         m_particlesPhysics.push_back(particle);
     }
 }
 
-void ExplosionParticleEffect::Update(float dt)
+void ExplosionParticleEffect::Update(f32 dt)
 {
     IParticleEffect::Update(dt);
 
-    const float DRAG_FORCE = 0.1f;
+    const f32 DRAG_FORCE = 0.1f;
 
-    for (unsigned int particleIndex = 0; particleIndex < m_noOfParticles; ++particleIndex)
+    for (u32 particleIndex = 0; particleIndex < m_noOfParticles; ++particleIndex)
     {
         //Update every particle vertex position as per it's velocity
         //Another way can be compute translation matrix and translate the constant vertex buffer to the world, but every particle would require a diff world?

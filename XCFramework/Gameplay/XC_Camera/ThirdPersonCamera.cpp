@@ -18,7 +18,7 @@ ThirdPersonCamera::~ThirdPersonCamera()
 {
 }
 
-ThirdPersonCamera::ThirdPersonCamera(IActor* actor, XCVec4& pos, XCVec4& target, XCVec4& up, float aspectRatio, float fov, float nearPlane, float farPlane)
+ThirdPersonCamera::ThirdPersonCamera(IActor* actor, XCVec4& pos, XCVec4& target, XCVec4& up, f32 aspectRatio, f32 fov, f32 nearPlane, f32 farPlane)
     : ICamera(pos, target, up, aspectRatio, fov, nearPlane, farPlane)
 {
     m_chaseableActor = actor;
@@ -38,7 +38,7 @@ ThirdPersonCamera::ThirdPersonCamera(IActor* actor, XCVec4& pos, XCVec4& target,
     BuildProjectionMatrix();
 }
 
-void ThirdPersonCamera::Update(float dt)
+void ThirdPersonCamera::Update(f32 dt)
 {
     //Get the target to chase position
     if (m_chaseableActor)
@@ -72,9 +72,9 @@ void ThirdPersonCamera::BuildViewMatrix()
     m_right = VectorCross(m_up, m_look);
     
     //Get origin x, y, z
-    float x = - VectorDot(m_position, m_right);
-    float y = - VectorDot(m_position, m_up);
-    float z = - VectorDot(m_position, m_look);
+    f32 x = - VectorDot(m_position, m_right);
+    f32 y = - VectorDot(m_position, m_up);
+    f32 z = - VectorDot(m_position, m_look);
 
     m_viewMatrix[0][0] = m_right.Get<X>();
     m_viewMatrix[1][0] = m_right.Get<Y>();

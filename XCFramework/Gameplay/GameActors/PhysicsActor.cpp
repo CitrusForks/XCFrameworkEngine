@@ -22,7 +22,7 @@ PhysicsActor::~PhysicsActor(void)
     delete(m_boundBox);
 }
 
-void PhysicsActor::Init(int actorId)
+void PhysicsActor::Init(i32 actorId)
 {
     IActor::Init(actorId);
 
@@ -68,7 +68,7 @@ void PhysicsActor::SetInitialPhysicsProperties()
     }
 }
 
-void PhysicsActor::Update(float dt)
+void PhysicsActor::Update(f32 dt)
 {
     IActor::Update(dt);
 

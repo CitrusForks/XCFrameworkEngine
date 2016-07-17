@@ -19,7 +19,7 @@ AIBrain::~AIBrain(void)
 {
 }
 
-void AIBrain::Update(float dt)
+void AIBrain::Update(f32 dt)
 {
     switch (m_actionState)
     {

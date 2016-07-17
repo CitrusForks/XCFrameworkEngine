@@ -37,7 +37,7 @@ void LoadingState::Init()
     m_futurePackageLoaded = taskMgr.RegisterTask(m_loadPackageTask);
 }
 
-void LoadingState::Update(float dt)
+void LoadingState::Update(f32 dt)
 {
     //Wait for resource loader to complete the loading of resources. When done move to next state.
     if (m_futurePackageLoaded._Is_ready() /*&& m_futurePackageLoaded.wait_for(std::chrono::seconds(1)) == std::future_status::ready */)

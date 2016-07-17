@@ -18,9 +18,9 @@ public:
 #define DECLARE_SYSTEMOBJECT_CREATION(classname) \
     static IBase* createObjectStatic() { return static_cast<IBase*>(XCNEW(classname)); }
 
-    virtual void                    Init(int baseId);
-    int                             GetBaseObjectId() { return m_baseObjectId; }
+    virtual void                    Init(i32 baseId);
+    i32                             GetBaseObjectId() { return m_baseObjectId; }
 
 private:
-    int                             m_baseObjectId;
+    i32                             m_baseObjectId;
 };

@@ -21,13 +21,13 @@ public:
 
     virtual void        PreLoad(XCVec3& initialPosition, std::string pMesh);
     virtual void        Load() override;
-    virtual void        Update(float dt) override;
+    virtual void        Update(f32 dt) override;
     virtual void        Draw(RenderContext& context) override;
     virtual void        Destroy() override;
                         
     void                SetInitialPhysicsProperties() override;
-    void                Accelerate(float dt);
-    void                Steer(float angle, float scalarForce);
+    void                Accelerate(f32 dt);
+    void                Steer(f32 angle, f32 scalarForce);
                         
 protected:              
     ShaderType          m_useShaderType;

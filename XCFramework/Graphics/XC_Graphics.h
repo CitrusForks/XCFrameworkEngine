@@ -18,7 +18,7 @@ public:
     XC_Graphics(void);
     virtual ~XC_Graphics(void);
     
-    virtual  void                   InitGraphicsWindow(HWND _mainWnd, int _width, int _height, bool _enable4xMsaa);
+    virtual  void                   InitGraphicsWindow(HWND _mainWnd, i32 _width, i32 _height, bool _enable4xMsaa);
     ID3DDevice*                     GetDevice()         { return m_pD3DDevice; }
 
     virtual ID3DDeviceContext*      GetDeviceContext() = 0;
@@ -39,7 +39,7 @@ public:
     virtual void                SetupShadersAndRenderPool();
 
     virtual void                Destroy();
-    virtual void                Update(float dt);
+    virtual void                Update(f32 dt);
     virtual void                BeginScene();
     virtual void                EndScene();
     virtual void                BeginSecondaryScene();
@@ -50,12 +50,12 @@ public:
     bool                        IsSecondaryDrawCall() { return m_secondaryDrawCall; }
     void                        SetSecondaryDrawCall(bool isSecondary) { m_secondaryDrawCall = isSecondary; }
     
-    virtual void                OnResize(int _width, int _height);
+    virtual void                OnResize(i32 _width, i32 _height);
     virtual void                SetClearColor(const XCVec4& color)           { m_clearColor = color; }
 
     virtual void                TurnOffZ();
     virtual void                TurnOnZ();
-    unsigned int                GetMsaaQuality() { return m_4xMsaaQuality; }
+    u32                GetMsaaQuality() { return m_4xMsaaQuality; }
 
     virtual ID3D12PipelineState*    GetPipelineState() { return nullptr; }
 
@@ -79,7 +79,7 @@ public:
 #if defined(XCGRAPHICS_GNM)
     virtual sce::Gnm::Sampler&  GetDefaultSampler() = 0;
 #endif
-    virtual int                 GetUserId() { return 0; }
+    virtual i32                 GetUserId() { return 0; }
 
     std::string                 GetDefaultWindowTitle();
     void                        SetWindowTitle(std::string value);
@@ -87,8 +87,8 @@ public:
 protected:
     ID3DDevice*                 m_pD3DDevice;
 
-    int                         m_ClientWidth;
-    int                         m_ClientHeight;
+    i32                         m_ClientWidth;
+    i32                         m_ClientHeight;
     bool                        m_Enable4xMsaa;
     
     HWND                        m_hMainWnd;
@@ -100,7 +100,7 @@ protected:
     RenderableTexture*          m_renderTargets[RENDERTARGET_MAX];
 #endif
     bool                        m_secondaryDrawCall;
-    unsigned int                m_4xMsaaQuality;
+    u32                m_4xMsaaQuality;
     
     XC_ShaderManager*           m_XCShaderSystem;
     RenderingPool*              m_renderingPool;

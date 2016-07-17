@@ -17,26 +17,26 @@ public:
     //Framework Methods
     virtual void            CreateMainWindow();
 
-    virtual int             Init();
+    virtual i32             Init();
     virtual void            OnResize()       = 0;
     virtual void            Run();
-    virtual void            Update(float dt) = 0;
+    virtual void            Update(f32 dt) = 0;
     virtual void            Draw()           = 0;
     virtual void            EnableFullScreenMode(bool enable) {}
     virtual void            Destroy();
 
-    virtual LRESULT         MsgProc(HWND hwnd, unsigned int msg,WPARAM wParam,LPARAM lParam);
+    virtual LRESULT         MsgProc(HWND hwnd, u32 msg,WPARAM wParam,LPARAM lParam);
     
     bool                    IsDeviceLost();
     static  void            GLRun();
 
 protected:
     virtual void            InitMainWindow();
-    virtual void            CalculateFramesPerSecond(float dt) {}	//Call from update method
+    virtual void            CalculateFramesPerSecond(f32 dt) {}	//Call from update method
 
     bool                    m_appInitialized;
 private:
     __int64                 m_cntsPerSec = 0;
-    float                   m_secsPerCnt;
+    f32                   m_secsPerCnt;
     __int64                 m_prevTimeStamp;
 };

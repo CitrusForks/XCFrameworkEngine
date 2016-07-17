@@ -14,8 +14,8 @@ public:
     Client(void);
     virtual ~Client(void);
 
-    virtual void    Init(const char *ip, int port);
-    virtual void    SendData(const char*, int size = -1);
+    virtual void    Init(const char *ip, i32 port);
+    virtual void    SendData(const char*, i32 size = -1);
     virtual char*   ReceiveData();
 
     void            ConnectToServer();

@@ -16,7 +16,7 @@ PCSoldier::~PCSoldier(void)
 {
 }
 
-void PCSoldier::Init(int actorId)
+void PCSoldier::Init(i32 actorId)
 {
     Soldier::Init(actorId);
 
@@ -27,7 +27,7 @@ void PCSoldier::Init(int actorId)
     TPCChaseableActor::SetChasingAxis(m_secondaryLookAxis, m_secondaryRightAxis, m_secondaryUpAxis);
 }
 
-void PCSoldier::Update(float dt)
+void PCSoldier::Update(f32 dt)
 {
     m_gun->CheckInput();
 

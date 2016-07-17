@@ -10,7 +10,7 @@
 #include "Engine/FlatBuffersInterface/FlatBuffersSystem.h"
 
 // default pp steps
-static const unsigned int ppsteps = aiProcess_CalcTangentSpace | // calculate tangents and bitangents if possible
+static const u32 ppsteps = aiProcess_CalcTangentSpace | // calculate tangents and bitangents if possible
                                     aiProcess_JoinIdenticalVertices | // join identical vertices/ optimize indexing
                                     aiProcess_ValidateDataStructure | // perform a full validation of the loader's output
                                     aiProcess_ImproveCacheLocality | // improve the cache locality of the output vertices
@@ -35,7 +35,7 @@ bool XCMeshAssimp::LoadMesh()
 
     auto FBXCMeshRoot = GetFBMesh(fbSystem.GetBufferFromLoadedData());
 
-    for (unsigned int meshIndex = 0; meshIndex < FBXCMeshRoot->meshes()->size(); ++meshIndex)
+    for (u32 meshIndex = 0; meshIndex < FBXCMeshRoot->meshes()->size(); ++meshIndex)
     {
         MeshData* submesh = XCNEW(MeshData);
 
@@ -100,7 +100,7 @@ bool XCMeshAssimp::LoadMesh()
     m_meshRootNode = new MeshNode(m_scene->mRootNode, nullptr, true);
 #endif
 
-    for (unsigned int meshIndex = 0; meshIndex < m_scene->mNumMeshes; ++meshIndex)
+    for (u32 meshIndex = 0; meshIndex < m_scene->mNumMeshes; ++meshIndex)
     {
         MeshData* submesh = CreateAndGetSubMesh();
         {
@@ -119,11 +119,11 @@ bool XCMeshAssimp::LoadMesh()
             std::vector<std::vector<aiVertexWeight> > weightsPerVertex(mesh[meshIndex]->mNumVertices);
 
             //Tranverse every bone and calculate the weight of every vertex in that bone
-            for (unsigned int boneIndex = 0; boneIndex < mesh[meshIndex]->mNumBones; ++boneIndex)
+            for (u32 boneIndex = 0; boneIndex < mesh[meshIndex]->mNumBones; ++boneIndex)
             {
                 const aiBone* bone = mesh[meshIndex]->mBones[boneIndex];
 
-                for (unsigned int weightIndex = 0; weightIndex < bone->mNumWeights; ++weightIndex)
+                for (u32 weightIndex = 0; weightIndex < bone->mNumWeights; ++weightIndex)
                 {
                     weightsPerVertex[bone->mWeights[weightIndex].mVertexId].push_back(aiVertexWeight(boneIndex, bone->mWeights[weightIndex].mWeight));
                 }
@@ -141,10 +141,10 @@ bool XCMeshAssimp::LoadMesh()
             aiVector3D* vertex = mesh[meshIndex]->mVertices;
             aiVector3D** uvCoord = mesh[meshIndex]->mTextureCoords;
 
-            float boneIndex[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-            float boneWeight[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+            f32 boneIndex[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+            f32 boneWeight[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
-            for (unsigned int vertexIndex = 0; vertexIndex < mesh[meshIndex]->mNumVertices; ++vertexIndex)
+            for (u32 vertexIndex = 0; vertexIndex < mesh[meshIndex]->mNumVertices; ++vertexIndex)
             {
                 //Add vertex
                 submesh->AddVertex(vertex[vertexIndex].x, vertex[vertexIndex].y, vertex[vertexIndex].z);
@@ -161,10 +161,10 @@ bool XCMeshAssimp::LoadMesh()
                 {
                     XCASSERT(weightsPerVertex[vertexIndex].size() <= 4);
 
-                    for (unsigned int weightIndex = 0; weightIndex < weightsPerVertex[vertexIndex].size(); ++weightIndex)
+                    for (u32 weightIndex = 0; weightIndex < weightsPerVertex[vertexIndex].size(); ++weightIndex)
                     {
-                        boneIndex[weightIndex] = (float)weightsPerVertex[vertexIndex][weightIndex].mVertexId;
-                        boneWeight[weightIndex] = (float)weightsPerVertex[vertexIndex][weightIndex].mWeight;
+                        boneIndex[weightIndex] = (f32)weightsPerVertex[vertexIndex][weightIndex].mVertexId;
+                        boneWeight[weightIndex] = (f32)weightsPerVertex[vertexIndex][weightIndex].mWeight;
                     }
 
                     submesh->AddBoneInfo(XCVec4Unaligned(boneIndex[0], boneIndex[1], boneIndex[2], boneIndex[3])
@@ -175,8 +175,8 @@ bool XCMeshAssimp::LoadMesh()
 
             //fill the faces
             aiFace* face = mesh[meshIndex]->mFaces;
-            unsigned int* indices = nullptr;
-            for (unsigned int faceIndex = 0; faceIndex < mesh[meshIndex]->mNumFaces; ++faceIndex)
+            u32* indices = nullptr;
+            for (u32 faceIndex = 0; faceIndex < mesh[meshIndex]->mNumFaces; ++faceIndex)
             {
                 indices = face[faceIndex].mIndices;
                 submesh->AddFace(indices[0], indices[1], indices[2], 0);

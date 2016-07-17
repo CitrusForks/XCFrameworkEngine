@@ -20,8 +20,8 @@ enum ENavigationType
 class AINavigator
 {
 public:
-    static const float DISTANCE_ABS;
-    static const float LOOK_TARGET_ANGLE_ABS;
+    static const f32 DISTANCE_ABS;
+    static const f32 LOOK_TARGET_ANGLE_ABS;
 
     AINavigator(PhysicsActor* actor);
     virtual ~AINavigator(void);
@@ -32,9 +32,9 @@ public:
 
     XCVec4                    GetTarget() { return m_targetPosition; }
 
-    void                      Update(float dt);
+    void                      Update(f32 dt);
 
-    void                      RotateTowardsTarget(float angle);
+    void                      RotateTowardsTarget(f32 angle);
     bool                      IsLookingAtTarget();
     void                      MoveOnLook();
     void                      MoveOnPath();
@@ -56,5 +56,5 @@ private:
     PhysicsActor*             m_chaseActor;
                               
     ENavigationType           m_navigateType;
-    float                     m_currentDelta;
+    f32                     m_currentDelta;
 };

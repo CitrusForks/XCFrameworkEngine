@@ -17,12 +17,12 @@ AnimatedActor::~AnimatedActor(void)
 {
 }
 
-void AnimatedActor::Init(int actorId)
+void AnimatedActor::Init(i32 actorId)
 {
     IActor::Init(actorId);
 }
 
-void AnimatedActor::Update(float dt)
+void AnimatedActor::Update(f32 dt)
 {
     IActor::Update(dt);
 }

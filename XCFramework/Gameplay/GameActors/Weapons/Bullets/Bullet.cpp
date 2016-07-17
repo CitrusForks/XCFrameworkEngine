@@ -68,18 +68,18 @@ void Bullet::Load()
 void Bullet::SetInitialPhysicsProperties()
 {
     PhysicsActor::SetInitialPhysicsProperties();
-    InitXPhysics(m_currentPosition, XCVec4(), XCVec4(), 1, (float)0.2);
+    InitXPhysics(m_currentPosition, XCVec4(), XCVec4(), 1, (f32)0.2);
 
     //Load done. Shoot the bullet
     Shoot(5000.0f);
 }
 
-void Bullet::Shoot(float scalarForce)
+void Bullet::Shoot(f32 scalarForce)
 {
     AddForce(m_look * scalarForce);
 }
 
-void Bullet::Update(float dt)
+void Bullet::Update(f32 dt)
 {
     PhysicsActor::Update(dt);
 
@@ -108,8 +108,8 @@ void Bullet::Draw(RenderContext& context)
 #if defined(XCGRAPHICS_DX11)
     context.GetDeviceContext().IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 #endif
-    unsigned int stride = sizeof(VertexPosNormTex);
-    unsigned int offset = 0;
+    u32 stride = sizeof(VertexPosNormTex);
+    u32 offset = 0;
     
     // Set constants
     ICamera& cam = context.GetShaderManagerSystem().GetGlobalShaderData().m_camera;

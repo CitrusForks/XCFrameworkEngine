@@ -69,7 +69,7 @@ typedef void*                           ID3DCommandQueue;
 typedef void*                           ID3DResource;
 typedef void*                           ID3D12PipelineState;
 typedef void*                           ID3D12GraphicsCommandList;
-typedef int                             CPU_DESCRIPTOR_HANDLE;
+typedef i32                             CPU_DESCRIPTOR_HANDLE;
 
 typedef D3D11_TEXTURE2D_DESC            D3D_TEXTURE2D_DESC;
 typedef D3D11_VIEWPORT                  D3D_VIEWPORT;
@@ -95,12 +95,12 @@ typedef D3D11_INPUT_LAYOUT_DESC         D3D_INPUT_LAYOUT_DESC;
 
 struct ViewPort
 {
-    float TopLeftX;
-    float TopLeftY;
-    float Width;
-    float Height;
-    float MinDepth;
-    float MaxDepth;
+    f32 TopLeftX;
+    f32 TopLeftY;
+    f32 Width;
+    f32 Height;
+    f32 MinDepth;
+    f32 MaxDepth;
 };
 
 struct Rect

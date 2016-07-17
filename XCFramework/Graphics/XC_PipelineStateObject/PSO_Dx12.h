@@ -47,7 +47,7 @@ public:
         ID3D12RootSignature*                m_rootSignature;
     };
 
-    bool                                    CreateRootSignature(ID3DDevice& device, void* bufferPtr, unsigned int bufferSize, PSOType type);
+    bool                                    CreateRootSignature(ID3DDevice& device, void* bufferPtr, u32 bufferSize, PSOType type);
     void                                    CreateGraphicPSO(ID3DDevice& context, PSOType type);
 
     ID3D12RootSignature&                    GetRootSignature(PSOType type);

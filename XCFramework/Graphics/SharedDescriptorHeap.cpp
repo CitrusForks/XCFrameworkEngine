@@ -13,7 +13,7 @@ SharedDescriptorHeap::SharedDescriptorHeap()
 {
 }
 
-void SharedDescriptorHeap::Init(ID3DDevice& device, unsigned int nbOfDesc)
+void SharedDescriptorHeap::Init(ID3DDevice& device, u32 nbOfDesc)
 {
     m_device = &device;
 
@@ -155,7 +155,7 @@ D3DConstantBuffer* SharedDescriptorHeap::CreateShaderResourceView()
     }
 }
 
-D3DConstantBuffer* SharedDescriptorHeap::FindFreeConstantBuffer(BufferType type, unsigned int size)
+D3DConstantBuffer* SharedDescriptorHeap::FindFreeConstantBuffer(BufferType type, u32 size)
 {
     for each (D3DConstantBuffer* buffer in m_constantBuffers)
     {

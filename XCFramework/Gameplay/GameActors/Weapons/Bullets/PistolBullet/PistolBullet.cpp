@@ -45,7 +45,7 @@ PistolBullet::PistolBullet(IActor* parentActor, XCVec3& initialPosition, std::st
     m_secondaryRightAxis = XCFloat4::XCFloat4ZeroVector;
 }
 
-void PistolBullet::Init(int actorId)
+void PistolBullet::Init(i32 actorId)
 {
     m_currentPosition += GetOffsetPosition();
 
@@ -64,7 +64,7 @@ void PistolBullet::Init(int actorId)
     m_secondaryRightAxis = m_right;
 }
 
-void PistolBullet::Update(float dt)
+void PistolBullet::Update(f32 dt)
 {
     UpdateOffsets(dt);
 
@@ -79,7 +79,7 @@ void PistolBullet::Update(float dt)
     SimpleMeshActor::Update(dt);
 }
 
-void PistolBullet::UpdateOffsets(float dt)
+void PistolBullet::UpdateOffsets(f32 dt)
 {
     m_look = m_bindedActor->GetLook();
     m_right = m_bindedActor->GetRight();
@@ -110,8 +110,8 @@ void PistolBullet::Draw(RenderContext& context)
 #if defined(XCGRAPHICS_DX11)
     context.GetDeviceContext().IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 #endif
-    unsigned int stride = sizeof(VertexPosNormTex);
-    unsigned int offset = 0;
+    u32 stride = sizeof(VertexPosNormTex);
+    u32 offset = 0;
     
     // Set constants
     ICamera& cam = context.GetShaderManagerSystem().GetGlobalShaderData().m_camera;

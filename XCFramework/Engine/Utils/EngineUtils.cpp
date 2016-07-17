@@ -17,17 +17,17 @@ const WCHAR* charToWideChar(const char* str)
     return wc.c_str();
 }
 
-unsigned int getFilelength(FILE* fp)
+u32 getFilelength(FILE* fp)
 {
     unsigned originalPosition = ftell(fp);
     fseek(fp, 0, SEEK_END);
-    unsigned int endPosition = ftell(fp);
+    u32 endPosition = ftell(fp);
 
     fseek(fp, originalPosition, SEEK_SET);
     return endPosition;
 }
 
-HRESULT ReadRawDataFromFile(const char* filename, UINT8** data, unsigned int& size)
+HRESULT ReadRawDataFromFile(const char* filename, UINT8** data, u32& size)
 {
     FILE* fp = fopen(filename, "rb");
 
@@ -36,10 +36,10 @@ HRESULT ReadRawDataFromFile(const char* filename, UINT8** data, unsigned int& si
     if (fp != nullptr)
     {
         //Get length of data
-        unsigned int length = getFilelength(fp);
+        u32 length = getFilelength(fp);
 
         *data = new UINT8[length];
-        int res = fread(*data, sizeof(byte), length, fp);
+        i32 res = fread(*data, sizeof(byte), length, fp);
         XCASSERT(res > 0);
 
         size = res;

@@ -14,7 +14,7 @@ XPhysics::XPhysics()
     m_GAcceleration = XCVec4(0, -5, 0, 0);
 }
 
-void XPhysics::InitXPhysics(const XCVec4& position, const XCVec4& velocity, const XCVec4& acceleration, float mass, float damping)
+void XPhysics::InitXPhysics(const XCVec4& position, const XCVec4& velocity, const XCVec4& acceleration, f32 mass, f32 damping)
 {
     m_Position = position;
     m_Velocity = velocity;
@@ -45,7 +45,7 @@ void XPhysics::AddForce(const XCVec4& _newForce)
     m_ForceAccumulator += _newForce;
 }
 
-void XPhysics::Integrator(float dt)
+void XPhysics::Integrator(f32 dt)
 {
     //Add gravity to force accumulator
     if (s_enableGravity)
@@ -63,7 +63,7 @@ void XPhysics::Integrator(float dt)
     m_Velocity += currentAcceleration * dt;
 
     //Impose Draging force
-    m_Velocity *= (float)pow( m_Damping, dt);
+    m_Velocity *= (f32)pow( m_Damping, dt);
 }
 
 void XPhysics::ClearForce()
@@ -81,7 +81,7 @@ bool XPhysics::HasFiniteMass() const
     return m_InverseMass >= 0.0f;
 }
 
-float XPhysics::GetMass() const
+f32 XPhysics::GetMass() const
 {
     if (m_InverseMass == 0)
     {

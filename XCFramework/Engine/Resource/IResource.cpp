@@ -17,7 +17,7 @@ IResource::IResource()
 {
 }
 
-void IResource::Init(int id, std::string userFriendlyName)
+void IResource::Init(i32 id, std::string userFriendlyName)
 {
     m_resourceId = id;
     m_userFriendlyName = userFriendlyName;

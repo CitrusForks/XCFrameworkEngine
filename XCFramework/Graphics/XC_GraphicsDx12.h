@@ -25,7 +25,7 @@ public:
     XC_GraphicsDx12(void);
     ~XC_GraphicsDx12(void);
     
-    void                        InitGraphicsWindow(HWND _mainWnd, int _width, int _height, bool _enable4xMsaa);
+    void                        InitGraphicsWindow(HWND _mainWnd, i32 _width, i32 _height, bool _enable4xMsaa);
     IDXGISwapChain*             GetSwapChain()      { return m_pSwapChain;   }
     
     ID3DDevice*                 GetDevice()                     { return m_pD3DDevice; }
@@ -34,12 +34,12 @@ public:
     ID3DCommandAllocator*       GetDeviceCommandAllocator()     { return m_pCommandAllocator; }
     ID3DCommandQueue*           GetCommandQueue()               { return m_pCommandQueue; }
 
-    void                        Update(float dt);
+    void                        Update(f32 dt);
     
     void                        BeginScene();
     void                        EndScene();
     
-    void                        OnResize(int _width, int _height);
+    void                        OnResize(i32 _width, i32 _height);
     void                        SetClearColor(XCVec4& color)    { m_clearColor = color; }
 
     void                        CreateDescriptorHeaps();
@@ -73,7 +73,7 @@ private:
     //RTV - 2 main render targets. Works in swaps
     ID3D12Resource*             m_renderTarget[2];
     ID3D12DescriptorHeap*       m_pRTVDescriptorHeap;
-    int                         m_rtvDescriptorSize;
+    i32                         m_rtvDescriptorSize;
 
     //DepthStencilResource
     ID3D12Resource*             m_depthStencilResource;
@@ -88,9 +88,9 @@ private:
     UINT64                      m_fenceValue;
 
     //FrameIndex
-    unsigned int                m_frameIndex;
+    u32                m_frameIndex;
 
-    std::atomic<int>            m_cmdListRefCount;
+    std::atomic<i32>            m_cmdListRefCount;
     CriticalSection             m_acquireCmdListRefCount;
 
     ID3D12RootSignature*        m_rootSignature;

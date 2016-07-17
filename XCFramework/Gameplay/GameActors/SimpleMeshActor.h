@@ -18,9 +18,9 @@ public:
     SimpleMeshActor();
     virtual ~SimpleMeshActor(void);
 
-    virtual void                Init(int actorId);
+    virtual void                Init(i32 actorId);
     virtual void                PreLoad(const void* fbBuffer) { SimpleActor::PreLoad(fbBuffer); }
-    virtual void                Update(float dt);
+    virtual void                Update(f32 dt);
     virtual void                Draw(RenderContext& renderContext);
     virtual void                Destroy();
 

@@ -17,7 +17,7 @@ class Soldier : public PhysicsActor
 public:
     DECLARE_OBJECT_CREATION(Soldier)
 
-    static const float                  MAX_PITCH_ANGLE;
+    static const f32                  MAX_PITCH_ANGLE;
 
     Soldier(void);
     virtual ~Soldier(void);
@@ -25,7 +25,7 @@ public:
     virtual void           PreLoad(const void* fbBuffer)   override;
     virtual void           Load()                          override;
     virtual void           UpdateState()                   override;
-    virtual void           Update(float dt)                override;
+    virtual void           Update(f32 dt)                override;
     virtual void           Draw(RenderContext& context)    override;
     virtual void           Destroy()                       override;
     virtual void           ApplyRotation(XCMatrix4& rotation);
@@ -33,13 +33,13 @@ public:
     void                   SetInitialPhysicsProperties()   override final;
 
     //Depreciated. Don't use this. Only for testing non axis movement
-    void                   AccelerateCar(float dt);
+    void                   AccelerateCar(f32 dt);
 
-    virtual void           Walk(float scalarForce);
-    virtual void           Jump(float scalarForce);
-    virtual void           Strafe(float scalarForce);
-    virtual void           Yaw(float angle, float scalarForce);
-    virtual void           Pitch(float angle, float scalarForce);
+    virtual void           Walk(f32 scalarForce);
+    virtual void           Jump(f32 scalarForce);
+    virtual void           Strafe(f32 scalarForce);
+    virtual void           Yaw(f32 angle, f32 scalarForce);
+    virtual void           Pitch(f32 angle, f32 scalarForce);
 
 protected:
 
@@ -48,6 +48,6 @@ protected:
     BasicMaterial          m_material;
     bool                   m_isMainCharacter;
 
-    float                  m_totalPitchAngle;
+    f32                    m_totalPitchAngle;
     Gun*                   m_gun;
 };

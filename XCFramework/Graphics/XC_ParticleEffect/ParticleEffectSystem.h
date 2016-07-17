@@ -17,7 +17,7 @@ public:
     ParticleEffectSystem();
     ~ParticleEffectSystem();
 
-    void      Update(float dt);
+    void      Update(f32 dt);
     void      Draw(RenderContext& renderContext);
 
     void      AddParticleEffect(IParticleEffect* effect);

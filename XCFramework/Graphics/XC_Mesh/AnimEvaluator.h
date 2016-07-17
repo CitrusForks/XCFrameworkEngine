@@ -24,8 +24,8 @@ public:
             : val1(v1), val2(v2), val3(v3)
         {}
 
-        template<int index>
-        unsigned int get()
+        template<i32 index>
+        u32 get()
         {
             switch (index)
             {
@@ -36,8 +36,8 @@ public:
             }
         }
 
-        template<int index>
-        void set(unsigned int value)
+        template<i32 index>
+        void set(u32 value)
         {
             switch (index)
             {
@@ -68,7 +68,7 @@ public:
      * @param pTime The time for which you want to evaluate the animation, in seconds. Will be mapped into the animation cycle, so
      *   it can be an arbitrary value. Best use with ever-increasing time stamps.
      */
-    void Evaluate( double pTime);
+    void Evaluate( f64 pTime);
 
     /** Returns the transform matrices calculated at the last Evaluate() call. The array matches the mChannels array of
      * the aiAnimation. */
@@ -81,8 +81,8 @@ protected:
     /** At which frame the last evaluation happened for each channel.
      * Useful to quickly find the corresponding frame for slightly increased time stamps
      */
-    double mLastTime;
-    std::vector<boost::tuple<unsigned int, unsigned int, unsigned int> > mLastPositions;
+    f64 mLastTime;
+    std::vector<boost::tuple<u32, u32, u32> > mLastPositions;
 
     /** The array to store the transformations results of the evaluation */
     std::vector<aiMatrix4x4> mTransforms;

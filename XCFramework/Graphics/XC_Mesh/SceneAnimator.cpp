@@ -20,10 +20,10 @@ SceneAnimator::SceneAnimator( const aiScene* pScene, size_t pAnimIndex)
     mRootNode = NULL;
 
     // build the nodes-for-bones table
-    for (unsigned int i = 0; i < pScene->mNumMeshes;++i)
+    for (u32 i = 0; i < pScene->mNumMeshes;++i)
     {
         const aiMesh* mesh = pScene->mMeshes[i];
-        for (unsigned int n = 0; n < mesh->mNumBones;++n)
+        for (u32 n = 0; n < mesh->mNumBones;++n)
         {
             const aiBone* bone = mesh->mBones[n];
 
@@ -72,7 +72,7 @@ void SceneAnimator::SetAnimIndex( size_t pAnimIndex)
 
 // ------------------------------------------------------------------------------------------------
 // Calculates the node transformations for the scene.
-void SceneAnimator::Calculate( double pTime)
+void SceneAnimator::Calculate( f64 pTime)
 {
     // invalid anim
     if( !mAnimEvaluator)
@@ -159,7 +159,7 @@ SceneAnimNode* SceneAnimator::CreateNodeTree( aiNode* pNode, SceneAnimNode* pPar
     {
         internalNode->mChannelIndex = -1;
         const aiAnimation* currentAnim = mScene->mAnimations[mCurrentAnimIndex];
-        for( unsigned int a = 0; a < currentAnim->mNumChannels; a++)
+        for( u32 a = 0; a < currentAnim->mNumChannels; a++)
         {
             if( currentAnim->mChannels[a]->mNodeName.data == internalNode->mName)
             {
@@ -170,7 +170,7 @@ SceneAnimNode* SceneAnimator::CreateNodeTree( aiNode* pNode, SceneAnimNode* pPar
     }
 
     // continue for all child nodes and assign the created internal nodes as our children
-    for( unsigned int a = 0; a < pNode->mNumChildren; a++)
+    for( u32 a = 0; a < pNode->mNumChildren; a++)
     {
         SceneAnimNode* childNode = CreateNodeTree( pNode->mChildren[a], internalNode);
         internalNode->mChildren.push_back( childNode);

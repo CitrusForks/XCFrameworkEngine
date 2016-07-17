@@ -9,7 +9,7 @@
 #include "Gameplay/XC_Camera/BasicCamera.h"
 #include "Engine/Input/Directinput.h"
 
-BasicCamera::BasicCamera(XCVec4& pos, XCVec4& target, XCVec4& up, float aspectRatio, float fov, float nearPlane, float farPlane)
+BasicCamera::BasicCamera(XCVec4& pos, XCVec4& target, XCVec4& up, f32 aspectRatio, f32 fov, f32 nearPlane, f32 farPlane)
     :ICamera(pos, target, up, aspectRatio, fov, nearPlane, farPlane)
 {
     m_CameraHeight = pos.Get<Y>();
@@ -28,7 +28,7 @@ void BasicCamera::Init()
     ICamera::Init();
 }
 
-void BasicCamera::Update(float dt)
+void BasicCamera::Update(f32 dt)
 {
     SetHeight(dt);
     SetRotation();
@@ -36,7 +36,7 @@ void BasicCamera::Update(float dt)
     ICamera::Update(dt);
 }
 
-void BasicCamera::SetHeight(float dt)
+void BasicCamera::SetHeight(f32 dt)
 {
     if (m_directInput->KeyDown(INPUT_UP))
     {
@@ -53,8 +53,8 @@ void BasicCamera::SetHeight(float dt)
 
 void BasicCamera::SetRotation()
 {
-    float x = 0.0f;
-    float y = 0.0f;
+    f32 x = 0.0f;
+    f32 y = 0.0f;
 
 #if defined(WIN_32) || defined(XC_ORBIS)
     x = m_directInput->MouseDX();
@@ -64,8 +64,8 @@ void BasicCamera::SetRotation()
     y = DIRECTINPUT_DURANGO->getStickValue(0, GAMEPAD_LEFTTHUMBSTICK).y; 
 #endif
 
-    m_CameraRotationY += (float)(x / 25.0f);
-    m_CameraRadius += (float)(y / 25.0f);
+    m_CameraRotationY += (f32)(x / 25.0f);
+    m_CameraRadius += (f32)(y / 25.0f);
 
     if (fabs(m_CameraRotationY) >= 2 * XC_PI)
     {

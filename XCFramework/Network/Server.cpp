@@ -11,7 +11,7 @@ Server::Server(void)
 {
 }
 
-void Server::Init(const char *ip, int port)
+void Server::Init(const char *ip, i32 port)
 {
 #if defined(WIN32)
     m_result = WSAStartup(MAKEWORD(2,2), &m_WsaData);
@@ -37,7 +37,7 @@ Server::~Server(void)
 #endif
 }
 
-void Server::CreateSocket(const char *ip, int port)
+void Server::CreateSocket(const char *ip, i32 port)
 {
 #if defined(WIN32)
     m_socket = socket(AF_INET,SOCK_DGRAM, 0);
@@ -114,7 +114,7 @@ char* Server::ReceiveData()
     return m_RecvBuffer;
 }
 
-void Server::SendData(const char* msg, int size)
+void Server::SendData(const char* msg, i32 size)
 {
 #if defined(WIN32)
     Logger("Sending");

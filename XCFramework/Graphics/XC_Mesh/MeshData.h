@@ -19,31 +19,31 @@ public:
 
     struct Vertex
     {
-        float x;
-        float y;
-        float z;
+        f32 x;
+        f32 y;
+        f32 z;
     };
 
     struct MapCoord
     {
-        float           u;
-        float           v;
+        f32           u;
+        f32           v;
     };
 
     struct Face
     {
-        Face(unsigned short x, unsigned short y, unsigned short z, unsigned short w = 0)
+        Face(u16 x, u16 y, u16 z, u16 w = 0)
             : a(x)
             , b(y)
             , c(z)
             , flags(w)
         {}
 
-        unsigned short a;
-        unsigned short b;
-        unsigned short c;
+        u16 a;
+        u16 b;
+        u16 c;
 
-        unsigned short flags;
+        u16 flags;
     };
 
 
@@ -52,26 +52,26 @@ public:
     void        Init();
     void        Destroy();
 
-    void        AddVertex(float x, float y, float z);
+    void        AddVertex(f32 x, f32 y, f32 z);
     void        AddVertex(Vertex& vert);
-    void        AddMapCoord(float u, float v);
+    void        AddMapCoord(f32 u, f32 v);
     void        AddFace(Face& face);
-    void        AddFace(unsigned short a, unsigned short b, unsigned short c, unsigned short flag);
+    void        AddFace(u16 a, u16 b, u16 c, u16 flag);
     void        AddBoneInfo(XCVec4Unaligned boneIndex, XCVec4Unaligned boneWeight);
 
 
 
-    void        SetNoOfVertices(unsigned int noVerts) { m_noOfVertices = noVerts; }
-    void        SetNoOfFaces(unsigned int noFaces) { m_noOfFaces = noFaces; }
+    void        SetNoOfVertices(u32 noVerts) { m_noOfVertices = noVerts; }
+    void        SetNoOfFaces(u32 noFaces) { m_noOfFaces = noFaces; }
     void        SetObjectName(const char* objName) { m_objectName = objName; }
-    void        SetNoOfBones(unsigned int noBones) { m_noOfBones = noBones; }
+    void        SetNoOfBones(u32 noBones) { m_noOfBones = noBones; }
 
     void        SetGeometryTranslation(XCVec3Unaligned trans) { m_initialTranslation = trans; }
     void        SetGeometryRotation(XCVec3Unaligned rot) { m_initialRotation = rot; }
     void        SetGeometryScaling(XCVec3Unaligned scale) { m_initialScaling = scale; }
 
-    int                    GetNoOfVertices() { return m_noOfVertices; }
-    int                    GetNoOfFaces() { return m_noOfFaces; }
+    i32                    GetNoOfVertices() { return m_noOfVertices; }
+    i32                    GetNoOfFaces() { return m_noOfFaces; }
     std::string            GetSubMeshName() { return m_objectName; }
 
     const XCVec3Unaligned& GetGeometryTranslation()     { return m_initialTranslation; }
@@ -81,7 +81,7 @@ public:
     //Get Geometry buffers
     void*                       GetVertexBuffer()   { return m_vertexBuffer; }
     void*                       GetInstanceBuffer() { return m_instanceBuffer; }
-    IndexBuffer<unsigned int>&  GetIndexBuffer()    { return m_indexBuffer; }
+    IndexBuffer<u32>&  GetIndexBuffer()    { return m_indexBuffer; }
 
     //Raw Geometry containers. TODO : Clear them when buffers are created.
     std::vector<Vertex>                m_vertices;
@@ -95,18 +95,18 @@ public:
     MeshNode*                          m_meshNodeStructure;
 #endif
 
-    float                               m_width;
+    f32                               m_width;
 
 private:
 
     //Geometry Buffers
     void*                              m_vertexBuffer;
     void*                              m_instanceBuffer;
-    IndexBuffer<unsigned int>          m_indexBuffer;
+    IndexBuffer<u32>          m_indexBuffer;
 
-    unsigned int                       m_noOfBones;
-    unsigned int                       m_noOfVertices;
-    unsigned int                       m_noOfFaces;
+    u32                       m_noOfBones;
+    u32                       m_noOfVertices;
+    u32                       m_noOfFaces;
 
     std::string                        m_objectName;
     ShaderType                         m_shaderType;

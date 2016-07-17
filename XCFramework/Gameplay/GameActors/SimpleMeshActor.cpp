@@ -17,12 +17,12 @@ SimpleMeshActor::~SimpleMeshActor(void)
 {
 }
 
-void SimpleMeshActor::Init(int actorId)
+void SimpleMeshActor::Init(i32 actorId)
 {
     SimpleActor::Init(actorId);
 }
 
-void SimpleMeshActor::Update(float dt)
+void SimpleMeshActor::Update(f32 dt)
 {
     SimpleActor::Update(dt);
 }

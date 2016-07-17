@@ -83,7 +83,7 @@ void XUserInterface::InitXui(HWND hWnd)
 }
 
 
-void XUserInterface::XCreateFont(float fontSize)
+void XUserInterface::XCreateFont(f32 fontSize)
 {
 }
 
@@ -96,7 +96,7 @@ void XUserInterface::UIRenderBeginScene()
 {
 }
 
-void XUserInterface::XDrawText(int _fontTypeIndex, XCVec4& color, float x, float y, LPCWSTR text)
+void XUserInterface::XDrawText(i32 _fontTypeIndex, XCVec4& color, f32 x, f32 y, LPCWSTR text)
 {
 }
 
@@ -118,7 +118,7 @@ void XUserInterface::XDrawText()
         m_pIRenderTarget->EndDraw();
 }
 
-void XUserInterface::DrawAnimatedText(int _fontTypeIndex, XCVec4& color, float x, float y, LPCWSTR text, float animSpeed)
+void XUserInterface::DrawAnimatedText(i32 _fontTypeIndex, XCVec4& color, f32 x, f32 y, LPCWSTR text, f32 animSpeed)
 {
     m_alphaFactor *= animSpeed;
     color.Set<W>(m_alphaFactor);

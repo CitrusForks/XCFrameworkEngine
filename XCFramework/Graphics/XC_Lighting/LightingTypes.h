@@ -59,7 +59,7 @@ struct PointLight : public ILight
 
     //Packed in 4D vector : (Position, Range)
     XCVec3Unaligned            Position;
-    float                      Range;
+    f32                      Range;
 
     //Packed into 4D vector: (A0, A1, A2)
     XCVec3Unaligned            Att;
@@ -78,11 +78,11 @@ struct SpotLight : public ILight
 
     //Packed into 4D vector : (Position, Range)
     XCVec3Unaligned            Position;
-    float                      Range;
+    f32                      Range;
 
     //Packed into 4D : (Direction, Spot)
     XCVec3Unaligned            Direction;
-    float                      Spot;
+    f32                      Spot;
 
     //Packed into 4D vector: (A0, A1, A2)
     XCVec3Unaligned            Att;

@@ -26,7 +26,7 @@ void GameState::PauseState::Init()
     IGameState::Init();
 }
 
-void PauseState::Update(float dt)
+void PauseState::Update(f32 dt)
 {
 }
 

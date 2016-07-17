@@ -21,18 +21,18 @@ class RenderingPool
 {
 public:
 
-    static const int NbRenderWorkerThreads = WorkerType_Max;
-    static const int NbFrameCommandList    = 1;
+    static const i32 NbRenderWorkerThreads = WorkerType_Max;
+    static const i32 NbFrameCommandList    = 1;
 
     struct RenderWorker
     {
         XCSyncEvent                         m_beginRender;
         XCSyncEvent                         m_finishRender;
 
-        int                                 m_workerId;
+        i32                                 m_workerId;
         bool                                m_running;
         RenderContext                       m_renderContext;
-        std::map<int, IRenderableObject*>   m_renderableObjectRefList;
+        std::map<i32, IRenderableObject*>   m_renderableObjectRefList;
         std::vector<IResource*>             m_resourceRefList;
 
         Thread                              m_workerThread;
@@ -40,7 +40,7 @@ public:
         void                                Init();
         void                                Destroy();
 
-        static int                          WorkerThreadFunc(void* param);
+        static i32                          WorkerThreadFunc(void* param);
     };
 
 
@@ -49,15 +49,15 @@ public:
     void                Init();
 
     //Gameplay Actors request
-    void                AddRenderableObject(IRenderableObject* obj, int baseObjId);      //Objects/Actors to be drawn
-    void                RemoveRenderableObject(IRenderableObject* obj, int baseObjId);
+    void                AddRenderableObject(IRenderableObject* obj, i32 baseObjId);      //Objects/Actors to be drawn
+    void                RemoveRenderableObject(IRenderableObject* obj, i32 baseObjId);
 
     //Resources related request
     void                AddResourceDrawable(IResource* obj);
     void                RemoveResourceDrawable(IResource* obj);
     void                RequestResourceDeviceContext(IResource* graphicsBuffer);
 
-    void                Update(float dt);                                               //Use it to push and pop renderable objects, since in update we remove the actors.
+    void                Update(f32 dt);                                               //Use it to push and pop renderable objects, since in update we remove the actors.
     void                Begin(RenderTargetsType targetType);                            //Signal the workers to draw
     void                Render();
     void                End();                                                          //Signal end and call execute command list on main thread

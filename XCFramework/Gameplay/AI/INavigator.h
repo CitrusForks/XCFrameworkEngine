@@ -15,12 +15,12 @@ public:
     INavigator(void);
     virtual ~INavigator(void);
 
-    virtual void                    Walk(float scalarForce)                 {}
-    virtual void                    Jump(float scalarForce)                 {}
-    virtual void                    Strafe(float scalarForce)               {}
-    virtual void                    Yaw(float angle, float scalarForce)     {}
-    virtual void                    Pitch(float angle, float scalarForce)   {}
+    virtual void                    Walk(f32 scalarForce)                 {}
+    virtual void                    Jump(f32 scalarForce)                 {}
+    virtual void                    Strafe(f32 scalarForce)               {}
+    virtual void                    Yaw(f32 angle, f32 scalarForce)     {}
+    virtual void                    Pitch(f32 angle, f32 scalarForce)   {}
 
-    virtual void                    Accelerate(float dt)                    {}
-    virtual void                    Steer(float angle, float scalarForce)   {}
+    virtual void                    Accelerate(f32 dt)                    {}
+    virtual void                    Steer(f32 angle, f32 scalarForce)   {}
 };

@@ -17,11 +17,11 @@ public:
     FontActor();
     virtual ~FontActor(void);
     
-    virtual void                        Init(int actorId) override;
+    virtual void                        Init(i32 actorId) override;
     virtual void                        PreLoad(const void* fbBuffer) override;
     virtual void                        Load() override;
     virtual void                        UpdateState() override;
-    virtual void                        Update(float dt) override;
+    virtual void                        Update(f32 dt) override;
     virtual void                        Draw(RenderContext& context) override;
     virtual void                        Destroy() override;
     

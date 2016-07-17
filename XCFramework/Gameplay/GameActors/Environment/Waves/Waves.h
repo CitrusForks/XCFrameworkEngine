@@ -17,8 +17,8 @@ public:
     virtual ~Waves(void);
  
     virtual void                        Preload(const void* fbBuff);
-    virtual void                        PreLoad(XCVec3& _initialPosition, int _rows, int _column, float _rowSpacing, float _colSpacing);
-    virtual void                        Update(float dt);
+    virtual void                        PreLoad(XCVec3& _initialPosition, i32 _rows, i32 _column, f32 _rowSpacing, f32 _colSpacing);
+    virtual void                        Update(f32 dt);
     virtual void                        Draw(RenderContext& context);
     virtual void                        Destroy();
 };

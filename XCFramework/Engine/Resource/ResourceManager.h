@@ -33,21 +33,21 @@ public:
     void                                   CreateAddResource(std::string resourceTypeName, std::string userFriendlyName, const void* startFBResourcePtr);
 
 #if defined(LEGACY_LOADING)
-    int                                    LoadResourcesFromPackage(char* filePath);
+    i32                                    LoadResourcesFromPackage(char* filePath);
 #endif
 
-    int                                    LoadResourcesFromPackageFB(const char* dataPath);
+    i32                                    LoadResourcesFromPackageFB(const char* dataPath);
 
     ResourceHandle&                        AcquireResource(const char* userFriendlyName);
     void                                   ReleaseResource(ResourceHandle* resHandle);
 
     ResourceFactory&                       GetResourceFactory() { return *m_resourceFactory; }
-    int                                    GetNoOfResources()   { return m_ResourcePool.size();  }
+    i32                                    GetNoOfResources()   { return m_ResourcePool.size();  }
     bool                                   IsPackageLoaded();
 
 #if defined(EDITOR)
     void                                   GetResourceList(ResourceInfo* recourcePtr);
-    const char*                            GetResourceNameAtIndex(int index);
+    const char*                            GetResourceNameAtIndex(i32 index);
 #endif
     
     void                                   Destroy();
@@ -55,7 +55,7 @@ public:
 private:
     
     std::map<std::string, ResourceHandle>  m_ResourcePool;
-    std::vector<unsigned long>             m_PackagePoolTaskThreadId;
+    std::vector<u64>             m_PackagePoolTaskThreadId;
                                            
     ResourceFactory*                       m_resourceFactory;
     TaskManager*                           m_taskManager;

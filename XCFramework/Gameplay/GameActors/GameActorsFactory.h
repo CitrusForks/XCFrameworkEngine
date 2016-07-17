@@ -47,12 +47,12 @@ public:
     
     void                            DestroyFactory();
 
-    int                             GetNoOfActorTypes() { return GAMEACTOR_MAX; }
+    i32                             GetNoOfActorTypes() { return GAMEACTOR_MAX; }
     void                            GetAllActorTypes(GameActorsInfo* actorTypes);
 
 private:
     std::map<EGameActorType, std::string>       m_registeredActors;
     std::mutex                                  m_gameActorsFactoryLock;
 
-    int                                         m_actorsCount;
+    i32                                         m_actorsCount;
 };

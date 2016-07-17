@@ -207,7 +207,7 @@ void WorldPendingTasks::Destroy()
     AsyncTask::Destroy();
 }
 
-void World::Update(float dt)
+void World::Update(f32 dt)
 {
     if (m_addRemoveFlag.load(std::memory_order_acquire))
     {
@@ -261,7 +261,7 @@ void World::RequestAddActor(IActor* actor)
 
 void World::AddActor(IActor* actor)
 {
-    int actorId = actor->GetBaseObjectId();
+    i32 actorId = actor->GetBaseObjectId();
     Logger("[WORLD] Adding actor id : %d", actorId);
 
     //Check if it's physics actor
@@ -295,15 +295,15 @@ void World::AddActor(IActor* actor)
     //m_GameObjects[actorId]->SetWorldReady(true);
 }
 
-void World::RequestRemoveActor(int key)
+void World::RequestRemoveActor(i32 key)
 {
     WorldPendingTasks::IPendingTask* task = new WorldPendingTasks::PendingTaskRemove(WorldPendingTasks::PENDINGTASK_REMOVE, key);
     m_worldPendingTasks->AddTask(task);
 }
 
-void World::RemoveActor(int _key)
+void World::RemoveActor(i32 _key)
 {
-    std::map<int, IActor*>::iterator it;
+    std::map<i32, IActor*>::iterator it;
     it = m_GameObjects.find(_key);
 
     if ( it != m_GameObjects.end())
@@ -327,7 +327,7 @@ void World::RemoveActor(int _key)
     }
 }
 
-bool World::IsActorReady(int actorId)
+bool World::IsActorReady(i32 actorId)
 {
     if (m_GameObjects.find(actorId) != m_GameObjects.end())
     {
@@ -338,7 +338,7 @@ bool World::IsActorReady(int actorId)
     return false;
 }
 
-void World::removeKey(std::vector<int>& list, int key)
+void World::removeKey(std::vector<i32>& list, i32 key)
 {
     for (auto it = list.begin(); it != list.end(); ++it)
     {
@@ -382,10 +382,10 @@ void World::CheckAllCollisions()
         {
             if (m_PhysicsActorIDs.size() > 0)
             {
-                std::vector<int>::iterator obj1;
+                std::vector<i32>::iterator obj1;
                 for (obj1 = m_PhysicsActorIDs.begin(); obj1 != m_PhysicsActorIDs.end() - 1; ++obj1)
                 {
-                    std::vector<int>::iterator obj2;
+                    std::vector<i32>::iterator obj2;
                     for (obj2 = obj1 + 1; obj2 != m_PhysicsActorIDs.end(); ++obj2)
                     {
                         if (*obj1 && *obj2 && CheckCollision((PhysicsActor*)m_GameObjects[*obj1], (PhysicsActor*)m_GameObjects[*obj2]))
@@ -439,7 +439,7 @@ bool World::CheckCollision(PhysicsActor* obj1, PhysicsActor* obj2)
                 if (!IsVectorEqual(contactPoint, XCVec4::XCFloat4ZeroVector))
                 {
                     //This is a impulse particle contact resolver, it actually first puts an object on a vertex
-                    XCVec4 direction = XCVec4(0.0f, (float)(contactPoint.Get<Y>()) + (float)0.1, 0.0f, 0.0f);
+                    XCVec4 direction = XCVec4(0.0f, (f32)(contactPoint.Get<Y>()) + (f32)0.1, 0.0f, 0.0f);
                     m_particleContact.ApplyImpulse(bboxActor, direction);
 
                     //This I am trying now to make it work with existing collision resolver, works perfectly.
@@ -490,12 +490,12 @@ bool World::CheckCollision(PhysicsActor* obj1, PhysicsActor* obj2)
 
 
 
-IActor* World::GetActor(int _InstanceID)
+IActor* World::GetActor(i32 _InstanceID)
 {
     return m_GameObjects[_InstanceID];
 }
 
-int World::GetInstanceIdOfActor(IActor* actor)
+i32 World::GetInstanceIdOfActor(IActor* actor)
 {
     for (auto& gameObject : m_GameObjects)
     {
@@ -508,7 +508,7 @@ int World::GetInstanceIdOfActor(IActor* actor)
     return -1;
 }
 
-void World::SetMainPlayableCharacter(int instanceId)
+void World::SetMainPlayableCharacter(i32 instanceId)
 { 
     if (m_GameObjects[instanceId] != nullptr)
     {
@@ -529,10 +529,10 @@ void World::SetMainPlayableCharacter(int instanceId)
     }
 }
 
-int	World::GetNextPlayableActor(int instanceId)
+i32	World::GetNextPlayableActor(i32 instanceId)
 {
     //First find the match
-    for (unsigned int index = 0; index < m_PlayableCharacterActors.size(); index++)
+    for (u32 index = 0; index < m_PlayableCharacterActors.size(); index++)
     {
         if (m_PlayableCharacterActors[index] == instanceId)
         {
@@ -556,7 +556,7 @@ int	World::GetNextPlayableActor(int instanceId)
 
 #if defined(EDITOR)
 
-extern "C" __declspec(dllexport) int GetNoOfActors()
+extern "C" __declspec(dllexport) i32 GetNoOfActors()
 {
     return WORLD->GetNumOfActors();
 }

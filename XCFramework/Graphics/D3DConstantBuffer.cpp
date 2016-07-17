@@ -14,7 +14,7 @@ D3DConstantBuffer::D3DConstantBuffer(BufferType type)
     m_isInUse = false;
 }
 
-void D3DConstantBuffer::UploadZeroMemoryDataOnGPU(ID3DDeviceContext& context, unsigned int sizeOfBuffer)
+void D3DConstantBuffer::UploadZeroMemoryDataOnGPU(ID3DDeviceContext& context, u32 sizeOfBuffer)
 {
     XCASSERT(m_sizeOfBuffer >= sizeOfBuffer);
 
@@ -31,7 +31,7 @@ void D3DConstantBuffer::UploadZeroMemoryDataOnGPU(ID3DDeviceContext& context, un
 #endif
 }
 
-void D3DConstantBuffer::UploadDataOnGPU(ID3DDeviceContext& context, void* buffer, unsigned int sizeOfBuffer)
+void D3DConstantBuffer::UploadDataOnGPU(ID3DDeviceContext& context, void* buffer, u32 sizeOfBuffer)
 {
     XCASSERT(m_sizeOfBuffer >= sizeOfBuffer);
 

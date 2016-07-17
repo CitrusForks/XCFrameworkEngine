@@ -57,8 +57,8 @@ void Terrain::PreLoad(const void* fbBuffer)
     
     m_rows = fbTerrainBuff->Rows();
     m_cols = fbTerrainBuff->Column();
-    m_rowSpacing = (float)fbTerrainBuff->RowSpacing();
-    m_colSpacing = (float)fbTerrainBuff->ColSpacing();
+    m_rowSpacing = (f32)fbTerrainBuff->RowSpacing();
+    m_colSpacing = (f32)fbTerrainBuff->ColSpacing();
 
     ComputeVertices();
 
@@ -75,10 +75,10 @@ void Terrain::PreLoad(const char* _pHeightMapFileName,
     std::string terrainTexture2,
     std::string blendMap,
     XCVec3& initialPosition, 
-    int _rows, 
-    int _column, 
-    float _rowSpacing, 
-    float _colSpacing)
+    i32 _rows, 
+    i32 _column, 
+    f32 _rowSpacing, 
+    f32 _colSpacing)
 {
     m_pHeightMapFileName = getPlatformPath(_pHeightMapFileName);
 
@@ -110,7 +110,7 @@ void Terrain::Load()
     UnloadHeightMap();
 
     XCVec3 vec = XCVec3(0, 0, 0);
-    InitXPhysics(XCVec4(m_initialPosition), XCVec4(vec), XCVec4(vec), 1000, (float)0.2); //Immovable
+    InitXPhysics(XCVec4(m_initialPosition), XCVec4(vec), XCVec4(vec), 1000, (f32)0.2); //Immovable
     
     //Terrain is loaded, so fire up the world ready event
     Event_World event(EventType_WorldReady);
@@ -139,13 +139,13 @@ void Terrain::GenerateVertices()
     //Set the position of every vertex
     m_vertexPosNormTexBuffer.m_vertexData.resize(m_totalVertices);
 
-    int verticesIndex = 0;
-    int bitmapRGBIndex = 0;
+    i32 verticesIndex = 0;
+    i32 bitmapRGBIndex = 0;
 
     XCVec4 vMin(Infinity, Infinity, Infinity, 1);
     XCVec4 vMax(-Infinity, -Infinity, -Infinity, 1);
     
-    int noOfQuads = 4;
+    i32 noOfQuads = 4;
     
     //Setup of quadruples, which divides the terrain into smaller quads. Conduct object test on the quads and moving towards the most inner quad within the OBBHierarchy
     //First create root bound box
@@ -185,16 +185,16 @@ void Terrain::GenerateVertices()
     m_OBBHierarchy->AddQuad(std::move(rootQuad));
 
 
-    for (int rowIndex = 0; rowIndex < m_rows; rowIndex++)
+    for (i32 rowIndex = 0; rowIndex < m_rows; rowIndex++)
     {
-        for (int colIndex = 0; colIndex < m_cols; colIndex++)
+        for (i32 colIndex = 0; colIndex < m_cols; colIndex++)
         {
-            float x = m_initialPosition.Get<X>() - (colIndex * m_rowSpacing);
-            float z = m_initialPosition.Get<Z>() + (rowIndex * m_colSpacing);
+            f32 x = m_initialPosition.Get<X>() - (colIndex * m_rowSpacing);
+            f32 z = m_initialPosition.Get<Z>() + (rowIndex * m_colSpacing);
       
             //float y = m_initialPosition.y + (float)GetHeightAt( (m_rows * rowIndex) + colIndex)/15.0f;
             //float y = m_initialPosition.y + ((float) GetHeightAt(k) / 10.0f);
-            float y = (float) GetHeightAt(bitmapRGBIndex) / 50.0f;
+            f32 y = (f32) GetHeightAt(bitmapRGBIndex) / 50.0f;
 
             //Necessary increment by 3, as the bitmap contains rgb format at each pixel, thus increment by 3.
             bitmapRGBIndex += 3;
@@ -219,7 +219,7 @@ void Terrain::GenerateVerticesNormal()
 {
     //Traverse through the vertices
 
-    for(unsigned int vertexIndex = 0; vertexIndex < m_indexBuffer.m_indexData.size() - 3; vertexIndex += 3)
+    for(u32 vertexIndex = 0; vertexIndex < m_indexBuffer.m_indexData.size() - 3; vertexIndex += 3)
     {
         XCVec4 v1(m_vertexPosNormTexBuffer.m_vertexData[m_indexBuffer.m_indexData[vertexIndex]].Pos);
         XCVec4 v2(m_vertexPosNormTexBuffer.m_vertexData[m_indexBuffer.m_indexData[vertexIndex + 1]].Pos);
@@ -245,9 +245,9 @@ XCVec4 Terrain::CheckTerrainCollisionFromPoint(OrientedBoundingBox* bbox)
     if (quad != nullptr)
     {
         //Find the vertex within the terrain quad
-        for (int rowIndex = quad->m_rowStart; rowIndex < quad->m_rowEnd; rowIndex++)
+        for (i32 rowIndex = quad->m_rowStart; rowIndex < quad->m_rowEnd; rowIndex++)
         {
-            for (int colIndex = quad->m_colStart; colIndex < quad->m_colEnd; colIndex++)
+            for (i32 colIndex = quad->m_colStart; colIndex < quad->m_colEnd; colIndex++)
             {
                 vertexPos = XCVec4(m_vertexPosNormTexBuffer.m_vertexData[quad->m_totalWidth * rowIndex + colIndex].Pos);
 
@@ -268,9 +268,9 @@ XCVec4 Terrain::CheckTerrainCollisionFromPoint(OrientedBoundingBox* bbox)
 void Terrain::LoadHeightMap()
 {
     FILE *pFilePtr;
-    int error;
+    i32 error;
 
-    unsigned int count;
+    u32 count;
 
     BITMAPFILEHEADER bitmapFileHeader;
     BITMAPINFOHEADER bitmapInfoHeader;
@@ -307,9 +307,9 @@ void Terrain::LoadHeightMap()
 
     m_totalVertices = m_rows * m_cols;
 
-    int imageSize = m_rows * m_cols * 3;
+    i32 imageSize = m_rows * m_cols * 3;
 
-    m_pBitmapImage = new unsigned char[imageSize];
+    m_pBitmapImage = new u8[imageSize];
 
     //Move to first position within the bitmap file
     fseek(pFilePtr, bitmapFileHeader.bfOffBits, SEEK_SET);
@@ -335,18 +335,18 @@ void Terrain::UnloadHeightMap()
     }
 }
 
-char Terrain::GetHeightAt(int _index) const
+char Terrain::GetHeightAt(i32 _index) const
 {
     return m_pBitmapImage[_index];
 }
 
-XCVec4 Terrain::GetPointAtIndex(int pointIndex) const
+XCVec4 Terrain::GetPointAtIndex(i32 pointIndex) const
 {
     XCVec3Unaligned vec = m_vertexPosNormTexBuffer.m_vertexData[pointIndex].Pos;
     return XCVec4(vec);
 }
 
-void Terrain::Update(float dt)
+void Terrain::Update(f32 dt)
 {
     SimpleTerrain::Update(dt);
 
@@ -415,7 +415,7 @@ void Terrain::Destroy()
     heap.DestroyBuffer(m_pCBPerObject);
 }
 
-XCVec3 Terrain::GetTerrainNormal(float x, float z) const
+XCVec3 Terrain::GetTerrainNormal(f32 x, f32 z) const
 {
     return XCVec3(0,0,0);
 }

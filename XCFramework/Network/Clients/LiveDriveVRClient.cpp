@@ -20,7 +20,7 @@ LiveDriveVRClient::~LiveDriveVRClient()
 {
 }
 
-void LiveDriveVRClient::Init(const char *ip, int port)
+void LiveDriveVRClient::Init(const char *ip, i32 port)
 {
     Client::Init(ip, port);
     m_directInput = (DirectInput*) &SystemLocator::GetInstance()->RequestSystem("InputSystem");
@@ -72,7 +72,7 @@ void LiveDriveVRClient::receiveInputs()
 
 void LiveDriveVRClient::processAccelerometerInputs(const char* pData)
 {
-    unsigned int index = 0;
+    u32 index = 0;
     
     while (pData[index] != '\0')
     {
@@ -109,7 +109,7 @@ void LiveDriveVRClient::processAccelerometerInputs(const char* pData)
 void LiveDriveVRClient::normalizeTexData()
 {
 #if defined(XCGRAPHICS_DX11)
-    for (unsigned int index = 0; index < m_texInfo->m_texSize; index++)
+    for (u32 index = 0; index < m_texInfo->m_texSize; index++)
     {
         if (m_texInfo->m_texData[index] == '\n' || m_texInfo->m_texData[index] == 0 || m_texInfo->m_texData[index] == '\r')
         {

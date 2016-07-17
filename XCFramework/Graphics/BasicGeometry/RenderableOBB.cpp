@@ -34,7 +34,7 @@ void RenderableOBB::Init()
     m_material.Specular = XCVec4(0.2f, 0.2f, 0.2f, 16.0f);
 }
 
-void RenderableOBB::Update(float dt)
+void RenderableOBB::Update(f32 dt)
 {
 #if defined(DEBUG_OBB)
     m_MScaling     = XMMatrixScaling(m_TransformedBox.Extents.x, m_TransformedBox.Extents.y, m_TransformedBox.Extents.z);
@@ -62,7 +62,7 @@ void RenderableOBB::Update(float dt)
     ValidateResult(graphicsSystem.GetDeviceContext()->Map(m_pVB, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData));
     VertexPosNormTex* v = (VertexPosNormTex*)mappedData.pData;
 
-    for(unsigned int vertexIndex = 0; vertexIndex < m_vertices.size(); vertexIndex++)
+    for(u32 vertexIndex = 0; vertexIndex < m_vertices.size(); vertexIndex++)
     {
         XMVECTOR vector = XMLoadFloat3(&m_vertices[vertexIndex].Pos);
         XMFLOAT3 value;

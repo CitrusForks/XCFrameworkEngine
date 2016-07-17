@@ -10,13 +10,13 @@ class ICamera
 {
 public:
     ICamera(void);
-    ICamera(XCVec4& _pos, XCVec4& _target, XCVec4& _up, float _aspectRatio, float _fov, float _near, float _far);
+    ICamera(XCVec4& _pos, XCVec4& _target, XCVec4& _up, f32 _aspectRatio, f32 _fov, f32 _near, f32 _far);
 
     virtual ~ICamera(void);
 
     virtual void            Init();
-    virtual void            Update(float dt);
-    virtual void            OnResize(int clientWidth, int clientHeight);
+    virtual void            Update(f32 dt);
+    virtual void            OnResize(i32 clientWidth, i32 clientHeight);
     virtual void            Destroy();
 
     virtual void            BuildViewMatrix();
@@ -31,17 +31,17 @@ public:
     XCVec4                  GetPosition() { return m_position; }
     void                    SetPosition(const XCVec4& _position) { m_position = _position; }
 
-    void                    SetAspectRatio(float _aspectRatio) { m_aspectRatio = _aspectRatio; }
+    void                    SetAspectRatio(f32 _aspectRatio) { m_aspectRatio = _aspectRatio; }
     void                    SetUp(const XCVec4& _up) { m_up = _up; }
-    void                    SetFOV(float _angle) { m_fov = _angle; }
-    void                    SetNearPlane(float _value) { m_nearPlane = _value; }
-    void                    SetFarPlane(float _value) { m_farPlane = _value; }
+    void                    SetFOV(f32 _angle) { m_fov = _angle; }
+    void                    SetNearPlane(f32 _value) { m_nearPlane = _value; }
+    void                    SetFarPlane(f32 _value) { m_farPlane = _value; }
 
 protected:
-    float                   m_aspectRatio;
-    float                   m_fov;
-    float                   m_nearPlane;
-    float                   m_farPlane;
+    f32                   m_aspectRatio;
+    f32                   m_fov;
+    f32                   m_nearPlane;
+    f32                   m_farPlane;
 
     XCVec4                  m_target;
     XCVec4                  m_position;

@@ -97,7 +97,7 @@ extern "C" __declspec(dllexport) void GetAllStateTypes(void* info)
 {
 }
 
-extern "C" __declspec(dllexport) int GetNoOfStateTypes()
+extern "C" __declspec(dllexport) i32 GetNoOfStateTypes()
 {
     return 0;
 }

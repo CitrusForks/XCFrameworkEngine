@@ -18,7 +18,7 @@ public:
     XC_GraphicsGL(void);
     virtual ~XC_GraphicsGL(void);
     
-    virtual  void               InitGraphicsWindow(HWND _mainWnd, int _width, int _height, bool _enable4xMsaa);
+    virtual  void               InitGraphicsWindow(HWND _mainWnd, i32 _width, i32 _height, bool _enable4xMsaa);
     ID3DDevice*                 GetDevice()         { return m_pD3DDevice; }
 
     virtual ID3DDeviceContext*      GetDeviceContext() { return nullptr; }
@@ -39,7 +39,7 @@ public:
     virtual void                SetupShadersAndRenderPool();
 
     virtual void                Destroy();
-    virtual void                Update(float dt);
+    virtual void                Update(f32 dt);
     virtual void                BeginScene();
     virtual void                EndScene();
     virtual void                BeginSecondaryScene();
@@ -50,12 +50,12 @@ public:
     bool                        IsSecondaryDrawCall() { return m_secondaryDrawCall; }
     void                        SetSecondaryDrawCall(bool isSecondary) { m_secondaryDrawCall = isSecondary; }
     
-    virtual void                OnResize(int _width, int _height);
+    virtual void                OnResize(i32 _width, i32 _height);
     virtual void                SetClearColor(XCVec4 color)           { m_clearColor = color; }
 
     virtual void                TurnOffZ();
     virtual void                TurnOnZ();
-    unsigned int                GetMsaaQuality() { return m_4xMsaaQuality; }
+    u32                GetMsaaQuality() { return m_4xMsaaQuality; }
 
     virtual ID3D12PipelineState* GetPipelineState() { return nullptr; }
 
@@ -68,7 +68,7 @@ public:
     void                        PresentRenderTarget(ID3D12GraphicsCommandList* cmdList) {}
     virtual void                ClearRTVAndDSV(ID3D12GraphicsCommandList* cmdList){}
     
-    virtual int                 GetUserId() { return 0; }
+    virtual i32                 GetUserId() { return 0; }
 
 private:
 #if defined(DEBUG_GRAPHICS_PIPELINE)

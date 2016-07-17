@@ -58,7 +58,7 @@ void XC_LightManager::InitializeLights()
     m_eyePos = XCVec4(0, 0, 0, 0);
 }
 
-void XC_LightManager::Update(float dt)
+void XC_LightManager::Update(f32 dt)
 {
     // Build the view matrix.
     XC_Graphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XC_Graphics>("GraphicsSystem");
@@ -100,7 +100,7 @@ void XC_LightManager::Draw(XC_Graphics& graphicsSystem)
 
 void XC_LightManager::Destroy()
 {
-    for (int index = 0; index < LIGHTTYPE_MAX; index++)
+    for (i32 index = 0; index < LIGHTTYPE_MAX; index++)
     {
         delete(m_Lights[(ELightType)index]);
     }

@@ -24,7 +24,7 @@ SimpleTerrain::~SimpleTerrain(void)
 {
 }
 
-void SimpleTerrain::PreLoad(XCVec3& _initialPosition, int _rows, int _column, float _rowSpacing, float _colSpacing)
+void SimpleTerrain::PreLoad(XCVec3& _initialPosition, i32 _rows, i32 _column, f32 _rowSpacing, f32 _colSpacing)
 {
     //Get initial position
     m_initialPosition = _initialPosition;
@@ -57,15 +57,15 @@ void SimpleTerrain::GenerateVertices()
     //Set the position of every vertex
     m_vertexPosColorBuffer.m_vertexData.resize(m_totalVertices);
 
-    int verticesIndex = 0;
+    i32 verticesIndex = 0;
 
-    for (int rowIndex = 0; rowIndex < m_rows; rowIndex++)
+    for (i32 rowIndex = 0; rowIndex < m_rows; rowIndex++)
     {
-        for (int colIndex = 0; colIndex < m_cols; colIndex++)
+        for (i32 colIndex = 0; colIndex < m_cols; colIndex++)
         {
-            float x = m_initialPosition.Get<X>() - (colIndex * m_rowSpacing);
-            float z = m_initialPosition.Get<Z>() + (rowIndex * m_colSpacing);
-            float y = GetHeight(x, z);
+            f32 x = m_initialPosition.Get<X>() - (colIndex * m_rowSpacing);
+            f32 z = m_initialPosition.Get<Z>() + (rowIndex * m_colSpacing);
+            f32 y = GetHeight(x, z);
 
             XCVec4 color;
             switch (rand() % 3)
@@ -110,18 +110,18 @@ void SimpleTerrain::GenerateVertices()
 void SimpleTerrain::GenerateIndicesWithTextureMapping()
 {
     //Set the indices
-    unsigned int faceCount = (m_rows - 1) * (m_cols - 1) * 2;
+    u32 faceCount = (m_rows - 1) * (m_cols - 1) * 2;
 
     m_indexBuffer.m_indexData.resize(faceCount * 3);
     m_totalIndices = m_indexBuffer.m_indexData.size();
-    int indicesIndex = 0;
+    i32 indicesIndex = 0;
 
-    float u = 1.0f / (m_rows - 1);
-    float v = 1.0f / (m_cols - 1);
+    f32 u = 1.0f / (m_rows - 1);
+    f32 v = 1.0f / (m_cols - 1);
 
-    for(int rowIndex = 0; rowIndex < m_rows - 1; rowIndex++)
+    for(i32 rowIndex = 0; rowIndex < m_rows - 1; rowIndex++)
     {
-        for(int colIndex = 0; colIndex < m_cols - 1 ; colIndex++)
+        for(i32 colIndex = 0; colIndex < m_cols - 1 ; colIndex++)
         {
             m_indexBuffer.m_indexData[indicesIndex] = rowIndex * m_cols + colIndex;
             m_indexBuffer.m_indexData[indicesIndex + 1] = rowIndex * m_cols + (colIndex + 1);
@@ -162,12 +162,12 @@ void SimpleTerrain::BuildGeometryBuffer()
     }
 }
 
-float SimpleTerrain::GetHeight(float _x, float _z)
+f32 SimpleTerrain::GetHeight(f32 _x, f32 _z)
 {
     return 0.3f*(_z*sinf(0.1f*_x) + _x*cosf(0.1f*_z));
 }
 
-void SimpleTerrain::Update(float dt)
+void SimpleTerrain::Update(f32 dt)
 {
 }
 

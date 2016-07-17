@@ -14,7 +14,7 @@ namespace
     static AppFramework_Win32* g_pD3DApp = nullptr;
 }
 
-LRESULT CALLBACK MainWndProc(HWND hwnd,unsigned int msg,WPARAM wParam,LPARAM lParam)
+LRESULT CALLBACK MainWndProc(HWND hwnd,u32 msg,WPARAM wParam,LPARAM lParam)
 {
     if(g_pD3DApp != 0)
         return g_pD3DApp->MsgProc(hwnd, msg, wParam, lParam);
@@ -41,10 +41,10 @@ AppFramework_Win32::~AppFramework_Win32()
 {
 }
 
-int AppFramework_Win32::Init()
+i32 AppFramework_Win32::Init()
 {
     QueryPerformanceFrequency((LARGE_INTEGER*)&m_cntsPerSec);
-    m_secsPerCnt = 1.0f / (float)m_cntsPerSec;
+    m_secsPerCnt = 1.0f / (f32)m_cntsPerSec;
     QueryPerformanceCounter((LARGE_INTEGER*)&m_prevTimeStamp);
 
     CreateMainWindow();
@@ -62,7 +62,7 @@ void AppFramework_Win32::Destroy()
 void AppFramework_Win32::CreateMainWindow()
 {
 #if defined(XCGRAPHICS_GL)
-    int ct = 0;
+    i32 ct = 0;
     char* args = "";
     glutInit(&ct, &args);
     glutInitDisplayMode(GLUT_RGBA);
@@ -129,7 +129,7 @@ void AppFramework_Win32::Run()
         __int64 currTimeStamp = 0;
         QueryPerformanceCounter((LARGE_INTEGER*)&currTimeStamp);
 
-        float dt = (currTimeStamp - m_prevTimeStamp) * m_secsPerCnt;
+        f32 dt = (currTimeStamp - m_prevTimeStamp) * m_secsPerCnt;
 
         Update(dt);
         Draw();
@@ -159,7 +159,7 @@ void AppFramework_Win32::Run()
                 __int64 currTimeStamp=0;
                 QueryPerformanceCounter((LARGE_INTEGER*)&currTimeStamp);
 
-                float dt = (currTimeStamp- m_prevTimeStamp) * m_secsPerCnt;
+                f32 dt = (currTimeStamp- m_prevTimeStamp) * m_secsPerCnt;
 
                 Update(dt);
                 Draw();
@@ -171,7 +171,7 @@ void AppFramework_Win32::Run()
 #endif
 }
 
-LRESULT AppFramework_Win32::MsgProc(HWND hwnd, unsigned int msg,WPARAM wParam,LPARAM lParam)
+LRESULT AppFramework_Win32::MsgProc(HWND hwnd, u32 msg,WPARAM wParam,LPARAM lParam)
 {
     RECT clientRect={0,0,0,0};
 

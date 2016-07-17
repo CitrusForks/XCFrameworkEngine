@@ -29,7 +29,7 @@ void CriticalSection::Create(bool isOwner, std::string mutexName)
 #endif
 }
 
-void CriticalSection::Enter(int timeOut)
+void CriticalSection::Enter(i32 timeOut)
 {
 #if USE_STD_MUTEX
     m_mutex.lock();

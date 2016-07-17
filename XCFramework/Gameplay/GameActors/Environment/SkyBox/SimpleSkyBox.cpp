@@ -23,7 +23,7 @@ SimpleSkyBox::~SimpleSkyBox(void)
 {
 }
 
-void SimpleSkyBox::Init(int actorId)
+void SimpleSkyBox::Init(i32 actorId)
 {
     SimpleActor::Init(actorId);
 
@@ -123,7 +123,7 @@ void SimpleSkyBox::BuildBuffers()
     m_indexBuffer.BuildIndexBuffer();
 }
 
-void SimpleSkyBox::Update(float dt)
+void SimpleSkyBox::Update(f32 dt)
 {
     SimpleActor::Update(dt);
 }

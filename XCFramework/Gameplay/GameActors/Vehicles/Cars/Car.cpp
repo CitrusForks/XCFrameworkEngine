@@ -51,11 +51,11 @@ void Car::Load()
 
 void Car::SetInitialPhysicsProperties()
 {
-    InitXPhysics(m_currentPosition, XCFloat4::XCFloat4ZeroVector, XCFloat4::XCFloat4ZeroVector, 10, (float)0.8);
+    InitXPhysics(m_currentPosition, XCFloat4::XCFloat4ZeroVector, XCFloat4::XCFloat4ZeroVector, 10, (f32)0.8);
     PhysicsActor::SetInitialPhysicsProperties();
 }
 
-void Car::Update(float dt)
+void Car::Update(f32 dt)
 {
     m_World = m_MScaling * m_MRotation * m_MTranslation;
     
@@ -64,12 +64,12 @@ void Car::Update(float dt)
     PhysicsActor::Update(dt);
 }
 
-void Car::Accelerate(float distance)
+void Car::Accelerate(f32 distance)
 {
     m_Position += (distance * m_look);
 }
 
-void Car::Steer(float angle, float scalarForce)
+void Car::Steer(f32 angle, f32 scalarForce)
 {
     XCVec4 quaternionAxis = QuaternionRotationAxis(XCVec4(0, 1, 0, 0), angle);
     XCMatrix4 rotation = MatrixRotationQuaternion(quaternionAxis);

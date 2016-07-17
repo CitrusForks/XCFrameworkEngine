@@ -22,7 +22,7 @@ public:
     Type*               GetResource() { return static_cast<Type*>(m_Resource); }
     bool                IsValid()     { return m_Resource != nullptr; }
 
-    unsigned int        m_refCount;
+    u32        m_refCount;
     IResource*          m_Resource;
     const void*         m_serializerBuffer;
 };

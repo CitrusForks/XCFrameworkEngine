@@ -31,6 +31,8 @@
 #include <memory>
 #include <windowsx.h>
 
+#include "Base/XCTypes.h"
+
 #include "Base/ErrorHandling/ErrorHandler.h"
 
 //Engine Memory includes. To remove this
@@ -38,5 +40,4 @@
 
 //Base Includes
 #include "Base/Serializer/IBase.h"
-#include "Base/BaseTypes.h"
 #include "Base/XCMath/XCMathIncludes.h"

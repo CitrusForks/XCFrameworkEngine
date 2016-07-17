@@ -15,7 +15,7 @@ public:
     virtual ~SubActor(void);
 
     virtual void           Init(const IActor* bindedParentActor);
-    virtual void           UpdateOffsets(float dt);
+    virtual void           UpdateOffsets(f32 dt);
 
     void                   InitOffsets(const XCVec4& position, const XCVec4& look, const XCVec4& right, const XCVec4& up);
 

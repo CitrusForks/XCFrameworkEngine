@@ -14,17 +14,17 @@ class FirstPersonCamera : public ICamera
 {
 public:
     FirstPersonCamera();
-    FirstPersonCamera(XCVec4& pos, XCVec4& target, XCVec4& up, float aspectRatio, float fov, float nearPlane, float farPlane);
+    FirstPersonCamera(XCVec4& pos, XCVec4& target, XCVec4& up, f32 aspectRatio, f32 fov, f32 nearPlane, f32 farPlane);
 
     virtual ~FirstPersonCamera();
 
     virtual void            BuildViewMatrix();
-    virtual void            Update(float dt);
+    virtual void            Update(f32 dt);
 
-    void                    Walk(float distance);
-    void                    Strafe(float distance);
-    void                    Yaw(float angle);
-    void                    Pitch(float angle);
+    void                    Walk(f32 distance);
+    void                    Strafe(f32 distance);
+    void                    Yaw(f32 angle);
+    void                    Pitch(f32 angle);
 
 private:
 
@@ -32,7 +32,7 @@ private:
     XCVec4                  m_right;
 
     //m_up and m_position is in ICamera
-    float                   m_lockYUnit;
+    f32                   m_lockYUnit;
     bool                    m_isSetLockY;
 
     DirectInput*            m_directInput;

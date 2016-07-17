@@ -20,18 +20,18 @@ public:
 protected:
     struct Chunk
     {
-        unsigned short           chunkId;          //2 bytes
-        unsigned int             chunkLength;        //4bytes
-        unsigned char            c_char;
-        unsigned short           amtOfData;
-        unsigned short           valToNextChunk;
+        u16           chunkId;          //2 bytes
+        u32             chunkLength;        //4bytes
+        u8            c_char;
+        u16           amtOfData;
+        u16           valToNextChunk;
     };
 
-    static const unsigned int           CHUNK_MAIN                  = 0x4d4d;
-    static const unsigned int           CHUNK_3DEDITOR              = 0x3d3d;
-    static const unsigned int           CHUNK_OBJECT                = 0x4000;
-    static const unsigned int           CHUNK_TRIANGULARMESHLIST    = 0x4100;
-    static const unsigned int           CHUNK_VERTICESLIST          = 0x4110;
-    static const unsigned int           CHUNK_FACESLIST             = 0x4120;
-    static const unsigned int           CHUNK_MAPCOORDLIST          = 0x4140;
+    static const u32           CHUNK_MAIN                  = 0x4d4d;
+    static const u32           CHUNK_3DEDITOR              = 0x3d3d;
+    static const u32           CHUNK_OBJECT                = 0x4000;
+    static const u32           CHUNK_TRIANGULARMESHLIST    = 0x4100;
+    static const u32           CHUNK_VERTICESLIST          = 0x4110;
+    static const u32           CHUNK_FACESLIST             = 0x4120;
+    static const u32           CHUNK_MAPCOORDLIST          = 0x4140;
 };

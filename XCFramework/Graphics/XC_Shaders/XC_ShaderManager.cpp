@@ -84,7 +84,7 @@ void XC_ShaderManager::LoadShaders()
         m_Shaders[it->ShaderUsage()] = binShader;
     }
 #else
-    for (unsigned int shaderIndex = 0; shaderIndex < ShaderType_Max; shaderIndex++)
+    for (u32 shaderIndex = 0; shaderIndex < ShaderType_Max; shaderIndex++)
     {
         switch (shaderIndex)
         {
@@ -226,7 +226,7 @@ void XC_ShaderManager::SetRasterizerState(ID3DDeviceContext& context, RasterType
 
 void XC_ShaderManager::Destroy()
 {
-    for (unsigned int shaderIndex = 0; shaderIndex < ShaderType_Max; shaderIndex++)
+    for (u32 shaderIndex = 0; shaderIndex < ShaderType_Max; shaderIndex++)
     {
         if (m_Shaders[(ShaderType)shaderIndex] != nullptr)
         {
@@ -256,7 +256,7 @@ IShader* XC_ShaderManager::GetShader(ShaderType _type)
     return m_Shaders[_type];
 }
 
-void XC_ShaderManager::DrawNonIndexed(ID3DDeviceContext& context, unsigned int vertexCount)
+void XC_ShaderManager::DrawNonIndexed(ID3DDeviceContext& context, u32 vertexCount)
 {
 #if defined(XCGRAPHICS_DX12)
     context.DrawInstanced(vertexCount, 1, 0, 0);
@@ -265,14 +265,14 @@ void XC_ShaderManager::DrawNonIndexed(ID3DDeviceContext& context, unsigned int v
 #endif
 }
 
-void XC_ShaderManager::DrawIndexedInstanced(ID3DDeviceContext& context, unsigned int _indexCount, void* indexGpuAddr, unsigned int instanceCount)
+void XC_ShaderManager::DrawIndexedInstanced(ID3DDeviceContext& context, u32 _indexCount, void* indexGpuAddr, u32 instanceCount)
 {
     context.DrawIndexedInstanced(_indexCount, instanceCount, 0, 0, 0);
 }
 
 void XC_ShaderManager::ClearShaderAndRenderStates(ID3DDeviceContext& context)
 {
-    for (unsigned int shaderIndex = 0; shaderIndex < ShaderType_Max; shaderIndex++)
+    for (u32 shaderIndex = 0; shaderIndex < ShaderType_Max; shaderIndex++)
     {
         if (m_Shaders[(ShaderType)shaderIndex] != nullptr)
         {

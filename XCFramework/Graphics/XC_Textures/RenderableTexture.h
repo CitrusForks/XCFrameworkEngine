@@ -16,14 +16,14 @@ public:
 
     struct RenderedTextureInfo
     {
-        unsigned char*  m_texData;
-        unsigned int    m_texSize;
+        u8*  m_texData;
+        u32    m_texSize;
     };
 
     RenderableTexture(ID3DDevice& device, ID3DDeviceContext& context);
     virtual ~RenderableTexture();
 
-    bool                        PreLoad(int msaaQuality, int texWidth, int texHeight);
+    bool                        PreLoad(i32 msaaQuality, i32 texWidth, i32 texHeight);
     void                        PreLoad(ID3DTexture2D* backbuffer);
     void                        Update();
     void                        Destroy();

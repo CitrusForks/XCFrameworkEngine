@@ -16,9 +16,9 @@ public:
     MemorySystem() {}
     virtual ~MemorySystem() {}
     
-    virtual void Init(int heapSize) { m_totalHeapSize = heapSize; }
-    virtual void Destroy() {}
+    virtual void  Init(i32 heapSize) { m_totalHeapSize = heapSize; }
+    virtual void  Destroy() {}
 
 private:
-    unsigned long               m_totalHeapSize;
+    u64           m_totalHeapSize;
 };

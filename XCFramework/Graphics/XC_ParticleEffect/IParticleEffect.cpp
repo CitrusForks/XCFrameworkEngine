@@ -10,7 +10,7 @@
 IParticleEffect::IParticleEffect()
 {
     m_lifeSpan = 0.0f;
-    setAlive(true);
+    SetAlive(true);
     m_timeFromSpawn = 0.0f;
 }
 
@@ -18,12 +18,12 @@ IParticleEffect::~IParticleEffect()
 {
 }
 
-void IParticleEffect::Update(float dt)
+void IParticleEffect::Update(f32 dt)
 {
     m_timeFromSpawn += dt;
 
     if (m_timeFromSpawn > m_lifeSpan)
     {
-        setAlive(false);
+        SetAlive(false);
     }
 }

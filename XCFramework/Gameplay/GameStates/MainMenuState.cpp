@@ -24,7 +24,7 @@ void MainMenuState::Init()
     IGameState::Init();
 }
 
-void MainMenuState::Update(float dt)
+void MainMenuState::Update(f32 dt)
 {
     Event_GameStateChange event("NewGameState", STATE_DESTROY);
     EventBroadcaster& broadcaster = (EventBroadcaster&)SystemLocator::GetInstance()->RequestSystem("EventBroadcaster");

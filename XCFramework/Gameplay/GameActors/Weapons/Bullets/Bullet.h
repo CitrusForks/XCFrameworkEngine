@@ -24,12 +24,12 @@ public:
 
     virtual void                        Load();
     virtual void                        SetInitialPhysicsProperties();
-    virtual void                        Update(float dt);
+    virtual void                        Update(f32 dt);
     virtual void                        Draw(RenderContext& context);
     virtual void                        Destroy();
 
     void                                PreLoad(XCVec3& initialPosition, XCVec3& target, std::string pMeshName);
-    void                                Shoot(float scalarForce);
+    void                                Shoot(f32 scalarForce);
 
 protected:
     ShaderType                          m_useShaderType;

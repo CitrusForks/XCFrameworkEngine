@@ -28,5 +28,5 @@ public:
     void                            loadResource(const void* buffer, IResource* const resource);
 
 private:
-    int                             m_resourceCount;
+    i32                             m_resourceCount;
 };

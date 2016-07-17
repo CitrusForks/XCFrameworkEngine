@@ -33,7 +33,7 @@ void GameState::LoadingWorldState::Init()
     m_futureWorldLoaded = taskMgr.RegisterTask(m_worldLoader);
 }
 
-void LoadingWorldState::Update(float dt)
+void LoadingWorldState::Update(f32 dt)
 {
     //Wait for resource loader to complete the loading of resources. When done move to next state.
     if (m_futureWorldLoaded._Is_ready() && m_futureWorldLoaded.valid() && m_futureWorldLoaded.get() > 0)

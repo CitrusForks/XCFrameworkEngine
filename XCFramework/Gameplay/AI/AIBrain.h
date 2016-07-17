@@ -26,7 +26,7 @@ public:
     AIBrain(World& world, AINavigator* navigator);
     ~AIBrain(void);
 
-    void virtual                        Update(float dt);
+    void virtual                        Update(f32 dt);
 
     void                                SetState(EActionState state) { m_actionState = state; }
 

@@ -18,18 +18,18 @@
 int _tmain(int argc, _TCHAR* argv[])
 {
 	MemorySystemWin32* chunkMgr = new MemorySystemWin32(32);
-	chunkMgr->allocateChunk();
+	chunkMgr->AllocateChunk();
 	//chunkMgr->allocateBytes('a', 5);
 	//chunkMgr->allocateBytes<int>(32768);
 
 	char* n = chunkMgr->newAlloc<char>('a');
 	int* ptrToInt = chunkMgr->newAlloc<int>(10);
-	double* ptrToDbl = chunkMgr->newAlloc<double>(5.5);
+	f64* ptrToDbl = chunkMgr->newAlloc<f64>(5.5);
 
 	printf("-----------%c-%d-%f------\n", *n, *ptrToInt, *ptrToDbl);
 	chunkMgr->printChunkInformation();
 
-	chunkMgr->deleteAlloc<double>(ptrToDbl);
+	chunkMgr->DeleteAlloc<f64>(ptrToDbl);
 	//chunkMgr->deleteAlloc<int>(ptrToInt);
 
 
@@ -37,11 +37,11 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	chunkMgr->printChunkInformation();
 
-	ptrToInt = chunkMgr->newAlloc<int>(20);
+	ptrToInt = chunkMgr->NewAlloc<int>(20);
 	//ptrToDbl = chunkMgr->newAlloc<double>(6.6);
 
-	char* newChar = chunkMgr->newAlloc('c');
-	int* newInteger = chunkMgr->newAlloc(77);
+	char* newChar = chunkMgr->NewAlloc('c');
+	int* newInteger = chunkMgr->NewAlloc(77);
 
 	printf("--------------REINSERTED-------------------");
 	printf("-----------%c-%d-%d-%c-----\n", *n, *ptrToInt, *newInteger, *newChar);

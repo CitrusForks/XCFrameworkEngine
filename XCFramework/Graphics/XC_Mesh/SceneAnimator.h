@@ -94,7 +94,7 @@ public:
      * uptodate results before calling one of the getters.
      * @param pTime Current time. Can be an arbitrary range.
      */
-    void Calculate( double pTime);
+    void Calculate( f64 pTime);
 
     // ----------------------------------------------------------------------------
     /** Retrieves the most recent local transformation matrix for the given node.

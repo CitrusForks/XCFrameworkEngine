@@ -12,11 +12,11 @@ public:
     XCSyncEvent(void);
     ~XCSyncEvent(void);
 
-    int     CreateEvent();
-    int     SignalEvent(int pattern);
-    int     WaitEvent(int pattern);
-    int     DestroyEvent();
+    i32     CreateEvent();
+    i32     SignalEvent(i32 pattern);
+    i32     WaitEvent(i32 pattern);
+    i32     DestroyEvent();
 
 private:
-    EVENTHANDLE      m_eventHandle;
+    EventHandle      m_eventHandle;
 };

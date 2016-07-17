@@ -21,11 +21,11 @@ namespace XCMath
     struct XCFloat2Unaligned
     {
         XCFloat2Unaligned() {}
-        XCFloat2Unaligned(float xVal, float yVal)
+        XCFloat2Unaligned(f32 xVal, f32 yVal)
             : x(xVal), y(yVal)
         {}
 
-        float x, y;
+        f32 x, y;
     };
 
     class XCFloat2
@@ -42,7 +42,7 @@ namespace XCMath
             m_vector = vector;
         }
 
-        explicit XCFloat2(float x, float y)
+        explicit XCFloat2(f32 x, f32 y)
         {
             SetValues(x, y);
         }
@@ -67,7 +67,7 @@ namespace XCMath
 
         //Getters
         template<VectorComponents component>
-        inline float Get() const
+        inline f32 Get() const
         {
             return m_vector[component];
         }
@@ -79,12 +79,12 @@ namespace XCMath
 
         //Setters
         template<VectorComponents component>
-        inline void Set(float value)
+        inline void Set(f32 value)
         {
             m_vector[component] = value;
         }
 
-        inline void SetValues(float x, float y)
+        inline void SetValues(f32 x, f32 y)
         {
             Set<X>(x);
             Set<Y>(y);
@@ -95,12 +95,12 @@ namespace XCMath
         }
 
         //Operations
-        inline const float operator [](unsigned int index) const
+        inline const f32 operator [](u32 index) const
         {
             return m_vector[index];
         }
 
-        inline float& operator [](unsigned int index)
+        inline f32& operator [](u32 index)
         {
             return m_vector[index];
         }
@@ -130,7 +130,7 @@ namespace XCMath
             return XCFloat2(Mul(m_vector, otherObj.GetData()));
         }
 
-        inline const XCFloat2 operator *(float value) const
+        inline const XCFloat2 operator *(f32 value) const
         {
             return XCFloat2(Get<X>() * value, Get<Y>() * value);
         }

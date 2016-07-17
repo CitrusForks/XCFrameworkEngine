@@ -14,12 +14,12 @@ class ThirdPersonCamera : public ICamera
 {
 public:
     ThirdPersonCamera();
-    ThirdPersonCamera(IActor* actor, XCVec4& pos, XCVec4& target, XCVec4& up, float aspectRatio, float fov, float nearPlane, float farPlane);
+    ThirdPersonCamera(IActor* actor, XCVec4& pos, XCVec4& target, XCVec4& up, f32 aspectRatio, f32 fov, f32 nearPlane, f32 farPlane);
 
     virtual ~ThirdPersonCamera();
 
     virtual void   BuildViewMatrix();
-    virtual void   Update(float dt);
+    virtual void   Update(f32 dt);
 
     void           AttachTo(IActor* actor);
     void           SetDistanceFromTarget(XCVec4& distance) { m_distanceFromTarget = distance; }

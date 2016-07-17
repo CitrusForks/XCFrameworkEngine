@@ -65,7 +65,7 @@ void IndexBuffer<T>::BuildIndexBuffer()
 
 #if defined(XCGRAPHICS_DX12)
     //Create IB
-    int ibSize = sizeof(unsigned int) * m_indexData.size();
+    i32 ibSize = sizeof(u32) * m_indexData.size();
 
     ValidateResult(graphicsSystem.GetDevice()->CreateCommittedResource(
         &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
@@ -114,7 +114,7 @@ void IndexBuffer<T>::RenderContextCallback(RenderContext& renderContext)
 {
 #if defined(XCGRAPHICS_DX12)
     ID3DDeviceContext& context = renderContext.GetDeviceContext();
-    int ibSize = sizeof(unsigned int) * m_indexData.size();
+    i32 ibSize = sizeof(u32) * m_indexData.size();
 
     D3D12_SUBRESOURCE_DATA indexData = {};
     indexData.pData = &m_indexData[0];

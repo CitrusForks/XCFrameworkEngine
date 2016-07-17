@@ -48,9 +48,9 @@ public:
             XCASSERT(false);
         }
 
-        m_total = static_cast<float>(
-            static_cast<double>(m_currentTime.QuadPart-m_startTime.QuadPart) /
-            static_cast<double>(m_frequency.QuadPart)
+        m_total = static_cast<f32>(
+            static_cast<f64>(m_currentTime.QuadPart-m_startTime.QuadPart) /
+            static_cast<f64>(m_frequency.QuadPart)
             );
 
         if (m_lastTime.QuadPart == m_startTime.QuadPart)
@@ -60,9 +60,9 @@ public:
         }
         else
         {
-            m_delta = static_cast<float>(
-                static_cast<double>(m_currentTime.QuadPart-m_lastTime.QuadPart) /
-                static_cast<double>(m_frequency.QuadPart)
+            m_delta = static_cast<f32>(
+                static_cast<f64>(m_currentTime.QuadPart-m_lastTime.QuadPart) /
+                static_cast<f64>(m_frequency.QuadPart)
                 );
         }
 #endif
@@ -88,9 +88,9 @@ public:
         }
     }
 
-    float GetTotalTimeSpent() { return m_total; }
+    f32 GetTotalTimeSpent() { return m_total; }
 
-    float getDeltaTime() { return m_delta; }
+    f32 getDeltaTime() { return m_delta; }
 
 private:
 
@@ -99,10 +99,10 @@ private:
     LARGE_INTEGER m_startTime;
     LARGE_INTEGER m_lastTime;
 
-    float         m_total;
-    float         m_delta;
-    float         m_perFrameTime;
-    int           m_fps;
+    f32         m_total;
+    f32         m_delta;
+    f32         m_perFrameTime;
+    i32           m_fps;
 };
 
 #endif

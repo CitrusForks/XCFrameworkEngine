@@ -13,12 +13,12 @@ namespace XCMath
     struct XCFloat4Unaligned : public XCFloat3Unaligned
     {
         XCFloat4Unaligned() {}
-        XCFloat4Unaligned(float xVal, float yVal, float zVal, float wVal)
+        XCFloat4Unaligned(f32 xVal, f32 yVal, f32 zVal, f32 wVal)
             : XCFloat3Unaligned(xVal, yVal, zVal)
             , w(wVal)
         {}
 
-        float w;
+        f32 w;
     };
 
     class XCFloat4 : public XCFloat3
@@ -35,7 +35,7 @@ namespace XCMath
             : XCFloat3(vector)
         {}
 
-        explicit XCFloat4(float x, float y, float z, float w)
+        explicit XCFloat4(f32 x, f32 y, f32 z, f32 w)
             : XCFloat3(x, y, z)
         {
             Set<W>(w);
@@ -78,7 +78,7 @@ namespace XCMath
         }
 
         //Setters
-        inline void SetValues(float x, float y, float z, float w)
+        inline void SetValues(f32 x, f32 y, f32 z, f32 w)
         {
             XCFloat3::SetValues(x, y, z);
             Set<W>(w);
@@ -121,7 +121,7 @@ namespace XCMath
             (*this) = (*this) * otherObj;
         }
 
-        inline void operator *=(float value)
+        inline void operator *=(f32 value)
         {
             (*this) = (*this) * XCFloat4(value, value, value, value);
         }
@@ -166,35 +166,35 @@ namespace XCMath
         }
     };
 
-    inline const XCFloat4 operator *(float value, const XCFloat4& obj)
+    inline const XCFloat4 operator *(f32 value, const XCFloat4& obj)
     {
         return XCFloat4(obj.Get<X>() * value, obj.Get<Y>() * value, obj.Get<Z>() * value, obj.Get<W>() * value);
     }
 
-    inline const XCFloat4 operator *(const XCFloat4& obj, float value)
+    inline const XCFloat4 operator *(const XCFloat4& obj, f32 value)
     {
         return value * obj;
     }
 
-    inline const XCFloat4 operator /(float value, const XCFloat4& obj)
+    inline const XCFloat4 operator /(f32 value, const XCFloat4& obj)
     {
-        float divvalue = 1 / value;
+        f32 divvalue = 1 / value;
         return divvalue * obj;
     }
 
-    template<unsigned int Components>
-    inline float VectorLength(const XCFloat4& vec)
+    template<u32 Components>
+    inline f32 VectorLength(const XCFloat4& vec)
     {
         return VectorLength<Components>(vec.GetData());
     }
 
-    template<unsigned int Components>
+    template<u32 Components>
     inline XCFloat4 VectorNormalize(const XCFloat4& vec)
     {
         return XCFloat4(VectorNormalize<Components>(vec.GetData()));
     }
 
-    inline float VectorDot(const XCFloat4& v1, const XCFloat4& v2)
+    inline f32 VectorDot(const XCFloat4& v1, const XCFloat4& v2)
     {
         PackedVector4& vec1 = v1.GetData();
         PackedVector4& vec2 = v2.GetData();
@@ -202,7 +202,7 @@ namespace XCMath
         return (vec1[0] * vec2[0]) + (vec1[1] * vec2[1]) + (vec1[2] * vec2[2]) + (vec1[3] * vec2[3]);
     }
 
-    inline float CosineVectorDot(const XCFloat4& v1, const XCFloat4& v2)
+    inline f32 CosineVectorDot(const XCFloat4& v1, const XCFloat4& v2)
     {
         return acosf(VectorDot(v1, v2) / (sqrt(((v1.Get<X>() * v1.Get<X>()) + (v1.Get<Y>() * v1.Get<Y>()) + (v1.Get<Z>() * v1.Get<Z>())) * ((v2.Get<X>() * v2.Get<X>()) + (v2.Get<Y>() * v2.Get<Y>()) + (v2.Get<Z>() * v2.Get<Z>())))));
     }
@@ -241,7 +241,7 @@ namespace XCMath
         return XCFloat4(Max(v1.GetData(), v2.GetData()));
     }
 
-    inline XCFloat4 QuaternionRotationAxis(const XCFloat4& Axis, float Angle)
+    inline XCFloat4 QuaternionRotationAxis(const XCFloat4& Axis, f32 Angle)
     {
         return XCFloat4(DirectX::XMQuaternionRotationAxis(Axis.GetPlatformIntrinsic(), Angle));
     }

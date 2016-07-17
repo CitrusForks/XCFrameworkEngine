@@ -21,7 +21,7 @@ struct TerrainQuad
         m_nextChildNode = nullptr;
     }
 
-    TerrainQuad(int rowStart, int rowEnd, int colStart, int colEnd, int width, XCVec4& min, XCVec4& max)
+    TerrainQuad(i32 rowStart, i32 rowEnd, i32 colStart, i32 colEnd, i32 width, XCVec4& min, XCVec4& max)
     {
         m_rowStart = rowStart;
         m_rowEnd = rowEnd;
@@ -46,11 +46,11 @@ struct TerrainQuad
     XCVec4         m_vMin;
     XCVec4         m_vMax;
 
-    int            m_totalWidth;
-    int            m_rowStart;
-    int            m_rowEnd;
-    int            m_colStart;
-    int            m_colEnd;
+    i32            m_totalWidth;
+    i32            m_rowStart;
+    i32            m_rowEnd;
+    i32            m_colStart;
+    i32            m_colEnd;
 
     std::unique_ptr<RenderableOBB>   m_bbox;
     std::unique_ptr<OBBHierarchy>    m_nextChildNode;
@@ -59,18 +59,18 @@ struct TerrainQuad
 class OBBHierarchy
 {
 public:
-    static const int     NO_OF_QUADS_EACH_LEVEL = 4;
+    static const i32     NO_OF_QUADS_EACH_LEVEL = 4;
 
     OBBHierarchy();
     ~OBBHierarchy();
 
     void                 AddQuad(std::unique_ptr<TerrainQuad> bbox) { m_Quads.push_back(std::move(bbox)); }
-    void                 CreateTerrainOBBHierarchy(int levels, int rowStart, int totalRows, int colStart, int totalColumns, int totalWidth);
-    void                 ComputeQuad(int row, int col, XCVec4& pos);
+    void                 CreateTerrainOBBHierarchy(i32 levels, i32 rowStart, i32 totalRows, i32 colStart, i32 totalColumns, i32 totalWidth);
+    void                 ComputeQuad(i32 row, i32 col, XCVec4& pos);
     void                 ComputeOBBForAllQuads();
     void                 Transform(XCMatrix4& translateMat, XCMatrix4& rotateMatrix);
 
-    void                 Update(float dt);
+    void                 Update(f32 dt);
     void                 Draw(RenderContext& context);
 
     TerrainQuad*         GetQuadCollidingWithOBB(OrientedBoundingBox* bbox);

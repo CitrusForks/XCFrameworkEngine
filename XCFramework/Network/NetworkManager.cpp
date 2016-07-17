@@ -33,7 +33,7 @@ void NetworkManager::Update()
     }
 }
 
-void NetworkManager::NetworkSendData(const char* _data, int size)
+void NetworkManager::NetworkSendData(const char* _data, i32 size)
 {
     for (auto peer : m_pNetPeers)
     {
@@ -60,7 +60,7 @@ char* NetworkManager::NetworkReceiveData()
 
 void NetworkManager::Destroy()
 {
-    unsigned int i = 0;
+    u32 i = 0;
     while (i < m_pNetPeers.size())
     {
         delete(m_pNetPeers[i++]);

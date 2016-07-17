@@ -45,7 +45,7 @@ IActor::~IActor(void)
     Logger("[IActor] Destructor called for %s", m_userFriendlyName.c_str());
 }
 
-void IActor::Update(float dt)
+void IActor::Update(f32 dt)
 {
 }
 

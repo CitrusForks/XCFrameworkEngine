@@ -19,8 +19,8 @@ class XUserInterface
 private:
     static XUserInterface*  ms_pXUserInterface;
                             
-    float                   m_alphaFactor;
-    float                   m_startTime;
+    f32                   m_alphaFactor;
+    f32                   m_startTime;
 
 #if defined(WIN32)
     ID2D1HwndRenderTarget*  m_pIRenderTarget;
@@ -41,14 +41,14 @@ public:
 
     static XUserInterface*  GetInstance();
     void                    InitXui(HWND hWnd);
-    void                    XCreateFont(float fontSize);
+    void                    XCreateFont(f32 fontSize);
     void                    Destroy();
     void                    Update();
     void                    UIRenderBeginScene();
     void                    UIRenderEndScene();
     void                    XDrawText();
-    void                    XDrawText(int _fontTypeIndex, XCVec4& _color, float _x, float _y, LPCWSTR _text);
-    void                    DrawAnimatedText(int _fontTypeIndex, XCVec4& _color, float _x, float _y, LPCWSTR _text, float _animSpeed);
+    void                    XDrawText(i32 _fontTypeIndex, XCVec4& _color, f32 _x, f32 _y, LPCWSTR _text);
+    void                    DrawAnimatedText(i32 _fontTypeIndex, XCVec4& _color, f32 _x, f32 _y, LPCWSTR _text, f32 _animSpeed);
 };
 
 #define XUSERINTERFACE      XUserInterface::GetInstance()

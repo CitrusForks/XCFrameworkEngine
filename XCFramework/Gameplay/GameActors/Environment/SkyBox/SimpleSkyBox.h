@@ -23,19 +23,19 @@ public:
     SimpleSkyBox(void);
     virtual ~SimpleSkyBox(void);
 
-    void                            Init(int actorId) override;
+    void                            Init(i32 actorId) override;
     void                            PreLoad(const void* fbBuffer) override;
     void                            Load() override;
     void                            UpdateState() override;
-    void                            Update(float dt) override;
+    void                            Update(f32 dt) override;
     void                            Draw(RenderContext& renderContext) override;
     void                            Destroy() override;
 
     void                            BuildBuffers();
 
 protected:
-    unsigned int                    m_Stride;
-    unsigned int                    m_Offset;
+    u32                    m_Stride;
+    u32                    m_Offset;
 
     ResourceHandle*                 m_cubeMapTexture;
 
@@ -43,7 +43,7 @@ protected:
     BasicMaterial                   m_material;
     
     VertexBuffer<VertexPos>         m_vertexBuffer;
-    IndexBuffer<unsigned int>       m_indexBuffer;
+    IndexBuffer<u32>       m_indexBuffer;
 
     RasterType                      m_rasterType;
 

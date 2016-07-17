@@ -22,7 +22,7 @@ public:
     virtual ~RenderableOBB();
 
     virtual void               Init();
-    virtual void               Update(float dt);
+    virtual void               Update(f32 dt);
     virtual void               Draw(RenderContext& context);
     virtual void               Destroy();
 

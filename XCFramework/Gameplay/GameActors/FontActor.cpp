@@ -20,7 +20,7 @@ FontActor::~FontActor(void)
 {
 }
 
-void FontActor::Init(int actorId)
+void FontActor::Init(i32 actorId)
 {
     IActor::Init(actorId);
 
@@ -56,7 +56,7 @@ void FontActor::UpdateState()
     }
 }
 
-void FontActor::Update(float dt)
+void FontActor::Update(f32 dt)
 {
     IActor::Update(dt);
 }

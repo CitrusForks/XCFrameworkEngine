@@ -25,7 +25,7 @@ public:
 
 private:
     std::string         m_sysName;
-    int                 m_NoRequestedClients;
+    i32                 m_NoRequestedClients;
 };
 
 class INullSystem : public ISystem

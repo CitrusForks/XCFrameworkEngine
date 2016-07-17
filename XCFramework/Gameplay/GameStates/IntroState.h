@@ -19,7 +19,7 @@ namespace GameState
         virtual ~IntroState(void);
 
         void                Init()                              override;
-        void                Update(float dt)                    override;
+        void                Update(f32 dt)                    override;
         void                Draw(XC_Graphics& graphicsSystem)   override;
         void                Destroy()                           override;
     };

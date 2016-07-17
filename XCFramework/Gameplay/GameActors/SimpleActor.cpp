@@ -16,12 +16,12 @@ SimpleActor::~SimpleActor(void)
 {
 }
 
-void SimpleActor::Init(int actorId)
+void SimpleActor::Init(i32 actorId)
 {
     IActor::Init(actorId);
 }
 
-void SimpleActor::Update(float dt)
+void SimpleActor::Update(f32 dt)
 {
     IActor::Update(dt);
 }

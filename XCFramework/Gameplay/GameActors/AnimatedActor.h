@@ -16,9 +16,9 @@ public:
     AnimatedActor(void);
     virtual ~AnimatedActor(void);
 
-    virtual void                    Init(int actorId);
+    virtual void                    Init(i32 actorId);
     virtual void                    PreLoad(const void* fbBuffer) { IActor::PreLoad(fbBuffer); }
-    virtual void                    Update(float dt);
+    virtual void                    Update(f32 dt);
     virtual void                    Draw(RenderContext& context);
     virtual void                    Destroy();
 };

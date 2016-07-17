@@ -13,12 +13,12 @@ namespace XCMath
     struct XCFloat3Unaligned : public XCFloat2Unaligned
     {
         XCFloat3Unaligned() {}
-        XCFloat3Unaligned(float xVal, float yVal, float zVal)
+        XCFloat3Unaligned(f32 xVal, f32 yVal, f32 zVal)
             : XCFloat2Unaligned(xVal, yVal)
             , z(zVal)
         {}
 
-        float z;
+        f32 z;
     };
 
     class XCFloat3 : public XCFloat2
@@ -34,7 +34,7 @@ namespace XCMath
             : XCFloat2(vector)
         {}
 
-        explicit XCFloat3(float x, float y, float z)
+        explicit XCFloat3(f32 x, f32 y, f32 z)
         {
             SetValues(x, y, z);
         }
@@ -58,7 +58,7 @@ namespace XCMath
         }
 
         //Setters
-        inline void SetValues(float x, float y, float z)
+        inline void SetValues(f32 x, f32 y, f32 z)
         {
             XCFloat2::SetValues(x, y);
 
@@ -93,7 +93,7 @@ namespace XCMath
             return XCFloat3(Mul(m_vector, otherObj.GetData()));
         }
 
-        inline const XCFloat3 operator *(float value)
+        inline const XCFloat3 operator *(f32 value)
         {
             return XCFloat3(Get<X>() * value, Get<Y>() * value, Get<Z>() * value);
         }

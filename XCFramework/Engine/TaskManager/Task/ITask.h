@@ -31,11 +31,11 @@ public:
     ETaskState              GetState() { return m_eCurrentState; }
     void                    SetState(ETaskState _state);
     
-    void                    SetInstanceId(int _id)              { m_InstanceId = _id; }
-    int                     GetInstanceId()                     { return m_InstanceId; }
+    void                    SetInstanceId(i32 _id)              { m_InstanceId = _id; }
+    i32                     GetInstanceId()                     { return m_InstanceId; }
 
-    void                    SetThreadId(unsigned long id) { m_threadID = id; }
-    unsigned long           GetThreadId()         { return m_threadID; }
+    void                    SetThreadId(u64 id) { m_threadID = id; }
+    u64           GetThreadId()         { return m_threadID; }
 
     bool                    IsAsync()                       { return m_isAsync; }
     void                    SetSynchronizable(bool _value)  { m_isAsync = _value; }
@@ -43,20 +43,20 @@ public:
     Thread*                 GetThreadHandle()               { return m_threadHandle; }
     void                    SetThreadHandle(Thread* handle)  { m_threadHandle = handle; }
 
-    std::future<int>        GetFuture()                     { return m_taskPromise.get_future(); }
+    std::future<i32>        GetFuture()                     { return m_taskPromise.get_future(); }
 
-    int                     GetTaskPriority()             { return m_taskPriority; }
-    void                    SetTaskPriority(int priority) { m_taskPriority = priority; }
+    i32                     GetTaskPriority()             { return m_taskPriority; }
+    void                    SetTaskPriority(i32 priority) { m_taskPriority = priority; }
 
 protected:
     bool                    m_isAsync;
     ETaskState              m_eCurrentState;
-    int                     m_InstanceId;
-    std::promise<int>       m_taskPromise;
+    i32                     m_InstanceId;
+    std::promise<i32>       m_taskPromise;
 
 private:
     Thread*                 m_threadHandle;
     std::mutex              m_stateLock;
-    unsigned long           m_threadID;
-    int                     m_taskPriority;
+    u64           m_threadID;
+    i32                     m_taskPriority;
 };

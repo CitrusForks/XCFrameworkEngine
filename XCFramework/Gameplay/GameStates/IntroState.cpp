@@ -24,7 +24,7 @@ void IntroState::Init()
     IGameState::Init();
 }
 
-void IntroState::Update(float dt)
+void IntroState::Update(f32 dt)
 {
     Logger("[GAME STATE] Intro");
     Event_GameStateChange event("MainMenuState", STATE_DESTROY);

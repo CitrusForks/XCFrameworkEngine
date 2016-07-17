@@ -21,7 +21,7 @@ XC_CameraManager::~XC_CameraManager()
 {
 }
 
-void XC_CameraManager::InitializeCameras(XC_Graphics& graphicsSystem, int clientWidth, int clientHeight)
+void XC_CameraManager::InitializeCameras(XC_Graphics& graphicsSystem, i32 clientWidth, i32 clientHeight)
 {
     m_graphicsSystem = &graphicsSystem;
 
@@ -30,7 +30,7 @@ void XC_CameraManager::InitializeCameras(XC_Graphics& graphicsSystem, int client
         XCVec4(3, 5, -2.0f, 1.0f), //Position
         XCVec4(0, 0, 0, 0), //Target
         XCVec4(0, 1, 0, 0), //Up
-        (float)clientWidth / clientHeight, //Aspect Ratio
+        (f32)clientWidth / clientHeight, //Aspect Ratio
         XC_PIDIV2, //FOV
         0.01f, //Near plane
         5000.0f //Far plane
@@ -41,7 +41,7 @@ void XC_CameraManager::InitializeCameras(XC_Graphics& graphicsSystem, int client
         XCVec4(3, 2, -2.0f, 1.0f), //Position
         XCVec4(0, 0, 1, 0), //Target
         XCVec4(0, 1, 0, 0), //Up
-        (float)clientWidth / clientHeight, //Aspect Ratio
+        (f32)clientWidth / clientHeight, //Aspect Ratio
         XC_PIDIV2, //FOV
         0.01f, //Near plane
         5000.0f //Far plane
@@ -53,7 +53,7 @@ void XC_CameraManager::InitializeCameras(XC_Graphics& graphicsSystem, int client
         XCVec4(3, 5, -2.0f, 1.0f), //Position
         XCVec4(0, 0, 1, 0), //Target
         XCVec4(0, 1, 0, 0), //Up
-        (float)clientWidth / clientHeight, //Aspect Ratio
+        (f32)clientWidth / clientHeight, //Aspect Ratio
         XC_PIDIV2, //FOV
         0.01f, //Near plane
         5000.0f //Far plane
@@ -86,7 +86,7 @@ void XC_CameraManager::AttachCameraToActor(IActor* actor, XCVec4& distanceFromTa
     ((ThirdPersonCamera*) m_Cameras[CAMERATYPE_TPS].get())->SetDistanceFromTarget(distanceFromTarget);
 }
 
-void XC_CameraManager::Update(float dt)
+void XC_CameraManager::Update(f32 dt)
 {
     m_Cameras[m_currentCameraType]->Update(dt);
 
@@ -102,9 +102,9 @@ void XC_CameraManager::Draw()
 {
 }
 
-void XC_CameraManager::onResize(int clientWidth, int clientHeight)
+void XC_CameraManager::onResize(i32 clientWidth, i32 clientHeight)
 {
-    for (int index = 0; index < CAMERATYPE_MAX; index++)
+    for (i32 index = 0; index < CAMERATYPE_MAX; index++)
     {
         if (m_Cameras[(ECameraType)index])
         {

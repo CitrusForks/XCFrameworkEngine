@@ -165,7 +165,7 @@ void RunningState::Init()
 #endif
 }
 
-void RunningState::Update(float dt)
+void RunningState::Update(f32 dt)
 {
     //This is hack, the world should tell whether it's ready by checking all the actors are loaded correctly?
     if (m_worldSystem->IsWorldReady())

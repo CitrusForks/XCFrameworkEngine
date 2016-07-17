@@ -13,12 +13,12 @@ class CubeTexture3D : public Texture2D
 public:
     DECLARE_OBJECT_CREATION(CubeTexture3D)
 
-    static const int    CUBE_MAP_SIZE = 256;
+    static const i32    CUBE_MAP_SIZE = 256;
 
     CubeTexture3D();
     ~CubeTexture3D();
 
-    virtual void        Init(int resourceId, std::string userFriendlyName) override;
+    virtual void        Init(i32 resourceId, std::string userFriendlyName) override;
     virtual void        Load(const void* buffer)                           override;
     virtual void        Destroy()                                          override;
 

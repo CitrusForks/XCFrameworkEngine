@@ -13,9 +13,9 @@
 #include <assert.h>
 #define XCASSERT(x) assert(x)
 
-static void Logger(const char* format, ...)
+static void Logger(const c8* format, ...)
 {
-    char messageBuffer[1024];
+    c8 messageBuffer[1024];
 
     va_list list;
 

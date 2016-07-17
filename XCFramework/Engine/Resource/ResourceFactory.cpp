@@ -69,7 +69,7 @@ void ResourceFactory::loadResource(FILE* packageFile, IResource* const resource)
     }
     else if (resource->GetResourceType() == RESOURCETYPE_MESH)
     {
-        float scaling = 0.0f;
+        f32 scaling = 0.0f;
         fscanf(packageFile, "%f", &scaling);
         ((XCMesh*)resource)->Load(rscPath, scaling);
     }

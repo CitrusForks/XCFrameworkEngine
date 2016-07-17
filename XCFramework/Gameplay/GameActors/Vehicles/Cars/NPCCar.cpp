@@ -26,7 +26,7 @@ void NPCCar::PreLoad(const void* fbBuffer)
     PhysicsActor::PreLoad(fbBuffer);
 }
 
-void NPCCar::Update(float dt)
+void NPCCar::Update(f32 dt)
 {
     Integrator(dt);
     ClearForce();

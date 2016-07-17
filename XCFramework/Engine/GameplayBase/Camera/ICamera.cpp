@@ -17,10 +17,10 @@ ICamera::ICamera(void)
     m_aspectRatio   = 16/9;
     m_nearPlane     = 1.0f;
     m_farPlane      = 100.0f;
-    m_fov           = (float) (0.25 * 3.14);
+    m_fov           = (f32) (0.25 * 3.14);
 }
 
-ICamera::ICamera(XCVec4& _pos, XCVec4& _target, XCVec4& _up, float _aspectRatio, float _fov, float _near, float _far)
+ICamera::ICamera(XCVec4& _pos, XCVec4& _target, XCVec4& _up, f32 _aspectRatio, f32 _fov, f32 _near, f32 _far)
     : m_position(_pos)
     , m_target(_target)
     , m_up(_up)
@@ -41,15 +41,15 @@ void ICamera::Init()
 {
 }
 
-void ICamera::Update(float dt)
+void ICamera::Update(f32 dt)
 {
     //Usually View changes in a scene
     BuildViewMatrix();
 }
 
-void ICamera::OnResize(int clientWidth, int clientHeight)
+void ICamera::OnResize(i32 clientWidth, i32 clientHeight)
 {
-    m_aspectRatio = (float)(clientWidth / clientHeight);
+    m_aspectRatio = (f32)(clientWidth / clientHeight);
     BuildProjectionMatrix();
     BuildViewMatrix();
 }

@@ -19,20 +19,20 @@ public:
 
     void                    Destroy();
 
-    std::future<int>        RegisterTask(ITask *_pProcess);
+    std::future<i32>        RegisterTask(ITask *_pProcess);
 
-    bool                    UnregisterTask(unsigned long threadId);
+    bool                    UnregisterTask(u64 threadId);
     void                    UnregisterAllTasks();
 
     void                    Update();
     bool                    CreateAsyncThread();
 
-    ETaskState              GetTaskState(unsigned long threadId);
+    ETaskState              GetTaskState(u64 threadId);
 
 private:
 
-    bool                    UnregisterTask(unsigned int _instanceId);
-    int                     GetTaskIndex(unsigned long threadId);
+    bool                    UnregisterTask(u32 _instanceId);
+    i32                     GetTaskIndex(u64 threadId);
     
     std::vector<ITask*>     m_taskQueue;
 };

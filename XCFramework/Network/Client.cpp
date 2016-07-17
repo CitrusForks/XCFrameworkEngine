@@ -34,7 +34,7 @@ Client::~Client(void)
 #endif
 }
 
-void Client::Init(const char *ip, int port)
+void Client::Init(const char *ip, i32 port)
 {
 #if defined(WIN32)
     memset(&m_sockAddressInfo, 0, sizeof(sockaddr_in));
@@ -115,10 +115,10 @@ char* Client::ReceiveData()
     return m_RecvBuffer;
 }
 
-void Client::SendData(const char* msg, int size)
+void Client::SendData(const char* msg, i32 size)
 {
 #if defined(WIN32)
-    int length = strlen(msg);
+    i32 length = strlen(msg);
 
     if (size != -1)
     {

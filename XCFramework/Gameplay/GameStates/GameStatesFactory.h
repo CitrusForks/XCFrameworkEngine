@@ -31,7 +31,7 @@ public:
 
 private:
 
-    int                                  m_statesCount;
+    i32                                  m_statesCount;
     std::map<EGameState, std::string>    m_registeredStates;
     std::mutex                           m_gameStatesFactoryLock;
 };

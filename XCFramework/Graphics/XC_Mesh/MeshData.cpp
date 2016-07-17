@@ -44,7 +44,7 @@ void MeshData::Init()
     m_vertexBuffer = shaderHandle->CreateVertexBuffer();
 }
 
-void MeshData::AddVertex(float x, float y, float z)
+void MeshData::AddVertex(f32 x, f32 y, f32 z)
 {
     Vertex v = { x, y, z };
     m_vertices.push_back(v);
@@ -60,13 +60,13 @@ void MeshData::AddFace(Face& face)
     m_faces.push_back(face);
 }
 
-void MeshData::AddMapCoord(float u, float v)
+void MeshData::AddMapCoord(f32 u, f32 v)
 {
     MapCoord mc = { u, v };
     m_mapCoord.push_back(mc);
 }
 
-void MeshData::AddFace(unsigned short a, unsigned short b, unsigned short c, unsigned short flag)
+void MeshData::AddFace(u16 a, u16 b, u16 c, u16 flag)
 {
     Face f = { a, b, c, flag };
     m_faces.push_back(f);

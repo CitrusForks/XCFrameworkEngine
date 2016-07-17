@@ -48,12 +48,12 @@ public:
     class PendingTaskRemove : public IPendingTask
     {
     public:
-        PendingTaskRemove(PendingTaskType type, int actorId)
+        PendingTaskRemove(PendingTaskType type, i32 actorId)
             : IPendingTask(type)
             , m_actorId(actorId)
         {}
 
-        int                     m_actorId;
+        i32                     m_actorId;
     };
 
     WorldPendingTasks(World& world)
@@ -106,7 +106,7 @@ public:
     virtual ~World(void);
     
     virtual void                                Init(TaskManager& taskMgr);
-    virtual void                                Update(float dt);
+    virtual void                                Update(f32 dt);
     virtual void                                Draw(XC_Graphics& graphicsSystem);
     virtual void                                Destroy();
     
@@ -114,24 +114,24 @@ public:
     void                                        CheckAllCollisions();
     bool                                        doesCollide(IActor* obj1, IActor* obj2);
     
-    IActor*                                     GetActor(int _instanceId);
-    int                                         GetNumOfActors()                            {  return m_GameObjects.size();  }
+    IActor*                                     GetActor(i32 _instanceId);
+    i32                                         GetNumOfActors()                            {  return m_GameObjects.size();  }
     
-    void                                        SetMainPlayableCharacter(int instanceId);
-    int                                         GetMainPlayableCharacter()                  { return m_currentMainPlayableCharacter;                      }
+    void                                        SetMainPlayableCharacter(i32 instanceId);
+    i32                                         GetMainPlayableCharacter()                  { return m_currentMainPlayableCharacter;                      }
     IActor*                                     GetMainPlayableActor()                      { return m_GameObjects[m_currentMainPlayableCharacter]; }
-    int                                         GetInstanceIdOfActor(IActor* actor);
-    int                                         GetNextPlayableActor(int instanceId);
+    i32                                         GetInstanceIdOfActor(IActor* actor);
+    i32                                         GetNextPlayableActor(i32 instanceId);
     
     bool                                        IsWorldReady()                              { return m_worldReady;  }
     void                                        SetWorldReady(bool value)                   { m_worldReady = true;  }
 
-    void                                        RequestRemoveActor(int key);
+    void                                        RequestRemoveActor(i32 key);
 
     void	                                    AddActor(IActor* actor);
-    void                                        RemoveActor(int key);
+    void                                        RemoveActor(i32 key);
 
-    bool                                        IsActorReady(int actorId);
+    bool                                        IsActorReady(i32 actorId);
     bool                                        IsWorldQuiting()                            { return m_worldQuiting; }
 
     void                                        EnablePhysics(bool enable)                  { m_isPhysicsEnabled = enable; XPhysics::s_enableGravity = enable; }
@@ -144,15 +144,15 @@ protected:
 
 private:
     void                                        processRemovePendingList();
-    void                                        removeKey(std::vector<int>& list, int key);
+    void                                        removeKey(std::vector<i32>& list, i32 key);
 
 
-    std::map<int, IActor*>                           m_GameObjects;
-    std::vector<int>                                 m_PhysicsActorIDs;
-    std::vector<int>                                 m_PlayableCharacterActors;
-    std::vector<int>                                 m_NonPlayableCharacterActors;
+    std::map<i32, IActor*>                           m_GameObjects;
+    std::vector<i32>                                 m_PhysicsActorIDs;
+    std::vector<i32>                                 m_PlayableCharacterActors;
+    std::vector<i32>                                 m_NonPlayableCharacterActors;
     
-    int                                              m_currentMainPlayableCharacter;
+    i32                                              m_currentMainPlayableCharacter;
     bool                                             m_worldReady;
 
     //Based on MemoryBarriers - takes ~20 cycles to flag compare to CriticalSection 

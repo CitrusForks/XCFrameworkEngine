@@ -25,7 +25,7 @@ XCVec4 CollisionDetection::GetTerrainPointOfContactWithBoundBox(PhysicsActor* bb
     XCVec4 result(0, 0, 0, 0);
 
     XCVec4 point;
-    for (int vertexIndex = 0; vertexIndex < terrainActor->GetNoOfVertices(); vertexIndex++)
+    for (i32 vertexIndex = 0; vertexIndex < terrainActor->GetNoOfVertices(); vertexIndex++)
     {
         point = terrainActor->GetPointAtIndex(vertexIndex);
 
@@ -34,7 +34,7 @@ XCVec4 CollisionDetection::GetTerrainPointOfContactWithBoundBox(PhysicsActor* bb
         {
             //Hit 
             XCVec4 currentPos = bboxActor->GetTransformedPosition();
-            currentPos.Set<Y>((float) point.Get<Y>() + (float)0.1); //Adding impulse of 2
+            currentPos.Set<Y>((f32) point.Get<Y>() + (f32)0.1); //Adding impulse of 2
             bboxActor->SetTransformedPosition(currentPos);
             result = XCVec4(0, 1, 0, 0);
             break;
@@ -58,7 +58,7 @@ EOrderingType CollisionDetection::DetermineOrderOfTriangle(XCVec4& v1, XCVec4& v
     detMatrix[2] = v3;
     detMatrix[3] = viewPoint;
 
-    float det = 0.0f;
+    f32 det = 0.0f;
     MatrixDeterminant(detMatrix, det);
 
     if (det > 0)
@@ -301,7 +301,7 @@ XCVec4 CollisionDetection::GetContactNormalFromOBBToOBBTriangleTest(OrientedBoun
     return contactNormal;
 }
 
-int	CollisionDetection::CheckOBBTriangleIntersection(XCVec4& v1, XCVec4& v2, XCVec4& v3, OrientedBoundingBox* bbox)
+i32	CollisionDetection::CheckOBBTriangleIntersection(XCVec4& v1, XCVec4& v2, XCVec4& v3, OrientedBoundingBox* bbox)
 {
     /*
     float p0, p2, r;
@@ -404,7 +404,7 @@ int	CollisionDetection::CheckOBBTriangleIntersection(XCVec4& v1, XCVec4& v2, XCV
     return false;
 }
 
-int CollisionDetection::CheckOBBPlaneIntersection(OrientedBoundingBox* bbox, Plane* p)
+i32 CollisionDetection::CheckOBBPlaneIntersection(OrientedBoundingBox* bbox, Plane* p)
 {
     //Compute  projection interval radius of box onto L(t) = b.x + t * p.n
     //XMVECTOR normDotOrient = VectorDot(p->GetPlaneNormal(), bbox->m_TransformedBox.)
@@ -412,12 +412,12 @@ int CollisionDetection::CheckOBBPlaneIntersection(OrientedBoundingBox* bbox, Pla
     return 1;
 }
 
-XCVec4 CollisionDetection::GetContactNormalFromBoundBoxContainedPoints(OrientedBoundingBox* bbox, XCVec4* points, int noOfPoints)
+XCVec4 CollisionDetection::GetContactNormalFromBoundBoxContainedPoints(OrientedBoundingBox* bbox, XCVec4* points, i32 noOfPoints)
 {
     XCVec4 contactNormal;
     //Got points
     //Now check for containment of these points within the obj1 box
-    for (int index = 0; index < noOfPoints; index++)
+    for (i32 index = 0; index < noOfPoints; index++)
     {
         DirectX::ContainmentType type = bbox->m_TransformedBox.Contains(points[index].GetPlatformIntrinsic());
 
@@ -479,7 +479,7 @@ XCVec4 CollisionDetection::GetContactNormalFromBoundBoxContainedBoundBox(Oriente
     DirectX::XMFLOAT3 points[OrientedBoundingBox::MAX_OBB_CORNER_POINTS_COUNT];
     bbox2->m_TransformedBox.GetCorners(&points[0]);
 
-    int hitCount = 0;
+    i32 hitCount = 0;
     DirectX::ContainmentType type = bbox1->m_TransformedBox.Contains(XMLoadFloat3(&points[4]));
     hitCount += type == DirectX::CONTAINS || type == DirectX::INTERSECTS ? true : false;
     type = bbox1->m_TransformedBox.Contains(XMLoadFloat3(&points[5]));
@@ -540,7 +540,7 @@ XCVec4 CollisionDetection::GetContactNormalFromBoundBoxContainedPlane(OrientedBo
     XCMatrix4 R = MatrixRotationQuaternion(XCVec4(bbox1->m_TransformedBox.Orientation));
     XCVec4 Outside, Inside;
 
-    for (int index = 0; index < 6; index++)
+    for (i32 index = 0; index < 6; index++)
     {
         switch (index)
         {

@@ -23,15 +23,15 @@ public:
     XC_CameraManager();
     ~XC_CameraManager();
 
-    void                   InitializeCameras(XC_Graphics& graphicsSystem, int clientWidth, int clientHeight);
-    void                   Update(float dt);
+    void                   InitializeCameras(XC_Graphics& graphicsSystem, i32 clientWidth, i32 clientHeight);
+    void                   Update(f32 dt);
     void                   Draw();
     void                   Destroy();
 
     void                   SetCameraType(ECameraType type) { m_currentCameraType = type; }
     ICamera*               GetCurrentCamera() { return m_Cameras[m_currentCameraType].get(); }
 
-    void                   onResize(int clientWidth, int clientHeight);
+    void                   onResize(i32 clientWidth, i32 clientHeight);
 
     void                   AttachCameraToActor(IActor* actor);
     void                   AttachCameraToActor(IActor* actor, XCVec4& distanceFromTarget);

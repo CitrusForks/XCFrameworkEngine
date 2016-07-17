@@ -9,21 +9,21 @@
 class INetPeer
 {
 public:
-    static const int DEFAULT_BUFLEN = 512;
+    static const i32 DEFAULT_BUFLEN = 512;
 
     INetPeer();
     virtual ~INetPeer();
 
-    virtual void     Init(const char *ip, int port) = 0;
+    virtual void     Init(const char *ip, i32 port) = 0;
     virtual void     update() {}
-    virtual void     SendData(const char* msg, int size = -1) = 0;
+    virtual void     SendData(const char* msg, i32 size = -1) = 0;
     virtual char*    ReceiveData() = 0;
 
 protected:
     char             m_RecvBuffer[DEFAULT_BUFLEN];
-    int              m_result;
+    i32              m_result;
 
-    int              m_socketLength;
+    i32              m_socketLength;
     SOCKET           m_socket;
 
     fd_set*          m_pFdSetDesc;

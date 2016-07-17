@@ -16,7 +16,7 @@ IBase::~IBase()
 {
 }
 
-void IBase::Init(int baseId)
+void IBase::Init(i32 baseId)
 {
     m_baseObjectId = baseId;
 }

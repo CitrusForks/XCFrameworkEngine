@@ -24,12 +24,12 @@ void ParticleEffectSystem::AddParticleEffect(IParticleEffect* effect)
     }
 }
 
-void ParticleEffectSystem::Update(float dt)
+void ParticleEffectSystem::Update(f32 dt)
 {
-    unsigned int i = 0;
+    u32 i = 0;
     while (i < m_instancedParticleEffects.size())
     {
-        if (m_instancedParticleEffects[i]->isAlive())
+        if (m_instancedParticleEffects[i]->IsAlive())
         {
             m_instancedParticleEffects[i]->Update(dt);
             ++i;

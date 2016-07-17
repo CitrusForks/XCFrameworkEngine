@@ -20,14 +20,14 @@ namespace GameState
         virtual ~LoadingWorldState(void);
 
         void                    Init();
-        void                    Update(float dt);
+        void                    Update(f32 dt);
         void                    Draw(XC_Graphics& graphicsSystem);
         void                    Destroy();
 
     private:
 
-        unsigned long           m_taskId;
+        u64           m_taskId;
         WorldSceneLoader*       m_worldLoader;
-        std::future<int>        m_futureWorldLoaded;
+        std::future<i32>        m_futureWorldLoaded;
     };
 }

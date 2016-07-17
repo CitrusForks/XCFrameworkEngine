@@ -30,14 +30,14 @@ public:
     XCMesh();
     virtual ~XCMesh(void);
 
-    virtual void                            Init(int resourceId, std::string userFriendlyName)  override;
+    virtual void                            Init(i32 resourceId, std::string userFriendlyName)  override;
     virtual void                            Load(const void* buffer)                            override;
     virtual void                            Unload()                                            override;
     virtual void                            UpdateState()                                       override;
-    virtual void                            Update(float dt)                                    override;
+    virtual void                            Update(f32 dt)                                    override;
     virtual void                            Destroy()                                           override;
 
-    virtual void                            Load(std::string fileName, float intialScaling = 1.0f);
+    virtual void                            Load(std::string fileName, f32 intialScaling = 1.0f);
 
     void                                    RegisterDrawable();
     void                                    UnregisterDrawable();
@@ -67,7 +67,7 @@ protected:
 
     //Draw calls
     virtual void                            Draw(RenderContext& context);
-    virtual void                            DrawSubMesh(RenderContext& renderContext, unsigned int meshIndex);
+    virtual void                            DrawSubMesh(RenderContext& renderContext, u32 meshIndex);
     virtual void                            DrawSubMeshes(RenderContext& renderContext);
 
 
@@ -85,7 +85,7 @@ protected:
     const aiScene*                          m_scene;
     SceneAnimator*                          m_sceneAnimator;
     Assimp::Importer                        m_importer;
-    float                                   m_lastPlayedAnimTime;
+    f32                                   m_lastPlayedAnimTime;
 
 #if CUSTOM_ANIMATION
     MeshNode*                               m_meshRootNode; //Root node of the mesh.
@@ -97,7 +97,7 @@ protected:
     XCVec3Unaligned                         m_globalRotation;
     XCVec3Unaligned                         m_globalScaling;
 
-    unsigned int                            m_instanceCount;
+    u32                            m_instanceCount;
 
     //This buffer is created based on the shader type
     struct InstanceBuffer

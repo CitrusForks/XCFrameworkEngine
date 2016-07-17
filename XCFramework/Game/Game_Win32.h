@@ -28,8 +28,8 @@ public:
     Game_Win32(HINSTANCE hInstance, std::string winCaption, bool enable4xMsaa);
     virtual ~Game_Win32();
 
-    int                          Init();
-    void                         Update(float dt);
+    i32                          Init();
+    void                         Update(f32 dt);
     void                         Draw();
     void                         Destroy();
 

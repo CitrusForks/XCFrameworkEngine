@@ -37,7 +37,7 @@ Game_Win32::~Game_Win32()
 {
 }
 
-int Game_Win32::Init()
+i32 Game_Win32::Init()
 {
     AppFramework_Win32::Init();
 
@@ -123,7 +123,7 @@ void Game_Win32::OnResize()
     m_cameraManagingSystem->onResize(m_clientWidth, m_clientHeight);
 }
 
-void Game_Win32::Update(float dt)
+void Game_Win32::Update(f32 dt)
 {
     m_eventBroadcaster->Update();
 
@@ -186,24 +186,8 @@ void Game_Win32::Destroy()
     SystemLocator::GetInstance()->Destroy();
 }
 
-class A
-{
-public:
-    A()
-    {
-        Logger("Constructed");
-    }
 
-    ~A()
-    {
-        Logger("Destructed");
-    }
-
-private:
-    int     m_member;
-};
-
-int WINAPI WinMain(__in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, __in LPSTR lpCmdLine, __in int nShowCmd)
+i32 WINAPI WinMain(__in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, __in LPSTR lpCmdLine, __in i32 nShowCmd)
 {
     // Enable run-time memory check for debug builds.
 #if defined(DEBUG) | defined(_DEBUG)
@@ -211,11 +195,8 @@ int WINAPI WinMain(__in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, _
 #endif
 
     //Initialize memory System
-    MemorySystemWin32 memorySystem(1024 * 1024);
-    memorySystem.allocateChunk();
-
-    A* a = new A();
-    delete a;
+    MemorySystemWin32 memorySystem((u32)1024 * 1024);
+    memorySystem.AllocateChunk();
 
     Game_Win32 app(hInstance, "", true);
     app.Run();

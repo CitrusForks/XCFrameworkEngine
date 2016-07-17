@@ -26,7 +26,7 @@ void XC_GraphicsGL::Destroy()
     m_renderingPool->Destroy();
 }
 
-void XC_GraphicsGL::InitGraphicsWindow(HWND _mainWnd, int _width, int _height, bool _enable4xMsaa)
+void XC_GraphicsGL::InitGraphicsWindow(HWND _mainWnd, i32 _width, i32 _height, bool _enable4xMsaa)
 {
     m_hMainWnd = _mainWnd;
     m_ClientWidth = _width;
@@ -103,7 +103,7 @@ void XC_GraphicsGL::SetupViewPort()
     XC_Graphics::SetupViewPort();
 }
 
-void XC_GraphicsGL::Update(float dt)
+void XC_GraphicsGL::Update(f32 dt)
 {
 }
 
@@ -146,7 +146,7 @@ void XC_GraphicsGL::GoFullscreen(bool go)
 {
 }
 
-void XC_GraphicsGL::OnResize(int _width, int _height)
+void XC_GraphicsGL::OnResize(i32 _width, i32 _height)
 {
 }
 

@@ -27,11 +27,11 @@ public:
     TexturedPlane(XCVec4& p1, XCVec4& p2, XCVec4& p3);
     virtual ~TexturedPlane();
 
-    virtual void                     Init(int actorId) override;
+    virtual void                     Init(i32 actorId) override;
     virtual void                     PreLoad(const void* fbBuffer);
     virtual void                     PreLoad(XCVec4& initialPosition, XCVec4& initialRotation, XCVec4& initialScaling, BasicMaterial& material, std::string texture, RasterType rasterType);
     virtual void                     Load();
-    virtual void                     Update(float dt);
+    virtual void                     Update(f32 dt);
     virtual void                     Draw(RenderContext& renderContext);
     virtual void                     Destroy();
     virtual void                     BuildGeometryBuffers();

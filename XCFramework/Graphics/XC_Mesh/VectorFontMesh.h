@@ -21,8 +21,8 @@ public:
 
     struct FontData
     {
-        unsigned int          submeshId;
-        unsigned int          instanceCount;
+        u32          submeshId;
+        u32          instanceCount;
 
         FontData()
         {
@@ -33,7 +33,7 @@ public:
     VectorFontMesh();
     virtual ~VectorFontMesh();
 
-    void            Init(int resourceId, std::string userFriendlyName) override;
+    void            Init(i32 resourceId, std::string userFriendlyName) override;
     void            DrawText(std::string text, XCVec3Unaligned& position, RenderContext& context);
     void            Destroy() override;
 
@@ -41,7 +41,7 @@ protected:
     void            CreateConstantBuffer() override;
 
     void            Draw(RenderContext& context) override;
-    void            DrawSubMesh(RenderContext& renderContext, unsigned int meshIndex, unsigned int instanceCount = 1);
+    void            DrawSubMesh(RenderContext& renderContext, u32 meshIndex, u32 instanceCount = 1);
 
 private:
     std::vector<FontData>                  m_subMeshesIdBuffer;

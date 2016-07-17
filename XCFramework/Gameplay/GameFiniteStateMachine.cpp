@@ -47,7 +47,7 @@ void GameFiniteStateMachine::Init()
     SetState("IntroState");
 }
 
-void GameFiniteStateMachine::Update(float dt)
+void GameFiniteStateMachine::Update(f32 dt)
 {
     m_StateStack.back()->Update(dt);
 }

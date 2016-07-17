@@ -11,11 +11,11 @@
 #include <io.h>
 #elif defined(XC_ORBIS)
 
-unsigned int _filelength(FILE* fp)
+u32 _filelength(FILE* fp)
 {
     unsigned originalPosition = ftell(fp);
     fseek(fp, 0, SEEK_END);
-    unsigned int endPosition = ftell(fp);
+    u32 endPosition = ftell(fp);
 
     fseek(fp, originalPosition, SEEK_SET);
     return endPosition;
@@ -55,7 +55,7 @@ bool XC3DSMeshLoader::loadMeshFromFile(std::string fileName, XCMesh* const outMe
     }
 
     Chunk tempChunk = {0};
-    int retValue = 0;
+    i32 retValue = 0;
 
     MeshData* subMesh;
 
@@ -83,7 +83,7 @@ bool XC3DSMeshLoader::loadMeshFromFile(std::string fileName, XCMesh* const outMe
                 subMesh = outMesh->CreateAndGetSubMesh();
 
                 //OBJECT CHUNK
-                int i = 0;
+                i32 i = 0;
                 char ch;
                 char* pObjectName = new char[20];
 
@@ -110,20 +110,20 @@ bool XC3DSMeshLoader::loadMeshFromFile(std::string fileName, XCMesh* const outMe
 
         case CHUNK_VERTICESLIST:
             {
-                fread(&tempChunk.amtOfData, sizeof(unsigned short), 1, fp);
+                fread(&tempChunk.amtOfData, sizeof(u16), 1, fp);
                 subMesh->SetNoOfVertices(tempChunk.amtOfData);
 
                 //cout<<"No of vertices : "<< obj.noOfVertices;
 #if defined(WRITE_DATA_TO_FILE)
                     fprintf(outFile, "No of vertices : %d\n", tempChunk.amtOfData);
 #endif
-                    float x, y, z;
+                    f32 x, y, z;
     
-                    for(unsigned int i = 0; i < tempChunk.amtOfData; i++)
+                    for(u32 i = 0; i < tempChunk.amtOfData; i++)
                     {
-                        fread(&x, sizeof(float), 1, fp);
-                        fread(&y, sizeof(float), 1, fp);
-                        fread(&z, sizeof(float), 1, fp);
+                        fread(&x, sizeof(f32), 1, fp);
+                        fread(&y, sizeof(f32), 1, fp);
+                        fread(&z, sizeof(f32), 1, fp);
     
                         //printf("Vertex [%d] : %f %f %f\n", obj.vertex[i].x, obj.vertex[i].y, obj.vertex[i].z);
                         subMesh->AddVertex(x, y, z);
@@ -140,21 +140,21 @@ bool XC3DSMeshLoader::loadMeshFromFile(std::string fileName, XCMesh* const outMe
         case CHUNK_FACESLIST:
             {
 
-                fread(&tempChunk.amtOfData, sizeof(unsigned short), 1, fp);
+                fread(&tempChunk.amtOfData, sizeof(u16), 1, fp);
                 subMesh->SetNoOfFaces(tempChunk.amtOfData);
 
                 //cout<<"No of Faces : "<< obj.noOfFaces;
 #if defined(WRITE_DATA_TO_FILE)
                 fprintf(outFile, "No of Faces : %d\n", tempChunk.amtOfData);
 #endif
-                unsigned short a, b, c, flags;
+                u16 a, b, c, flags;
 
-                for(unsigned int i = 0; i < tempChunk.amtOfData; i++)
+                for(u32 i = 0; i < tempChunk.amtOfData; i++)
                 {
-                    fread(&a, sizeof(unsigned short), 1, fp);
-                    fread(&b, sizeof(unsigned short), 1, fp);
-                    fread(&c, sizeof(unsigned short), 1, fp);
-                    fread(&flags, sizeof(unsigned short), 1, fp);
+                    fread(&a, sizeof(u16), 1, fp);
+                    fread(&b, sizeof(u16), 1, fp);
+                    fread(&c, sizeof(u16), 1, fp);
+                    fread(&flags, sizeof(u16), 1, fp);
                     subMesh->AddFace(a, b, c, flags);
 
                     //printf("Faces [%d] : %d %d %d\n", obj.face[i].a, obj.face[i].b, obj.face[i].c);
@@ -172,13 +172,13 @@ bool XC3DSMeshLoader::loadMeshFromFile(std::string fileName, XCMesh* const outMe
         case CHUNK_MAPCOORDLIST:
             {
 
-                fread(&tempChunk.amtOfData, sizeof(unsigned short), 1, fp);
+                fread(&tempChunk.amtOfData, sizeof(u16), 1, fp);
 
-                float u, v;
-                for(unsigned int i = 0; i <tempChunk.amtOfData; i++)
+                f32 u, v;
+                for(u32 i = 0; i <tempChunk.amtOfData; i++)
                 {
-                    fread(&u, sizeof(float), 1, fp);
-                    fread(&v, sizeof(float), 1, fp);
+                    fread(&u, sizeof(f32), 1, fp);
+                    fread(&v, sizeof(f32), 1, fp);
                     
                     subMesh->AddMapCoord(u, v);
                     //printf("Map Coord [%d] : %f %f\n", obj.mapCoord[i].u, obj.mapCoord[i].v);

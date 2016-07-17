@@ -74,7 +74,7 @@ void Gun::Load()
     m_secondaryRightAxis = m_right;
 }
 
-void Gun::Update(float dt)
+void Gun::Update(f32 dt)
 {
     UpdateGunRecoil(dt);
 
@@ -91,7 +91,7 @@ void Gun::Update(float dt)
     SimpleMeshActor::Update(dt);
 }
 
-void Gun::UpdateGunRecoil(float dt)
+void Gun::UpdateGunRecoil(f32 dt)
 {
     if (!m_canShootBullet)
     {
@@ -105,7 +105,7 @@ void Gun::UpdateGunRecoil(float dt)
     }
 }
 
-void Gun::UpdateOffsets(float dt)
+void Gun::UpdateOffsets(f32 dt)
 {
     m_look = m_bindedActor->GetLook();
     m_right = m_bindedActor->GetRight();

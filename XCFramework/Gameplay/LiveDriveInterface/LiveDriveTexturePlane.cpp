@@ -47,7 +47,7 @@ void LiveDriveTexturePlane::PreLoad(const void* fbBuffer)
     m_texture->m_Resource = m_liveDriveTexture;
 }
 
-void LiveDriveTexturePlane::Update(float dt)
+void LiveDriveTexturePlane::Update(f32 dt)
 {
 }
 

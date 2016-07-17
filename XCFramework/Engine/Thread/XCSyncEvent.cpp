@@ -16,24 +16,24 @@ XCSyncEvent::~XCSyncEvent(void)
 {
 }
 
-int XCSyncEvent::CreateEvent()
+i32 XCSyncEvent::CreateEvent()
 {
     m_eventHandle = ::CreateEvent(NULL, FALSE, FALSE, NULL);
     return true;
 }
 
-int XCSyncEvent::SignalEvent(int pattern)
+i32 XCSyncEvent::SignalEvent(i32 pattern)
 {
     return SetEvent(m_eventHandle);
 }
 
-int XCSyncEvent::WaitEvent(int pattern)
+i32 XCSyncEvent::WaitEvent(i32 pattern)
 {
     WaitForSingleObject(m_eventHandle, INFINITE);
     return true;
 }
 
-int XCSyncEvent::DestroyEvent()
+i32 XCSyncEvent::DestroyEvent()
 {
     CloseHandle(m_eventHandle);
     return true;

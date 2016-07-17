@@ -10,7 +10,7 @@
 bool Thread::CreateThread(runFunction asyncFunction, void* params)
 {
     //Create a new Thread and init the process
-    unsigned long *threadID = 0;
+    DWORD* threadID = 0;
 
     m_threadHandle = ::CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)asyncFunction, params, CREATE_SUSPENDED, threadID);
     Logger("Thread Created : in suspended mode. Call run!!");
@@ -45,6 +45,6 @@ void Thread::Destroy()
     CloseHandle(m_threadHandle);
 }
 
-void Thread::SetThreadPriority(unsigned int priority)
+void Thread::SetThreadPriority(u32 priority)
 {
 }

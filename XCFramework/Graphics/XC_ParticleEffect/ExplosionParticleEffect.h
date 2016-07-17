@@ -12,10 +12,10 @@
 class ExplosionParticleEffect : public IParticleEffect
 {
 public:
-    ExplosionParticleEffect(XCVec3Unaligned explosionCentre, unsigned int noOfParticles, float lifeSpan);
+    ExplosionParticleEffect(XCVec3Unaligned explosionCentre, u32 noOfParticles, f32 lifeSpan);
     ~ExplosionParticleEffect();
 
-    void                            Update(float dt);
+    void                            Update(f32 dt);
     void                            Draw(RenderContext& context);
 
     void                            AssignParticleLocations();
@@ -25,7 +25,7 @@ private:
     struct ParticlePhysics
     {
         XCVec4     velocity;
-        float               acceleration;
+        f32               acceleration;
     };
     
     //Vertex Buffer
@@ -35,5 +35,5 @@ private:
     std::vector<ParticlePhysics>    m_particlesPhysics;
     
     XCVec3Unaligned                 m_explosionCentre;
-    unsigned int                    m_noOfParticles;
+    u32                    m_noOfParticles;
 };

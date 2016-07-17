@@ -111,7 +111,7 @@ void ResourceManager::ReleaseResource(ResourceHandle * resHandle)
 }
 
 #if defined(LEGACY_LOADING)
-int ResourceManager::LoadResourcesFromPackage(char* filePath)
+i32 ResourceManager::LoadResourcesFromPackage(char* filePath)
 {
     //Read the file and create resources and load contents based on it
     m_loadPackageTask = new LoadPackageFileTask(filePath);
@@ -121,7 +121,7 @@ int ResourceManager::LoadResourcesFromPackage(char* filePath)
 }
 #endif
 
-int ResourceManager::LoadResourcesFromPackageFB(const char* dataPath)
+i32 ResourceManager::LoadResourcesFromPackageFB(const char* dataPath)
 {
     return true;
 }
@@ -195,9 +195,9 @@ void ResourceManager::Destroy()
 }
 
 #if defined(EDITOR)
-const char* ResourceManager::GetResourceNameAtIndex(int index)
+const char* ResourceManager::GetResourceNameAtIndex(i32 index)
 {
-    int count = 0;
+    i32 count = 0;
     for (auto& resource : m_ResourcePool)
     {
         if (count++ == index)
@@ -211,7 +211,7 @@ const char* ResourceManager::GetResourceNameAtIndex(int index)
 
 void ResourceManager::GetResourceList(ResourceInfo* resourcePtr)
 {
-    int index = 0;
+    i32 index = 0;
     for (auto& resource : m_ResourcePool)
     {
         resourcePtr[index].m_resourecId = resource.second->getResourecId();
@@ -223,7 +223,7 @@ void ResourceManager::GetResourceList(ResourceInfo* resourcePtr)
     }
 }
 
-extern "C" __declspec(dllexport) int GetNoOfResources()
+extern "C" __declspec(dllexport) i32 GetNoOfResources()
 {
     return RESOURCE_MANAGER->GetNoOfResources();
 }
@@ -233,7 +233,7 @@ extern "C" __declspec(dllexport) void GetResourceList(ResourceInfo* ptrToList)
     RESOURCE_MANAGER->GetResourceList(ptrToList);
 }
 
-extern "C" __declspec(dllexport) const char* GetResourceAt(int index)
+extern "C" __declspec(dllexport) const char* GetResourceAt(i32 index)
 {
     return RESOURCE_MANAGER->GetResourceNameAtIndex(index);
 }

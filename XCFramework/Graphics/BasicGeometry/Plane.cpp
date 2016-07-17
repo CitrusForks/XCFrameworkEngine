@@ -25,7 +25,7 @@ Plane::Plane(XCVec4& p1, XCVec4& p2, XCVec4& p3)
     XCVec4 axis2 = v3 - v2; // from 1 to 2
 
     m_planeNormal = VectorNormalize<3>(VectorCross(axis1, axis2));
-    float dotVal = VectorDot(m_planeNormal, p1);
+    f32 dotVal = VectorDot(m_planeNormal, p1);
     
     m_dVector = XCVec4(dotVal, dotVal, dotVal, dotVal);
 

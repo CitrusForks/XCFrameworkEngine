@@ -12,7 +12,7 @@ DirectInput::DirectInput()
 {
 }
 
-void DirectInput::Init(HINSTANCE _hAppInstance, HWND _hAppWnd, unsigned long keyboardCoopFlags,unsigned long mouseCoopFlags)
+void DirectInput::Init(HINSTANCE _hAppInstance, HWND _hAppWnd, u64 keyboardCoopFlags,u64 mouseCoopFlags)
 {
 }
 
@@ -40,7 +40,7 @@ void DirectInput::SetFakeKeyDown(char key)
 {
 }
 
-void DirectInput::SetFakeMouseInput(FakeMouseInputType type, float value)
+void DirectInput::SetFakeMouseInput(FakeMouseInputType type, f32 value)
 {
 }
 
@@ -49,22 +49,22 @@ bool DirectInput::KeyDown(char key)
     return false;
 }
 
-bool DirectInput::MouseButtonDown(int button)
+bool DirectInput::MouseButtonDown(i32 button)
 {
     return false;
 }
 
-float DirectInput::MouseDX()
+f32 DirectInput::MouseDX()
 {
-    return (float)0.0f;
+    return (f32)0.0f;
 }
 
-float DirectInput::MouseDY()
+f32 DirectInput::MouseDY()
 {
-    return (float)0.0f;
+    return (f32)0.0f;
 }
 
-float DirectInput::MouseDZ()
+f32 DirectInput::MouseDZ()
 {
-    return (float)0.0f;
+    return (f32)0.0f;
 }

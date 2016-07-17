@@ -24,7 +24,7 @@ void EndGameState::Init()
     IGameState::Init();
 }
 
-void EndGameState::Update(float dt)
+void EndGameState::Update(f32 dt)
 {
 }
 

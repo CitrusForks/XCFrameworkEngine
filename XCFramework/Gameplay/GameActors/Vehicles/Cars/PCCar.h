@@ -18,10 +18,10 @@ public:
     PCCar(void);
     virtual ~PCCar(void);
 
-    virtual void                        Init(int actorId);
+    virtual void                        Init(i32 actorId);
     virtual void                        PreLoad(const void* fbBuffer);
     virtual void                        Load();
-    virtual void                        Update(float dt);
+    virtual void                        Update(f32 dt);
     virtual void                        Destroy();
 
 private:

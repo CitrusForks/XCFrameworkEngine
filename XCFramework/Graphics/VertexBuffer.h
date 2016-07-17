@@ -38,7 +38,7 @@ public:
     void            UpdateState() override;
     void            BuildVertexBuffer();
     void            RenderContextCallback(RenderContext& renderContext);
-    unsigned int    GetVertexFormatStride() { return sizeof(T); }
+    u32    GetVertexFormatStride() { return sizeof(T); }
     void            SetVertexBuffer(ID3DDeviceContext& context);
 
 #if defined(XCGRAPHICS_DX12) 
@@ -67,8 +67,8 @@ void VertexBuffer<T>::SetVertexBuffer(ID3DDeviceContext& context)
 #elif defined(XCGRAPHICS_DX11)
     context.IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-    unsigned int stride = GetVertexFormatStride();
-    unsigned int offset = 0;
+    u32 stride = GetVertexFormatStride();
+    u32 offset = 0;
 
     context.IASetVertexBuffers(0, 1, &m_pVB, &stride, &offset);
 #endif
@@ -81,7 +81,7 @@ void VertexBuffer<T>::BuildVertexBuffer()
 
 #if defined(XCGRAPHICS_DX12)
     //Create VB
-    int vbSize = sizeof(T) * m_vertexData.size();
+    i32 vbSize = sizeof(T) * m_vertexData.size();
 
     ValidateResult(graphicsSystem.GetDevice()->CreateCommittedResource(
         &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
@@ -136,7 +136,7 @@ void VertexBuffer<T>::RenderContextCallback(RenderContext& renderContext)
 {
 #if defined(XCGRAPHICS_DX12)
     ID3DDeviceContext& context = renderContext.GetDeviceContext();
-    int vbSize = sizeof(T) * m_vertexData.size();
+    i32 vbSize = sizeof(T) * m_vertexData.size();
 
     D3D12_SUBRESOURCE_DATA vertexData = {};
     vertexData.pData = &m_vertexData[0];

@@ -34,6 +34,6 @@ void SubActor::InitOffsets(const XCVec4& position, const XCVec4& look, const XCV
     m_offsetUp       = up;
 }
 
-void SubActor::UpdateOffsets(float dt)
+void SubActor::UpdateOffsets(f32 dt)
 {
 }

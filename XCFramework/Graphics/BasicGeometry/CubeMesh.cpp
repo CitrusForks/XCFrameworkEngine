@@ -134,7 +134,7 @@ void CubeMesh::BuildBuffers()
 #endif
 }
 
-void CubeMesh::Update(float dt)
+void CubeMesh::Update(f32 dt)
 {
     m_World = m_MScaling * m_MRotation * m_MTranslation;
 }

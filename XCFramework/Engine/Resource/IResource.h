@@ -27,7 +27,7 @@ public:
     IResource();
     virtual ~IResource();
 
-    virtual void            Init(int id, std::string userFriendlyName);
+    virtual void            Init(i32 id, std::string userFriendlyName);
 
     //Dynamic loading/spawning or legacy data structure
     virtual void            Load(std::string resourcePath);
@@ -37,7 +37,7 @@ public:
     virtual void            Unload();
 
     virtual void            UpdateState();
-    virtual void            Update(float dt) {}
+    virtual void            Update(f32 dt) {}
     virtual void            Draw() {}
     virtual void            Draw(RenderContext& context) {}
 
@@ -47,21 +47,21 @@ public:
 
     void                    WaitResourceUpdate();
 
-    int                     GetResourecId()                                  { return m_resourceId; }
+    i32                     GetResourecId()                                  { return m_resourceId; }
     EResourceType           GetResourceType()                                { return m_resourceType;  }
     
     std::string             SetUserFriendlyName(std::string usrFriendlyName) { m_userFriendlyName = usrFriendlyName; }
     std::string             GetUserFriendlyName()                            { return m_userFriendlyName;  }
     std::string             GetResourcePath()                                { return m_resourcePath; }
                                                                              
-    int                     IsLoaded()                                       { return m_resourceState == ResourceState_Loaded; }
+    i32                     IsLoaded()                                       { return m_resourceState == ResourceState_Loaded; }
 
     ResourceState           GetResourceState()                               { return m_resourceState; }
     void                    SetResourceState(ResourceState state)            { m_resourceState = state; }
 
 protected:
     EResourceType           m_resourceType;
-    int                     m_resourceId;
+    i32                     m_resourceId;
     ResourceState           m_resourceState;
 
     std::string             m_resourcePath;
@@ -75,7 +75,7 @@ protected:
 #if defined(EDITOR)
 struct ResourceInfo
 {
-    int                 m_resourecId;
+    i32                 m_resourecId;
     EResourceType       m_resourecType;
     char                m_userfriendlyName[50];
     char                m_resourcePath[50];

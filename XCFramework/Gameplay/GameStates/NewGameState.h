@@ -19,7 +19,7 @@ namespace GameState
         virtual ~NewGameState(void);
 
         void                    Init();
-        void                    Update(float dt);
+        void                    Update(f32 dt);
         void                    Draw(XC_Graphics& graphicsSystem);
         void                    Destroy();
     };

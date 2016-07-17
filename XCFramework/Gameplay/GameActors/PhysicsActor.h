@@ -24,11 +24,11 @@ public:
     virtual ~PhysicsActor(void);
     
     //To make a Physics Object Immovable, set Inverse Mass to 0
-    virtual void                Init(int actorId)             override;
+    virtual void                Init(i32 actorId)             override;
     virtual void                PreLoad(const void* fbBuffer) override   { AnimatedActor::PreLoad(fbBuffer); }
     virtual void                Load()                        override;
     virtual void                UpdateState()                 override;
-    virtual void                Update(float dt)              override;
+    virtual void                Update(f32 dt)              override;
     virtual void                Draw(RenderContext& context)  override;
     virtual void                Unload()                      override;
     virtual void                Destroy()                     override;

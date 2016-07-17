@@ -24,7 +24,7 @@ void XC_Graphics::Destroy()
     m_renderingPool->Destroy();
 }
 
-void XC_Graphics::InitGraphicsWindow(HWND _mainWnd, int _width, int _height, bool _enable4xMsaa)
+void XC_Graphics::InitGraphicsWindow(HWND _mainWnd, i32 _width, i32 _height, bool _enable4xMsaa)
 {
     m_hMainWnd = _mainWnd;
     m_ClientWidth = _width;
@@ -77,16 +77,16 @@ void XC_Graphics::SetupViewPort()
     //Set the Viewport
     m_ScreenViewPort[RENDERTARGET_MAIN_0].TopLeftX = 0.0f;
     m_ScreenViewPort[RENDERTARGET_MAIN_0].TopLeftY = 0.0f;
-    m_ScreenViewPort[RENDERTARGET_MAIN_0].Width = (float)m_ClientWidth;
-    m_ScreenViewPort[RENDERTARGET_MAIN_0].Height = (float)m_ClientHeight;
+    m_ScreenViewPort[RENDERTARGET_MAIN_0].Width = (f32)m_ClientWidth;
+    m_ScreenViewPort[RENDERTARGET_MAIN_0].Height = (f32)m_ClientHeight;
     m_ScreenViewPort[RENDERTARGET_MAIN_0].MinDepth = 0.0f;
     m_ScreenViewPort[RENDERTARGET_MAIN_0].MaxDepth = 1.0f;
 
     //Set the Viewport Live Drive
     m_ScreenViewPort[RENDERTARGET_LIVEDRIVE].TopLeftX = 0.0f;
     m_ScreenViewPort[RENDERTARGET_LIVEDRIVE].TopLeftY = 0.0f;
-    m_ScreenViewPort[RENDERTARGET_LIVEDRIVE].Width = (float)256;
-    m_ScreenViewPort[RENDERTARGET_LIVEDRIVE].Height = (float)256;
+    m_ScreenViewPort[RENDERTARGET_LIVEDRIVE].Width = (f32)256;
+    m_ScreenViewPort[RENDERTARGET_LIVEDRIVE].Height = (f32)256;
     m_ScreenViewPort[RENDERTARGET_LIVEDRIVE].MinDepth = 0.0f;
     m_ScreenViewPort[RENDERTARGET_LIVEDRIVE].MaxDepth = 1.0f;
 
@@ -96,7 +96,7 @@ void XC_Graphics::SetupViewPort()
 #endif
 }
 
-void XC_Graphics::Update(float dt)
+void XC_Graphics::Update(f32 dt)
 {
 }
 
@@ -132,7 +132,7 @@ void XC_Graphics::GoFullscreen(bool go)
 {
 }
 
-void XC_Graphics::OnResize(int _width, int _height)
+void XC_Graphics::OnResize(i32 _width, i32 _height)
 {
 }
 

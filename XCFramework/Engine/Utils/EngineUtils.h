@@ -8,10 +8,10 @@
 
 #define ReleaseCOM(x) { if(x){ x->Release();x = 0; } }
 
-const float Infinity = FLT_MAX;
+const f32 Infinity = FLT_MAX;
 
-unsigned int getFilelength(FILE* fp);
-HRESULT ReadRawDataFromFile(const char* filename, UINT8** data, unsigned int& size);
+u32 getFilelength(FILE* fp);
+HRESULT ReadRawDataFromFile(const char* filename, UINT8** data, u32& size);
 
 #if !defined(XC_ORBIS)
 const WCHAR* charToWideChar(const char* str);

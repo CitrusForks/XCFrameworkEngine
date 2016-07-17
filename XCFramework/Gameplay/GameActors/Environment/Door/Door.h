@@ -24,7 +24,7 @@ public:
     virtual void                        PreLoad(XCVec3& _initialPosition, std::string pMesh);
     virtual void                        Load();
     virtual void                        SetInitialPhysicsProperties();
-    virtual void                        Update(float dt);
+    virtual void                        Update(f32 dt);
     virtual void                        Draw(RenderContext& context);
     virtual void                        Destroy();
 

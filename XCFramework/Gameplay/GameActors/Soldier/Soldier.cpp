@@ -15,7 +15,7 @@
 
 #include "Gameplay/GameActors/GameActorsFactory.h"
 
-const float Soldier::MAX_PITCH_ANGLE = XC_PIDIV4;
+const f32 Soldier::MAX_PITCH_ANGLE = XC_PIDIV4;
 
 Soldier::Soldier(void)
 {
@@ -82,7 +82,7 @@ void Soldier::Load()
 void Soldier::SetInitialPhysicsProperties()
 {
     PhysicsActor::SetInitialPhysicsProperties();
-    InitXPhysics(m_currentPosition, XCVec4(), XCVec4(), 10, (float)0.8);
+    InitXPhysics(m_currentPosition, XCVec4(), XCVec4(), 10, (f32)0.8);
 }
 
 void Soldier::UpdateState()
@@ -90,7 +90,7 @@ void Soldier::UpdateState()
     PhysicsActor::UpdateState();
 }
 
-void Soldier::Update(float dt)
+void Soldier::Update(f32 dt)
 {
     //Update the rotation based on initial and transformed.
     m_MRotation = m_transformedRotation;
@@ -104,27 +104,27 @@ void Soldier::Update(float dt)
     m_gun->Update(dt);
 }
 
-void Soldier::AccelerateCar(float distance)
+void Soldier::AccelerateCar(f32 distance)
 {
     m_Position += (distance * m_look);
 }
 
-void Soldier::Walk(float scalarForce)
+void Soldier::Walk(f32 scalarForce)
 {
     AddForce(m_look * scalarForce);
 }
 
-void Soldier::Strafe(float scalarForce)
+void Soldier::Strafe(f32 scalarForce)
 {
     AddForce(m_right * scalarForce);
 }
 
-void Soldier::Jump(float scalarForce)
+void Soldier::Jump(f32 scalarForce)
 {
     AddForce(m_up * scalarForce);
 }
 
-void Soldier::Yaw(float angle, float scalarForce)
+void Soldier::Yaw(f32 angle, f32 scalarForce)
 {
     //Total RotationOffset will be applied from Pitch. So remember to always YAW AND PITCH together. ApplyOffsetRotation will be applied from Pitch()
     XCVec4 quaternionAxis = QuaternionRotationAxis(XCVec4(0, 1, 0, 0), angle);
@@ -149,7 +149,7 @@ void Soldier::Yaw(float angle, float scalarForce)
     m_gun->SetOffsetRotation(rotation);
 }
 
-void Soldier::Pitch(float angle, float scalarForce)
+void Soldier::Pitch(f32 angle, f32 scalarForce)
 {
     //Total RotationOffset will be applied from Pitch. So remember to always YAW AND PITCH together. ApplyOffsetRotation will be applied from Pitch()
     XCVec4 quaternionAxis = QuaternionRotationAxis(m_secondaryRightAxis, angle);

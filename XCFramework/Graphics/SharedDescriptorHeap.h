@@ -18,12 +18,12 @@ public:
     DECLARE_OBJECT_CREATION(SharedDescriptorHeap)
 
     //TODO: Get count of FBTexture2DS from data
-    static const int        nbOfTexturesFromData = 14;
+    static const i32        nbOfTexturesFromData = 14;
 
     SharedDescriptorHeap();
     ~SharedDescriptorHeap()    {}
 
-    void                    Init(ID3DDevice& device, unsigned int nbOfDesc);
+    void                    Init(ID3DDevice& device, u32 nbOfDesc);
     D3DConstantBuffer*      CreateBufferView(D3DBufferDesc& desc);
 
 #if defined(XCGRAPHICS_DX12)
@@ -38,7 +38,7 @@ public:
 
 private:
 
-    D3DConstantBuffer*      FindFreeConstantBuffer(BufferType type, unsigned int size);
+    D3DConstantBuffer*      FindFreeConstantBuffer(BufferType type, u32 size);
 
 #if defined(XCGRAPHICS_DX12)
     ID3D12DescriptorHeap*           m_sharedDescriptorHeap; //SRV, CB, UAV only

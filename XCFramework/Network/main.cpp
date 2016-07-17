@@ -16,19 +16,19 @@
 #include "Client.h"
 
 
-static const int MAX_IMAGE_SIZE = 200 * 1024;       //200 kb
+static const i32 MAX_IMAGE_SIZE = 200 * 1024;       //200 kb
 
 void sendImageData(NetworkManager& netMgr);
 
 
-int main(int argc, char* argv[])
+i32 main(i32 argc, char* argv[])
 {
     NetworkManager netMgr;
     
     INetPeer* peer = nullptr;
 
     const char* ipAddress = IP_ADDRESS;
-    int port = DEFAULT_PORT;
+    i32 port = DEFAULT_PORT;
 
     if (argc > 0)
     {
@@ -89,13 +89,13 @@ int main(int argc, char* argv[])
 void sendImageData(NetworkManager& netMgr)
 {
     FILE* fp = fopen("out.bmp", "rb");
-    unsigned char* pImageData = new unsigned char[256 * 256 * 4];
-    fread(pImageData, sizeof(unsigned char), 256 * 256 * 4, fp);
+    u8* pImageData = new u8[256 * 256 * 4];
+    fread(pImageData, sizeof(u8), 256 * 256 * 4, fp);
     fclose(fp);
 
     netMgr.NetworkSendData("S", 1);
 
-    for (int index = 0; index < 256 * 256 * 4; index++)
+    for (i32 index = 0; index < 256 * 256 * 4; index++)
     {
         if (pImageData[index] == '\n' || pImageData[index] == 0)
         {
@@ -107,7 +107,7 @@ void sendImageData(NetworkManager& netMgr)
         }
     }
 
-    for (int index = 0; index < 128; index += 4)
+    for (i32 index = 0; index < 128; index += 4)
     {
         printf("[Pixel %d] R : %d  G: %d B : %d A : %d\n", index, pImageData[index], pImageData[index + 1], pImageData[index + 2], pImageData[index + 3]);
     }

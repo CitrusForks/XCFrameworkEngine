@@ -7,7 +7,7 @@
 #include "GraphicsPrecompiledHeader.h"
 #include "MeshAnimator.h"
 
-void MeshAnimator::PlayAnimation(unsigned int animIndex)
+void MeshAnimator::PlayAnimation(u32 animIndex)
 {
     if (m_currentAnimationIndex == animIndex)
     {
@@ -22,7 +22,7 @@ void MeshAnimator::PlayAnimation(unsigned int animIndex)
     //TODO: AnimEvalutor
 }
 
-void MeshAnimator::Update(float dt)
+void MeshAnimator::Update(f32 dt)
 {
 }
 
@@ -42,7 +42,7 @@ AnimNode* MeshAnimator::GenerateNodeStructure(const MeshNode* pNode, AnimNode* p
     {
         internalNode->m_channelIndex = -1;
         const aiAnimation* currentAnim = m_scene->mAnimations[m_currentAnimationIndex];
-        for (unsigned int a = 0; a < currentAnim->mNumChannels; a++)
+        for (u32 a = 0; a < currentAnim->mNumChannels; a++)
         {
             if (strcmp(currentAnim->mChannels[a]->mNodeName.C_Str(), internalNode->m_animName.c_str()) == 0)
             {
@@ -53,7 +53,7 @@ AnimNode* MeshAnimator::GenerateNodeStructure(const MeshNode* pNode, AnimNode* p
     }
 
     // continue for all child nodes and assign the created internal nodes as our children
-    for (unsigned int a = 0; a < pNode->m_childNodes.size(); a++)
+    for (u32 a = 0; a < pNode->m_childNodes.size(); a++)
     {
         AnimNode* childNode = GenerateNodeStructure(pNode->m_childNodes[a], internalNode);
         internalNode->m_childNodes.push_back(childNode);
@@ -84,7 +84,7 @@ std::vector<XCMatrix4Unaligned>& MeshAnimator::GetBoneMatrices(MeshNode* meshNod
 
     // Bone matrices transform from mesh coordinates in bind pose to mesh coordinates in skinned pose
     // Therefore the formula is offsetMatrix * currentGlobalTransform * inverseCurrentMeshTransform
-    for (unsigned int boneIndex = 0; boneIndex < boneHierarchy->m_boneNodes.size(); ++boneIndex)
+    for (u32 boneIndex = 0; boneIndex < boneHierarchy->m_boneNodes.size(); ++boneIndex)
     {
         const XCMatrix4& currentGlobalTransform(GetWorldTransform(boneHierarchy->m_boneNodes[boneNodes[boneIndex].m_boneName]));
         m_boneTransforms[boneIndex] = (MatrixTranspose(worldInvTransform * currentGlobalTransform * XCMatrix4(boneNodes[boneIndex].m_offsetMatrix))).GetUnaligned();

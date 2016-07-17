@@ -22,7 +22,7 @@ public:
                                   
     void                          Update();
 
-    void                          NetworkSendData(const char* _data, int size = -1);
+    void                          NetworkSendData(const char* _data, i32 size = -1);
     char*                         NetworkReceiveData();
                                   
     void                          Destroy();

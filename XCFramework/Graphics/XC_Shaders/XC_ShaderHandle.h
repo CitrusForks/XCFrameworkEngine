@@ -63,7 +63,7 @@ struct ShaderSlot
 
     BufferDesc      m_bufferDesc;
     BufferType      m_bufferType;
-    unsigned int    m_shaderSlotId;
+    u32    m_shaderSlotId;
 };
 
 class XCShaderHandle : public IShader
@@ -158,7 +158,7 @@ public:
         }
     }
 
-    void SetIndexBuffer(ID3DDeviceContext& context, IndexBuffer<unsigned int>& indexBuffer)
+    void SetIndexBuffer(ID3DDeviceContext& context, IndexBuffer<u32>& indexBuffer)
     {
 #if defined(XCGRAPHICS_DX12)
         context.IASetIndexBuffer(&indexBuffer.GetIndexBufferView());
@@ -174,11 +174,11 @@ protected:
 
     void                    LoadShader();
     void                    SortSlots();
-    unsigned int            GetSlotPriority(std::string bufferName);
+    u32            GetSlotPriority(std::string bufferName);
     void                    GenerateRootSignature();
     void                    GeneratePSO();
     void                    ReadShaderDescription();
-    unsigned int            GetSizeOfConstantBuffer(std::string& cbName);
+    u32            GetSizeOfConstantBuffer(std::string& cbName);
 
 private:
 

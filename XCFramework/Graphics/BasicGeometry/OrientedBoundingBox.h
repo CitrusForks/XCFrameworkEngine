@@ -11,7 +11,7 @@
 class OrientedBoundingBox
 {
 public:
-    static const int MAX_OBB_CORNER_POINTS_COUNT = 8;
+    static const i32 MAX_OBB_CORNER_POINTS_COUNT = 8;
 
     OrientedBoundingBox();
     virtual ~OrientedBoundingBox();

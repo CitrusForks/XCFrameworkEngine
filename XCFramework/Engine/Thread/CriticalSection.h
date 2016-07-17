@@ -22,7 +22,7 @@ public:
 
     void                        Create(bool isOwner = false, std::string mutexName = "Mutex");
 
-    void                        Enter(int timeOut = INFINITE);
+    void                        Enter(i32 timeOut = INFINITE);
     void                        Exit();
     CS&                         GetRawMutex() { return m_mutex; }
     void                        Release();

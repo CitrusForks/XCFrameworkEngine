@@ -18,7 +18,7 @@ VectorFontMesh::~VectorFontMesh()
 {
 }
 
-void VectorFontMesh::Init(int resourceId, std::string userFriendlyName)
+void VectorFontMesh::Init(i32 resourceId, std::string userFriendlyName)
 {
     XCMeshFBX::Init(resourceId, userFriendlyName);
 
@@ -37,15 +37,15 @@ void VectorFontMesh::DrawText(std::string text, XCVec3Unaligned& position, Rende
     //Calculate start world for every character
     ICamera& cam = context.GetShaderManagerSystem().GetGlobalShaderData().m_camera;
 
-    unsigned int CharacterSpacing = 10;
-    unsigned int charPosition = 0;
+    u32 CharacterSpacing = 10;
+    u32 charPosition = 0;
     
-    float scale = 0.5f;
-    float computePos = 0.0f;
+    f32 scale = 0.5f;
+    f32 computePos = 0.0f;
 
     FontData fontData = {};
     
-    for (unsigned int charIndex = 0; charIndex < text.size(); ++charIndex)
+    for (u32 charIndex = 0; charIndex < text.size(); ++charIndex)
     {
         std::string textchar = { text.at(charIndex) };
         auto findSubMesh = std::find_if(m_subMeshes.begin(), m_subMeshes.end(), [&textchar](MeshData* submesh)
@@ -55,7 +55,7 @@ void VectorFontMesh::DrawText(std::string text, XCVec3Unaligned& position, Rende
 
         if (findSubMesh != m_subMeshes.end())
         {
-            unsigned int subMeshId = findSubMesh - m_subMeshes.begin();
+            u32 subMeshId = findSubMesh - m_subMeshes.begin();
 
             //Find if the submesh is already in our buffer. If yes Instance ++ it.
             auto subMeshExists = std::find_if(m_subMeshesIdBuffer.begin(), m_subMeshesIdBuffer.end(), [&subMeshId](FontData& fontData)
@@ -114,7 +114,7 @@ void VectorFontMesh::CreateConstantBuffer()
         SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
         XC_Graphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XC_Graphics>("GraphicsSystem");
 
-        for (unsigned int subMeshIndex = 0; subMeshIndex < m_subMeshes.size(); ++subMeshIndex)
+        for (u32 subMeshIndex = 0; subMeshIndex < m_subMeshes.size(); ++subMeshIndex)
         {
             buffer.m_instanceBufferGPU = m_shaderHandler->CreateConstantBuffer("cbPerObjectInstanced");
             buffer.m_instanceBufferGPU->UploadZeroMemoryDataOnGPU(*graphicsSystem.GetDeviceContext(), sizeof(cbVectorFontInstanced));
@@ -150,7 +150,7 @@ void VectorFontMesh::Draw(RenderContext& context)
     m_subMeshesIdBuffer.clear();
 }
 
-void VectorFontMesh::DrawSubMesh(RenderContext & renderContext, unsigned int meshIndex, unsigned int instanceCount)
+void VectorFontMesh::DrawSubMesh(RenderContext & renderContext, u32 meshIndex, u32 instanceCount)
 {
     m_shaderHandler->SetVertexBuffer(renderContext.GetDeviceContext(), m_subMeshes[meshIndex]->GetVertexBuffer());
     m_shaderHandler->SetIndexBuffer(renderContext.GetDeviceContext(), m_subMeshes[meshIndex]->GetIndexBuffer());

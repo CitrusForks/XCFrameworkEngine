@@ -18,7 +18,7 @@ FirstPersonCamera::~FirstPersonCamera()
 {
 }
 
-FirstPersonCamera::FirstPersonCamera(XCVec4& pos, XCVec4& target, XCVec4& up, float aspectRatio, float fov, float nearPlane, float farPlane)
+FirstPersonCamera::FirstPersonCamera(XCVec4& pos, XCVec4& target, XCVec4& up, f32 aspectRatio, f32 fov, f32 nearPlane, f32 farPlane)
     : ICamera(pos, target, up, aspectRatio, fov, nearPlane, farPlane)
 {
     m_isSetLockY = false;
@@ -41,7 +41,7 @@ FirstPersonCamera::FirstPersonCamera(XCVec4& pos, XCVec4& target, XCVec4& up, fl
     BuildProjectionMatrix();
 }
 
-void FirstPersonCamera::Update(float dt)
+void FirstPersonCamera::Update(f32 dt)
 {
     //Check for inputs
     if (m_directInput->KeyDown(INPUT_UP))
@@ -77,9 +77,9 @@ void FirstPersonCamera::BuildViewMatrix()
     m_right = VectorCross(m_up, m_look);
     
     //Get origin x, y, z
-    float x = - VectorDot(m_position, m_right);
-    float y = - VectorDot(m_position, m_up);
-    float z = - VectorDot(m_position, m_look);
+    f32 x = - VectorDot(m_position, m_right);
+    f32 y = - VectorDot(m_position, m_up);
+    f32 z = - VectorDot(m_position, m_look);
     
     m_viewMatrix[0][0] = m_right.Get<X>();
     m_viewMatrix[1][0] = m_right.Get<Y>();
@@ -102,7 +102,7 @@ void FirstPersonCamera::BuildViewMatrix()
     m_viewMatrix[3][3] = 1;
 }
 
-void FirstPersonCamera::Walk(float distance)
+void FirstPersonCamera::Walk(f32 distance)
 {
     m_position += (distance * m_look);
     
@@ -112,12 +112,12 @@ void FirstPersonCamera::Walk(float distance)
     }
 }
 
-void FirstPersonCamera::Strafe(float distance)
+void FirstPersonCamera::Strafe(f32 distance)
 {
     m_position += (distance * m_right);
 }
 
-void FirstPersonCamera::Yaw(float angle)
+void FirstPersonCamera::Yaw(f32 angle)
 {
     XCMatrix4 rotation = MatrixRotationY(angle);
     
@@ -126,7 +126,7 @@ void FirstPersonCamera::Yaw(float angle)
     m_look  = VectorTransformNormal(m_look, rotation);
 }
 
-void FirstPersonCamera::Pitch(float angle)
+void FirstPersonCamera::Pitch(f32 angle)
 {
     XCMatrix4 rotation = MatrixRotationAxis(m_right, angle);
     

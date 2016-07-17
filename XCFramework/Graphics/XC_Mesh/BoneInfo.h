@@ -30,12 +30,12 @@ public:
         m_weight = weight.mWeight;
     }
 
-    BoneVertexWeight(unsigned int vertexId, float weight)
+    BoneVertexWeight(u32 vertexId, f32 weight)
     : m_vertexId(vertexId), m_weight(weight)
     {}
 
-    unsigned int m_vertexId;
-    float        m_weight;
+    u32 m_vertexId;
+    f32        m_weight;
 };
 
 class BoneNode
@@ -45,7 +45,7 @@ public:
     BoneNode(const aiBone* node)
     {
         m_boneName = node->mName.C_Str();
-        for (unsigned int weightIndex = 0; weightIndex < node->mNumWeights; ++weightIndex)
+        for (u32 weightIndex = 0; weightIndex < node->mNumWeights; ++weightIndex)
         {
             m_vertexWeights.push_back(BoneVertexWeight(node->mWeights[weightIndex]));
         }

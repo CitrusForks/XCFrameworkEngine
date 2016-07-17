@@ -1,7 +1,7 @@
 /* XCFrameworkEngine
  * Copyright (C) Abhishek Porwal, 2016
  * Any queries? Contact author <https://github.com/abhishekp314>
- * This program is complaint with GNU General Public License, version 3.
+ * This program is complau32 with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
 #pragma once
@@ -9,50 +9,50 @@
 class MemorySystemWin32
 {
 public:
-    static const int                NEW_MEM_PATTERN     = 0x0;
-    static const int                DELETE_MEM_PATTERN  = -41;
+    static const u32                NEW_MEM_PATTERN     = 0x0;
+    static const u32                DELETE_MEM_PATTERN  = -41;
 
-    MemorySystemWin32(int chunkSize);
+    MemorySystemWin32(u32 chunkSize);
     ~MemorySystemWin32();
 
-    bool                            allocateChunk();
-    void                            printChunkInformation();
+    bool                            AllocateChunk();
+    void                            PrintChunkInformation();
 
     template<class Type>
-    bool                            allocateBytes(Type val);
+    bool                            AllocateBytes(Type val);
 
     template<class Type>
-    Type*                           newAlloc(Type t);
+    Type*                           NewAlloc(Type t);
 
     template<class Type>
-    Type*                           newAlloc(size_t size);
+    Type*                           NewAlloc(size_t size);
 
-    void                            deleteAlloc(void** t);
+    void                            DeleteAlloc(void** t);
 
     static MemorySystemWin32*       ms_pMemorySystem;
 
 protected:
-    void*                           findBlock(int sizeOfType);
-    int                             findBlockFromAllocated(int sizeOfType);
+    void*                           FindBlock(u32 sizeOfType);
+    u32                             FindBlockFromAllocated(u32 sizeOfType);
 
-    void                            assignAndUpdateAllocatedList(int blockIndex, int sizeOfObj);
+    void                            AssignAndUpdateAllocatedList(u32 blockIndex, u32 sizeOfObj);
 
-    void*                           getPointerToAllocatedBlock(int blockIndex);
+    void*                           GetPointerToAllocatedBlock(u32 blockIndex);
 
 private:
-    std::vector<int>                m_allocatedBytesList;
-    unsigned int                    m_freeSize;
-    unsigned int                    m_chunkSize;
+    std::vector<u32>                m_allocatedBytesList;
+    u32                             m_freeSize;
+    u32                             m_chunkSize;
 
     char*                           m_pChunkFront;  //Do not modify this
     char*                           m_pChunkBack;
 };
 
 template<class Type>
-bool MemorySystemWin32::allocateBytes(Type val)
+bool MemorySystemWin32::AllocateBytes(Type val)
 {
     //Calc the size of obj
-    int sizeOfObj = sizeof(val);
+    u32 sizeOfObj = sizeof(val);
 
     if (sizeOfObj > m_freeSize)
         return false;
@@ -66,10 +66,10 @@ bool MemorySystemWin32::allocateBytes(Type val)
 }
 
 template<class Type>
-Type* MemorySystemWin32::newAlloc(Type t)
+Type* MemorySystemWin32::NewAlloc(Type t)
 {
     //Calc the size of obj
-    unsigned int sizeOfObj = sizeof(t);
+    u32 sizeOfObj = sizeof(t);
 
     if (sizeOfObj > m_freeSize)
     {
@@ -79,7 +79,7 @@ Type* MemorySystemWin32::newAlloc(Type t)
     }
 
     //Find the best block and assign it to the Type
-    int allocatedBlockNumber = findBlockFromAllocated(sizeOfObj);
+    u32 allocatedBlockNumber = FindBlockFromAllocated(sizeOfObj);
 
     //Update the Chunk
     //add the no of allocated bytes to the allocated list
@@ -91,11 +91,11 @@ Type* MemorySystemWin32::newAlloc(Type t)
     }
     else
     {
-        assignAndUpdateAllocatedList(allocatedBlockNumber, sizeOfObj);
+        AssignAndUpdateAllocatedList(allocatedBlockNumber, sizeOfObj);
     }
 
-    //Get pointer to allocatedBlockNumber
-    void* ptrToBlock = getPointerToAllocatedBlock(allocatedBlockNumber);
+    //Get pou32er to allocatedBlockNumber
+    void* ptrToBlock = GetPointerToAllocatedBlock(allocatedBlockNumber);
 
     if (ptrToBlock)
     {
@@ -116,7 +116,7 @@ Type* MemorySystemWin32::newAlloc(Type t)
 }
 
 template<class Type>
-Type* MemorySystemWin32::newAlloc(size_t size)
+Type* MemorySystemWin32::NewAlloc(size_t size)
 {
     if (size > m_freeSize)
     {
@@ -126,7 +126,7 @@ Type* MemorySystemWin32::newAlloc(size_t size)
     }
 
     //Find the best block and assign it to the Type
-    int allocatedBlockNumber = findBlockFromAllocated(size);
+    u32 allocatedBlockNumber = FindBlockFromAllocated(size);
 
     //Update the Chunk
     //add the no of allocated bytes to the allocated list
@@ -138,11 +138,11 @@ Type* MemorySystemWin32::newAlloc(size_t size)
     }
     else
     {
-        assignAndUpdateAllocatedList(allocatedBlockNumber, size);
+        AssignAndUpdateAllocatedList(allocatedBlockNumber, size);
     }
 
-    //Get pointer to allocatedBlockNumber
-    void* ptrToBlock = getPointerToAllocatedBlock(allocatedBlockNumber);
+    //Get pou32er to allocatedBlockNumber
+    void* ptrToBlock = GetPointerToAllocatedBlock(allocatedBlockNumber);
 
     if (ptrToBlock)
     {

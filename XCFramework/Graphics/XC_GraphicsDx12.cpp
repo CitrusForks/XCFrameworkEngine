@@ -34,7 +34,7 @@ XC_GraphicsDx12::~XC_GraphicsDx12(void)
     ReleaseCOM(m_pSwapChain);
 }
 
-void XC_GraphicsDx12::InitGraphicsWindow(HWND _mainWnd, int _width, int _height, bool _enable4xMsaa)
+void XC_GraphicsDx12::InitGraphicsWindow(HWND _mainWnd, i32 _width, i32 _height, bool _enable4xMsaa)
 {
     XC_Graphics::InitGraphicsWindow(_mainWnd, _width, _height, _enable4xMsaa);
 
@@ -51,7 +51,7 @@ void XC_GraphicsDx12::InitGraphicsWindow(HWND _mainWnd, int _width, int _height,
     }
 #endif
     
-    unsigned int adapterIndex = 0;
+    u32 adapterIndex = 0;
     IDXGIAdapter* pAdapter;
     HRESULT hr;
 
@@ -197,7 +197,7 @@ void XC_GraphicsDx12::DebugTestGraphicsPipeline()
         ValidateResult(D3DCompileFromFile(L"Assets\\Shaders\\Default\\default.hlsl", nullptr, nullptr, "VSMain", "vs_5_0", compileFlags, 0, &vertexShader, nullptr));
         ValidateResult(D3DCompileFromFile(L"Assets\\Shaders\\Default\\default.hlsl", nullptr, nullptr, "PSMain", "ps_5_0", compileFlags, 0, &pixelShader, nullptr));
 #else
-        unsigned int vsSize, psSize;
+        u32 vsSize, psSize;
         ValidateResult(ReadRawDataFromFile("Assets\\Shaders\\Default\\default_vs.cso", &vertexShader, vsSize));
         ValidateResult(ReadRawDataFromFile("Assets\\Shaders\\Default\\default_ps.cso", &pixelShader, psSize));
         XCASSERT(vertexShader || pixelShader);
@@ -236,7 +236,7 @@ void XC_GraphicsDx12::DebugTestGraphicsPipeline()
     // Create the vertex buffer.
     {
         // Define the geometry for a triangle.
-        const float aspectRatio = 1024 / 786;
+        const f32 aspectRatio = 1024 / 786;
         Vertex triangleVertices[] =
         {
             { { 0.0f, 0.25f * aspectRatio, 0.0f },{ 1.0f, 0.0f, 0.0f, 1.0f } },
@@ -285,7 +285,7 @@ void XC_GraphicsDx12::SetupRenderTargets()
     
     CD3DX12_CPU_DESCRIPTOR_HANDLE rtvCPUHandle(m_pRTVDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
     
-    for (unsigned int frameIndex = 0; frameIndex < 2; ++frameIndex)
+    for (u32 frameIndex = 0; frameIndex < 2; ++frameIndex)
     {
         ValidateResult(m_pSwapChain->GetBuffer(frameIndex, IID_PPV_ARGS(&m_renderTarget[frameIndex])));
         m_pD3DDevice->CreateRenderTargetView(m_renderTarget[frameIndex], nullptr, rtvCPUHandle);
@@ -368,7 +368,7 @@ void XC_GraphicsDx12::SetResourceBarrier(ID3D12GraphicsCommandList* commandList,
     commandList->ResourceBarrier(1, &barrierDesc);
 }
 
-void XC_GraphicsDx12::Update(float dt)
+void XC_GraphicsDx12::Update(f32 dt)
 {
 }
 
@@ -432,8 +432,8 @@ void XC_GraphicsDx12::PresentRenderTarget(ID3D12GraphicsCommandList* cmdList)
 void XC_GraphicsDx12::ClearRTVAndDSV(ID3D12GraphicsCommandList* cmdList)
 {
     //Clear screen
-    float variadic = 1.0f /*+ (float)(0.5 * (float)(rand() % 5) / 10)*/;
-    const float clearColor[] = { variadic * m_clearColor.Get<X>(), variadic * m_clearColor.Get<Y>(), variadic * m_clearColor.Get<Z>(), m_clearColor.Get<W>() };
+    f32 variadic = 1.0f /*+ (float)(0.5 * (float)(rand() % 5) / 10)*/;
+    const f32 clearColor[] = { variadic * m_clearColor.Get<X>(), variadic * m_clearColor.Get<Y>(), variadic * m_clearColor.Get<Z>(), m_clearColor.Get<W>() };
 
     cmdList->ClearRenderTargetView(GetRTVCPUDescHandler(), clearColor, 0, nullptr);
     cmdList->ClearDepthStencilView(m_pDSVDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
@@ -466,7 +466,7 @@ void XC_GraphicsDx12::WaitForPreviousFrameCompletion()
     m_frameIndex = m_pSwapChain->GetCurrentBackBufferIndex();
 }
 
-void XC_GraphicsDx12::OnResize(int _width, int _height)
+void XC_GraphicsDx12::OnResize(i32 _width, i32 _height)
 {
 #if defined(WIN_32)
     if (m_initDone)

@@ -18,27 +18,27 @@ public:
     DirectInput_Win32();
     virtual ~DirectInput_Win32();
 
-    void                        Init(HINSTANCE hAppInstance, HWND hAppWnd, unsigned long keyboardCoopFlags, unsigned long mouseCoopFlags);
+    void                        Init(HINSTANCE hAppInstance, HWND hAppWnd, u64 keyboardCoopFlags, u64 mouseCoopFlags);
     void                        Destroy();
 
     void                        Update();
     bool                        KeyDown(char key);
-    bool                        MouseButtonDown(int button);
-    float                       MouseDX();
-    float                       MouseDY();
-    float                       MouseDZ();
+    bool                        MouseButtonDown(i32 button);
+    f32                       MouseDX();
+    f32                       MouseDY();
+    f32                       MouseDZ();
 
     //Fake Inputs
     void                        InitFakeInputs();
     void                        SetFakeKeyDown(char key);
-    void                        SetFakeMouseInput(FakeMouseInputType type, float value);
+    void                        SetFakeMouseInput(FakeMouseInputType type, f32 value);
     void                        ResetAllFakeInputs();
 
 private:
 
     char                        m_KeyboardState[256];
     std::map<char, bool>        m_fakeKeyboardInputsMap;
-    std::map<int, float>        m_fakeMouseInputsMap;
+    std::map<i32, f32>        m_fakeMouseInputsMap;
 
     IDirectInput8*              m_pDInput;
     IDirectInputDevice8*        m_pKeyboard;

@@ -27,7 +27,7 @@ public:
 
     virtual void                    Init();
     virtual void                    Load();
-    virtual void                    Update(float dt);
+    virtual void                    Update(f32 dt);
     virtual void                    Draw(RenderContext& context);
     virtual void                    Destroy();
     virtual void                    BuildBuffers();
@@ -39,15 +39,15 @@ protected:
 
     bool                            m_isBufferBuild;
 
-    unsigned int                    m_Stride;
-    unsigned int                    m_Offset;
+    u32                    m_Stride;
+    u32                    m_Offset;
 
     ShaderType                      m_useShaderType;
     BasicMaterial                   m_material;
     Texture2D*                      m_texture;
 
     VertexBuffer<VertexPosNormTex>  m_vertexBuffer;
-    IndexBuffer<unsigned int>       m_indexBuffer;
+    IndexBuffer<u32>       m_indexBuffer;
 
     RasterType                      m_rasterType;
 };

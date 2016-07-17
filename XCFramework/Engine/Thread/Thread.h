@@ -6,7 +6,7 @@
 
 #pragma once
 
-typedef int (*runFunction)(void* param);
+typedef i32 (*runFunction)(void* param);
 
 class Thread
 {
@@ -20,5 +20,5 @@ public:
     void                        Run();
     void                        Join();
     void                        Destroy();
-    void                        SetThreadPriority(unsigned int priority);
+    void                        SetThreadPriority(u32 priority);
 };

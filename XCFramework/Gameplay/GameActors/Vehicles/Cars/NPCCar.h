@@ -18,7 +18,7 @@ public:
     virtual ~NPCCar(void);
  
     virtual void                        PreLoad(const void* fbBuffer);
-    virtual void                        Update(float dt);
+    virtual void                        Update(f32 dt);
     virtual void                        Destroy();
 
 protected:
