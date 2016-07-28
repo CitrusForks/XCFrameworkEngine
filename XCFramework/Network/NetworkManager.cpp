@@ -63,6 +63,6 @@ void NetworkManager::Destroy()
     u32 i = 0;
     while (i < m_pNetPeers.size())
     {
-        delete(m_pNetPeers[i++]);
+        XCDELETE(m_pNetPeers[i++]);
     }
 }

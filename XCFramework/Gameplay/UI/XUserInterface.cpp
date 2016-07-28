@@ -13,6 +13,7 @@ XUserInterface* XUserInterface::ms_pXUserInterface = nullptr;
 XUserInterface::~XUserInterface(void)
 {
     Destroy();
+    XCDELETE(ms_pXUserInterface);
 }
 
 void XUserInterface::Destroy()
@@ -25,7 +26,7 @@ void XUserInterface::Destroy()
 XUserInterface*	XUserInterface::GetInstance()
 {
     if(ms_pXUserInterface == nullptr)
-        ms_pXUserInterface = new XUserInterface();
+        ms_pXUserInterface = XCNEW(XUserInterface)();
 
     return ms_pXUserInterface;
 }

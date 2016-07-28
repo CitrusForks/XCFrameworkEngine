@@ -40,7 +40,7 @@ public:
 
 protected:
     std::string                         m_pHeightMapFileName;    //Height Map Filename
-    u8*                      m_pBitmapImage;
+    u8*                                 m_pBitmapImage;
     BasicMaterial                       m_material;
 
     //MultiTex

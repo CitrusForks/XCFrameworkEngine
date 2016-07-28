@@ -27,7 +27,7 @@ void GameState::LoadingWorldState::Init()
     IGameState::Init();
     World& world = SystemLocator::GetInstance()->RequestSystem<World>("World");
 
-    m_worldLoader = new WorldSceneLoader(world, WORLD_DATA_FILEPATH);
+    m_worldLoader = XCNEW(WorldSceneLoader)(world, WORLD_DATA_FILEPATH);
 
     TaskManager& taskMgr = SystemLocator::GetInstance()->RequestSystem<TaskManager>("TaskManager");
     m_futureWorldLoaded = taskMgr.RegisterTask(m_worldLoader);

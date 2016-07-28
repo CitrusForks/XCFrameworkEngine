@@ -34,12 +34,12 @@ XCShaderHandle::~XCShaderHandle()
 
     if (m_pVS)
     {
-        delete(m_pVS);
+        XCDELETE(m_pVS);
     }
 
     if (m_pPS)
     {
-        delete(m_pPS);
+        XCDELETE(m_pPS);
     }
 
 #if defined(XCGRAPHICS_DX12)

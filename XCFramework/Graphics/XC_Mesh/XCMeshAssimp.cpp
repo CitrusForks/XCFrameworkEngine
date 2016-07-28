@@ -93,11 +93,11 @@ bool XCMeshAssimp::LoadMesh()
     XCASSERT(m_scene);
 
     aiMesh** mesh = m_scene->mMeshes;
-    m_sceneAnimator = new SceneAnimator(m_scene, 0);
+    m_sceneAnimator = XCNEW(SceneAnimator)(m_scene, 0);
 
 #if CUSTOM_ANIMATION
     //Copy all the nodes to our root node
-    m_meshRootNode = new MeshNode(m_scene->mRootNode, nullptr, true);
+    m_meshRootNode = XCNEW(MeshNode)(m_scene->mRootNode, nullptr, true);
 #endif
 
     for (u32 meshIndex = 0; meshIndex < m_scene->mNumMeshes; ++meshIndex)
@@ -132,7 +132,7 @@ bool XCMeshAssimp::LoadMesh()
 
                 //Fill the bone hierarchy by finding the bone nodes.
                 const MeshNode* node = m_meshRootNode->FindNode(bone->mName.C_Str());
-                submesh->m_boneHierarchy.m_boneNodes[bone->mName.C_Str()] = new MeshNode(node, nullptr, false);
+                submesh->m_boneHierarchy.m_boneNodes[bone->mName.C_Str()] = XCNEW(MeshNode)(node, nullptr, false);
 
             }
 #endif

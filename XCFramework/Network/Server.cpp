@@ -20,8 +20,8 @@ void Server::Init(const char *ip, i32 port)
     {
         Logger("WSASTARTUP FAILED ", m_result);
     }
-    m_pFdSetDesc = new fd_set();
-    m_pTimeOut = new TIMEVAL();
+    m_pFdSetDesc = XCNEW(fd_set)();
+    m_pTimeOut   = XCNEW(TIMEVAL)();
 
     CreateSocket((char*)ip, port);
     BindSocket();

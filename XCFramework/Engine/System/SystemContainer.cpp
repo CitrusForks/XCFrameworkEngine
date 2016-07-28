@@ -78,7 +78,7 @@ void SystemContainer::Destroy()
     {
         if (it->second)
         {
-            delete(it->second);
+            XCDELETE(it->second);
         }
     }
 

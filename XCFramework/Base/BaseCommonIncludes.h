@@ -36,7 +36,7 @@
 #include "Base/ErrorHandling/ErrorHandler.h"
 
 //Engine Memory includes. To remove this
-#include "Engine/Memory/MemorySystemWin32.h"
+#include "Engine/Memory/MemoryOverrides.h"
 
 //Base Includes
 #include "Base/Serializer/IBase.h"

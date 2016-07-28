@@ -36,7 +36,7 @@ void ParticleEffectSystem::Update(f32 dt)
         }
         else
         {
-            delete(m_instancedParticleEffects[i]);
+            XCDELETE(m_instancedParticleEffects[i]);
             m_instancedParticleEffects.erase(m_instancedParticleEffects.begin() + i);
         }
     }
@@ -54,7 +54,7 @@ void ParticleEffectSystem::DestroyAllParticleEffects()
 {
     while (m_instancedParticleEffects.size() != 0)
     {
-        delete(m_instancedParticleEffects.back());
+        XCDELETE(m_instancedParticleEffects.back());
         m_instancedParticleEffects.pop_back();
     }
 

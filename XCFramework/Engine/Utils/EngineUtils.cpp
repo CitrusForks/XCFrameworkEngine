@@ -38,7 +38,7 @@ HRESULT ReadRawDataFromFile(const char* filename, UINT8** data, u32& size)
         //Get length of data
         u32 length = getFilelength(fp);
 
-        *data = new UINT8[length];
+        *data = XCNEW(UINT8)[length];
         i32 res = fread(*data, sizeof(byte), length, fp);
         XCASSERT(res > 0);
 

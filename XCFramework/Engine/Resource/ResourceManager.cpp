@@ -24,7 +24,6 @@ ResourceManager::ResourceManager()
 
 ResourceManager::~ResourceManager(void)
 {
-    delete(m_resourceFactory);
 }
 
 void ResourceManager::Init(TaskManager& taskManger)
@@ -41,7 +40,7 @@ void ResourceManager::Init(TaskManager& taskManger)
     m_resourceFactory->InitFactory();
 
     //Start the ResourceLoader task
-    m_resourceLoaderTask = new ResourceLoaderTask();
+    m_resourceLoaderTask = XCNEW(ResourceLoaderTask)();
     m_taskManager->RegisterTask(m_resourceLoaderTask);
 }
 

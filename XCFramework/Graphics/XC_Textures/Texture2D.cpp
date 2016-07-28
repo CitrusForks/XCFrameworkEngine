@@ -22,7 +22,7 @@ Texture2D::Texture2D()
     m_diffuseMapTextureSRV = nullptr;
 
 #if defined(XCGRAPHICS_DX12)
-    m_diffuseMapTextureSRVUpload = new D3DConstantBuffer(BUFFERTYPE_SRV);
+    m_diffuseMapTextureSRVUpload = XCNEW(D3DConstantBuffer)(BUFFERTYPE_SRV);
 #endif
 }
 
@@ -170,7 +170,7 @@ void Texture2D::Unload()
     if (m_diffuseMapTextureSRVUpload)
     {
         m_diffuseMapTextureSRVUpload->Release();
-        delete m_diffuseMapTextureSRVUpload;
+        XCDELETE(m_diffuseMapTextureSRVUpload);
         m_diffuseMapTextureSRVUpload = nullptr;
     }
 #endif

@@ -39,11 +39,11 @@ void XC_Graphics::SetupPipeline()
 void XC_Graphics::SetupShadersAndRenderPool()
 {
     //Initialize Shader System
-    m_XCShaderSystem = new XC_ShaderManager(*m_pD3DDevice);
+    m_XCShaderSystem = XCNEW(XC_ShaderManager)(*m_pD3DDevice);
     m_XCShaderSystem->Init();
 
     //Initialize the rendering pool
-    m_renderingPool = new RenderingPool();
+    m_renderingPool = XCNEW(RenderingPool)();
     m_renderingPool->Init();
 }
 

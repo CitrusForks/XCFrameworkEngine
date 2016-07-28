@@ -25,7 +25,7 @@ RenderableTexture::RenderableTexture(ID3DDevice& device, ID3DDeviceContext& cont
     , m_device(device)
     , m_deviceContext(context)
 {
-    m_renderableTexture = new RenderedTextureInfo();
+    m_renderableTexture = XCNEW(RenderedTextureInfo)();
 
 #if defined(XCGRAPHICS_GNM)
     m_pRenderTargetView = new ID3DRenderTargetView;
@@ -40,18 +40,18 @@ RenderableTexture::~RenderableTexture()
     ReleaseCOM(m_pRenderTargetTexture);
     ReleaseCOM(m_pSRV);
 #elif defined(XCGRAPHICS_GNM)
-    delete(m_pRenderTargetView);
+    XCDELETE(m_pRenderTargetView);
 #endif
 }
 
 void RenderableTexture::Destroy()
 {
-    delete(m_renderableTexture->m_texData);
-    delete(m_renderableTexture);
+    XCDELETE(m_renderableTexture->m_texData);
+    XCDELETE(m_renderableTexture);
 
     if (m_pSRV)
     {
-        delete m_pSRV;
+        XCDELETE(m_pSRV);
     }
 }
 
@@ -118,12 +118,12 @@ bool RenderableTexture::PreLoad(i32 msaaQuality, i32 texWidth, i32 texHeight)
     shaderResourceViewDesc.Texture2D.MipLevels = 1;
 
     // Create the shader resource view.
-    m_pSRV = new D3DConstantBuffer(BUFFERTYPE_SRV);
+    m_pSRV = XCNEW(D3DConstantBuffer)(BUFFERTYPE_SRV);
 
     ValidateResult(m_device.CreateShaderResourceView(m_pRenderTargetTextureStaged, &shaderResourceViewDesc, &m_pSRV->m_cbResource));
 
     // RGB Texture for transferring over the network
-    m_renderableTexture->m_texData = new u8[texWidth * texHeight * 3];
+    m_renderableTexture->m_texData = XCNEW(u8)[texWidth * texHeight * 3];
     m_renderableTexture->m_texSize = texWidth * texHeight * 3;
 #endif
 

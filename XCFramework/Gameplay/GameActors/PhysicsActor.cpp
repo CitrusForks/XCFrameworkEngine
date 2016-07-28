@@ -14,12 +14,12 @@ PhysicsActor::PhysicsActor()
     m_pMesh = nullptr;
     m_collisionDetectionType = COLLISIONDETECTIONTYPE_MAX;
 
-    m_boundBox = new RenderableOBB();
+    m_boundBox = XCNEW(RenderableOBB)();
 }
 
 PhysicsActor::~PhysicsActor(void)
 {
-    delete(m_boundBox);
+    XCDELETE(m_boundBox);
 }
 
 void PhysicsActor::Init(i32 actorId)

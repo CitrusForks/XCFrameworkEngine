@@ -34,11 +34,11 @@ i32 main(i32 argc, char* argv[])
     {
         if (strcmp(argv[1], "server") == 0)
         {
-            peer = new Server();
+            peer = XCNEW(Server)();
         }
         else if (strcmp(argv[1], "client") == 0)
         {
-            peer = new Client();
+            peer = XCNEW(Client)();
         }
 
         if (argc > 1 && argv[2])
@@ -89,7 +89,7 @@ i32 main(i32 argc, char* argv[])
 void sendImageData(NetworkManager& netMgr)
 {
     FILE* fp = fopen("out.bmp", "rb");
-    u8* pImageData = new u8[256 * 256 * 4];
+    u8* pImageData = XCNEW(u8)[256 * 256 * 4];
     fread(pImageData, sizeof(u8), 256 * 256 * 4, fp);
     fclose(fp);
 
@@ -117,7 +117,7 @@ void sendImageData(NetworkManager& netMgr)
 
     netMgr.NetworkSendData((char*)pImageData, 256 * 256 * 4);
 
-    delete(pImageData);
+    XCDELETEARRAY(pImageData);
     fclose(fp);
 }
 

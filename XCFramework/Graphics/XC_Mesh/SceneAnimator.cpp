@@ -39,8 +39,8 @@ SceneAnimator::SceneAnimator( const aiScene* pScene, size_t pAnimIndex)
 // Destructor
 SceneAnimator::~SceneAnimator()
 {
-    delete mRootNode;
-    delete mAnimEvaluator;
+    XCDELETE(mRootNode);
+    XCDELETE(mAnimEvaluator);
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -52,8 +52,8 @@ void SceneAnimator::SetAnimIndex( size_t pAnimIndex)
         return;
 
     // kill data of the previous anim
-    delete mRootNode;  mRootNode = NULL;
-    delete mAnimEvaluator;  mAnimEvaluator = NULL;
+    XCDELETE(mRootNode);  mRootNode = NULL;
+    XCDELETE(mAnimEvaluator);  mAnimEvaluator = NULL;
     mNodesByName.clear();
 
     mCurrentAnimIndex = pAnimIndex;
@@ -67,7 +67,7 @@ void SceneAnimator::SetAnimIndex( size_t pAnimIndex)
         return;
 
     // create an evaluator for this animation
-    mAnimEvaluator = new AnimEvaluator( mScene->mAnimations[mCurrentAnimIndex]);
+    mAnimEvaluator = XCNEW(AnimEvaluator)( mScene->mAnimations[mCurrentAnimIndex]);
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -146,7 +146,7 @@ const std::vector<aiMatrix4x4>& SceneAnimator::GetBoneMatrices( const aiNode* pN
 SceneAnimNode* SceneAnimator::CreateNodeTree( aiNode* pNode, SceneAnimNode* pParent)
 {
     // create a node
-    SceneAnimNode* internalNode = new SceneAnimNode( pNode->mName.data);
+    SceneAnimNode* internalNode = XCNEW(SceneAnimNode)( pNode->mName.data);
     internalNode->mParent = pParent;
     mNodesByName[pNode] = internalNode;
 

@@ -18,12 +18,74 @@ MemorySystemWin32::MemorySystemWin32(u32 chunkSize)
     m_freeSize = m_chunkSize;
 }
 
+bool MemorySystemWin32::IsInMyMemory(uintptr_t address)
+{
+    bool res = false;
+
+    if (address >= (uintptr_t)m_pChunkFront && address < (uintptr_t)m_pChunkBack)
+    {
+        res = true;
+    }
+
+    return res;
+}
+
 bool MemorySystemWin32::AllocateChunk()
 {
-    m_pChunkFront = (c8*)malloc(sizeof(c8) * m_chunkSize);
+    m_pChunkFront = (c8*)_aligned_malloc(sizeof(c8) * m_chunkSize, AlignmentBoundary);
     m_pChunkBack = m_pChunkFront + m_chunkSize;
 
     return m_pChunkFront ? true : false;
+}
+
+void* MemorySystemWin32::AllocateBytes(size_t size)
+{
+    //Find the best block and assign it to the Type
+    u32 allocatedBlockNumber = FindBlockFromAllocated(size);
+
+    //Update the Chunk
+    //add the no of allocated bytes to the allocated list
+    if (allocatedBlockNumber == -1)
+    {
+        //This means we need to add the block at the end of allocated list, so pushback
+        m_allocatedBytesList.push_back(size);
+        allocatedBlockNumber = m_allocatedBytesList.size() - 1;
+    }
+    else
+    {
+        AssignAndUpdateAllocatedList(allocatedBlockNumber, size);
+    }
+
+    //Get pointer to allocatedBlockNumber
+    void* ptrToBlock = GetPointerToAllocatedBlock(allocatedBlockNumber);
+
+    if (ptrToBlock)
+    {
+        memset(ptrToBlock, NEW_MEM_PATTERN, size);
+
+        //Placement new here in the location
+        //Type* newedPtr = new(ptrToBlock) Type();
+        m_freeSize = m_freeSize - size;
+
+        return (void*)ptrToBlock;
+    }
+
+    Logger("[NewAlloc] Error. Block not found");
+    XCASSERT(false);
+
+    return nullptr;
+}
+
+void* MemorySystemWin32::NewAlloc(size_t size)
+{
+    if (size > m_freeSize)
+    {
+        Logger("[Memory] OUT OF MEMORY");
+        XCASSERT(false);
+        return 0;
+    }
+
+    return AllocateBytes(size);
 }
 
 void MemorySystemWin32::DeleteAlloc(void** ptrToBlock)
@@ -40,19 +102,19 @@ void MemorySystemWin32::DeleteAlloc(void** ptrToBlock)
         {
             //Found!!! Here the next allocated i.e i+1 is the block that is to be deleted.
             //Garbage the contents by size in allocated bytes list
-            u32 allocatedBytes = std::abs((int)m_allocatedBytesList[i]);
+            u32 allocatedBytes = std::abs((int)m_allocatedBytesList[i].m_nbOfBytes);
 
             memset(t, DELETE_MEM_PATTERN, allocatedBytes);
 
             //Found the block, make it invalid by negating the block
-            m_allocatedBytesList[i] *= -1;
+            m_allocatedBytesList[i].m_nbOfBytes *= -1;
 
             (*ptrToBlock) = nullptr;
             t = nullptr;
 
             break;
         }
-        offsetAdded += std::abs((int)m_allocatedBytesList[i]);
+        offsetAdded += std::abs((int)m_allocatedBytesList[i].m_nbOfBytes);
     }
 }
 
@@ -98,17 +160,17 @@ void* MemorySystemWin32::FindBlock(u32 sizeOfType)
         if (allocatedBytesIndex < m_allocatedBytesList.size())
         {
 
-            if (m_allocatedBytesList[allocatedBytesIndex] <= 0)
+            if (m_allocatedBytesList[allocatedBytesIndex].m_nbOfBytes <= 0)
             {
                 //That means it's a free block, see if it fits for sizeOfType, may be here the diff cases can be searched for. Best fit, first fit.
-                if (std::abs((int)m_allocatedBytesList[allocatedBytesIndex]) >= sizeOfType)
+                if (std::abs((int)m_allocatedBytesList[allocatedBytesIndex].m_nbOfBytes) >= sizeOfType)
                 {
                     //Found the block, return the address.
                     return pStart += offsetByte;
                 }
             }
 
-            offsetByte += m_allocatedBytesList[allocatedBytesIndex];
+            offsetByte += m_allocatedBytesList[allocatedBytesIndex].m_nbOfBytes;
             allocatedBytesIndex++;
             continue;
         }
@@ -131,16 +193,16 @@ u32 MemorySystemWin32::FindBlockFromAllocated(u32 sizeOfType)
     for (u32 allocatedBytesIndex = 0; allocatedBytesIndex < m_allocatedBytesList.size(); allocatedBytesIndex++)
     {
         //First check the allocated list and find a suitable block to insert
-        if (m_allocatedBytesList[allocatedBytesIndex] <= 0)
+        if (m_allocatedBytesList[allocatedBytesIndex].m_nbOfBytes <= 0)
         {
             //That means it's a free block, see if it fits for sizeOfType, may be here the diff cases can be searched for. Best fit, first fit.
-            if (std::abs((int)m_allocatedBytesList[allocatedBytesIndex]) >= sizeOfType)
+            if (std::abs((int)m_allocatedBytesList[allocatedBytesIndex].m_nbOfBytes) >= sizeOfType)
             {
                 //Found the block, return the address.
                 return allocatedBytesIndex;
             }
         }
-        offsetByte += m_allocatedBytesList[allocatedBytesIndex];
+        offsetByte += m_allocatedBytesList[allocatedBytesIndex].m_nbOfBytes;
     }
 
     //If we come here that means allocated byte list was traversed and found no block, so find new block at the end of the allocated list
@@ -150,7 +212,7 @@ u32 MemorySystemWin32::FindBlockFromAllocated(u32 sizeOfType)
 
 void MemorySystemWin32::AssignAndUpdateAllocatedList(u32 blockIndex, u32 sizeOfObj)
 {
-    u32 blockSizeAllocated = std::abs((int)m_allocatedBytesList[blockIndex]);
+    u32 blockSizeAllocated = std::abs((int)m_allocatedBytesList[blockIndex].m_nbOfBytes);
 
     if (sizeOfObj < blockSizeAllocated)
     {
@@ -160,13 +222,13 @@ void MemorySystemWin32::AssignAndUpdateAllocatedList(u32 blockIndex, u32 sizeOfO
         m_allocatedBytesList[blockIndex] = sizeOfObj;
 
         //Create new entry after the blockIndex and insert this divideBlockSize
-        std::vector<u32>::iterator it = m_allocatedBytesList.begin() + blockIndex + 1;
-        m_allocatedBytesList.insert(it, dividedBlockSize * -1);
+        std::vector<AllocInfo>::iterator it = m_allocatedBytesList.begin() + blockIndex + 1;
+        m_allocatedBytesList.insert(it, AllocInfo(dividedBlockSize * -1));
     }
     else
     {
         //Just update the block
-        m_allocatedBytesList[blockIndex] *= -1;
+        m_allocatedBytesList[blockIndex].m_nbOfBytes *= -1;
     }
 }
 
@@ -182,7 +244,7 @@ void* MemorySystemWin32::GetPointerToAllocatedBlock(u32 blockIndex)
             break;
         }
 
-        offsetAdded += std::abs((int)m_allocatedBytesList[index]);
+        offsetAdded += std::abs((int)m_allocatedBytesList[index].m_nbOfBytes);
     }
 
     return pStart + offsetAdded;
@@ -190,38 +252,8 @@ void* MemorySystemWin32::GetPointerToAllocatedBlock(u32 blockIndex)
 
 MemorySystemWin32::~MemorySystemWin32()
 {
-    free(m_pChunkFront);
-}
-
-
-//default new and delete overrides
-void* operator new(size_t classSize)
-{
-    if (0/*MemorySystemWin32::ms_pMemorySystem*/)
+    if (m_pChunkFront)
     {
-        //TODO : Support 16byte alignment in custom allocator.
-        return MemorySystemWin32::ms_pMemorySystem->NewAlloc(classSize);
-    }
-    else
-    {
-        //Memory System not initialized yet.
-        return _aligned_malloc(classSize, 16);
-        //return malloc(classSize);
-    }
-
-}
-
-void operator delete(void* p)
-{
-    if (0/*MemorySystemWin32::ms_pMemorySystem*/)
-    {
-        //TODO : Support 16byte alignment in custom allocator.
-        return MemorySystemWin32::ms_pMemorySystem->DeleteAlloc(&p);
-    }
-    else
-    {
-        //Memory System not initialized yet.
-        return _aligned_free(p);
-        //return free(p);
+        _aligned_free(m_pChunkFront);
     }
 }

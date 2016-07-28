@@ -25,7 +25,7 @@ void MeshData::Destroy()
 
 void MeshData::Init()
 {
-    m_objectName = new char[20];
+    m_objectName = XCNEW(char)[20];
     m_noOfVertices = 0;
     m_noOfFaces = 0;
 

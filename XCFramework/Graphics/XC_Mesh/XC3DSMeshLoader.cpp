@@ -85,7 +85,7 @@ bool XC3DSMeshLoader::loadMeshFromFile(std::string fileName, XCMesh* const outMe
                 //OBJECT CHUNK
                 i32 i = 0;
                 char ch;
-                char* pObjectName = new char[20];
+                char* pObjectName = XCNEW(char)[20];
 
                 do 
                 {

@@ -44,7 +44,7 @@ D3DConstantBuffer* SharedDescriptorHeap::CreateBufferView(D3DBufferDesc& desc)
     {
         XCASSERT(desc.m_bufferSize);
 
-        constBuffer = new D3DConstantBuffer(BUFFERTYPE_CBV);
+        constBuffer = XCNEW(D3DConstantBuffer)(BUFFERTYPE_CBV);
 
         //Create the cbv
         if (desc.m_bufferSize)
@@ -100,7 +100,7 @@ D3DConstantBuffer* SharedDescriptorHeap::CreateBufferView(D3DBufferDesc& desc)
         }
         else
         {
-            delete constBuffer;
+            XCDELETE(constBuffer);
         }
     }
 
@@ -123,7 +123,7 @@ D3DConstantBuffer* SharedDescriptorHeap::CreateShaderResourceView()
     }
     else
     {
-        constBuffer = new D3DConstantBuffer(BUFFERTYPE_SRV);
+        constBuffer = XCNEW(D3DConstantBuffer)(BUFFERTYPE_SRV);
         constBuffer->m_sizeOfBuffer = 0;
         constBuffer->m_isInUse = true;
 
@@ -176,7 +176,7 @@ void SharedDescriptorHeap::Destroy()
 {
     for each(D3DConstantBuffer* buffer in m_constantBuffers)
     {
-        delete(buffer);
+        XCDELETE(buffer);
     }
 
     m_constantBuffers.clear();

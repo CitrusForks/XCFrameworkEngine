@@ -28,3 +28,5 @@ XCFramework/.vs/*
 /XCTools/XCShaderCompiler/XCShaderCompiler/obj/Debug
 /XCTools/XCShaderCompiler/XCShaderCompiler/bin/Debug
 /XCFramework/Debug
+/XCFramworkEditor/obj/Debug
+/XCFramworkEditor/bin/Debug

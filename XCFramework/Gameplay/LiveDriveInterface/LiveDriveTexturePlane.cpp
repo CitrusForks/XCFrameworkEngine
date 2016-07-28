@@ -24,7 +24,7 @@ LiveDriveTexturePlane::LiveDriveTexturePlane(XCVec4& p1, XCVec4& p2, XCVec4& p3)
 
 LiveDriveTexturePlane::~LiveDriveTexturePlane()
 {
-    delete(m_liveDriveTexture);
+    XCDELETE(m_liveDriveTexture);
 }
 
 void LiveDriveTexturePlane::PreLoad(const void* fbBuffer)
@@ -42,7 +42,7 @@ void LiveDriveTexturePlane::PreLoad(const void* fbBuffer)
 
     XC_Graphics& graphicsSystem = (XC_Graphics&)SystemLocator::GetInstance()->RequestSystem("GraphicsSystem");
 #if defined(XCGRAPHICS_DX11)
-    m_liveDriveTexture = new Texture2D(graphicsSystem.GetRenderTexture(RENDERTARGET_LIVEDRIVE).GetShaderResourceView());
+    m_liveDriveTexture = XCNEW(Texture2D)(graphicsSystem.GetRenderTexture(RENDERTARGET_LIVEDRIVE).GetShaderResourceView());
 #endif
     m_texture->m_Resource = m_liveDriveTexture;
 }

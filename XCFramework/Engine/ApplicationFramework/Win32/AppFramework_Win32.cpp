@@ -7,7 +7,7 @@
 #include "EnginePrecompiledHeader.h"
 
 #include "Engine/ApplicationFramework/Win32/AppFramework_Win32.h"
-#include "Engine/Memory/MemorySystemWin32.h"
+#include "Engine/Memory/MemoryOverrides.h"
 
 namespace
 {

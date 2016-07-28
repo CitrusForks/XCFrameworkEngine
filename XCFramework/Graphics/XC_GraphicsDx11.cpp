@@ -30,10 +30,10 @@ XC_GraphicsDx11::XC_GraphicsDx11(void)
 
 XC_GraphicsDx11::~XC_GraphicsDx11(void)
 {
-    delete(m_XCShaderSystem);
-    delete(m_renderingPool);
-    delete(m_renderTargets[RENDERTARGET_MAIN_0]);
-    delete(m_renderTargets[RENDERTARGET_LIVEDRIVE]);
+    XCDELETE(m_XCShaderSystem);
+    XCDELETE(m_renderingPool);
+    XCDELETE(m_renderTargets[RENDERTARGET_MAIN_0]);
+    XCDELETE(m_renderTargets[RENDERTARGET_LIVEDRIVE]);
 }
 
 void XC_GraphicsDx11::Destroy()
@@ -148,10 +148,10 @@ void XC_GraphicsDx11::SetupRenderTargets()
     m_pSwapChain->GetBuffer(0, __uuidof(ID3DTexture2D), (void**)&backBuffer);
 
     //Initiate RenderableTextures
-    m_renderTargets[RENDERTARGET_MAIN_0] = new RenderableTexture(*m_pD3DDevice, *m_pD3DDeviceContext);
+    m_renderTargets[RENDERTARGET_MAIN_0] = XCNEW(RenderableTexture)(*m_pD3DDevice, *m_pD3DDeviceContext);
     m_renderTargets[RENDERTARGET_MAIN_0]->PreLoad(backBuffer);
 
-    m_renderTargets[RENDERTARGET_LIVEDRIVE] = new RenderableTexture(*m_pD3DDevice, *m_pD3DDeviceContext);
+    m_renderTargets[RENDERTARGET_LIVEDRIVE] = XCNEW(RenderableTexture)(*m_pD3DDevice, *m_pD3DDeviceContext);
     m_renderTargets[RENDERTARGET_LIVEDRIVE]->PreLoad(m_4xMsaaQuality, 256, 256);
 
     ReleaseCOM(backBuffer);

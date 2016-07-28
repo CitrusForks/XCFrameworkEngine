@@ -50,7 +50,7 @@ struct SceneAnimNode
     //! Destruct all children recursively
     ~SceneAnimNode() {
         for( std::vector<SceneAnimNode*>::iterator it = mChildren.begin(); it != mChildren.end(); ++it)
-            delete *it;
+            XCDELETE(*it);
     }
 };
 

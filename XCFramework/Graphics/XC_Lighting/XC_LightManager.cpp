@@ -27,7 +27,7 @@ void XC_LightManager::InitializeLights()
 
     //Add Lights - To remove. Need a LightManager- Manages all types of light, allows to add and remove lights from world. Maybe we can add this light actors directly into the world
     //Directional light
-    DirectionalLight* directionalLight = new DirectionalLight();
+    DirectionalLight* directionalLight = XCNEW(DirectionalLight)();
 
     directionalLight->Ambient = XCVec4Unaligned(1.0f, 1.0f, 1.0f, 1.0f);
     directionalLight->Diffuse = XCVec4Unaligned(0.2f, 0.2f, 0.2f, 1.0f);
@@ -37,7 +37,7 @@ void XC_LightManager::InitializeLights()
     m_Lights[LIGHTTYPE_DIRECTIONAL] = (ILight*)directionalLight;
 
     //Point Light
-    PointLight* pointLight = new PointLight();
+    PointLight* pointLight = XCNEW(PointLight)();
     pointLight->Ambient = XCVec4Unaligned(0.3f, 0.3f, 0.3f, 1.0f);
     pointLight->Diffuse = XCVec4Unaligned(0.7f, 0.7f, 0.7f, 1.0f);
     pointLight->Specular = XCVec4Unaligned(0.7f, 0.7f, 0.7f, 1.0f);
@@ -46,7 +46,7 @@ void XC_LightManager::InitializeLights()
     m_Lights[LIGHTTYPE_POINT] = (ILight*)pointLight;
 
     //Spot Light
-    SpotLight* spotLight = new SpotLight();
+    SpotLight* spotLight = XCNEW(SpotLight)();
     spotLight->Ambient = XCVec4Unaligned(0.0f, 0.0f, 0.0f, 1.0f);
     spotLight->Diffuse = XCVec4Unaligned(1.0f, 1.0f, 0.0f, 1.0f);
     spotLight->Specular = XCVec4Unaligned(1.0f, 1.0f, 1.0f, 1.0f);
@@ -102,7 +102,7 @@ void XC_LightManager::Destroy()
 {
     for (i32 index = 0; index < LIGHTTYPE_MAX; index++)
     {
-        delete(m_Lights[(ELightType)index]);
+        XCDELETE(m_Lights[(ELightType)index]);
     }
     m_Lights.clear();
 

@@ -14,7 +14,7 @@
 
 #include "Engine/Input/Directinput_Win32.h"
 #include "Engine/System/SystemLocator.h"
-#include "Engine/Memory/MemorySystemWin32.h"
+#include "Engine/Memory/MemoryOverrides.h"
 
 #if defined(XCGRAPHICS_DX12)
 #include "Graphics/XC_GraphicsDx12.h"
@@ -80,7 +80,7 @@ i32 Game_Win32::Init()
 
 #if defined(LIVE_DRIVE_ENABLED)
     //Initalize the network clients
-    m_liveDriveClient = new LiveDriveVRClient();
+    m_liveDriveClient = XCNEW(LiveDriveVRClient);
     m_liveDriveClient->Init(IP_ADDRESS, DEFAULT_PORT);
 
     m_networkManagingSystem->AddNetPeer(m_liveDriveClient);

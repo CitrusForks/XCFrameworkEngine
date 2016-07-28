@@ -23,7 +23,7 @@ FileIO* FileIO::getInstance()
 {
     if(ms_pFileIO == nullptr)
     {
-        ms_pFileIO = new FileIO();
+        ms_pFileIO = XCNEW(FileIO);
     }
 
     return ms_pFileIO;

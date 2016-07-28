@@ -33,7 +33,7 @@ void LoadingState::Init()
 
     TaskManager& taskMgr = SystemLocator::GetInstance()->RequestSystem<TaskManager>("TaskManager");
 
-    m_loadPackageTask = new LoadPackageFileFBTask(RESOURCE_DATA_FILEPATH);
+    m_loadPackageTask = XCNEW(LoadPackageFileFBTask)(RESOURCE_DATA_FILEPATH);
     m_futurePackageLoaded = taskMgr.RegisterTask(m_loadPackageTask);
 }
 

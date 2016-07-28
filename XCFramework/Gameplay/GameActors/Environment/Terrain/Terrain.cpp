@@ -37,8 +37,10 @@ Terrain::Terrain()
 
 Terrain::~Terrain(void)
 {
-    if(m_pBitmapImage)
-        delete(m_pBitmapImage);
+    if (m_pBitmapImage)
+    {
+        XCDELETEARRAY(m_pBitmapImage);
+    }
 }
 
 void Terrain::PreLoad(const void* fbBuffer)
@@ -309,7 +311,7 @@ void Terrain::LoadHeightMap()
 
     i32 imageSize = m_rows * m_cols * 3;
 
-    m_pBitmapImage = new u8[imageSize];
+    m_pBitmapImage = XCNEW(u8)[imageSize];
 
     //Move to first position within the bitmap file
     fseek(pFilePtr, bitmapFileHeader.bfOffBits, SEEK_SET);
@@ -330,7 +332,7 @@ void Terrain::UnloadHeightMap()
 {
     if (m_pBitmapImage)
     {
-        delete(m_pBitmapImage);
+        XCDELETEARRAY(m_pBitmapImage);
         m_pBitmapImage = nullptr;
     }
 }

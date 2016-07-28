@@ -18,6 +18,8 @@ print("Building C++ Win32 Project XCUnitTest")
 
 		excludes { "**/Orbis/**", "**orbis.cpp", "**/Durango/**", "**durango.cpp", "**editor.cpp", "**/Editor/**", "**Editor.cpp", "**Editor**.*", "**/DDSTextureLoader_Legacy/**", "**.pssl", "**/XC_Shaders/src/**"}
 		
+		links { "XCEngine", "XCBase", "XCGraphics" }
+		
 		defines { "DEBUG", "WIN_32", "WIN32", "_DEBUG", "_WINDOWS" }
 		pchheader "UnitTestPrecompiledHeader.h"
 		pchsource "UnitTestPrecompiledHeader.cpp"
@@ -36,7 +38,7 @@ print("Building C++ Win32 Project XCUnitTest")
 
 		excludes { "**/Orbis/**", "**orbis.cpp", "**/Durango/**", "**durango.cpp", "**editor.cpp", "**/Editor/**", "**Editor.cpp", "**Editor**.*", "**/DDSTextureLoader_Legacy/**", "**.pssl", "**/XC_Shaders/src/**"}
 		
-		links { "ws2_32" }
+		links { "XCEngine", "XCBase", "XCGraphics" }
 		
 		defines { "NDEBUG", "WIN_32", "WIN32", "_WINDOWS" }
 		pchheader "UnitTestPrecompiledHeader.h"

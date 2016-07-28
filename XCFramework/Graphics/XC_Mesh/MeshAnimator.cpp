@@ -15,7 +15,7 @@ void MeshAnimator::PlayAnimation(u32 animIndex)
     }
 
     if(m_currentNodeStructure != nullptr)
-        delete m_currentNodeStructure;
+        XCDELETE(m_currentNodeStructure);
     
     m_currentNodeStructure = GenerateNodeStructure(m_rootNode, nullptr);
 
@@ -29,7 +29,7 @@ void MeshAnimator::Update(f32 dt)
 AnimNode* MeshAnimator::GenerateNodeStructure(const MeshNode* pNode, AnimNode* pParent)
 {
     // create a node
-    AnimNode* internalNode = new AnimNode(pNode->m_nodeName);
+    AnimNode* internalNode = XCNEW(AnimNode)(pNode->m_nodeName);
     internalNode->m_parentNode = pParent;
     m_mappedMeshNodeAnimNodes[pNode] = internalNode;
 

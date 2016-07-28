@@ -31,7 +31,7 @@ struct VertexOut
     float4 Color : COLOR;
 };
 
-VertexOut VS(VertexIn vin)
+VertexOut VSMain(VertexIn vin)
 {
 	VertexOut vout = (VertexOut)0;
 

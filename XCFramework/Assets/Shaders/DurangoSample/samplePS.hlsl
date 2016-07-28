@@ -12,7 +12,7 @@ struct VertexOut
 
 
 
-float4 PS(VertexOut pin) : SV_Target
+float4 PSMain(VertexOut pin) : SV_Target
 {
     return pin.Color;
 }

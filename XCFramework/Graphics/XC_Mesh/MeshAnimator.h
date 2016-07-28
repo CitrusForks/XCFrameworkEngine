@@ -36,7 +36,7 @@ public:
     {
         while(m_childNodes.size() > 0)
         {
-            delete m_childNodes.back();
+            XCDELETE(m_childNodes.back());
             m_childNodes.pop_back();
         }
     }

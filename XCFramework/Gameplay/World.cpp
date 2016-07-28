@@ -31,8 +31,8 @@ World::World()
 
 World::~World(void)
 {
-    delete(m_worldPendingTasks);
-    delete(m_worldCollisionTask);
+    XCDELETE(m_worldPendingTasks);
+    XCDELETE(m_worldCollisionTask);
 }
 
 void World::Init(TaskManager& taskMgr)
@@ -40,11 +40,11 @@ void World::Init(TaskManager& taskMgr)
     m_taskManager = &taskMgr;
     
     //Initialize the WorldPendingTasks.
-    m_worldPendingTasks = new WorldPendingTasks(*this);
+    m_worldPendingTasks = XCNEW(WorldPendingTasks)(*this);
     m_taskManager->RegisterTask(m_worldPendingTasks);
 
     //Initialize the collision thread
-    m_worldCollisionTask = new WorldCollisionTask(*this);
+    m_worldCollisionTask = XCNEW(WorldCollisionTask)(*this);
     m_worldCollisionTask->SetTaskPriority(THREAD_PRIORITY_BELOW_NORMAL);
     m_taskManager->RegisterTask(m_worldCollisionTask);
 
@@ -186,7 +186,7 @@ void WorldPendingTasks::ProcessFromWorld()
                     break;
             }
 
-            delete task;
+            XCDELETE(task);
             task = nullptr;
         }
     }
@@ -197,7 +197,7 @@ void WorldPendingTasks::Destroy()
     while (m_pendingTaskList.size() > 0)
     {
         //TODO: What if the actor are preloaded and we have some destruction to be done before the removal of this tasks.
-        delete (m_pendingTaskList.front());
+        XCDELETE(m_pendingTaskList.front());
         m_pendingTaskList.pop();
     }
 
@@ -255,7 +255,7 @@ void World::OnEvent(IEvent* evt)
 
 void World::RequestAddActor(IActor* actor)
 {
-    WorldPendingTasks::IPendingTask* task = new WorldPendingTasks::PendingTaskAdd(WorldPendingTasks::PENDINGTASK_ADD, std::move(actor));
+    WorldPendingTasks::IPendingTask* task = XCNEW(WorldPendingTasks::PendingTaskAdd)(WorldPendingTasks::PENDINGTASK_ADD, std::move(actor));
     m_worldPendingTasks->AddTask(task);
 }
 
@@ -297,7 +297,7 @@ void World::AddActor(IActor* actor)
 
 void World::RequestRemoveActor(i32 key)
 {
-    WorldPendingTasks::IPendingTask* task = new WorldPendingTasks::PendingTaskRemove(WorldPendingTasks::PENDINGTASK_REMOVE, key);
+    WorldPendingTasks::IPendingTask* task = XCNEW(WorldPendingTasks::PendingTaskRemove)(WorldPendingTasks::PENDINGTASK_REMOVE, key);
     m_worldPendingTasks->AddTask(task);
 }
 

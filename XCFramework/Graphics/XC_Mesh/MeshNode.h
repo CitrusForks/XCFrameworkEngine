@@ -30,7 +30,7 @@ public:
             {
                 if (node->mChildren[childIndex])
                 {
-                    m_childNodes.push_back(new MeshNode(node->mChildren[childIndex], this, tranverse));
+                    m_childNodes.push_back(XCNEW(MeshNode)(node->mChildren[childIndex], this, tranverse));
                 }
             }
         }
@@ -49,7 +49,7 @@ public:
         while (m_childNodes.size() > 0)
         {
             if (m_childNodes.back() != nullptr)
-                delete(m_childNodes.back());
+                XCDELETE(m_childNodes.back());
             m_childNodes.pop_back();
         }
     }

@@ -37,8 +37,8 @@ inline HRESULT ValidateResult(HRESULT hr)
 {
     if (FAILED(hr))
     {
-        __debugbreak();
         Logger("[FAILED] In file %s at %d with error code : %x", __FILE__, __LINE__, hr);
+        __debugbreak();
     }
 
     return hr;

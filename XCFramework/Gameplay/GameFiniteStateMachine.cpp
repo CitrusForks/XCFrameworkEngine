@@ -16,9 +16,6 @@ GameFiniteStateMachine::GameFiniteStateMachine()
 
 GameFiniteStateMachine::~GameFiniteStateMachine(void)
 {
-    delete(m_worldSystem);
-    delete(m_gameActorFactory);
-    delete(m_gameStateFactory);
 }
 
 void GameFiniteStateMachine::Init()

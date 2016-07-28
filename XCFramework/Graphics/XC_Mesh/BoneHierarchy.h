@@ -19,7 +19,7 @@ public:
         for (auto node : m_boneNodes)
         {
             if (node.second)
-                delete(node.second);
+                XCDELETE(node.second);
         }
         m_boneNodes.clear();
     }

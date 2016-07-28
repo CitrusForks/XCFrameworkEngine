@@ -38,12 +38,12 @@ XCMesh::~XCMesh(void)
 {
     if (m_sceneAnimator)
     {
-        delete m_sceneAnimator;
+        XCDELETE(m_sceneAnimator);
     }
 
     if (m_scene)
     {
-        delete m_scene;
+        XCDELETE(m_scene);
     }
 }
 
@@ -90,7 +90,7 @@ void XCMesh::Unload()
     for (auto& subMesh : m_subMeshes)
     {
         subMesh->Destroy();
-        delete(subMesh);
+        XCDELETE(subMesh);
     }
 
     m_subMeshes.clear();
@@ -182,7 +182,7 @@ bool XCMesh::LoadMesh()
 
 MeshData* XCMesh::CreateAndGetSubMesh()
 {
-    MeshData* subMesh = new MeshData(m_shaderType);
+    MeshData* subMesh = XCNEW(MeshData)(m_shaderType);
     m_subMeshes.push_back(subMesh);
     return m_subMeshes.back();
 }
@@ -556,7 +556,7 @@ void XCMesh::FilterSubMeshes()
         auto it = m_subMeshes.begin() + index;
         if ((*it)->m_vertices.size() == 0)
         {
-            delete(*it);
+            XCDELETE(*it);
             m_subMeshes.erase(it);
         }
         else

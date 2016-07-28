@@ -93,23 +93,23 @@ public:
         switch (m_vertexFormat)
         {
         case VertexFormat_Position:
-            buffer = new VertexBuffer<VertexPos>();
+            buffer = XCNEW(VertexBuffer<VertexPos>)();
             break;
 
         case VertexFormat_PositionColor:
-            buffer = new VertexBuffer<VertexPosColor>();
+            buffer = XCNEW(VertexBuffer<VertexPosColor>)();
             break;
 
         case VertexFormat_PositionNormalTexture:
-            buffer = new VertexBuffer<VertexPosNormTex>();
+            buffer = XCNEW(VertexBuffer<VertexPosNormTex>)();
             break;
 
         case VertexFormat_PositionNormalTextureBlendIndexBlendWeight:
-            buffer = new VertexBuffer<VertexPosNormTexBIndexBWeight>();
+            buffer = XCNEW(VertexBuffer<VertexPosNormTexBIndexBWeight>)();
             break;
 
         case VertexFormat_PositionColorInstanceIndex:
-            buffer = new VertexBuffer<VertexPosColorInstanceIndex>();
+            buffer = XCNEW(VertexBuffer<VertexPosColorInstanceIndex>)();
             break;
 
         default:

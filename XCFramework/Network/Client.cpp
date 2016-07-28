@@ -43,8 +43,8 @@ void Client::Init(const char *ip, i32 port)
     m_sockAddressInfo.sin_family = AF_INET;
     m_sockAddressInfo.sin_port = htons(port);   //270512
 
-    m_pFdSetDesc = new fd_set();
-    m_pTimeOut = new TIMEVAL();
+    m_pFdSetDesc = XCNEW(fd_set)();
+    m_pTimeOut = XCNEW(TIMEVAL)();
 
     CreateSocket();
     ConnectToServer();
