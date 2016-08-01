@@ -47,6 +47,4 @@ protected:
     std::vector<ResourceHandle*>        m_textures;
 
     std::unique_ptr<OBBHierarchy>       m_OBBHierarchy;
-
-    D3DConstantBuffer*                  m_pCBPerObject;
 };

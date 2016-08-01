@@ -28,11 +28,12 @@ void EventBroadcaster::RemoveListener(IEventListener* listener)
     if (listener)
     {
         for (std::vector<IEventListener*>::iterator it = m_eventListeners.begin();
-            it != m_eventListeners.end(); it++)
+            it != m_eventListeners.end(); ++it)
         {
             if (*it == listener)
             {
                 m_eventListeners.erase(it);
+                break;
             }
         }
     }

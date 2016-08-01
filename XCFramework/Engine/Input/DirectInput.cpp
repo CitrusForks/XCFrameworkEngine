@@ -14,6 +14,7 @@ DirectInput::DirectInput()
 
 void DirectInput::Init(HINSTANCE _hAppInstance, HWND _hAppWnd, u64 keyboardCoopFlags,u64 mouseCoopFlags)
 {
+    ISystem::Init();
 }
 
 void DirectInput::Destroy()

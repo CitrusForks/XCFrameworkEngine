@@ -7,27 +7,40 @@
 #include "EnginePrecompiledHeader.h"
 #include "MemorySystemWin32.h"
 
-MemorySystemWin32* MemorySystemWin32::ms_pMemorySystem = nullptr;
-
-MemorySystemWin32::MemorySystemWin32(u32 chunkSize)
+MemorySystemWin32::MemorySystemWin32()
 {
-    ms_pMemorySystem = this;
+}
 
-    //We know the size now.
+MemorySystemWin32::~MemorySystemWin32()
+{
+}
+
+void MemorySystemWin32::Init(u64 chunkSize)
+{
     m_chunkSize = chunkSize;
     m_freeSize = m_chunkSize;
+
+    bool res = AllocateChunk();
+    XCASSERT(res);
+
+    res ? MemorySystem::Init(chunkSize) : false;
+}
+
+void MemorySystemWin32::Update(f32 dt)
+{
+}
+
+void MemorySystemWin32::Destroy()
+{
+    if (m_pChunkFront)
+    {
+        _aligned_free(m_pChunkFront);
+    }
 }
 
 bool MemorySystemWin32::IsInMyMemory(uintptr_t address)
 {
-    bool res = false;
-
-    if (address >= (uintptr_t)m_pChunkFront && address < (uintptr_t)m_pChunkBack)
-    {
-        res = true;
-    }
-
-    return res;
+    return address >= (uintptr_t)m_pChunkFront && address < (uintptr_t)m_pChunkBack;
 }
 
 bool MemorySystemWin32::AllocateChunk()
@@ -63,8 +76,6 @@ void* MemorySystemWin32::AllocateBytes(size_t size)
     {
         memset(ptrToBlock, NEW_MEM_PATTERN, size);
 
-        //Placement new here in the location
-        //Type* newedPtr = new(ptrToBlock) Type();
         m_freeSize = m_freeSize - size;
 
         return (void*)ptrToBlock;
@@ -248,12 +259,4 @@ void* MemorySystemWin32::GetPointerToAllocatedBlock(u32 blockIndex)
     }
 
     return pStart + offsetAdded;
-}
-
-MemorySystemWin32::~MemorySystemWin32()
-{
-    if (m_pChunkFront)
-    {
-        _aligned_free(m_pChunkFront);
-    }
 }

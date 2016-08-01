@@ -25,7 +25,7 @@ public:
     XC_GraphicsDx12(void);
     ~XC_GraphicsDx12(void);
     
-    void                        InitGraphicsWindow(HWND _mainWnd, i32 _width, i32 _height, bool _enable4xMsaa);
+    void                        Init(HWND _mainWnd, i32 _width, i32 _height, bool _enable4xMsaa);
     IDXGISwapChain*             GetSwapChain()      { return m_pSwapChain;   }
     
     ID3DDevice*                 GetDevice()                     { return m_pD3DDevice; }

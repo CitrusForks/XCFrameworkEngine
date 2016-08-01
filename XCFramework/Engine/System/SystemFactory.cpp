@@ -24,7 +24,9 @@ void SystemFactory::DestroyFactory()
 ISystem* SystemFactory::CreateSystem(std::string classKey)
 {
     ISystem* outSystem = (ISystem*) CreateObject(classKey);
-    outSystem->Init(classKey);
+    XCASSERT(outSystem);
+
+    outSystem->SetSystemName(classKey);
 
     return outSystem;
 }

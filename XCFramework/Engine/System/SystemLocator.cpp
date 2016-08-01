@@ -22,14 +22,17 @@ SystemLocator* SystemLocator::GetInstance()
 {
     if (ms_pSystemLocator == nullptr)
     {
-        ms_pSystemLocator = XCNEW(SystemLocator)();
+        ms_pSystemLocator = new SystemLocator();
     }
     return ms_pSystemLocator;
 }
 
 SystemLocator::~SystemLocator(void)
 {
-    XCDELETE(ms_pSystemLocator);
+    if (ms_pSystemLocator)
+    {
+        delete ms_pSystemLocator;
+    }
 }
 
 ISystem& SystemLocator::RequestSystem(std::string sysName)

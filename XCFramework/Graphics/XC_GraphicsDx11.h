@@ -23,7 +23,7 @@ public:
     XC_GraphicsDx11(void);
     ~XC_GraphicsDx11(void);
     
-    void                        InitGraphicsWindow(HWND _mainWnd, i32 _width, i32 _height, bool _enable4xMsaa);
+    void                        Init(HWND _mainWnd, i32 _width, i32 _height, bool _enable4xMsaa);
     IDXGISwapChain*             GetSwapChain()      { return m_pSwapChain;   }
 
     ID3DDeviceContext*          GetDeviceContext() { return m_pD3DDeviceContext; }

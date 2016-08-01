@@ -6,6 +6,9 @@
 
 #include "UnitTestPrecompiledHeader.h"
 
+#include "Engine/Memory/MemorySystem.h"
+#include "Engine/Memory/MemorySystemWin32.h"
+
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace XCFrameworkUnitTest
@@ -34,25 +37,28 @@ namespace XCFrameworkUnitTest
 
         TEST_METHOD(AllocDealloc)
         {
-            MemorySystemWin32 memorySystem((u32)1024 * 1024);
-            memorySystem.AllocateChunk();
+            SystemContainer& container = SystemLocator::GetInstance()->GetSystemContainer();
+            container.RegisterSystem<MemorySystemWin32>("MemorySystem");
+
+            MemorySystem& memSys = (MemorySystem&)container.CreateNewSystem("MemorySystem");
+            memSys.Init(1024 * 1024);
 
             A* a = XCNEW(A)(10);
-            Assert::IsTrue(MemorySystemWin32::GetInstance()->IsInMyMemory((uintptr_t)a) == true);
+            Assert::IsTrue(memSys.IsInMyMemory((uintptr_t)a) == true);
             XCDELETE(a);
 
             A* ab = XCNEW(A)(20);
-            Assert::IsTrue(MemorySystemWin32::GetInstance()->IsInMyMemory((uintptr_t)ab) == true);
+            Assert::IsTrue(memSys.IsInMyMemory((uintptr_t)ab) == true);
             XCDELETE(ab);
 
             A* abc = new A(20);
-            Assert::IsTrue(MemorySystemWin32::GetInstance()->IsInMyMemory((uintptr_t)abc) == false);
+            Assert::IsTrue(memSys.IsInMyMemory((uintptr_t)abc) == false);
             XCDELETE(abc);
             
             {
                 std::vector<A*> listOfStackAllocs;
                 listOfStackAllocs.push_back(XCNEW(A)(10));
-                Assert::IsTrue(MemorySystemWin32::GetInstance()->IsInMyMemory((uintptr_t)listOfStackAllocs.back()) == true);
+                Assert::IsTrue(memSys.IsInMyMemory((uintptr_t)listOfStackAllocs.back()) == true);
                 XCDELETE(listOfStackAllocs.back());
                 listOfStackAllocs.clear();
             }
@@ -60,17 +66,20 @@ namespace XCFrameworkUnitTest
             {
                 std::vector<A> listOfStackAllocs;
                 listOfStackAllocs.push_back(A(30));
-                Assert::IsTrue(MemorySystemWin32::GetInstance()->IsInMyMemory((uintptr_t)&listOfStackAllocs.back()) == false);
+                Assert::IsTrue(memSys.IsInMyMemory((uintptr_t)&listOfStackAllocs.back()) == false);
                 listOfStackAllocs.clear();
             }
 
             {
                 std::vector<A*> listOfStackAllocs;
                 listOfStackAllocs.push_back(new A(30));
-                Assert::IsTrue(MemorySystemWin32::GetInstance()->IsInMyMemory((uintptr_t)listOfStackAllocs.back()) == false);
+                Assert::IsTrue(memSys.IsInMyMemory((uintptr_t)listOfStackAllocs.back()) == false);
                 XCDELETE(listOfStackAllocs.back());
                 listOfStackAllocs.clear();
             }
+
+            memSys.Destroy();
+            container.Destroy();
         }
 
     };

@@ -42,6 +42,8 @@ void GameFiniteStateMachine::Init()
     broadCaster.AddListener(this);
 
     SetState("IntroState");
+
+    ISystem::Init();
 }
 
 void GameFiniteStateMachine::Update(f32 dt)

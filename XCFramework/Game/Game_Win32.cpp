@@ -10,12 +10,18 @@
 
 #include "Assets/Packages/PackageConsts.h"
 
-#include "Network/Clients/LiveDriveVRClient.h"
-
-#include "Engine/Input/Directinput_Win32.h"
 #include "Engine/System/SystemLocator.h"
 #include "Engine/Memory/MemoryOverrides.h"
+#include "Engine/Memory/MemorySystem.h"
+#include "Engine/Memory/MemorySystemWin32.h"
+#include "Engine/Event/EventBroadcaster.h"
+#include "Engine/TaskManager/TaskManager.h"
+#include "Engine/Input/Directinput.h"
+#include "Engine/FlatBuffersInterface/FlatBuffersSystem.h"
+#include "Engine/Resource/ResourceManager.h"
+#include "Engine/Input/Directinput_Win32.h"
 
+#include "Graphics/XC_Graphics.h"
 #if defined(XCGRAPHICS_DX12)
 #include "Graphics/XC_GraphicsDx12.h"
 #elif defined(XCGRAPHICS_DX11)
@@ -24,12 +30,30 @@
 #include "Graphics/XC_GraphicsGL.h"
 #endif
 
+#include "Gameplay/XC_Camera/XC_CameraManager.h"
+#include "Gameplay/GameFiniteStateMachine.h"
+
+#include "Network/NetworkManager.h"
+#include "Network/INetPeer.h"
+#include "Network/Clients/LiveDriveVRClient.h"
+
+
 Game_Win32::Game_Win32(HINSTANCE hInstance, std::string winCaption, bool enable4xMsaa)
     : AppFramework_Win32(hInstance, winCaption, enable4xMsaa)
+    , m_systemContainer(nullptr)
+    , m_memorySystem(nullptr)
+    , m_eventBroadcaster(nullptr)
+    , m_taskManagingSystem(nullptr)
+    , m_fbSystem(nullptr)
+    , m_graphicsSystem(nullptr)
+    , m_directInputSystem(nullptr)
+    , m_resourceManagingSystem(nullptr)
+    , m_cameraManagingSystem(nullptr)
+    , m_gameFSM(nullptr)
+    , m_networkManagingSystem(nullptr)
+    , m_liveDriveClient(nullptr)
 {
     srand(time_t(0));
-    Init();
-
     Logger("[GAME MAIN]");
 }
 
@@ -44,18 +68,25 @@ i32 Game_Win32::Init()
     //Register Systems
     RegisterSystems();
 
+    //Initialize memory System
+    m_memorySystem = (MemorySystem*)&m_systemContainer->CreateNewSystem("MemorySystem");
+    m_memorySystem->Init(1024 * 1024);
+
     //Event Broadcaster
     m_eventBroadcaster = (EventBroadcaster*)&m_systemContainer->CreateNewSystem("EventBroadcaster");
+    m_eventBroadcaster->Init();
 
     //TaskManager
     m_taskManagingSystem = (TaskManager*) &m_systemContainer->CreateNewSystem("TaskManager");
+    m_taskManagingSystem->Init();
 
     //Flatbuffers System
     m_fbSystem = (FlatBuffersSystem*)&m_systemContainer->CreateNewSystem("FlatBuffersSystem");
+    m_fbSystem->Init();
 
     //Graphics Dx11
     m_graphicsSystem = (XC_Graphics*)&m_systemContainer->CreateNewSystem("GraphicsSystem");
-    m_graphicsSystem->InitGraphicsWindow(m_hMainWnd, m_clientWidth, m_clientHeight, true);
+    m_graphicsSystem->Init(m_hMainWnd, m_clientWidth, m_clientHeight, true);
 
     //Init Input Handlers which depend on above window created.
     m_directInputSystem = (DirectInput*)&m_systemContainer->CreateNewSystem("InputSystem");
@@ -67,7 +98,7 @@ i32 Game_Win32::Init()
 
     //Initialize Cameras
     m_cameraManagingSystem = (XC_CameraManager*)&m_systemContainer->CreateNewSystem("CameraManager");
-    m_cameraManagingSystem->InitializeCameras(*m_graphicsSystem, m_clientWidth, m_clientHeight);
+    m_cameraManagingSystem->Init(*m_graphicsSystem, m_clientWidth, m_clientHeight);
     m_cameraManagingSystem->SetCameraType(CAMERATYPE_BASIC);
 
     //Gameplay state machine
@@ -77,6 +108,7 @@ i32 Game_Win32::Init()
 
     //Network Manger
     m_networkManagingSystem = (NetworkManager*)&m_systemContainer->CreateNewSystem("NetworkManager");
+    m_networkManagingSystem->Init();
 
 #if defined(LIVE_DRIVE_ENABLED)
     //Initalize the network clients
@@ -98,6 +130,7 @@ void Game_Win32::RegisterSystems()
 {
     m_systemContainer = &SystemLocator::GetInstance()->GetSystemContainer();
 
+    m_systemContainer->RegisterSystem<MemorySystemWin32>("MemorySystem");
     m_systemContainer->RegisterSystem<EventBroadcaster>("EventBroadcaster");
     m_systemContainer->RegisterSystem<DirectInput_Win32>("InputSystem");
     m_systemContainer->RegisterSystem<TaskManager>("TaskManager");
@@ -125,21 +158,23 @@ void Game_Win32::OnResize()
 
 void Game_Win32::Update(f32 dt)
 {
+    m_memorySystem->Update(dt);
+
     m_eventBroadcaster->Update();
 
     m_directInputSystem->Update();
 
-    m_graphicsSystem->Update(dt);
     m_resourceManagingSystem->Update();
-
-    m_networkManagingSystem->Update();
 
     m_cameraManagingSystem->Update(dt);
 
     m_gameFSM->Update(dt);
 
-    //Do the tasks if any
     m_taskManagingSystem->Update();
+
+    m_graphicsSystem->Update(dt);
+
+    m_networkManagingSystem->Update();
 }
 
 void Game_Win32::Draw()
@@ -182,6 +217,7 @@ void Game_Win32::Destroy()
     m_taskManagingSystem->Destroy();
     m_networkManagingSystem->Destroy();
     m_eventBroadcaster->Destroy();
+    m_memorySystem->Destroy();
 
     SystemLocator::GetInstance()->Destroy();
 }
@@ -194,11 +230,8 @@ i32 WINAPI WinMain(__in HINSTANCE hInstance, __in_opt HINSTANCE hPrevInstance, _
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
-    //Initialize memory System
-    MemorySystemWin32 memorySystem((u32)1024 * 1024);
-    memorySystem.AllocateChunk();
-
     Game_Win32 app(hInstance, "", true);
+    app.Init();
     app.Run();
     app.Destroy();
 

@@ -42,6 +42,8 @@ void ResourceManager::Init(TaskManager& taskManger)
     //Start the ResourceLoader task
     m_resourceLoaderTask = XCNEW(ResourceLoaderTask)();
     m_taskManager->RegisterTask(m_resourceLoaderTask);
+
+    ISystem::Init();
 }
 
 void ResourceManager::Update()

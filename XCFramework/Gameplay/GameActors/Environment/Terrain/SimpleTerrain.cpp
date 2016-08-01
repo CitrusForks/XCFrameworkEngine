@@ -7,11 +7,15 @@
 #include "GameplayPrecompiledHeader.h"
 
 #include "SimpleTerrain.h"
-#include "Graphics/XC_GraphicsDx11.h"
+
+#include "Engine/Utils/EngineUtils.h"
+#include "Graphics/XC_Graphics.h"
 #include "Graphics/XC_Shaders/XC_ShaderBufferConstants.h"
 #include "Graphics/XC_Shaders/XC_ShaderManager.h"
-#include "Gameplay/XC_Camera/XC_CameraManager.h"
 #include "Graphics/XC_Shaders/XC_ShaderHandle.h"
+#include "Graphics/VertexBuffer.h"
+#include "Graphics/IndexBuffer.h"
+#include "Gameplay/XC_Camera/XC_CameraManager.h"
 
 SimpleTerrain::SimpleTerrain(void)
 {

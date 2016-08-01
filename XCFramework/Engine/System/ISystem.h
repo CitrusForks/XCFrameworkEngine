@@ -18,10 +18,17 @@ public:
 
     virtual ~ISystem(void);
 
-    void                Init(std::string sysName) { m_sysName = sysName; }
+    virtual void        Init() { m_initialized = true; }
+    virtual void        Destroy() {}
+
+    void                SetSystemName(std::string sysName) { m_sysName = sysName; }
     std::string         GetSystemName() { return m_sysName; }
     void                ClientRequest() { m_NoRequestedClients++; }
-    virtual void        Destroy() {}
+
+    bool                IsInitialized() const { return m_initialized; }
+
+protected:
+    bool                m_initialized;
 
 private:
     std::string         m_sysName;

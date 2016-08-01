@@ -35,7 +35,7 @@ public:
     i32                     GetInstanceId()                     { return m_InstanceId; }
 
     void                    SetThreadId(u64 id) { m_threadID = id; }
-    u64           GetThreadId()         { return m_threadID; }
+    u64                     GetThreadId()         { return m_threadID; }
 
     bool                    IsAsync()                       { return m_isAsync; }
     void                    SetSynchronizable(bool _value)  { m_isAsync = _value; }
@@ -57,6 +57,6 @@ protected:
 private:
     Thread*                 m_threadHandle;
     std::mutex              m_stateLock;
-    u64           m_threadID;
+    u64                     m_threadID;
     i32                     m_taskPriority;
 };

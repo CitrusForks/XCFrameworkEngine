@@ -21,7 +21,7 @@ XC_CameraManager::~XC_CameraManager()
 {
 }
 
-void XC_CameraManager::InitializeCameras(XC_Graphics& graphicsSystem, i32 clientWidth, i32 clientHeight)
+void XC_CameraManager::Init(XC_Graphics& graphicsSystem, i32 clientWidth, i32 clientHeight)
 {
     m_graphicsSystem = &graphicsSystem;
 
@@ -61,6 +61,8 @@ void XC_CameraManager::InitializeCameras(XC_Graphics& graphicsSystem, i32 client
 
     //Set default camera
     m_currentCameraType = CAMERATYPE_BASIC;
+
+    ISystem::Init();
 }
 
 void XC_CameraManager::AttachCameraToActor(IActor* actor)

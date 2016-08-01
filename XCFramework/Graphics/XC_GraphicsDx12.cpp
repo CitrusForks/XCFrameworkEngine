@@ -34,9 +34,9 @@ XC_GraphicsDx12::~XC_GraphicsDx12(void)
     ReleaseCOM(m_pSwapChain);
 }
 
-void XC_GraphicsDx12::InitGraphicsWindow(HWND _mainWnd, i32 _width, i32 _height, bool _enable4xMsaa)
+void XC_GraphicsDx12::Init(HWND _mainWnd, i32 _width, i32 _height, bool _enable4xMsaa)
 {
-    XC_Graphics::InitGraphicsWindow(_mainWnd, _width, _height, _enable4xMsaa);
+    XC_Graphics::Init(_mainWnd, _width, _height, _enable4xMsaa);
 
     SetWindowText(_mainWnd, "XC Framework Dx12");
 

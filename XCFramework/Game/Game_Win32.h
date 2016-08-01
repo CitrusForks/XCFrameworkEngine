@@ -8,19 +8,19 @@
 
 #include "Engine/ApplicationFramework/Win32/AppFramework_Win32.h"
 
-#include "Engine/Event/EventBroadcaster.h"
-#include "Engine/TaskManager/TaskManager.h"
-#include "Engine/Input/Directinput.h"
-#include "Engine/FlatBuffersInterface/FlatBuffersSystem.h"
-#include "Engine/Resource/ResourceManager.h"
-
-#include "Network/INetPeer.h"
-#include "Network/NetworkManager.h"
-
-#include "Graphics/XC_Graphics.h"
-
-#include "Gameplay/GameFiniteStateMachine.h"
-#include "Gameplay/XC_Camera/XC_CameraManager.h"
+//Forward Declarations
+class SystemContainer;
+class MemorySystem;
+class EventBroadcaster;
+class TaskManager;
+class FlatBuffersSystem;
+class XC_Graphics;
+class DirectInput;
+class ResourceManager;
+class XC_CameraManager;
+class GameFiniteStateMachine;
+class NetworkManager;
+class INetPeer;
 
 class Game_Win32 : public AppFramework_Win32
 {
@@ -28,27 +28,29 @@ public:
     Game_Win32(HINSTANCE hInstance, std::string winCaption, bool enable4xMsaa);
     virtual ~Game_Win32();
 
-    i32                          Init();
-    void                         Update(f32 dt);
-    void                         Draw();
-    void                         Destroy();
+    i32                          Init()         override;
+    void                         Update(f32 dt) override;
+    void                         Draw()         override;
+    void                         Destroy()      override;
 
+    void                         OnResize()     override;
+    void                         EnableFullScreenMode(bool enable) override;
+
+protected:
     void                         RegisterSystems();
-    void                         OnResize();
-    void                         EnableFullScreenMode(bool enable);
 
 private:
-    
+
+    SystemContainer*             m_systemContainer;
+    MemorySystem*                m_memorySystem;
     EventBroadcaster*            m_eventBroadcaster;
-    INetPeer*                    m_liveDriveClient;
-    DirectInput*                 m_directInputSystem;
-    XC_Graphics*                 m_graphicsSystem;
-    FlatBuffersSystem*           m_fbSystem;
-    ResourceManager*             m_resourceManagingSystem;
     TaskManager*                 m_taskManagingSystem;
+    FlatBuffersSystem*           m_fbSystem;
+    XC_Graphics*                 m_graphicsSystem;
+    DirectInput*                 m_directInputSystem;
+    ResourceManager*             m_resourceManagingSystem;
     XC_CameraManager*            m_cameraManagingSystem;
     GameFiniteStateMachine*      m_gameFSM;
     NetworkManager*              m_networkManagingSystem;
-
-    SystemContainer*             m_systemContainer;
+    INetPeer*                    m_liveDriveClient;
 };

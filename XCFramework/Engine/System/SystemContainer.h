@@ -12,7 +12,7 @@
 class SystemContainer
 {
 public:
-    INullSystem*          NULLSYSTEM;
+    static INullSystem*   NULLSYSTEM;
 
     SystemContainer(void);
     virtual ~SystemContainer(void);
@@ -26,6 +26,7 @@ public:
         return (T&)CreateNewSystem(sysName);
     }
     
+    bool                  SystemExists(std::string sysName) const;
     void                  RemoveSystem(std::string sysName);
     ISystem&              GetSystem(std::string sysName);
 

@@ -5,13 +5,17 @@
  * For complete license, read License.txt in source root directory. */
 
 #include "EnginePrecompiledHeader.h"
+
 #include "MemoryOverrides.h"
+#include "MemorySystem.h"
+#include "MemorySystemWin32.h"
 
 void* NewAlloc(size_t classSize, bool isNonMem)
 {
-    if (isNonMem && MemorySystemWin32::GetInstance())
+    MemorySystem* memSys = MemorySystem::GetInstance();
+    if (isNonMem && memSys)
     {
-        return MemorySystemWin32::GetInstance()->NewAlloc(classSize);
+        return memSys->NewAlloc(classSize);
     }
     else
     {
@@ -21,9 +25,10 @@ void* NewAlloc(size_t classSize, bool isNonMem)
 
 void DeAlloc(void* ptr, bool isCustom)
 {
-    if (MemorySystemWin32::GetInstance() && MemorySystemWin32::GetInstance()->IsInMyMemory((uintptr_t)ptr))
+    MemorySystem* memSys = MemorySystem::GetInstance();
+    if (memSys && memSys->IsInMyMemory((uintptr_t)ptr))
     {
-        return MemorySystemWin32::GetInstance()->DeleteAlloc(&ptr);
+        return memSys->DeleteAlloc(&ptr);
     }
     else
     {

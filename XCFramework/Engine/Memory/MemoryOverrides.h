@@ -6,20 +6,21 @@
 
 #pragma once
 
-#include "MemorySystemWin32.h"
-
 #define XCNEW(x)         new (true) x
 #define XCDELETE(x)      delete x
 #define XCDELETEARRAY(x) delete[] x
 
+//new overrides
 void* operator new(size_t classSize);
 void* operator new(size_t classSize, bool isNonMem);
 
 void* operator new[](std::size_t size);
 void* operator new[](size_t classSize, bool isNonMem);
 
-void operator delete(void* p);
-void operator delete(void* p, bool isNonMem);
 
-void operator delete[](void* p);
-void operator delete[](void* p, bool isNonMem);
+//delete overrides
+void operator  delete(void* p);
+void operator  delete(void* p, bool isNonMem);
+               
+void operator  delete[](void* p);
+void operator  delete[](void* p, bool isNonMem);

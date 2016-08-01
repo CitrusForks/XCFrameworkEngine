@@ -18,7 +18,7 @@ public:
     XC_Graphics(void);
     virtual ~XC_Graphics(void);
     
-    virtual  void                   InitGraphicsWindow(HWND _mainWnd, i32 _width, i32 _height, bool _enable4xMsaa);
+    virtual  void                   Init(HWND _mainWnd, i32 _width, i32 _height, bool _enable4xMsaa);
     ID3DDevice*                     GetDevice()         { return m_pD3DDevice; }
 
     virtual ID3DDeviceContext*      GetDeviceContext() = 0;

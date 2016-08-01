@@ -38,7 +38,7 @@ public:
     void            UpdateState() override;
     void            BuildVertexBuffer();
     void            RenderContextCallback(RenderContext& renderContext);
-    u32    GetVertexFormatStride() { return sizeof(T); }
+    u32             GetVertexFormatStride() { return sizeof(T); }
     void            SetVertexBuffer(ID3DDeviceContext& context);
 
 #if defined(XCGRAPHICS_DX12) 

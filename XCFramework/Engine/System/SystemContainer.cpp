@@ -9,6 +9,8 @@
 #include "SystemContainer.h"
 #include "Engine/System/SystemFactory.h"
 
+INullSystem* SystemContainer::NULLSYSTEM = nullptr;
+
 SystemContainer::SystemContainer(void)
 {
 }
@@ -39,6 +41,11 @@ ISystem& SystemContainer::CreateNewSystem(std::string sysName)
     }
 
     return (*m_systemContainer[sysName]);
+}
+
+bool SystemContainer::SystemExists(std::string sysName) const
+{
+    return m_systemContainer.find(sysName) != m_systemContainer.end();
 }
 
 void SystemContainer::RemoveSystem(std::string sysName)

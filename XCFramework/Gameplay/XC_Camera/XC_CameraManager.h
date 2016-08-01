@@ -23,7 +23,7 @@ public:
     XC_CameraManager();
     ~XC_CameraManager();
 
-    void                   InitializeCameras(XC_Graphics& graphicsSystem, i32 clientWidth, i32 clientHeight);
+    void                   Init(XC_Graphics& graphicsSystem, i32 clientWidth, i32 clientHeight);
     void                   Update(f32 dt);
     void                   Draw();
     void                   Destroy();

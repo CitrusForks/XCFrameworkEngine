@@ -6,12 +6,9 @@
 
 #pragma once
 
-#include "Engine/Utils/EngineUtils.h"
-#include "Graphics/XC_Shaders/XC_VertexFormat.h"
 #include "Gameplay/GameActors/PhysicsActor.h"
+#include "Graphics/XC_Shaders/XC_VertexFormat.h"
 #include "Graphics/XC_Shaders/XC_ShaderTypes.h"
-#include "Graphics/VertexBuffer.h"
-#include "Graphics/IndexBuffer.h"
 
 class SimpleTerrain : public PhysicsActor
 {
@@ -31,7 +28,7 @@ public:
     virtual void                        Destroy();
 
     void                                ComputeVertices();
-    f32                               GetHeight(f32 _x, f32 _z); //Builds a hill height
+    f32                                 GetHeight(f32 _x, f32 _z); //Builds a hill height
     virtual i32                         GetNoOfVertices() const         { return m_totalVertices;  }
 
 protected:
@@ -40,15 +37,13 @@ protected:
     i32                                 m_cols;
     i32                                 m_totalVertices;
     i32                                 m_totalIndices;
-    f32                               m_rowSpacing;
-    f32                               m_colSpacing;
+    f32                                 m_rowSpacing;
+    f32                                 m_colSpacing;
 
     VertexBuffer<VertexPosColor>        m_vertexPosColorBuffer;
     VertexBuffer<VertexPosNormTex>      m_vertexPosNormTexBuffer;
-    IndexBuffer<u32>           m_indexBuffer;
+    IndexBuffer<u32>                    m_indexBuffer;
 
     ShaderType                          m_useShaderType;
-
-private:
     D3DConstantBuffer*                  m_pCBPerObject;
 };

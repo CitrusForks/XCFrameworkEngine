@@ -5,3 +5,17 @@
  * For complete license, read License.txt in source root directory. */
 
 #include "EnginePrecompiledHeader.h"
+#include "MemorySystem.h"
+
+MemorySystem* MemorySystem::ms_pMemorySystem = nullptr;
+
+MemorySystem::MemorySystem()
+    : m_chunkSize(0)
+{
+}
+
+void MemorySystem::Init(u64 chunkSize)
+{
+    ISystem::Init();
+    ms_pMemorySystem = this;
+}

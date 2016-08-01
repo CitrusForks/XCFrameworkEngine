@@ -6,11 +6,19 @@
 
 #pragma once
 
-class MemorySystemWin32
+#include "MemorySystem.h"
+
+class MemorySystemWin32 : public MemorySystem
 {
 public:
-    static const u32                AlignmentBoundary = 16;
+    DECLARE_OBJECT_CREATION(MemorySystemWin32)
 
+    static const u32                AlignmentBoundary   = 16;
+
+    static const u32                NEW_MEM_PATTERN     = 0x0;
+    static const u32                DELETE_MEM_PATTERN  = -41;
+
+    //Add more info to this. Its like header to every allocated memory.
     struct AllocInfo
     {
         AllocInfo(u32 bytes)
@@ -21,44 +29,40 @@ public:
         u32     m_nbOfBytes;
     };
 
-    static const u32                NEW_MEM_PATTERN     = 0x0;
-    static const u32                DELETE_MEM_PATTERN  = -41;
 
-    MemorySystemWin32(u32 chunkSize);
+    MemorySystemWin32();
     ~MemorySystemWin32();
 
-    static MemorySystemWin32*       GetInstance() { return ms_pMemorySystem; }
+    void                 Init(u64 chunkSize)   override;
+    void                 Update(f32 dt)        override;
+    void                 Destroy()             override;
 
-    bool                            AllocateChunk();
-    void                            PrintChunkInformation();
+    void*                NewAlloc(size_t size) override;
+    void                 DeleteAlloc(void** t) override;
 
-    void*                           NewAlloc(size_t size);
-    void                            DeleteAlloc(void** t);
+    bool                 IsInMyMemory(uintptr_t address) override;
 
-    inline uintptr_t                AlignPointer(u32 alignSize, uintptr_t** ptr);
-
-    bool                            IsInMyMemory(uintptr_t address);
-
-    static MemorySystemWin32*       ms_pMemorySystem;
+    inline uintptr_t     AlignPointer(u32 alignSize, uintptr_t** ptr);
+    void                 PrintChunkInformation();
 
 protected:
-    void*                           AllocateBytes(size_t val);
+    bool                 AllocateChunk();
+    void*                AllocateBytes(size_t val);
+    void                 AssignAndUpdateAllocatedList(u32 blockIndex, u32 sizeOfObj);
 
-    void*                           FindBlock(u32 sizeOfType);
-    u32                             FindBlockFromAllocated(u32 sizeOfType);
+    //First fit algorithm used. Can be enhanced further to use different strategy best-fit.
+    void*                FindBlock(u32 sizeOfType);
+    u32                  FindBlockFromAllocated(u32 sizeOfType);
 
-    void                            AssignAndUpdateAllocatedList(u32 blockIndex, u32 sizeOfObj);
-
-    void*                           GetPointerToAllocatedBlock(u32 blockIndex);
+    void*                GetPointerToAllocatedBlock(u32 blockIndex);
 
 private:
 
-    std::vector<AllocInfo>          m_allocatedBytesList;
-    u32                             m_freeSize;
-    u32                             m_chunkSize;
+    std::vector<AllocInfo>     m_allocatedBytesList;
+    u64                        m_freeSize;
 
-    char*                           m_pChunkFront;  //Do not modify this
-    char*                           m_pChunkBack;
+    char*                      m_pChunkFront;  //Do not modify this
+    char*                      m_pChunkBack;
 };
 
 uintptr_t MemorySystemWin32::AlignPointer(u32 alignSize, uintptr_t** ptr)
