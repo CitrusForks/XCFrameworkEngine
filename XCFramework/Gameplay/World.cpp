@@ -365,7 +365,9 @@ void World::Destroy()
     //Remove all actors
     for (auto& actor : m_GameObjects)
     {
+        actor.second->Unload();
         actor.second->Destroy();
+        XCDELETE(actor.second);
     }
 
     m_PlayableCharacterActors.clear();

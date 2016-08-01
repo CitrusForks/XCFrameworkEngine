@@ -11,7 +11,7 @@
 class AsyncTask : public ITask
 {
 public:
-    AsyncTask();
+    AsyncTask(std::string taskName = "");
     virtual ~AsyncTask(void);
 
     virtual void                        Init();

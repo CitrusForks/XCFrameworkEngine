@@ -8,6 +8,7 @@
 #include "ResourceLoaderTask.h"
 
 ResourceLoaderTask::ResourceLoaderTask()
+    : AsyncTask("ResourceLoaderTask")
 {
 }
 

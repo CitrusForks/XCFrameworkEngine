@@ -11,7 +11,8 @@
 #include "Assets/Packages/PackageConsts.h"
 
 LoadPackageFileFBTask::LoadPackageFileFBTask(std::string packageData)
-    : m_packageData(packageData)
+    : AsyncTask("LoadPackageFileFBTask")
+    , m_packageData(packageData)
 {
 }
 

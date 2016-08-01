@@ -8,10 +8,15 @@
 #include "ITask.h"
 
 
-ITask::ITask()
+ITask::ITask(std::string taskName)
+    : m_isAsync(false)
+    , m_eCurrentState(TASKSTATE_INVALID)
+    , m_InstanceId(TASKSTATE_INVALID)
+    , m_threadHandle(nullptr)
+    , m_threadID(0)
+    , m_taskPriority(THREAD_PRIORITY_NORMAL)
+    , m_taskName(taskName)
 {
-    m_isAsync = false;
-    m_taskPriority = THREAD_PRIORITY_NORMAL;
 }
 
 ITask::~ITask(void)

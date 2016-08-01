@@ -12,7 +12,8 @@
 #include "Assets/Packages/PackageConsts.h"
 
 WorldSceneLoader::WorldSceneLoader(World& world, std::string packageData)
-    : m_packageName(packageData)
+    : AsyncTask("WorldSceneLoader")
+    , m_packageName(packageData)
     , m_worldRef(world)
 {
 }

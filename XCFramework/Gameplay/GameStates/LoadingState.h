@@ -25,7 +25,7 @@ namespace GameState
         void                    Destroy();
 
     private:                    
-        u64           m_taskId;
+        u64                     m_taskId;
         std::future<i32>        m_futurePackageLoaded;
         ITask*                  m_loadPackageTask;
     };

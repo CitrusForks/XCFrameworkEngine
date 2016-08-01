@@ -10,15 +10,18 @@ typedef i32 (*runFunction)(void* param);
 
 class Thread
 {
-    HANDLE                      m_threadHandle;
-
 public:
     Thread(void);
     ~Thread(void);
 
-    bool                        CreateThread(runFunction asyncFunction, void* params);
-    void                        Run();
-    void                        Join();
-    void                        Destroy();
-    void                        SetThreadPriority(u32 priority);
+    bool          CreateThread(runFunction asyncFunction, void* params);
+    void          Run();
+    void          Join();
+    void          Destroy();
+    void          SetThreadPriority(u32 priority);
+    void          SetThreadIdentifier(std::string threadName);
+
+private:
+    HANDLE        m_threadHandle;
+    DWORD         m_threadId;
 };

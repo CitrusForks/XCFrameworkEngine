@@ -8,7 +8,8 @@
 #include "AsyncTask.h"
 
 
-AsyncTask::AsyncTask()
+AsyncTask::AsyncTask(std::string taskName)
+    : ITask(taskName)
 {
     m_isAsync = true;
 }

@@ -152,9 +152,10 @@ bool TaskManager::CreateAsyncThread()
     //Create a new Thread and init the process
     u64 threadID = 0;
     
-    Thread* threadHandle = XCNEW(Thread); 
+    Thread* threadHandle = XCNEW(Thread);
     threadHandle->CreateThread((runFunction)RunProcess, m_taskQueue.back());
     threadHandle->SetThreadPriority(m_taskQueue.back()->GetTaskPriority());
+    threadHandle->SetThreadIdentifier(m_taskQueue.back()->GetTaskName());
     threadHandle->Run();
 
     m_taskQueue.back()->SetThreadHandle(threadHandle);

@@ -24,3 +24,5 @@ void Swap(T& obj1, T& obj2)
     obj1 = obj2;
     obj2 = temp;
 }
+
+void SetThreadName(DWORD dwThreadID, const char* threadName);

@@ -19,34 +19,35 @@ enum ETaskState
 
 class ITask
 {
-
 public:
-    ITask();
+    ITask(std::string taskName = "");
     virtual ~ITask(void);
     
     virtual void            Init() = 0;
     virtual void            Run() = 0;
     virtual void            Destroy();
 
-    ETaskState              GetState() { return m_eCurrentState; }
+    ETaskState              GetState()                       { return m_eCurrentState; }
     void                    SetState(ETaskState _state);
     
-    void                    SetInstanceId(i32 _id)              { m_InstanceId = _id; }
-    i32                     GetInstanceId()                     { return m_InstanceId; }
+    void                    SetInstanceId(i32 _id)           { m_InstanceId = _id; }
+    i32                     GetInstanceId()                  { return m_InstanceId; }
 
-    void                    SetThreadId(u64 id) { m_threadID = id; }
-    u64                     GetThreadId()         { return m_threadID; }
+    void                    SetThreadId(u64 id)              { m_threadID = id; }
+    u64                     GetThreadId()                    { return m_threadID; }
 
-    bool                    IsAsync()                       { return m_isAsync; }
-    void                    SetSynchronizable(bool _value)  { m_isAsync = _value; }
+    bool                    IsAsync()                        { return m_isAsync; }
+    void                    SetSynchronizable(bool _value)   { m_isAsync = _value; }
 
-    Thread*                 GetThreadHandle()               { return m_threadHandle; }
+    Thread*                 GetThreadHandle()                { return m_threadHandle; }
     void                    SetThreadHandle(Thread* handle)  { m_threadHandle = handle; }
 
-    std::future<i32>        GetFuture()                     { return m_taskPromise.get_future(); }
+    std::future<i32>        GetFuture()                      { return m_taskPromise.get_future(); }
 
-    i32                     GetTaskPriority()             { return m_taskPriority; }
-    void                    SetTaskPriority(i32 priority) { m_taskPriority = priority; }
+    i32                     GetTaskPriority()                { return m_taskPriority; }
+    void                    SetTaskPriority(i32 priority)    { m_taskPriority = priority; }
+
+    std::string             GetTaskName()                    { return m_taskName;}
 
 protected:
     bool                    m_isAsync;
@@ -56,7 +57,8 @@ protected:
 
 private:
     Thread*                 m_threadHandle;
-    std::mutex              m_stateLock;
     u64                     m_threadID;
     i32                     m_taskPriority;
+    std::string             m_taskName;
+    std::mutex              m_stateLock;
 };

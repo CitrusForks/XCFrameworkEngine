@@ -57,7 +57,8 @@ public:
     };
 
     WorldPendingTasks(World& world)
-        : m_parentWorld(world)
+        : AsyncTask("WorldCollisionTask")
+        , m_parentWorld(world)
     {
         m_pendingTaskLock.Create();
         m_bufferedPendingTaskList.clear();
@@ -84,8 +85,9 @@ private:
 class WorldCollisionTask : public AsyncTask
 {
 public:
-    WorldCollisionTask(World& world) 
-        : m_parentWorld(world)
+    WorldCollisionTask(World& world)
+        : AsyncTask("WorldCollisionTask")
+        , m_parentWorld(world)
     {}
     ~WorldCollisionTask() {}
 
