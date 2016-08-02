@@ -164,7 +164,7 @@ void RenderableTexture::SetRenderableTarget(ID3DDeviceContext& context, ID3DDept
 void RenderableTexture::ClearRenderTarget(ID3DDeviceContext& context, ID3DDepthStencilView* depthView, const XCVec4& xmColor)
 {
 #if defined(XCGRAPHICS_DX11)
-    const f32 color[] = { xmColor.x, xmColor.y, xmColor.z, xmColor.w };
+    const f32 color[] = { xmColor.Get<X>(), xmColor.Get<Y>(), xmColor.Get<Z>(), xmColor.Get<W>() };
 
     context.ClearRenderTargetView(m_pRenderTargetView, color);
     context.ClearDepthStencilView(depthView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
