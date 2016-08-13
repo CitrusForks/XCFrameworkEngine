@@ -22,7 +22,8 @@ void RenderingPool::Init()
     m_graphicsSystem = &SystemLocator::GetInstance()->RequestSystem<XC_Graphics>("GraphicsSystem");
 
     //Initialize the staged render contexts
-    m_FrameCommandList[0].Init(m_graphicsSystem->GetDevice(), m_graphicsSystem->GetShaderManagerSystem(), false, true);
+    //These staging render context are used per frame states which are common and not be deferred. Such as clear rtv, execute deferred contexts...
+    m_FrameCommandList[0].Init(m_graphicsSystem->GetDevice(), &m_graphicsSystem->GetShaderManagerSystem(), false, true);
 
 #if defined(XCGRAPHICS_DX12)
     m_ppCmdList[0] = &m_FrameCommandList[0].GetDeviceContext();
@@ -34,7 +35,8 @@ void RenderingPool::Init()
         m_renderWorkers[workerIndex].Init();
         m_renderWorkers[workerIndex].m_workerId = workerIndex;
         m_renderWorkers[workerIndex].m_running = true;
-        m_renderWorkers[workerIndex].m_renderContext.Init(m_graphicsSystem->GetDevice(), m_graphicsSystem->GetShaderManagerSystem(), false, true);
+        m_renderWorkers[workerIndex].m_renderContext.Init(m_graphicsSystem->GetDevice(), &m_graphicsSystem->GetShaderManagerSystem(), false, true);
+
 #if !defined(SINGLE_THREAD_RENDER)
         m_renderWorkers[workerIndex].m_workerThread.CreateThread(m_renderWorkers[workerIndex].WorkerThreadFunc, &m_renderWorkers[workerIndex]);
         m_renderWorkers[workerIndex].m_workerThread.Run();
@@ -82,7 +84,7 @@ void RenderingPool::AddResourceDrawable(IResource* obj)
     {
     case RESOURCETYPE_MESH:
         m_renderWorkers[WorkerType_XCMesh].m_resourceRefList.push_back(obj);
-    	break;
+        break;
 
     default:
         Logger("Unkown resource draw request");
@@ -126,22 +128,13 @@ void RenderingPool::Begin(RenderTargetsType targetType)
 {
 #if defined(XCGRAPHICS_DX12)
     //Clear the rtv and dsv
-    m_FrameCommandList[0].BeginRender();
+    m_FrameCommandList[0].BeginRender(targetType);
     m_graphicsSystem->ClearRTVAndDSV(&m_FrameCommandList[0].GetDeviceContext());
 #endif
 
     for (auto& workers : m_renderWorkers)
     {
-#if defined(XCGRAPHICS_DX12)
-        workers.m_renderContext.BeginRender();
-#elif defined(XCGRAPHICS_DX11)
-        workers.m_renderContext.BeginRender();
-        workers.m_renderContext.GetDeviceContext().RSSetViewports(1, &m_graphicsSystem->GetViewPort(targetType));
-        m_graphicsSystem->GetRenderTexture(targetType).SetRenderableTarget(workers.m_renderContext.GetDeviceContext(), &m_graphicsSystem->GetDepthStencilView(targetType));
-#elif defined(XCGRAPHICS_GNM)
-        workers.m_renderContext.BeginRender();
-        m_graphicsSystem->GetRenderTexture(targetType).SetRenderableTarget(workers.m_renderContext.GetDeviceContext(), nullptr);
-#endif
+        workers.m_renderContext.BeginRender(targetType);
     }
 }
 
@@ -186,8 +179,6 @@ void RenderingPool::Render()
 void RenderingPool::End()
 {
 #if defined(XCGRAPHICS_DX12)
-    //Move the render target to present from the very last context
-    //m_graphicsSystem->PresentRenderTarget(&m_renderWorkers[NbRenderWorkerThreads - 1].m_renderContext.GetDeviceContext());
     m_FrameCommandList[0].FinishRender();
 #endif
 
@@ -196,17 +187,6 @@ void RenderingPool::End()
     {
         //Finish cmdlist
         workers.m_renderContext.FinishRender();
-
-#if defined(USE_IMMEDIATE_CONTEXT)
-
-#else
-#if defined(XCGRAPHICS_DX11)
-        m_graphicsSystem->GetDeviceContext()->ExecuteCommandList(&workers.m_renderContext.GetCommandList(), false);
-        workers.m_renderContext.ReleaseCommandList();
-        workers.m_renderContext.GetShaderManagerSystem().ClearShaderAndRenderStates(workers.m_renderContext.GetDeviceContext());
-#endif
-#endif
-
     }
 }
 

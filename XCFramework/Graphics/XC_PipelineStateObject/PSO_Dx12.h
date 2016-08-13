@@ -43,7 +43,7 @@ public:
         }
 
         D3D12_GRAPHICS_PIPELINE_STATE_DESC  m_psoDesc;
-        ID3D12PipelineState*                m_pPso;
+        ID3DPipelineState*                m_pPso;
         ID3D12RootSignature*                m_rootSignature;
     };
 

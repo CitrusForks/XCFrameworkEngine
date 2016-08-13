@@ -6,7 +6,9 @@
 
 #include "GraphicsPrecompiledHeader.h"
 
-#include "Graphics/XC_Shaders/XC_ShaderManager.h"
+#include "Graphics/XC_Shaders/IShader.h"
+#include "Graphics/SharedDescriptorHeap.h"
+#include "Graphics/XC_Shaders/XC_ShaderContainer.h"
 #include "Graphics/XC_Shaders/XC_ShaderTypes.h"
 #include "Graphics/XC_Shaders/XC_VertexShaderLayout.h"
 #include "Graphics/XC_Shaders/XC_ShaderHandle.h"
@@ -22,17 +24,17 @@
 
 #include "Assets/Packages/PackageConsts.h"
 
-XC_ShaderManager::XC_ShaderManager(ID3DDevice& device)
+XC_ShaderContainer::XC_ShaderContainer(ID3DDevice& device)
     : m_device(device)
 {
     m_rasterType = RasterType_FillSolid;
 }
 
-XC_ShaderManager::~XC_ShaderManager(void)
+XC_ShaderContainer::~XC_ShaderContainer(void)
 {
 }
 
-void XC_ShaderManager::Init()
+void XC_ShaderContainer::Init()
 {
     m_globalShaderData.m_camera.Init();
 
@@ -66,7 +68,23 @@ void XC_ShaderManager::Init()
     LoadSamplers();
 }
 
-void XC_ShaderManager::LoadShaders()
+void XC_ShaderContainer::Destroy()
+{
+    for (u32 shaderIndex = 0; shaderIndex < ShaderType_Max; shaderIndex++)
+    {
+        if (m_Shaders[(ShaderType)shaderIndex] != nullptr)
+        {
+            m_Shaders[(ShaderType)shaderIndex]->Destroy();
+        }
+    }
+    m_Shaders.clear();
+
+    m_sharedDescriptorHeap->Destroy();
+    SystemContainer& container = SystemLocator::GetInstance()->GetSystemContainer();
+    container.RemoveSystem("SharedDescriptorHeap");
+}
+
+void XC_ShaderContainer::LoadShaders()
 {
     IShader* binShader;
 
@@ -168,7 +186,7 @@ void XC_ShaderManager::LoadShaders()
 #endif
 }
 
-void XC_ShaderManager::LoadRasterizers()
+void XC_ShaderContainer::LoadRasterizers()
 {
 #if defined(XCGRAPHICS_DX11)
     m_rasterizerDesc.FillMode = D3D11_FILL_WIREFRAME;
@@ -183,7 +201,7 @@ void XC_ShaderManager::LoadRasterizers()
 #endif
 }
 
-void XC_ShaderManager::LoadSamplers()
+void XC_ShaderContainer::LoadSamplers()
 {
 #if defined(XCGRAPHICS_DX11)
     m_samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
@@ -216,7 +234,7 @@ void XC_ShaderManager::LoadSamplers()
 #endif
 }
 
-void XC_ShaderManager::SetRasterizerState(ID3DDeviceContext& context, RasterType type)
+void XC_ShaderContainer::SetRasterizerState(ID3DDeviceContext& context, RasterType type)
 {
     m_rasterType = type;
 #if defined(XCGRAPHICS_DX11)
@@ -224,23 +242,7 @@ void XC_ShaderManager::SetRasterizerState(ID3DDeviceContext& context, RasterType
 #endif
 }
 
-void XC_ShaderManager::Destroy()
-{
-    for (u32 shaderIndex = 0; shaderIndex < ShaderType_Max; shaderIndex++)
-    {
-        if (m_Shaders[(ShaderType)shaderIndex] != nullptr)
-        {
-            m_Shaders[(ShaderType)shaderIndex]->Destroy();
-        }
-    }
-    m_Shaders.clear();
-
-    m_sharedDescriptorHeap->Destroy();
-    SystemContainer& container = SystemLocator::GetInstance()->GetSystemContainer();
-    container.RemoveSystem("SharedDescriptorHeap");
-}
-
-void XC_ShaderManager::ApplyShader(ID3DDeviceContext& context, ShaderType _ShaderType)
+void XC_ShaderContainer::ApplyShader(ID3DDeviceContext& context, ShaderType _ShaderType)
 {
     m_Shaders[_ShaderType]->ApplyShader(context);
 #if defined(XCGRAPHICS_DX11)
@@ -251,26 +253,12 @@ void XC_ShaderManager::ApplyShader(ID3DDeviceContext& context, ShaderType _Shade
 #endif
 }
 
-IShader* XC_ShaderManager::GetShader(ShaderType _type)
+IShader* XC_ShaderContainer::GetShader(ShaderType _type)
 {
     return m_Shaders[_type];
 }
 
-void XC_ShaderManager::DrawNonIndexed(ID3DDeviceContext& context, u32 vertexCount)
-{
-#if defined(XCGRAPHICS_DX12)
-    context.DrawInstanced(vertexCount, 1, 0, 0);
-#elif defined(XCGRAPHICS_DX11)
-    context.Draw(vertexCount, 0);
-#endif
-}
-
-void XC_ShaderManager::DrawIndexedInstanced(ID3DDeviceContext& context, u32 _indexCount, void* indexGpuAddr, u32 instanceCount)
-{
-    context.DrawIndexedInstanced(_indexCount, instanceCount, 0, 0, 0);
-}
-
-void XC_ShaderManager::ClearShaderAndRenderStates(ID3DDeviceContext& context)
+void XC_ShaderContainer::ClearShaderAndRenderStates(ID3DDeviceContext& context)
 {
     for (u32 shaderIndex = 0; shaderIndex < ShaderType_Max; shaderIndex++)
     {

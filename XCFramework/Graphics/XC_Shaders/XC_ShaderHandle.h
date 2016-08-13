@@ -7,6 +7,7 @@
 #pragma once
 
 #include "Graphics/XC_Shaders/IShader.h"
+#include "Graphics/SharedDescriptorHeap.h"
 #include "Graphics/XC_Shaders/XC_VertexFormat.h"
 #include "Graphics/VertexBuffer.h"
 #include "Graphics/IndexBuffer.h"

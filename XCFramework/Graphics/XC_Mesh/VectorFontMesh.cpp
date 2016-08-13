@@ -35,7 +35,7 @@ void VectorFontMesh::DrawText(std::string text, XCVec3Unaligned& position, Rende
 {
     //Decrypt the text and fill up the FontData Buffer to draw
     //Calculate start world for every character
-    ICamera& cam = context.GetShaderManagerSystem().GetGlobalShaderData().m_camera;
+    ICamera& cam = context.GetGlobalShaderData().m_camera;
 
     u32 CharacterSpacing = 10;
     u32 charPosition = 0;
@@ -133,7 +133,7 @@ void VectorFontMesh::Draw(RenderContext& context)
     context.SetRasterizerState(RasterType_FillSolid);
     context.ApplyShader(m_shaderType);
 
-    XCShaderHandle* shader = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(m_shaderType);
+    XCShaderHandle* shader = (XCShaderHandle*)context.GetShader(m_shaderType);
 
     for (auto subMesh : m_subMeshesIdBuffer)
     {
@@ -155,7 +155,7 @@ void VectorFontMesh::DrawSubMesh(RenderContext & renderContext, u32 meshIndex, u
     m_shaderHandler->SetVertexBuffer(renderContext.GetDeviceContext(), m_subMeshes[meshIndex]->GetVertexBuffer());
     m_shaderHandler->SetIndexBuffer(renderContext.GetDeviceContext(), m_subMeshes[meshIndex]->GetIndexBuffer());
 
-    renderContext.GetShaderManagerSystem().DrawIndexedInstanced(renderContext.GetDeviceContext(),
+    renderContext.DrawIndexedInstanced(renderContext.GetDeviceContext(),
         m_subMeshes[meshIndex]->GetNoOfFaces() * 3,
         m_subMeshes[meshIndex]->GetIndexBuffer().GetIndexBufferInGPUMem(),
         instanceCount);

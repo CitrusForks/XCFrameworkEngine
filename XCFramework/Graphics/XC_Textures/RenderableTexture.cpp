@@ -6,8 +6,6 @@
 
 #include "GraphicsPrecompiledHeader.h"
 
-#if defined(XCGRAPHICS_DX11) || defined(XCGRAPHICS_GNM)
-
 #include "RenderableTexture.h"
 #include "Engine/Input/Directinput.h"
 #include "Graphics/SharedDescriptorHeap.h"
@@ -237,5 +235,3 @@ RenderableTexture::RenderedTextureInfo* RenderableTexture::GetRenderToTexture()
 
     return m_renderableTexture;
 }
-
-#endif

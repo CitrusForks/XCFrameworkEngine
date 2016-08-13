@@ -365,7 +365,7 @@ void Terrain::Draw(RenderContext& context)
     XCShaderHandle* shaderHandle = nullptr;
 
     // Set constants
-    ICamera& cam = context.GetShaderManagerSystem().GetGlobalShaderData().m_camera;
+    ICamera& cam = context.GetGlobalShaderData().m_camera;
     PerObjectBuffer perObject = {
         MatrixTranspose(m_World).GetUnaligned(),
         MatrixTranspose(m_World * cam.GetViewMatrix() * cam.GetProjectionMatrix()).GetUnaligned(),
@@ -377,13 +377,13 @@ void Terrain::Draw(RenderContext& context)
 
     if (m_useShaderType == ShaderType_LightTexture)
     {
-        shaderHandle = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(ShaderType_LightTexture);
+        shaderHandle = (XCShaderHandle*)context.GetShader(ShaderType_LightTexture);
         shaderHandle->SetConstantBuffer("PerObjectBuffer", context.GetDeviceContext(), *m_pCBPerObject);
         shaderHandle->SetResource("gDiffuseMap", context.GetDeviceContext(), m_textures[0]);
     }
     else if (m_useShaderType == ShaderType_TerrainMultiTexture)
     {
-        shaderHandle = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(ShaderType_TerrainMultiTexture);
+        shaderHandle = (XCShaderHandle*)context.GetShader(ShaderType_TerrainMultiTexture);
         shaderHandle->SetConstantBuffer("PerObjectBuffer", context.GetDeviceContext(), *m_pCBPerObject);
         shaderHandle->SetResource("gDiffuseMap",  context.GetDeviceContext(), m_textures[0]);
         shaderHandle->SetResource("gDiffuseMap1", context.GetDeviceContext(), m_textures[1]);
@@ -397,7 +397,7 @@ void Terrain::Draw(RenderContext& context)
     shaderHandle->SetVertexBuffer(context.GetDeviceContext(), &m_vertexPosNormTexBuffer);
     shaderHandle->SetIndexBuffer(context.GetDeviceContext(), m_indexBuffer);
 
-    context.GetShaderManagerSystem().DrawIndexedInstanced(context.GetDeviceContext(), m_indexBuffer.m_indexData.size(), m_indexBuffer.GetIndexBufferInGPUMem());
+    context.DrawIndexedInstanced(context.GetDeviceContext(), m_indexBuffer.m_indexData.size(), m_indexBuffer.GetIndexBufferInGPUMem());
 
     m_OBBHierarchy->Draw(context);
 }

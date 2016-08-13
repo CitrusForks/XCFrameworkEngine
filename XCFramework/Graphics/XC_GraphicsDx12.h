@@ -16,49 +16,52 @@ class XC_GraphicsDx12 : public XC_Graphics
 public:
     DECLARE_SYSTEMOBJECT_CREATION(XC_GraphicsDx12)
 
+#if defined(DEBUG_GRAPHICS_PIPELINE)
     struct Vertex
     {
         XCVec3 position;
         XCVec4 color;
     };
+#endif
 
     XC_GraphicsDx12(void);
     ~XC_GraphicsDx12(void);
     
     void                        Init(HWND _mainWnd, i32 _width, i32 _height, bool _enable4xMsaa);
-    IDXGISwapChain*             GetSwapChain()      { return m_pSwapChain;   }
-    
-    ID3DDevice*                 GetDevice()                     { return m_pD3DDevice; }
-    ID3DDeviceContext*          GetDeviceContext()              { return m_graphicsCommandList; }
-    
-    ID3DCommandAllocator*       GetDeviceCommandAllocator()     { return m_pCommandAllocator; }
-    ID3DCommandQueue*           GetCommandQueue()               { return m_pCommandQueue; }
-
-    void                        Update(f32 dt);
-    
     void                        BeginScene();
     void                        EndScene();
-    
+    void                        Update(f32 dt);
+    void                        Destroy();
+
+    ID3DDevice*                 GetDevice()                     { return m_pD3DDevice; }
+    ID3DDeviceContext*          GetDeviceContext()              { return m_graphicsCommandList; }
+
     void                        OnResize(i32 _width, i32 _height);
     void                        SetClearColor(XCVec4& color)    { m_clearColor = color; }
 
+    ID3DPipelineState*          GetPipelineState() { return m_pipelineState; }
+
+    CPU_DESCRIPTOR_HANDLE       GetRTVCPUDescHandler();
+    CPU_DESCRIPTOR_HANDLE       GetDSVCPUDescHandler();
+    ID3DDepthStencilView*       GetDepthStencilView(RenderTargetsType type);
+
+    void                        ClearRTVAndDSV(ID3D12GraphicsCommandList* cmdList);
+
+protected:
+    
+    static void                 SetResourceBarrier(ID3D12GraphicsCommandList* commandList, ID3D12Resource* resource, D3D12_RESOURCE_STATES StateBefore, D3D12_RESOURCE_STATES StateAfter);
+    
     void                        CreateDescriptorHeaps();
     void                        CreateGraphicPipelineStateObjects();
     void                        SetupRenderTargets();
     void                        SetupDepthView();
 
     void                        DebugTestGraphicsPipeline();
-    ID3D12PipelineState*        GetPipelineState() { return m_pipelineState; }
 
     ID3D12Resource*             GetCurrentFrameRenderTarget() { return m_renderTarget[m_frameIndex]; }
-    CPU_DESCRIPTOR_HANDLE       GetRTVCPUDescHandler();
-    CPU_DESCRIPTOR_HANDLE       GetDSVCPUDescHandler();
+    void                        WaitForPreviousFrameCompletion();
 
     void                        PresentRenderTarget(ID3D12GraphicsCommandList* cmdList);
-    void                        ClearRTVAndDSV(ID3D12GraphicsCommandList* cmdList);
-
-    static void                 SetResourceBarrier(ID3D12GraphicsCommandList* commandList, ID3D12Resource* resource, D3D12_RESOURCE_STATES StateBefore, D3D12_RESOURCE_STATES StateAfter);
-    void                        WaitForPreviousFrameCompletion();
 
 private:
     IDXGISwapChain3*            m_pSwapChain;
@@ -88,13 +91,13 @@ private:
     UINT64                      m_fenceValue;
 
     //FrameIndex
-    u32                m_frameIndex;
+    u32                         m_frameIndex;
 
     std::atomic<i32>            m_cmdListRefCount;
     CriticalSection             m_acquireCmdListRefCount;
 
     ID3D12RootSignature*        m_rootSignature;
-    ID3D12PipelineState*        m_pipelineState;
+    ID3DPipelineState*          m_pipelineState;
 
 #if defined(DEBUG_GRAPHICS_PIPELINE)
     // App resources.

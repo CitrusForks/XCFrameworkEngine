@@ -11,7 +11,10 @@
 #include <dxgi.h>
 
 #include "XC_GraphicsDx12.h"
+
 #include "Graphics/XC_Shaders/XC_VertexShaderLayout.h"
+#include "Graphics/SharedDescriptorHeap.h"
+
 #include "Libs/Dx12Helpers/d3dx12.h"
 
 XC_GraphicsDx12::XC_GraphicsDx12(void)
@@ -29,9 +32,6 @@ XC_GraphicsDx12::XC_GraphicsDx12(void)
 
 XC_GraphicsDx12::~XC_GraphicsDx12(void)
 {
-    ReleaseCOM(m_pD3DDevice);
-    ReleaseCOM(m_pdxgiFactory);
-    ReleaseCOM(m_pSwapChain);
 }
 
 void XC_GraphicsDx12::Init(HWND _mainWnd, i32 _width, i32 _height, bool _enable4xMsaa)
@@ -166,6 +166,13 @@ void XC_GraphicsDx12::Init(HWND _mainWnd, i32 _width, i32 _height, bool _enable4
 
     WaitForPreviousFrameCompletion();
     m_initDone = true;
+}
+
+void XC_GraphicsDx12::Destroy()
+{
+    ReleaseCOM(m_pD3DDevice);
+    ReleaseCOM(m_pdxgiFactory);
+    ReleaseCOM(m_pSwapChain);
 }
 
 void XC_GraphicsDx12::DebugTestGraphicsPipeline()
@@ -439,6 +446,12 @@ void XC_GraphicsDx12::ClearRTVAndDSV(ID3D12GraphicsCommandList* cmdList)
     cmdList->ClearDepthStencilView(m_pDSVDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 }
 
+ID3DDepthStencilView* XC_GraphicsDx12::GetDepthStencilView(RenderTargetsType type)
+{
+    XCASSERT(false);
+    return nullptr;
+}
+
 CPU_DESCRIPTOR_HANDLE XC_GraphicsDx12::GetRTVCPUDescHandler()
 {
     D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle(m_pRTVDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
@@ -468,7 +481,6 @@ void XC_GraphicsDx12::WaitForPreviousFrameCompletion()
 
 void XC_GraphicsDx12::OnResize(i32 _width, i32 _height)
 {
-#if defined(WIN_32)
     if (m_initDone)
     {
         m_ClientWidth = _width;
@@ -478,7 +490,6 @@ void XC_GraphicsDx12::OnResize(i32 _width, i32 _height)
         
         SetupViewPort();
     }
-#endif
 }
 
 #endif

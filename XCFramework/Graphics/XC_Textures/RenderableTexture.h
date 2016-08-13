@@ -6,8 +6,6 @@
 
 #pragma once
 
-#if defined(XCGRAPHICS_DX11) || defined(XCGRAPHICS_GNM)
-
 #include "Graphics/D3DConstantBuffer.h"
 
 class RenderableTexture
@@ -60,5 +58,3 @@ private:
     sce::Gnm::DepthRenderTarget m_gnmDepthTarget;
 #endif
 };
-
-#endif

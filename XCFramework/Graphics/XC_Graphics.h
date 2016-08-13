@@ -7,7 +7,7 @@
 #pragma once
 
 #include "Engine/System/ISystem.h"
-#include "Graphics/XC_Shaders/XC_ShaderManager.h"
+#include "Graphics/XC_Shaders/XC_ShaderContainer.h"
 #include "Graphics/RenderingPool.h"
 #include "Graphics/XC_Textures/RenderableTexture.h"
 #include "Graphics/RenderTargetTypes.h"
@@ -18,92 +18,78 @@ public:
     XC_Graphics(void);
     virtual ~XC_Graphics(void);
     
-    virtual  void                   Init(HWND _mainWnd, i32 _width, i32 _height, bool _enable4xMsaa);
-    ID3DDevice*                     GetDevice()         { return m_pD3DDevice; }
+    virtual void                    Init(HWND _mainWnd, i32 _width, i32 _height, bool _enable4xMsaa);
+    virtual void                    BeginScene();
+    virtual void                    EndScene();
+    virtual void                    BeginSecondaryScene();
+    virtual void                    EndSecondaryScene();
+    virtual void                    Update(f32 dt);
+    virtual void                    Destroy();
 
     virtual ID3DDeviceContext*      GetDeviceContext() = 0;
-    virtual ID3DCommandAllocator*   GetDeviceCommandAllocator() = 0;
-    virtual ID3DResource*           GetCurrentFrameRenderTarget() = 0;
     virtual CPU_DESCRIPTOR_HANDLE   GetRTVCPUDescHandler() = 0;
     virtual CPU_DESCRIPTOR_HANDLE   GetDSVCPUDescHandler() = 0;
-    virtual ID3DCommandQueue*       GetCommandQueue() = 0;
+    virtual ID3DDepthStencilView*   GetDepthStencilView(RenderTargetsType type) = 0;
+    virtual ID3DPipelineState*      GetPipelineState() { return nullptr; }
 
-    virtual void                SetupPipeline();
-    virtual void                SetupDevice();
-    virtual void                SetupSwapChain();
-    virtual void                SetupRenderTargets();
-    virtual void                SetupDepthStencilBuffer();
-    virtual void                SetupDepthStencilStates();
-    virtual void                SetupDepthView();
-    virtual void                SetupViewPort();
-    virtual void                SetupShadersAndRenderPool();
+    virtual void                    GoFullscreen(bool go);
+    virtual void                    OnResize(i32 _width, i32 _height);
 
-    virtual void                Destroy();
-    virtual void                Update(f32 dt);
-    virtual void                BeginScene();
-    virtual void                EndScene();
-    virtual void                BeginSecondaryScene();
-    virtual void                EndSecondaryScene();
+    virtual void                    SetClearColor(const XCVec4& color) { m_clearColor = color; }
 
-    virtual void                GoFullscreen(bool go);
+    virtual void                    TurnOffZ();
+    virtual void                    TurnOnZ();
+    virtual void                    SetLessEqualDepthStencilView(ID3DDeviceContext& context, bool turnOn);
+    virtual void                    ClearRTVAndDSV(ID3D12GraphicsCommandList* cmdList) {}
 
-    bool                        IsSecondaryDrawCall() { return m_secondaryDrawCall; }
-    void                        SetSecondaryDrawCall(bool isSecondary) { m_secondaryDrawCall = isSecondary; }
-    
-    virtual void                OnResize(i32 _width, i32 _height);
-    virtual void                SetClearColor(const XCVec4& color)           { m_clearColor = color; }
-
-    virtual void                TurnOffZ();
-    virtual void                TurnOnZ();
-    u32                GetMsaaQuality() { return m_4xMsaaQuality; }
-
-    virtual ID3D12PipelineState*    GetPipelineState() { return nullptr; }
-
-    XC_ShaderManager&               GetShaderManagerSystem() { return *m_XCShaderSystem; }
+    ID3DDevice*                     GetDevice() { return m_pD3DDevice; }
+    XC_ShaderContainer&             GetShaderManagerSystem() { return *m_XCShaderSystem; }
     RenderingPool&                  GetRenderingPool() { return *m_renderingPool; }
-
-#if defined(XCGRAPHICS_DX11) || defined(XCGRAPHICS_GNM)
     RenderableTexture&              GetRenderTexture(RenderTargetsType type) { return *m_renderTargets[type]; }
-#endif
 
-#if defined(XCGRAPHICS_DX11) 
-    virtual ID3DDepthStencilView&   GetDepthStencilView(RenderTargetsType type) = 0;
-#endif
-
-    virtual void                SetLessEqualDepthStencilView(ID3DDeviceContext& context, bool turnOn);
-    D3D_VIEWPORT&               GetViewPort(RenderTargetsType type) { return m_ScreenViewPort[type]; }
-    D3D_RECT&                   GetScissorRect() { return m_scissorRect; }
-    void                        PresentRenderTarget(ID3D12GraphicsCommandList* cmdList) {}
-    virtual void                ClearRTVAndDSV(ID3D12GraphicsCommandList* cmdList){}
+    u32                             GetMsaaQuality() { return m_4xMsaaQuality; }
+    D3D_VIEWPORT&                   GetViewPort(RenderTargetsType type) { return m_ScreenViewPort[type]; }
+    D3D_RECT&                       GetScissorRect() { return m_scissorRect; }
     
-#if defined(XCGRAPHICS_GNM)
-    virtual sce::Gnm::Sampler&  GetDefaultSampler() = 0;
-#endif
-    virtual i32                 GetUserId() { return 0; }
+    std::string                     GetDefaultWindowTitle();
+    void                            SetWindowTitle(std::string value);
 
-    std::string                 GetDefaultWindowTitle();
-    void                        SetWindowTitle(std::string value);
+    bool                            IsSecondaryDrawCall() { return m_secondaryDrawCall; }
+    void                            SetSecondaryDrawCall(bool isSecondary) { m_secondaryDrawCall = isSecondary; }
 
 protected:
-    ID3DDevice*                 m_pD3DDevice;
 
-    i32                         m_ClientWidth;
-    i32                         m_ClientHeight;
-    bool                        m_Enable4xMsaa;
+    virtual void                    SetupPipeline();
+    virtual void                    SetupDevice();
+    virtual void                    SetupSwapChain();
+    virtual void                    SetupRenderTargets();
+    virtual void                    SetupDepthStencilBuffer();
+    virtual void                    SetupDepthStencilStates();
+    virtual void                    SetupDepthView();
+    virtual void                    SetupViewPort();
+    virtual void                    SetupShadersAndRenderPool();
+
+    void                            PresentRenderTarget(ID3D12GraphicsCommandList* cmdList) {}
+
+protected:
+    ID3DDevice*                     m_pD3DDevice;
+    XC_ShaderContainer*             m_XCShaderSystem;
+
+    RenderingPool*                  m_renderingPool;
+    RenderableTexture*              m_renderTargets[RENDERTARGET_MAX];
     
-    HWND                        m_hMainWnd;
-    bool                        m_initDone;
+    D3D_VIEWPORT                    m_ScreenViewPort[RENDERTARGET_MAX];
+    D3D_RECT                        m_scissorRect;
 
-    XCVec4                      m_clearColor;
+    XCVec4                          m_clearColor;
+    bool                            m_secondaryDrawCall;
 
-#if defined(XCGRAPHICS_DX11) || defined(XCGRAPHICS_GNM)
-    RenderableTexture*          m_renderTargets[RENDERTARGET_MAX];
-#endif
-    bool                        m_secondaryDrawCall;
-    u32                m_4xMsaaQuality;
+    u32                             m_4xMsaaQuality;
+    bool                            m_Enable4xMsaa;
+
+    i32                             m_ClientWidth;
+    i32                             m_ClientHeight;
     
-    XC_ShaderManager*           m_XCShaderSystem;
-    RenderingPool*              m_renderingPool;
-    D3D_VIEWPORT                m_ScreenViewPort[RENDERTARGET_MAX];
-    D3D_RECT                    m_scissorRect;
+    HWND                            m_hMainWnd;
+    bool                            m_initDone;
 };

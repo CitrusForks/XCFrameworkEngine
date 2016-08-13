@@ -8,7 +8,6 @@
 
 #include "Car.h"
 #include "Graphics/XC_Shaders/XC_ShaderBufferConstants.h"
-#include "Graphics/XC_Shaders/XC_ShaderManager.h"
 #include "Graphics/XC_Shaders/XC_ShaderHandle.h"
 #include "Gameplay/XC_Camera/XC_CameraManager.h"
 #include "Engine/Resource/ResourceManager.h"
@@ -86,7 +85,7 @@ void Car::Steer(f32 angle, f32 scalarForce)
 void Car::Draw(RenderContext& context)
 {
     // Set constants
-    ICamera& cam = context.GetShaderManagerSystem().GetGlobalShaderData().m_camera;
+    ICamera& cam = context.GetGlobalShaderData().m_camera;
     PerObjectBuffer perObject = {
        MatrixTranspose(m_World).GetUnaligned(),
        MatrixTranspose(m_World * cam.GetViewMatrix() * cam.GetProjectionMatrix()).GetUnaligned(),

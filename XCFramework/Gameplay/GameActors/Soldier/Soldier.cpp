@@ -190,7 +190,7 @@ void Soldier::ApplyRotation(XCMatrix4& rotation)
 void Soldier::Draw(RenderContext& context)
 {
     // Set constants
-    ICamera& cam = context.GetShaderManagerSystem().GetGlobalShaderData().m_camera;
+    ICamera& cam = context.GetGlobalShaderData().m_camera;
 
     PerObjectBuffer perObject = {};
 

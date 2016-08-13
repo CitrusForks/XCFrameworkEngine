@@ -140,13 +140,13 @@ void SimpleSkyBox::Draw(RenderContext& context)
 
     // Set constants
     //Calculate wvp and set it to the constant.
-    ICamera& cam = context.GetShaderManagerSystem().GetGlobalShaderData().m_camera;
+    ICamera& cam = context.GetGlobalShaderData().m_camera;
 
     cbWVP wbuffer = { MatrixTranspose(m_World * cam.GetViewMatrix() * cam.GetProjectionMatrix()).GetUnaligned() };
     m_CBwvp->UploadDataOnGPU(context.GetDeviceContext(), &wbuffer, sizeof(cbWVP));
 
     // Set constants
-    XCShaderHandle* cubeMapShader = (XCShaderHandle*) context.GetShaderManagerSystem().GetShader(ShaderType_SimpleCubeMap);
+    XCShaderHandle* cubeMapShader = (XCShaderHandle*) context.GetShader(ShaderType_SimpleCubeMap);
 
     cubeMapShader->SetVertexBuffer(context.GetDeviceContext(), &m_vertexBuffer);
     cubeMapShader->SetIndexBuffer(context.GetDeviceContext(), m_indexBuffer);
@@ -154,7 +154,7 @@ void SimpleSkyBox::Draw(RenderContext& context)
     cubeMapShader->SetConstantBuffer("cbWVP", context.GetDeviceContext(), *m_CBwvp);
     cubeMapShader->SetResource("gCubeMap", context.GetDeviceContext(), m_cubeMapTexture);
     
-    context.GetShaderManagerSystem().DrawIndexedInstanced(context.GetDeviceContext(), 36, m_indexBuffer.GetIndexBufferInGPUMem());
+    context.DrawIndexedInstanced(context.GetDeviceContext(), 36, m_indexBuffer.GetIndexBufferInGPUMem());
     graphicsSystem.SetLessEqualDepthStencilView(context.GetDeviceContext(), false);
 }
 

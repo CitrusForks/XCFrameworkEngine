@@ -53,7 +53,7 @@ public:
 #endif
     
     u32*               m_cbDataBegin;
-    BufferType                  m_bufferType;
-    bool                        m_isInUse;
+    BufferType         m_bufferType;
+    bool               m_isInUse;
     u32                m_sizeOfBuffer;
 };

@@ -9,7 +9,7 @@
 #if defined(UNUSED)
 
 #include "Graphics/XC_PipelineStateObject/PSOManager_Dx12.h"
-#include "Graphics/XC_Shaders/XC_ShaderManager.h"
+#include "Graphics/XC_Shaders/XC_ShaderContainer.h"
 #include "Graphics/XC_GraphicsDx12.h"
 #include "Graphics/XC_Shaders/XC_VertexShaderLayout.h"
 #include "Assets/Packages/PackageConsts.h"

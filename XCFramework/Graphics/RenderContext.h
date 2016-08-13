@@ -6,45 +6,52 @@
 
 #pragma once
 
-#include "Graphics/XC_Shaders/XC_ShaderManager.h"
+#include "Assets/Packages/PackageConsts.h"
+
+#include "Graphics/RenderTargetTypes.h"
+#include "Graphics/XC_Shaders/GlobalShaderData.h"
 
 class XC_Graphics;
+class XC_ShaderContainer;
+class IShader;
 
 class RenderContext
 {
 public:
     RenderContext();
 
-    void                        Init(ID3DDevice* device, XC_ShaderManager& shaderMgr, bool clearStateOnBegin, bool clearStateOnFinish);
-    void                        BeginRender();
-    void                        FinishRender();
-    void                        ReleaseCommandList();
-    void                        Destroy();
+    void                                Init(ID3DDevice* device, XC_ShaderContainer* shaderMgr, bool clearStateOnBegin, bool clearStateOnFinish);
+    void                                BeginRender(RenderTargetsType targetType);
+    void                                FinishRender();
+    void                                Destroy();
 
-    ID3DDeviceContext&          GetDeviceContext() { return *m_deviceContext; }
+    ID3DDeviceContext&                  GetDeviceContext() { return *m_deviceContext; }
 
-#if defined(XCGRAPHICS_DX12)
-    ID3DCommandAllocator*       GetCommandAllocator() { return m_commandAllocator; }
-#elif defined(XCGRAPHICS_DX11)
-    ID3DCommandList&            GetCommandList() { return *m_commandList; }
-#endif
+    void                                SetRasterizerState(RasterType type);
+    void                                ApplyShader(ShaderType shaderType);
+    IShader*                            GetShader(ShaderType shaderType);
 
-    void                        SetRasterizerState(RasterType type);
-    void                        ApplyShader(ShaderType shaderType);
-    XC_ShaderManager&           GetShaderManagerSystem() { return *m_shaderManager; }
+    GlobalShaderData&                   GetGlobalShaderData();
+
+    void                                DrawNonIndexed(ID3DDeviceContext& context, u32 vertexCount);
+    void                                DrawIndexedInstanced(ID3DDeviceContext& context, u32 _indexCount, void* indexGpuAddr = nullptr, u32 instanceCount = 1);
+
+protected:
+    void                                ReleaseCommandList();
 
 private:
-    XC_ShaderManager*            m_shaderManager;
-    ID3DDeviceContext*           m_deviceContext;
+    XC_ShaderContainer*                   m_shaderManager;
+    ID3DDeviceContext*                  m_deviceContext;
 
 #if defined(XCGRAPHICS_DX12)
-    ID3DCommandAllocator*        m_commandAllocator;
+    ID3DCommandAllocator*               m_commandAllocator;
 #elif defined(XCGRAPHICS_DX11)
-    ID3DCommandList*             m_commandList;
+    ID3DCommandList*                    m_commandList;
 #endif
 
-    XC_Graphics*                 m_graphicsSystem;
-    bool                         m_clearStateOnBegin;
-    bool                         m_clearStateOnFinish;
-    XCVec4                       m_clearColor;
+    XC_Graphics*                        m_graphicsSystem;
+    XCVec4                              m_clearColor;
+
+    bool                                m_clearStateOnBegin;
+    bool                                m_clearStateOnFinish;
 };

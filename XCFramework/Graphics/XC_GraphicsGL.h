@@ -18,57 +18,41 @@ public:
     XC_GraphicsGL(void);
     virtual ~XC_GraphicsGL(void);
     
-    virtual  void               Init(HWND _mainWnd, i32 _width, i32 _height, bool _enable4xMsaa);
-    ID3DDevice*                 GetDevice()         { return m_pD3DDevice; }
-
-    virtual ID3DDeviceContext*      GetDeviceContext() { return nullptr; }
-    virtual ID3DCommandAllocator*   GetDeviceCommandAllocator() { return nullptr; }
-    virtual ID3DResource*           GetCurrentFrameRenderTarget() { return nullptr; }
-    virtual CPU_DESCRIPTOR_HANDLE   GetRTVCPUDescHandler() { return nullptr; }
-    virtual CPU_DESCRIPTOR_HANDLE   GetDSVCPUDescHandler() { return nullptr; }
-    virtual ID3DCommandQueue*       GetCommandQueue() { return nullptr; };
-
-    virtual void                SetupPipeline();
-    virtual void                SetupDevice();
-    virtual void                SetupSwapChain();
-    virtual void                SetupRenderTargets();
-    virtual void                SetupDepthStencilBuffer();
-    virtual void                SetupDepthStencilStates();
-    virtual void                SetupDepthView();
-    virtual void                SetupViewPort();
-    virtual void                SetupShadersAndRenderPool();
-
-    virtual void                Destroy();
-    virtual void                Update(f32 dt);
-    virtual void                BeginScene();
-    virtual void                EndScene();
-    virtual void                BeginSecondaryScene();
-    virtual void                EndSecondaryScene();
-
-    virtual void                GoFullscreen(bool go);
-
-    bool                        IsSecondaryDrawCall() { return m_secondaryDrawCall; }
-    void                        SetSecondaryDrawCall(bool isSecondary) { m_secondaryDrawCall = isSecondary; }
+    void                            Init(HWND _mainWnd, i32 _width, i32 _height, bool _enable4xMsaa);
+    void                            Destroy();
+    void                            Update(f32 dt);
+    void                            BeginScene();
+    void                            EndScene();
+    void                            BeginSecondaryScene();
+    void                            EndSecondaryScene();
     
-    virtual void                OnResize(i32 _width, i32 _height);
-    virtual void                SetClearColor(XCVec4 color)           { m_clearColor = color; }
+    ID3DDevice*                     GetDevice()         { return m_pD3DDevice; }
+    ID3DDeviceContext*              GetDeviceContext() { return nullptr; }
+    CPU_DESCRIPTOR_HANDLE           GetRTVCPUDescHandler() { return nullptr; }
+    CPU_DESCRIPTOR_HANDLE           GetDSVCPUDescHandler() { return nullptr; }
 
-    virtual void                TurnOffZ();
-    virtual void                TurnOnZ();
-    u32                GetMsaaQuality() { return m_4xMsaaQuality; }
+    void                            GoFullscreen(bool go);
 
-    virtual ID3D12PipelineState* GetPipelineState() { return nullptr; }
+    void                            OnResize(i32 _width, i32 _height);
 
-    XC_ShaderManager&           GetShaderManagerSystem() { return *m_XCShaderSystem; }
-    RenderingPool&              GetRenderingPool() { return *m_renderingPool; }
+    void                            TurnOffZ();
+    void                            TurnOnZ();
 
-    virtual void                SetLessEqualDepthStencilView(ID3DDeviceContext& context, bool turnOn);
-    D3D_VIEWPORT&               GetViewPort(RenderTargetsType type) { return m_ScreenViewPort[type]; }
-    D3D_RECT&                   GetScissorRect() { return m_scissorRect; }
-    void                        PresentRenderTarget(ID3D12GraphicsCommandList* cmdList) {}
-    virtual void                ClearRTVAndDSV(ID3D12GraphicsCommandList* cmdList){}
-    
-    virtual i32                 GetUserId() { return 0; }
+    void                            SetLessEqualDepthStencilView(ID3DDeviceContext& context, bool turnOn);
+    void                            ClearRTVAndDSV(ID3D12GraphicsCommandList* cmdList) {}
+
+protected:
+    void                            SetupPipeline();
+    void                            SetupDevice();
+    void                            SetupSwapChain();
+    void                            SetupRenderTargets();
+    void                            SetupDepthStencilBuffer();
+    void                            SetupDepthStencilStates();
+    void                            SetupDepthView();
+    void                            SetupViewPort();
+    void                            SetupShadersAndRenderPool();
+
+    void                            PresentRenderTarget(ID3D12GraphicsCommandList* cmdList) {}
 
 private:
 #if defined(DEBUG_GRAPHICS_PIPELINE)

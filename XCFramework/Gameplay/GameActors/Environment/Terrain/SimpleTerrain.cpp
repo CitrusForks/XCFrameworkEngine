@@ -11,7 +11,6 @@
 #include "Engine/Utils/EngineUtils.h"
 #include "Graphics/XC_Graphics.h"
 #include "Graphics/XC_Shaders/XC_ShaderBufferConstants.h"
-#include "Graphics/XC_Shaders/XC_ShaderManager.h"
 #include "Graphics/XC_Shaders/XC_ShaderHandle.h"
 #include "Graphics/VertexBuffer.h"
 #include "Graphics/IndexBuffer.h"
@@ -182,21 +181,21 @@ void SimpleTerrain::Draw(RenderContext& context)
     
     // Set constants
     cbWorld wbuffer = { MatrixTranspose(m_World).GetUnaligned() };
-    ICamera& cam = context.GetShaderManagerSystem().GetGlobalShaderData().m_camera;
+    ICamera& cam = context.GetGlobalShaderData().m_camera;
     
     cbWVP perObject = {
         MatrixTranspose(cam.GetViewMatrix() * cam.GetProjectionMatrix() * m_World).GetUnaligned(),
     };
     m_pCBPerObject->UploadDataOnGPU(context.GetDeviceContext(), &perObject, sizeof(PerObjectBuffer));
     
-    XCShaderHandle* solidColorShader = (XCShaderHandle*)context.GetShaderManagerSystem().GetShader(m_useShaderType);
+    XCShaderHandle* solidColorShader = (XCShaderHandle*)context.GetShader(m_useShaderType);
     solidColorShader->SetVertexBuffer(context.GetDeviceContext(), &m_vertexPosColorBuffer);
     solidColorShader->SetIndexBuffer(context.GetDeviceContext(), m_indexBuffer);
 
     solidColorShader->SetConstantBuffer("cbWVP", context.GetDeviceContext(), *m_pCBPerObject);
 
 
-    context.GetShaderManagerSystem().DrawIndexedInstanced(context.GetDeviceContext(), m_indexBuffer.m_indexData.size());
+    context.DrawIndexedInstanced(context.GetDeviceContext(), m_indexBuffer.m_indexData.size());
 }
 
 void SimpleTerrain::Destroy()

@@ -83,7 +83,7 @@ void Door::Update(f32 dt)
 void Door::Draw(RenderContext& context)
 {
     // Set constants
-    ICamera& cam = context.GetShaderManagerSystem().GetGlobalShaderData().m_camera;
+    ICamera& cam = context.GetGlobalShaderData().m_camera;
 
     PerObjectBuffer perObject = {
         MatrixTranspose(m_World).GetUnaligned(),

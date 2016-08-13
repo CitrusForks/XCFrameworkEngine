@@ -7,13 +7,13 @@
 #pragma once
 
 #include "Engine/System/ISystem.h"
-#include "Engine/GameplayBase/Camera/ICamera.h"
 
-#include "Gameplay/GameActors/IActor.h"
 #include "Gameplay/XC_Camera/XC_CameraTypes.h"
 
-#include "Graphics/XC_Shaders/XC_ShaderManager.h"
 #include "Graphics/XC_Graphics.h"
+
+class IActor;
+class ICamera;
 
 class XC_CameraManager : public ISystem
 {

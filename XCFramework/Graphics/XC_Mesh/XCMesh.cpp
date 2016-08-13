@@ -684,7 +684,7 @@ void XCMesh::DrawSubMesh(RenderContext& renderContext, u32 meshIndex)
     m_shaderHandler->SetVertexBuffer(renderContext.GetDeviceContext(), m_subMeshes[meshIndex]->GetVertexBuffer());
     m_shaderHandler->SetIndexBuffer(renderContext.GetDeviceContext(), m_subMeshes[meshIndex]->GetIndexBuffer());
 
-    renderContext.GetShaderManagerSystem().DrawIndexedInstanced(renderContext.GetDeviceContext(),
+    renderContext.DrawIndexedInstanced(renderContext.GetDeviceContext(),
         m_subMeshes[meshIndex]->GetNoOfFaces() * 3,
         m_subMeshes[meshIndex]->GetIndexBuffer().GetIndexBufferInGPUMem(),
         m_instanceCount);

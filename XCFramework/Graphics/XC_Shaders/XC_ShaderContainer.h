@@ -8,46 +8,36 @@
 
 #include "Graphics/XC_Shaders/XC_ShaderTypes.h"
 #include "Graphics/XC_Shaders/XC_RasterizerTypes.h"
-#include "Graphics/XC_Shaders/IShader.h"
-#include "Graphics/SharedDescriptorHeap.h"
+#include "Graphics/XC_Shaders/GlobalShaderData.h"
 
-#include "Engine/GameplayBase/Camera/GlobalCamera.h"
 #include "Engine/FlatBuffersInterface/FlatBuffersSystem.h"
 
-class XC_ShaderManager
+class IShader;
+class SharedDescriptorHeap;
+
+class XC_ShaderContainer
 {
 public:
-    
-    struct GlobalShaderData
-    {
-        GlobalCamera   m_camera;
-    };
+    XC_ShaderContainer(ID3DDevice& device);
+    ~XC_ShaderContainer(void);
 
-    XC_ShaderManager(ID3DDevice& device);
-    ~XC_ShaderManager(void);
+    void                        Init();
+    void                        LoadShaders();
+    void                        Destroy();
 
-    void                  Init();
-    void                  LoadShaders();
-    void                  Destroy();
+    void                        ApplyShader(ID3DDeviceContext& context, ShaderType _ShaderType);
+    void                        ClearShaderAndRenderStates(ID3DDeviceContext& context);
 
-    void                  SetRasterizerState(ID3DDeviceContext& context, RasterType type);
-    IShader*              GetShader(ShaderType shaderType);
+    void                        LoadRasterizers();
+    void                        LoadSamplers();
 
+    IShader*                    GetShader(ShaderType shaderType);
+    GlobalShaderData&           GetGlobalShaderData() { return m_globalShaderData; }
 #if defined(XCGRAPHICS_DX12)
-    ID3D12DescriptorHeap* GetSamplerDescriptorHeap() { return m_samplerHeap; }
+    ID3D12DescriptorHeap*       GetSamplerDescriptorHeap() { return m_samplerHeap; }
 #endif
 
-    void                  ApplyShader(ID3DDeviceContext& context, ShaderType _ShaderType);
-
-    void                  DrawNonIndexed(ID3DDeviceContext& context, u32 vertexCount);
-    void                  DrawIndexedInstanced(ID3DDeviceContext& context, u32 _indexCount, void* indexGpuAddr = nullptr, u32 instanceCount = 1);
-                          
-    void                  ClearShaderAndRenderStates(ID3DDeviceContext& context);
-                          
-    void                  LoadRasterizers();
-    void                  LoadSamplers();
-
-    GlobalShaderData&     GetGlobalShaderData() { return m_globalShaderData; }
+    void                        SetRasterizerState(ID3DDeviceContext& context, RasterType type);
 
 private:
 

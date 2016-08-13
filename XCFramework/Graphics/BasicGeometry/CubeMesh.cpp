@@ -156,7 +156,7 @@ void CubeMesh::Draw(RenderContext& context)
 
     if (m_useShaderType == ShaderType_LightTexture)
     {
-        LightTextureShader* lightTexShader = (LightTextureShader*)context.GetShaderManagerSystem().GetShader(ShaderType_LightTexture);
+        LightTextureShader* lightTexShader = (LightTextureShader*)context.GetShader(ShaderType_LightTexture);
         lightTexShader->setCBWorld(context.GetDeviceContext(), &wbuffer);
         lightTexShader->setCBInvTransposeMatrix(context.GetDeviceContext(), &invTransWorld);
         lightTexShader->setCBMatTexPerObject(context.GetDeviceContext(), &matTexPerObject);
@@ -165,11 +165,11 @@ void CubeMesh::Draw(RenderContext& context)
     else
     {
         //Solid Shader
-        SolidColorShader* solidColorShader = (SolidColorShader*)context.GetShaderManagerSystem().GetShader(ShaderType_SolidColor);
+        SolidColorShader* solidColorShader = (SolidColorShader*)context.GetShader(ShaderType_SolidColor);
         solidColorShader->setCBWorld(context.GetDeviceContext(), wbuffer);
     }
 
-    context.GetShaderManagerSystem().DrawIndexedInstanced(context.GetDeviceContext(), 36);
+    context.DrawIndexedInstanced(context.GetDeviceContext(), 36);
 #endif
 }
 

@@ -8,6 +8,11 @@
 
 #include "XC_CameraManager.h"
 
+#include "Engine/GameplayBase/Camera/ICamera.h"
+
+#include "Graphics/XC_Shaders/XC_ShaderContainer.h"
+
+#include "Gameplay/GameActors/IActor.h"
 #include "Gameplay/XC_Camera/BasicCamera.h"
 #include "Gameplay/XC_Camera/FirstPersonCamera.h"
 #include "Gameplay/XC_Camera/ThirdPersonCamera.h"
@@ -93,7 +98,7 @@ void XC_CameraManager::Update(f32 dt)
     m_Cameras[m_currentCameraType]->Update(dt);
 
     //Set the global camera with the current camera values.
-    XC_ShaderManager& shaderSystem = m_graphicsSystem->GetShaderManagerSystem();
+    XC_ShaderContainer& shaderSystem = m_graphicsSystem->GetShaderManagerSystem();
     shaderSystem.GetGlobalShaderData().m_camera.SetProjectionMatrix(GetProjMatrix());
     shaderSystem.GetGlobalShaderData().m_camera.SetViewMatrix(GetViewMatrix());
     shaderSystem.GetGlobalShaderData().m_camera.SetPosition(GetCameraPosition());
