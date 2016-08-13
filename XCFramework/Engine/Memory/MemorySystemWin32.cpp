@@ -74,7 +74,7 @@ void* MemorySystemWin32::AllocateBytes(size_t size)
 
     if (ptrToBlock)
     {
-        memset(ptrToBlock, NEW_MEM_PATTERN, size);
+        memset(ptrToBlock, NewMemPattern, size);
 
         m_freeSize = m_freeSize - size;
 
@@ -115,7 +115,7 @@ void MemorySystemWin32::DeleteAlloc(void** ptrToBlock)
             //Garbage the contents by size in allocated bytes list
             u32 allocatedBytes = std::abs((int)m_allocatedBytesList[i].m_nbOfBytes);
 
-            memset(t, DELETE_MEM_PATTERN, allocatedBytes);
+            memset(t, DeleteMemPattern, allocatedBytes);
 
             //Found the block, make it invalid by negating the block
             m_allocatedBytesList[i].m_nbOfBytes *= -1;
@@ -174,7 +174,7 @@ void* MemorySystemWin32::FindBlock(u32 sizeOfType)
             if (m_allocatedBytesList[allocatedBytesIndex].m_nbOfBytes <= 0)
             {
                 //That means it's a free block, see if it fits for sizeOfType, may be here the diff cases can be searched for. Best fit, first fit.
-                if (std::abs((int)m_allocatedBytesList[allocatedBytesIndex].m_nbOfBytes) >= sizeOfType)
+                if ((u32)std::abs((int)m_allocatedBytesList[allocatedBytesIndex].m_nbOfBytes) >= sizeOfType)
                 {
                     //Found the block, return the address.
                     return pStart += offsetByte;
@@ -207,7 +207,7 @@ u32 MemorySystemWin32::FindBlockFromAllocated(u32 sizeOfType)
         if (m_allocatedBytesList[allocatedBytesIndex].m_nbOfBytes <= 0)
         {
             //That means it's a free block, see if it fits for sizeOfType, may be here the diff cases can be searched for. Best fit, first fit.
-            if (std::abs((int)m_allocatedBytesList[allocatedBytesIndex].m_nbOfBytes) >= sizeOfType)
+            if ((u32)std::abs((int)m_allocatedBytesList[allocatedBytesIndex].m_nbOfBytes) >= sizeOfType)
             {
                 //Found the block, return the address.
                 return allocatedBytesIndex;

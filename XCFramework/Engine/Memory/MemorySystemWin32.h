@@ -15,8 +15,8 @@ public:
 
     static const u32                AlignmentBoundary   = 16;
 
-    static const u32                NEW_MEM_PATTERN     = 0x0;
-    static const u32                DELETE_MEM_PATTERN  = -41;
+    static const u32                NewMemPattern       = 0x0;
+    static const u32                DeleteMemPattern    = -41;
 
     //Add more info to this. Its like header to every allocated memory.
     struct AllocInfo
