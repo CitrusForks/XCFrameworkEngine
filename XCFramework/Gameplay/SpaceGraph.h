@@ -6,15 +6,16 @@
 
 #pragma once
 
-#include "Gameplay/GameActors/IActor.h"
+#include "Matter.h"
 
 class XC_Graphics;
 
-class SceneGraph
+//SpaceGraph is a collection of Matter that consumes some physical space.
+class SpaceGraph
 {
 public:
-    SceneGraph();
-    virtual ~SceneGraph();
+    SpaceGraph();
+    virtual ~SpaceGraph();
 
     virtual void            Init() {}
     virtual void            Update(f32 dt) {}
@@ -22,4 +23,5 @@ public:
     virtual void            Destroy() {}
 
 private:
+    std::vector<Matter*>    m_matterList;
 };

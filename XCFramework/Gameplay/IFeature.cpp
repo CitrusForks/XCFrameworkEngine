@@ -6,14 +6,14 @@
 
 #include "GameplayPrecompiledHeader.h"
 
-#include "SceneGraph.h"
+#include "IFeature.h"
 
-SceneGraph::SceneGraph()
+IFeature::IFeature()
 {
 
 }
 
-SceneGraph::~SceneGraph()
+IFeature::~IFeature()
 {
 
 }

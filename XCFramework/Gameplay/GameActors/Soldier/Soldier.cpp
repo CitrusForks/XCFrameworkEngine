@@ -210,7 +210,7 @@ void Soldier::Draw(RenderContext& context)
         static XCMatrix4 rotation = MatrixRotationX(XC_PI);
 
         XCMatrix4 transform(m_pMesh->GetResource<XCMesh>()->GetRootTransform());
-        //transform = scaling * transform;
+        transform = scaling * transform;
 
         perObject = {
             MatrixTranspose(transform).GetUnaligned(),
