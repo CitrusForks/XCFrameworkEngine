@@ -588,18 +588,16 @@ void XCMesh::Update(f32 dt)
 
             m_sceneAnimator->Calculate(time);
             m_lastPlayedAnimTime = (f32)g_dCurrent;
-            /*
+
             if (m_lastPlayedAnimTime > anim->mDuration)
             {
-                Logger("Resetting @ %f", currentTime);
                 m_lastPlayedAnimTime = 0.0f;
             }
             else
             {
-                Logger("Updating @ %f", currentTime);
                 m_lastPlayedAnimTime += dt;
             }
-            */
+
         }
     }
 }

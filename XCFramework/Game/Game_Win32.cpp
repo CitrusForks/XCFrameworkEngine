@@ -70,7 +70,7 @@ i32 Game_Win32::Init()
 
     //Initialize memory System
     m_memorySystem = (MemorySystem*)&m_systemContainer->CreateNewSystem("MemorySystem");
-    m_memorySystem->Init(1024 * 1024);
+    m_memorySystem->Init(1024 * 1024 * 1024);
 
     //Event Broadcaster
     m_eventBroadcaster = (EventBroadcaster*)&m_systemContainer->CreateNewSystem("EventBroadcaster");

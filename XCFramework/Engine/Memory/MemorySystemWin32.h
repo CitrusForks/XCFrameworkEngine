@@ -21,12 +21,12 @@ public:
     //Add more info to this. Its like header to every allocated memory.
     struct AllocInfo
     {
-        AllocInfo(u32 bytes)
+        AllocInfo(i32 bytes)
         {
             m_nbOfBytes = bytes;
         }
 
-        u32     m_nbOfBytes;
+        i32     m_nbOfBytes;
     };
 
 

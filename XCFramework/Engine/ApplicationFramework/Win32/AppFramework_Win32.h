@@ -20,7 +20,7 @@ public:
     virtual i32             Init();
     virtual void            OnResize()       = 0;
     virtual void            Run();
-    virtual void            Update(f32 dt) = 0;
+    virtual void            Update(f32 dt)   = 0;
     virtual void            Draw()           = 0;
     virtual void            EnableFullScreenMode(bool enable) {}
     virtual void            Destroy();
@@ -35,8 +35,9 @@ protected:
     virtual void            CalculateFramesPerSecond(f32 dt) {}	//Call from update method
 
     bool                    m_appInitialized;
+
 private:
     __int64                 m_cntsPerSec = 0;
-    f32                   m_secsPerCnt;
+    f32                     m_secsPerCnt;
     __int64                 m_prevTimeStamp;
 };

@@ -28,7 +28,7 @@ public:
 
 protected:
     //Override these methods, if you need to change working
-    virtual void            CalculateFramesPerSecond(f32 dt) {}	//Call from update method
+    virtual void            CalculateFramesPerSecond(f32 dt) {} //Call from update method
     
     //Customized data members
     std::string             m_MainWndCaption;

@@ -55,7 +55,7 @@ public:
 private:
     
     std::map<std::string, ResourceHandle>  m_ResourcePool;
-    std::vector<u64>             m_PackagePoolTaskThreadId;
+    std::vector<u64>                       m_PackagePoolTaskThreadId;
                                            
     ResourceFactory*                       m_resourceFactory;
     TaskManager*                           m_taskManager;

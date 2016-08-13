@@ -34,7 +34,7 @@ public:
     virtual void                            Load(const void* buffer)                            override;
     virtual void                            Unload()                                            override;
     virtual void                            UpdateState()                                       override;
-    virtual void                            Update(f32 dt)                                    override;
+    virtual void                            Update(f32 dt)                                      override;
     virtual void                            Destroy()                                           override;
 
     virtual void                            Load(std::string fileName, f32 intialScaling = 1.0f);
@@ -85,7 +85,7 @@ protected:
     const aiScene*                          m_scene;
     SceneAnimator*                          m_sceneAnimator;
     Assimp::Importer                        m_importer;
-    f32                                   m_lastPlayedAnimTime;
+    f32                                     m_lastPlayedAnimTime;
 
 #if CUSTOM_ANIMATION
     MeshNode*                               m_meshRootNode; //Root node of the mesh.
@@ -97,7 +97,7 @@ protected:
     XCVec3Unaligned                         m_globalRotation;
     XCVec3Unaligned                         m_globalScaling;
 
-    u32                            m_instanceCount;
+    u32                                     m_instanceCount;
 
     //This buffer is created based on the shader type
     struct InstanceBuffer

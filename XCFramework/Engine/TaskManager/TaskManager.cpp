@@ -116,7 +116,7 @@ void TaskManager::UnregisterAllTasks()
 
 void TaskManager::Update()
 {
-        for(u32 i=0; i < m_taskQueue.size(); i++)
+        for(u32 i = 0; i < m_taskQueue.size(); i++)
         {
             switch(m_taskQueue[i]->GetState())
             {
