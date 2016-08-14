@@ -20,8 +20,17 @@ XC_Graphics::~XC_Graphics(void)
 
 void XC_Graphics::Destroy()
 {
-    m_XCShaderSystem->Destroy();
-    m_renderingPool->Destroy();
+    if (m_XCShaderSystem)
+    {
+        m_XCShaderSystem->Destroy();
+        XCDELETE(m_XCShaderSystem);
+    }
+
+    if (m_renderingPool)
+    {
+        m_renderingPool->Destroy();
+        XCDELETE(m_renderingPool);
+    }
 }
 
 void XC_Graphics::Init(HWND _mainWnd, i32 _width, i32 _height, bool _enable4xMsaa)

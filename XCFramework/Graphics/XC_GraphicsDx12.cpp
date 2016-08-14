@@ -170,6 +170,23 @@ void XC_GraphicsDx12::Init(HWND _mainWnd, i32 _width, i32 _height, bool _enable4
 
 void XC_GraphicsDx12::Destroy()
 {
+    ReleaseCOM(m_pCommandAllocator);
+    ReleaseCOM(m_pCommandQueue);
+    ReleaseCOM(m_graphicsCommandList);
+    ReleaseCOM(m_renderTarget[0]);
+    ReleaseCOM(m_renderTarget[1]);
+    ReleaseCOM(m_pRTVDescriptorHeap);
+    ReleaseCOM(m_depthStencilResource);
+    ReleaseCOM(m_pDSVDescriptorHeap);
+    ReleaseCOM(m_constantBuffersHeap);
+    ReleaseCOM(m_rootSignature);
+    ReleaseCOM(m_pipelineState);
+
+#if defined(DEBUG_GRAPHICS_PIPELINE)
+    ReleaseCOM(m_vertexBuffer);
+    ReleaseCOM(m_vertexBufferView);
+#endif
+
     ReleaseCOM(m_pD3DDevice);
     ReleaseCOM(m_pdxgiFactory);
     ReleaseCOM(m_pSwapChain);

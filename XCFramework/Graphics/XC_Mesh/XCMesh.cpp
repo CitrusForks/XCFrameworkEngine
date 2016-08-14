@@ -36,6 +36,8 @@ void XCMesh::Init(i32 resourceId, std::string userFriendlyName)
 
 XCMesh::~XCMesh(void)
 {
+    Unload();
+
     if (m_sceneAnimator)
     {
         XCDELETE(m_sceneAnimator);
@@ -85,7 +87,6 @@ void XCMesh::Unload()
     }
 
     m_boneBuffers.clear();
-
 
     for (auto& subMesh : m_subMeshes)
     {

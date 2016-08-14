@@ -186,6 +186,7 @@ void ResourceManager::Destroy()
 
     m_resourceLoaderTask->Destroy();
     m_taskManager->UnregisterTask(m_resourceLoaderTask->GetThreadId());
+    XCDELETE(m_resourceLoaderTask);
 
     m_ResourcePool.clear();
 

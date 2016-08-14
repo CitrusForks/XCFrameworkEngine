@@ -22,6 +22,12 @@ public:
 
     ~IndexBuffer()
     {
+#if defined(XCGRAPHICS_DX11)
+        ReleaseCOM(m_pIB);
+#elif defined(XCGRAPHICS_DX12)
+        ReleaseCOM(m_pIndexBufferResource);
+        ReleaseCOM(m_pIndexBufferUploadResource);
+#endif
     }
 
     void UpdateState() override;

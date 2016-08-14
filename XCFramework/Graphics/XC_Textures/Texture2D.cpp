@@ -21,9 +21,7 @@ Texture2D::Texture2D()
     m_resourceType = RESOURCETYPE_TEXTURE2D;
     m_diffuseMapTextureSRV = nullptr;
 
-#if defined(XCGRAPHICS_DX12)
-    m_diffuseMapTextureSRVUpload = XCNEW(D3DConstantBuffer)(BUFFERTYPE_SRV);
-#endif
+
 }
 
 Texture2D::Texture2D(D3DConstantBuffer* srv)
@@ -38,6 +36,10 @@ Texture2D::~Texture2D()
 
 void Texture2D::LoadTexture()
 {
+#if defined(XCGRAPHICS_DX12)
+    m_diffuseMapTextureSRVUpload = XCNEW(D3DConstantBuffer)(BUFFERTYPE_SRV);
+#endif
+
     XC_Graphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XC_Graphics>("GraphicsSystem");
 
     size_t cSize = strlen(m_resourcePath.c_str()) + 1;

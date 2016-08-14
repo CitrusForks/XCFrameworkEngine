@@ -9,9 +9,21 @@
 #include "D3DConstantBuffer.h"
 
 D3DConstantBuffer::D3DConstantBuffer(BufferType type)
-    : m_bufferType(type)
+    : m_cbResource(nullptr)
+    , m_cbDataBegin(nullptr)
+    , m_bufferType(type)
+    , m_isInUse(false)
+    , m_sizeOfBuffer(0)
 {
-    m_isInUse = false;
+#if defined(XCGRAPHICS_DX11)
+    m_gpuHandle = nullptr;
+    m_cpuHandle = nullptr;
+#endif
+}
+
+D3DConstantBuffer::~D3DConstantBuffer()
+{
+    Release();
 }
 
 void D3DConstantBuffer::UploadZeroMemoryDataOnGPU(ID3DDeviceContext& context, u32 sizeOfBuffer)
@@ -48,9 +60,16 @@ void D3DConstantBuffer::UploadDataOnGPU(ID3DDeviceContext& context, void* buffer
 
 void D3DConstantBuffer::Release()
 {
-#if defined(XCGRAPHICS_DX12)
+    if (m_cbDataBegin)
+    {
+        //Dx12 : Not sure of this. Because the m_cbResource gpu memory is mapped on cpu and is controlled by dx. Anyway if at all the memory is not deallocated, it will be.
+        delete m_cbDataBegin;
+    }
+
     ReleaseCOM(m_cbResource);
-#elif defined(XCGRAPHICS_DX11)
+
+#if defined(XCGRAPHICS_DX11)
+    ReleaseCOM(m_cpuHandle);
     ReleaseCOM(m_gpuHandle);
 #endif
 }

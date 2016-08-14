@@ -9,10 +9,10 @@
 #include "Network/Client.h"
 
 #if defined(XCGRAPHICS_DX11)
-#include "Graphics/XC_Graphics.h"
 #include "Graphics/XC_Textures/RenderableTexture.h"
 #endif
 
+class XC_Graphics;
 class DirectInput;
 
 static const char* IP_ADDRESS = "192.168.1.101";

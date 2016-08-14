@@ -29,6 +29,9 @@ Client::Client(void)
 Client::~Client(void)
 {
 #if defined(WIN32)
+    XCDELETE(m_pFdSetDesc);
+    XCDELETE(m_pTimeOut);
+
     closesocket(m_socket);
     WSACleanup();
 #endif

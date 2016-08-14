@@ -7,7 +7,8 @@
 #pragma once
 
 #include "Gameplay/GameStates/IGameState.h"
-#include "Engine/TaskManager/Task/ITask.h"
+
+class ITask;
 
 namespace GameState
 {

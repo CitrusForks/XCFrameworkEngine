@@ -97,6 +97,8 @@ bool XC3DSMeshLoader::loadMeshFromFile(std::string fileName, XCMesh* const outMe
                 pObjectName[i] = '\0';
                 subMesh->SetObjectName(pObjectName);
 
+                XCDELETEARRAY(pObjectName);
+
                 //cout<<"Object Name : "<< obj.objectName;
 #if defined(WRITE_DATA_TO_FILE)
                 fprintf(outFile, "Object Name : %s\n",  pObjectName);

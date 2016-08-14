@@ -21,11 +21,15 @@ void MeshData::Destroy()
     m_vertices.clear();
     m_mapCoord.clear();
     m_faces.clear();
+
+    if (m_vertexBuffer)
+    {
+        XCDELETE(m_vertexBuffer);
+    }
 }
 
 void MeshData::Init()
 {
-    m_objectName = XCNEW(char)[20];
     m_noOfVertices = 0;
     m_noOfFaces = 0;
 

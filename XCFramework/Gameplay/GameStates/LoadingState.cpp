@@ -9,10 +9,12 @@
 #include "Gameplay/GameStates/LoadingState.h"
 #include "Gameplay/GameStates/GameStateTypes.h"
 
-#include "Engine/Resource/ResourceManager.h"
-#include "Graphics/XC_Graphics.h"
+#include "Engine/TaskManager/Task/ITask.h"
 #include "Engine/TaskManager/TaskManager.h"
+#include "Engine/Resource/ResourceManager.h"
 #include "Engine/Resource/LoadPackageFileFBTask.h"
+
+#include "Graphics/XC_Graphics.h"
 #include "Graphics/BasicGeometry/MeshGeneratorSystem.h"
 
 #include "Assets/Packages/PackageConsts.h"
@@ -25,6 +27,10 @@ LoadingState::LoadingState(void)
 
 LoadingState::~LoadingState(void)
 {
+    if (m_loadPackageTask)
+    {
+        XCDELETE(m_loadPackageTask);
+    }
 }
 
 void LoadingState::Init()
@@ -74,4 +80,9 @@ void LoadingState::Destroy()
 
     TaskManager& taskMgr = SystemLocator::GetInstance()->RequestSystem<TaskManager>("TaskManager");
     taskMgr.UnregisterTask(m_loadPackageTask->GetThreadId());
+
+    //Keep the task in memory until this LoadingState object is deleted. This is beacuse, the flat buffer instance remains until the its parent object exists.
+    //In LoadPackageFileFBTask we have already requested to load and the fb pointer remains active until the object is deleted. So if we delete here, 
+    //then the buffer pointers to every resource load request becomes dangling, as fb pointer is released.
+    //XCDELETE(m_loadPackageTask);
 }

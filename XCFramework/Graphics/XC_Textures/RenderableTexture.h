@@ -14,8 +14,16 @@ public:
 
     struct RenderedTextureInfo
     {
-        u8*  m_texData;
-        u32    m_texSize;
+        ~RenderedTextureInfo()
+        {
+            if (m_texData)
+            {
+                XCDELETE(m_texData);
+            }
+        }
+
+        u8*     m_texData;
+        u32     m_texSize;
     };
 
     RenderableTexture(ID3DDevice& device, ID3DDeviceContext& context);

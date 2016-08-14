@@ -209,6 +209,10 @@ void Game_Win32::EnableFullScreenMode(bool enable)
 
 void Game_Win32::Destroy()
 {
+#if defined(LIVE_DRIVE_ENABLED)
+    XCDELETE(m_liveDriveClient);
+#endif
+
     m_gameFSM->Destroy();
     m_cameraManagingSystem->Destroy();
     m_directInputSystem->Destroy();

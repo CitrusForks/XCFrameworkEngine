@@ -28,7 +28,14 @@ public:
     }
 
     ~VertexBuffer()
-    {}
+    {
+#if defined(XCGRAPHICS_DX11)
+        ReleaseCOM(m_pVB);
+#else defined(XCGRAPHICS_DX12)
+        ReleaseCOM(m_pVertexBufferResource);
+        ReleaseCOM(m_pVertexBufferUploadResource);
+#endif
+    }
 
     void operator =(const VertexBuffer& vertexBuffer)
     {

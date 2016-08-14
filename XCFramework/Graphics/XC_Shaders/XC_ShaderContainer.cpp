@@ -7,11 +7,11 @@
 #include "GraphicsPrecompiledHeader.h"
 
 #include "Graphics/XC_Shaders/IShader.h"
-#include "Graphics/SharedDescriptorHeap.h"
 #include "Graphics/XC_Shaders/XC_ShaderContainer.h"
 #include "Graphics/XC_Shaders/XC_ShaderTypes.h"
 #include "Graphics/XC_Shaders/XC_VertexShaderLayout.h"
 #include "Graphics/XC_Shaders/XC_ShaderHandle.h"
+#include "Graphics/SharedDescriptorHeap.h"
 
 #if !defined(LOAD_SHADERS_FROM_DATA)
 #include "Graphics/XC_Shaders/src/DefaultShader.h"
@@ -75,6 +75,7 @@ void XC_ShaderContainer::Destroy()
         if (m_Shaders[(ShaderType)shaderIndex] != nullptr)
         {
             m_Shaders[(ShaderType)shaderIndex]->Destroy();
+            XCDELETE(m_Shaders[(ShaderType)shaderIndex]);
         }
     }
     m_Shaders.clear();

@@ -10,8 +10,6 @@
 #include "Libs/Dx12Helpers/d3dx12.h"
 #endif
 
-#include "Graphics/Utils/GraphicUtils.h"
-
 enum BufferType
 {
     BUFFERTYPE_SRV,
@@ -36,24 +34,20 @@ class D3DConstantBuffer
 public:
 
     explicit D3DConstantBuffer(BufferType type);
+    ~D3DConstantBuffer();
+
+    void Release();
 
     void UploadZeroMemoryDataOnGPU(ID3DDeviceContext& context, u32 sizeOfBuffer);
     void UploadDataOnGPU(ID3DDeviceContext& context, void* buffer, u32 sizeOfBuffer);
-    void Release();
 
-#if defined(XCGRAPHICS_DX12)
     //Constant buffer heap
-    ID3D12Resource*             m_cbResource;
-    D3D12_GPU_DESCRIPTOR_HANDLE m_gpuHandle;
-    D3D12_CPU_DESCRIPTOR_HANDLE m_cpuHandle;
-#else
-    ID3D11Buffer*               m_cpuHandle;    //Unused?
-    ID3D11Buffer*               m_gpuHandle;
-    D3DShaderResourceView*      m_cbResource;   //SRV
-#endif
+    GPU_DESCRIPTOR_HANDLE        m_gpuHandle;
+    CPU_DESCRIPTOR_HANDLE        m_cpuHandle;
+    ID3DShaderResourceView*      m_cbResource;
     
-    u32*               m_cbDataBegin;
-    BufferType         m_bufferType;
-    bool               m_isInUse;
-    u32                m_sizeOfBuffer;
+    u32*                         m_cbDataBegin;
+    BufferType                   m_bufferType;
+    bool                         m_isInUse;
+    u32                          m_sizeOfBuffer;
 };

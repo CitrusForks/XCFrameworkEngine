@@ -67,6 +67,7 @@ D3DConstantBuffer* SharedDescriptorHeap::CreateBufferView(D3DBufferDesc& desc)
                 IID_PPV_ARGS(&constBuffer->m_cbResource)));
 
             //Map the above heap with the actual cb on CPU. Keep it mapped.
+            //TODO: Need to analyze whether the cpu mapped memory is released when cbResource is released. Check the dtor of D3DConstantBuffer.
             ValidateResult(constBuffer->m_cbResource->Map(0, nullptr, reinterpret_cast<void**>(&constBuffer->m_cbDataBegin)));
 
             D3D12_CONSTANT_BUFFER_VIEW_DESC cbDesc = {};

@@ -108,9 +108,9 @@ static D3D_INPUT_LAYOUT_DESC GetInputLayoutFromVertexFormat(VertexFormat format)
     return layout;
 }
 
-static D3D12_INPUT_LAYOUT_DESC GetInputLayoutFromSemantics(std::vector<std::string>& semanticNames)
+static D3D_INPUT_LAYOUT_DESC GetInputLayoutFromSemantics(std::vector<std::string>& semanticNames)
 {
-    D3D12_INPUT_LAYOUT_DESC layout = {};
+    D3D_INPUT_LAYOUT_DESC layout = {};
 
     VertexFormat format = GetVertexFormatFromSematicNames(semanticNames);
     layout = GetInputLayoutFromVertexFormat(format);

@@ -30,24 +30,26 @@ XC_GraphicsDx11::XC_GraphicsDx11(void)
 
 XC_GraphicsDx11::~XC_GraphicsDx11(void)
 {
-    XCDELETE(m_XCShaderSystem);
-    XCDELETE(m_renderingPool);
-    XCDELETE(m_renderTargets[RENDERTARGET_MAIN_0]);
-    XCDELETE(m_renderTargets[RENDERTARGET_LIVEDRIVE]);
 }
 
 void XC_GraphicsDx11::Destroy()
 {
-    m_XCShaderSystem->Destroy();
-    m_renderingPool->Destroy();
+    XC_Graphics::Destroy();
 
     m_renderTargets[RENDERTARGET_MAIN_0]->Destroy();
     m_renderTargets[RENDERTARGET_LIVEDRIVE]->Destroy();
+
+    XCDELETE(m_renderTargets[RENDERTARGET_MAIN_0]);
+    XCDELETE(m_renderTargets[RENDERTARGET_LIVEDRIVE]);
 
     ReleaseCOM(m_pD3DDeviceContext);
     ReleaseCOM(m_pD3DDevice);
     ReleaseCOM(m_pdxgiFactory);
     ReleaseCOM(m_pSwapChain);
+    ReleaseCOM(m_pRenderTargetView);
+    ReleaseCOM(m_pDepthStencilBuffer);
+    ReleaseCOM(m_pDepthStencilView);
+    ReleaseCOM(m_depthDisabledStencilState);
 }
 
 void XC_GraphicsDx11::Init(HWND _mainWnd, i32 _width, i32 _height, bool _enable4xMsaa)

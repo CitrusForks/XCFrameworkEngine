@@ -24,7 +24,6 @@ LiveDriveTexturePlane::LiveDriveTexturePlane(XCVec4& p1, XCVec4& p2, XCVec4& p3)
 
 LiveDriveTexturePlane::~LiveDriveTexturePlane()
 {
-    XCDELETE(m_liveDriveTexture);
 }
 
 void LiveDriveTexturePlane::PreLoad(const void* fbBuffer)
@@ -63,5 +62,7 @@ void LiveDriveTexturePlane::Draw(RenderContext& renderContext)
 void LiveDriveTexturePlane::Destroy()
 {
     TexturedPlane::Destroy();
+
     m_liveDriveTexture->Destroy();
+    XCDELETE(m_liveDriveTexture);
 }

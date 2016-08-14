@@ -31,8 +31,7 @@ World::World()
 
 World::~World(void)
 {
-    XCDELETE(m_worldPendingTasks);
-    XCDELETE(m_worldCollisionTask);
+    
 }
 
 void World::Init(TaskManager& taskMgr)
@@ -352,14 +351,6 @@ void World::removeKey(std::vector<i32>& list, i32 key)
 
 void World::Destroy()
 {
-    m_worldPendingTasks->Destroy();
-    m_taskManager->UnregisterTask(m_worldPendingTasks->GetThreadId());
-
-#if !defined(EDITOR)
-    m_worldCollisionTask->Destroy();
-    m_taskManager->UnregisterTask(m_worldCollisionTask->GetThreadId());
-#endif
-
     m_worldReady = false;
 
     //Remove all actors
@@ -374,6 +365,14 @@ void World::Destroy()
     m_NonPlayableCharacterActors.clear();
     m_PhysicsActorIDs.clear();
     m_GameObjects.clear();
+
+    m_worldPendingTasks->Destroy();
+    m_taskManager->UnregisterTask(m_worldPendingTasks->GetThreadId());
+    XCDELETE(m_worldPendingTasks);
+
+    m_worldCollisionTask->Destroy();
+    m_taskManager->UnregisterTask(m_worldCollisionTask->GetThreadId());
+    XCDELETE(m_worldCollisionTask);
 }
 
 void World::CheckAllCollisions()

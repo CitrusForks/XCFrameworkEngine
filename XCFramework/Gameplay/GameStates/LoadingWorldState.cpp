@@ -52,4 +52,10 @@ void GameState::LoadingWorldState::Draw(XC_Graphics& graphicsSystem)
 void LoadingWorldState::Destroy()
 {
     IGameState::Destroy();
+
+    TaskManager& taskMgr = SystemLocator::GetInstance()->RequestSystem<TaskManager>("TaskManager");
+    taskMgr.UnregisterTask(m_worldLoader->GetThreadId());
+    
+    XCDELETE(m_worldLoader);
+
 }

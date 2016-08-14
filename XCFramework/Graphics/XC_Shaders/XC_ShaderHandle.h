@@ -64,7 +64,7 @@ struct ShaderSlot
 
     BufferDesc      m_bufferDesc;
     BufferType      m_bufferType;
-    u32    m_shaderSlotId;
+    u32             m_shaderSlotId;
 };
 
 class XCShaderHandle : public IShader
@@ -175,11 +175,11 @@ protected:
 
     void                    LoadShader();
     void                    SortSlots();
-    u32            GetSlotPriority(std::string bufferName);
+    u32                     GetSlotPriority(std::string bufferName);
     void                    GenerateRootSignature();
     void                    GeneratePSO();
     void                    ReadShaderDescription();
-    u32            GetSizeOfConstantBuffer(std::string& cbName);
+    u32                     GetSizeOfConstantBuffer(std::string& cbName);
 
 private:
 

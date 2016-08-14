@@ -37,6 +37,10 @@ void CubeTexture3D::Load(const void* buffer)
 
 void CubeTexture3D::LoadTexture()
 {
+#if defined(XCGRAPHICS_DX12)
+    m_diffuseMapTextureSRVUpload = XCNEW(D3DConstantBuffer)(BUFFERTYPE_SRV);
+#endif
+
     XC_Graphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XC_Graphics>("GraphicsSystem");
 
 #if defined(XCGRAPHICS_DX12)

@@ -44,8 +44,10 @@ RenderableTexture::~RenderableTexture()
 
 void RenderableTexture::Destroy()
 {
-    XCDELETE(m_renderableTexture->m_texData);
-    XCDELETE(m_renderableTexture);
+    if (m_renderableTexture)
+    {
+        XCDELETE(m_renderableTexture);
+    }
 
     if (m_pSRV)
     {

@@ -31,6 +31,9 @@ void Server::Init(const char *ip, i32 port)
 
 Server::~Server(void)
 {
+    XCDELETE(m_pFdSetDesc);
+    XCDELETE(m_pTimeOut);
+
 #if defined(WIN32)
     closesocket(m_socket);
     WSACleanup();
