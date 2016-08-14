@@ -31,7 +31,7 @@ public:
     static MemorySystem* GetInstance() { return ms_pMemorySystem; }
 
 protected:
-    u64           m_chunkSize;
+    u64                     m_chunkSize;
 
 private:
     static MemorySystem*    ms_pMemorySystem;

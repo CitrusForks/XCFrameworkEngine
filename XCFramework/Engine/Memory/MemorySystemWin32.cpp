@@ -17,6 +17,8 @@ MemorySystemWin32::~MemorySystemWin32()
 
 void MemorySystemWin32::Init(u64 chunkSize)
 {
+    m_threadLock.Create();
+
     m_chunkSize = chunkSize;
     m_freeSize = m_chunkSize;
 
@@ -36,6 +38,8 @@ void MemorySystemWin32::Destroy()
     {
         _aligned_free(m_pChunkFront);
     }
+
+    m_threadLock.Release();
 }
 
 bool MemorySystemWin32::IsInMyMemory(uintptr_t address)
@@ -53,6 +57,8 @@ bool MemorySystemWin32::AllocateChunk()
 
 void* MemorySystemWin32::AllocateBytes(size_t size)
 {
+    m_threadLock.Enter();
+
     //Find the best block and assign it to the Type
     u32 allocatedBlockNumber = FindBlockFromAllocated(size);
 
@@ -71,6 +77,8 @@ void* MemorySystemWin32::AllocateBytes(size_t size)
 
     //Get pointer to allocatedBlockNumber
     void* ptrToBlock = GetPointerToAllocatedBlock(allocatedBlockNumber);
+
+    m_threadLock.Exit();
 
     if (ptrToBlock)
     {
@@ -106,6 +114,8 @@ void MemorySystemWin32::DeleteAlloc(void** ptrToBlock)
     u32 offset = (c8*)t - m_pChunkFront;
     u32 offsetAdded = 0;
 
+    m_threadLock.Enter();
+
     //Find the above offset in the allocated list
     for (u32 i = 0; i < m_allocatedBytesList.size(); i++)
     {
@@ -127,6 +137,8 @@ void MemorySystemWin32::DeleteAlloc(void** ptrToBlock)
         }
         offsetAdded += std::abs((int)m_allocatedBytesList[i].m_nbOfBytes);
     }
+
+    m_threadLock.Exit();
 }
 
 void MemorySystemWin32::PrintChunkInformation()

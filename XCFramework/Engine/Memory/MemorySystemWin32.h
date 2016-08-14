@@ -7,6 +7,7 @@
 #pragma once
 
 #include "MemorySystem.h"
+#include "Engine/Thread/CriticalSection.h"
 
 class MemorySystemWin32 : public MemorySystem
 {
@@ -63,6 +64,7 @@ private:
 
     char*                      m_pChunkFront;  //Do not modify this
     char*                      m_pChunkBack;
+    CriticalSection            m_threadLock;
 };
 
 uintptr_t MemorySystemWin32::AlignPointer(u32 alignSize, uintptr_t** ptr)

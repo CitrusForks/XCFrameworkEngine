@@ -28,12 +28,14 @@ void DeAlloc(void* ptr, bool isCustom)
     MemorySystem* memSys = MemorySystem::GetInstance();
     if (memSys && memSys->IsInMyMemory((uintptr_t)ptr))
     {
-        return memSys->DeleteAlloc(&ptr);
+        memSys->DeleteAlloc(&ptr);
     }
     else
     {
-        return _aligned_free(ptr);
+        _aligned_free(ptr);
     }
+
+    ptr = nullptr;
 }
 
 void* operator new(size_t classSize)
