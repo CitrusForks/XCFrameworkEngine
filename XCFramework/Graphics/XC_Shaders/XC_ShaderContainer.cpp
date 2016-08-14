@@ -45,24 +45,6 @@ void XC_ShaderContainer::Init()
     ZeroMemory(&m_samplerDesc, sizeof(m_samplerDesc));
 #endif
 
-    //Initialize shader shared descriptor heap
-    SystemContainer& container = SystemLocator::GetInstance()->GetSystemContainer();
-    container.RegisterSystem<SharedDescriptorHeap>("SharedDescriptorHeap");
-    m_sharedDescriptorHeap = (SharedDescriptorHeap*)&container.CreateNewSystem("SharedDescriptorHeap");
-
-    m_sharedDescriptorHeap->Init(m_device,
-#if defined(LOAD_SHADERS_FROM_DATA)
-        100
-#else
-        SolidColorShader::NbOfDescriptors 
-        + LightTextureShader::NbOfDescriptors 
-        + TerrainMultiTex::NbOfDescriptors 
-        + CubeMapShader::NbOfDescriptors 
-        + SkinnedCharacterShader::NbOfDescriptors 
-        + NbOfTextureResources 
-#endif
-        + 100);
-
     LoadShaders();
     LoadRasterizers();
     LoadSamplers();
@@ -79,10 +61,6 @@ void XC_ShaderContainer::Destroy()
         }
     }
     m_Shaders.clear();
-
-    m_sharedDescriptorHeap->Destroy();
-    SystemContainer& container = SystemLocator::GetInstance()->GetSystemContainer();
-    container.RemoveSystem("SharedDescriptorHeap");
 }
 
 void XC_ShaderContainer::LoadShaders()
@@ -215,13 +193,6 @@ void XC_ShaderContainer::LoadSamplers()
 
     ValidateResult(m_device.CreateSamplerState(&m_samplerDesc, &m_SamplerLinear));
 #elif defined(XCGRAPHICS_DX12)
-    //Create descriptor heap for sampler
-    D3D12_DESCRIPTOR_HEAP_DESC samplerHeapDesc = {};
-    samplerHeapDesc.NumDescriptors = 1;
-    samplerHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER;
-    samplerHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-
-    ValidateResult(m_device.CreateDescriptorHeap(&samplerHeapDesc, IID_PPV_ARGS(&m_samplerHeap)));
 
     m_samplerDesc.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
     m_samplerDesc.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
@@ -231,7 +202,8 @@ void XC_ShaderContainer::LoadSamplers()
     m_samplerDesc.MinLOD = 0;
     m_samplerDesc.MaxLOD = D3D12_FLOAT32_MAX;
 
-    m_device.CreateSampler(&m_samplerDesc, m_samplerHeap->GetCPUDescriptorHandleForHeapStart());
+    SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
+    m_device.CreateSampler(&m_samplerDesc, heap.GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER).m_heapDesc->GetCPUDescriptorHandleForHeapStart());
 #endif
 }
 
@@ -248,9 +220,10 @@ void XC_ShaderContainer::ApplyShader(ID3DDeviceContext& context, ShaderType _Sha
     m_Shaders[_ShaderType]->ApplyShader(context);
 #if defined(XCGRAPHICS_DX11)
     ((XCShaderHandle*)m_Shaders[_ShaderType])->SetSampler("samLinear", context, m_SamplerLinear);
-#else
+#elif defined(XCGRAPHICS_DX12)
     //Set sampler
-    ((XCShaderHandle*)m_Shaders[_ShaderType])->SetSampler("samLinear", context, m_samplerHeap->GetGPUDescriptorHandleForHeapStart());
+    SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
+    ((XCShaderHandle*)m_Shaders[_ShaderType])->SetSampler("samLinear", context, heap.GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER).m_heapDesc->GetGPUDescriptorHandleForHeapStart());
 #endif
 }
 

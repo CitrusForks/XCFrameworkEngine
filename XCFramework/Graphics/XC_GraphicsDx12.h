@@ -11,6 +11,8 @@
 #include "Graphics/XC_Graphics.h"
 #include "Engine/Thread/CriticalSection.h"
 
+class SharedDescriptorHeap;
+
 class XC_GraphicsDx12 : public XC_Graphics
 {
 public:
@@ -39,10 +41,8 @@ public:
     void                        OnResize(i32 _width, i32 _height);
     void                        SetClearColor(XCVec4& color)    { m_clearColor = color; }
 
+    u32                         GetCurrentRTVFrameIndex() { return m_frameIndex; }
     ID3DPipelineState*          GetPipelineState() { return m_pipelineState; }
-
-    CPU_DESCRIPTOR_HANDLE       GetRTVCPUDescHandler();
-    CPU_DESCRIPTOR_HANDLE       GetDSVCPUDescHandler();
     ID3DDepthStencilView*       GetDepthStencilView(RenderTargetsType type);
 
     void                        ClearRTVAndDSV(ID3D12GraphicsCommandList* cmdList);
@@ -52,7 +52,6 @@ protected:
     static void                 SetResourceBarrier(ID3D12GraphicsCommandList* commandList, ID3D12Resource* resource, D3D12_RESOURCE_STATES StateBefore, D3D12_RESOURCE_STATES StateAfter);
     
     void                        CreateDescriptorHeaps();
-    void                        CreateGraphicPipelineStateObjects();
     void                        SetupRenderTargets();
     void                        SetupDepthView();
 
@@ -75,15 +74,9 @@ private:
 
     //RTV - 2 main render targets. Works in swaps
     ID3D12Resource*             m_renderTarget[2];
-    ID3D12DescriptorHeap*       m_pRTVDescriptorHeap;
-    i32                         m_rtvDescriptorSize;
 
     //DepthStencilResource
     ID3D12Resource*             m_depthStencilResource;
-    ID3D12DescriptorHeap*       m_pDSVDescriptorHeap;
-
-    //Constant buffer heap
-    ID3D12DescriptorHeap*       m_constantBuffersHeap;
 
     //Fencing
     HANDLE                      m_fenceEvent;
@@ -98,6 +91,7 @@ private:
 
     ID3D12RootSignature*        m_rootSignature;
     ID3DPipelineState*          m_pipelineState;
+    SharedDescriptorHeap*       m_sharedDescriptorHeap;
 
 #if defined(DEBUG_GRAPHICS_PIPELINE)
     // App resources.

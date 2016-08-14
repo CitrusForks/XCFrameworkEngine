@@ -65,13 +65,16 @@ void RenderContext::BeginRender(RenderTargetsType targetType)
         m_deviceContext->RSSetViewports(1, &m_graphicsSystem->GetViewPort(RENDERTARGET_MAIN_0));
         m_deviceContext->RSSetScissorRects(1, &m_graphicsSystem->GetScissorRect());
     
-        CPU_DESCRIPTOR_HANDLE rtvhandle = m_graphicsSystem->GetRTVCPUDescHandler();
-        CPU_DESCRIPTOR_HANDLE dsvhandle = m_graphicsSystem->GetDSVCPUDescHandler();
-        m_deviceContext->OMSetRenderTargets(1, &rtvhandle, false, &dsvhandle);
+        SharedDescriptorHeap& heap = SystemLocator::GetInstance()->RequestSystem<SharedDescriptorHeap>("SharedDescriptorHeap");
+        D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle(heap.GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV).m_heapDesc->GetCPUDescriptorHandleForHeapStart());
+        rtvHandle.ptr = rtvHandle.ptr + (m_graphicsSystem->GetCurrentRTVFrameIndex() * heap.GetRTVDescHeapIncSize());
+
+        m_deviceContext->OMSetRenderTargets(1, &rtvHandle, false, &heap.GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV).m_cbvCPUOffsetHandle);
     
         //Set descriptor heaps
-        SharedDescriptorHeap& heap = SystemLocator::GetInstance()->RequestSystem<SharedDescriptorHeap>("SharedDescriptorHeap");
-        ID3D12DescriptorHeap* ppHeaps[] = { heap.GetDescriptorHeap(), m_shaderManager->GetSamplerDescriptorHeap() };
+        ID3D12DescriptorHeap* ppHeaps[] = { heap.GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV).m_heapDesc, 
+            heap.GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER).m_heapDesc };
+
         m_deviceContext->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
     #elif defined(XCGRAPHICS_DX11)
         if (m_clearStateOnBegin)

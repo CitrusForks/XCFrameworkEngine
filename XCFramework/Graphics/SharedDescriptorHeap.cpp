@@ -10,24 +10,59 @@
 
 
 SharedDescriptorHeap::SharedDescriptorHeap()
+    : m_rtvDescriptorSize(0)
 {
 }
 
-void SharedDescriptorHeap::Init(ID3DDevice& device, u32 nbOfDesc)
+void SharedDescriptorHeap::Init(ID3DDevice& device, u32 nbOfRTVDesc, u32 nbOfDSVDesc, u32 nbOfSamplerDesc, u32 nbOfCBVDesc)
 {
     m_device = &device;
 
 #if defined(XCGRAPHICS_DX12)
+    //Create render targets. Acts like swapping render targets.
+    D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc = {};
+    rtvHeapDesc.NumDescriptors = nbOfRTVDesc;
+    rtvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+    rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+    m_heapDesc[D3D12_DESCRIPTOR_HEAP_TYPE_RTV] = CreateHeapDesc(rtvHeapDesc);
+    m_rtvDescriptorSize = m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+
+    //Create descriptor heap for Depth Shader View
+    //Allocate on heap
+    D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc = {};
+    dsvHeapDesc.NumDescriptors = 1;
+    dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
+    dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+    m_heapDesc[D3D12_DESCRIPTOR_HEAP_TYPE_DSV] = CreateHeapDesc(dsvHeapDesc);
+
+    //Create descriptor heap for sampler
+    D3D12_DESCRIPTOR_HEAP_DESC samplerHeapDesc = {};
+    samplerHeapDesc.NumDescriptors = nbOfSamplerDesc;
+    samplerHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER;
+    samplerHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+    m_heapDesc[D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER] = CreateHeapDesc(samplerHeapDesc);
+
+    //Create CBV/UAV descripto heap.
     D3D12_DESCRIPTOR_HEAP_DESC cbHeapDesc = {};
-    cbHeapDesc.NumDescriptors = nbOfDesc;
+    cbHeapDesc.NumDescriptors = nbOfCBVDesc;
     cbHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
     cbHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-    ValidateResult(m_device->CreateDescriptorHeap(&cbHeapDesc, IID_PPV_ARGS(&m_sharedDescriptorHeap)));
-
-    m_cbvCPUOffsetHandle = CD3DX12_CPU_DESCRIPTOR_HANDLE(m_sharedDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
-    m_cbvGPUOffsetHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(m_sharedDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
+    m_heapDesc[D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV] = CreateHeapDesc(cbHeapDesc);
 #endif
 }
+
+#if defined(XCGRAPHICS_DX12)
+SharedDescriptorHeap::HeapDesc* SharedDescriptorHeap::CreateHeapDesc(D3D12_DESCRIPTOR_HEAP_DESC heapDesc)
+{
+    HeapDesc* desc = XCNEW(HeapDesc)(heapDesc.Type);
+    ValidateResult(m_device->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&desc->m_heapDesc)));
+
+    desc->m_cbvCPUOffsetHandle = CD3DX12_CPU_DESCRIPTOR_HANDLE(desc->m_heapDesc->GetCPUDescriptorHandleForHeapStart());
+    desc->m_cbvGPUOffsetHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(desc->m_heapDesc->GetGPUDescriptorHandleForHeapStart());
+
+    return desc;
+}
+#endif
 
 D3DConstantBuffer* SharedDescriptorHeap::CreateBufferView(D3DBufferDesc& desc)
 {
@@ -74,14 +109,15 @@ D3DConstantBuffer* SharedDescriptorHeap::CreateBufferView(D3DBufferDesc& desc)
             cbDesc.BufferLocation = constBuffer->m_cbResource->GetGPUVirtualAddress();
             cbDesc.SizeInBytes = constBuffer->m_sizeOfBuffer;
 
-            m_device->CreateConstantBufferView(&cbDesc, m_cbvCPUOffsetHandle);
+            m_device->CreateConstantBufferView(&cbDesc, m_heapDesc[D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV]->m_cbvCPUOffsetHandle);
 
-            constBuffer->m_cpuHandle = m_cbvCPUOffsetHandle;
-            constBuffer->m_gpuHandle = m_cbvGPUOffsetHandle;
+            HeapDesc& desc = *m_heapDesc[D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV];
+            constBuffer->m_cpuHandle = desc.m_cbvCPUOffsetHandle;
+            constBuffer->m_gpuHandle = desc.m_cbvGPUOffsetHandle;
 
             //Inc the offsets
-            m_cbvCPUOffsetHandle.Offset(m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
-            m_cbvGPUOffsetHandle.Offset(m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
+            desc.m_cbvCPUOffsetHandle.Offset(m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
+            desc.m_cbvGPUOffsetHandle.Offset(m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
 
 #elif defined(XCGRAPHICS_DX11)
             
@@ -140,14 +176,15 @@ D3DConstantBuffer* SharedDescriptorHeap::CreateShaderResourceView()
             nullptr,
             IID_PPV_ARGS(&constBuffer->m_cbResource)));
 
-        m_device->CreateShaderResourceView(constBuffer->m_cbResource, &viewDesc, m_cbvCPUOffsetHandle);
+        m_device->CreateShaderResourceView(constBuffer->m_cbResource, &viewDesc, m_heapDesc[D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV]->m_cbvCPUOffsetHandle);
 
-        constBuffer->m_cpuHandle = m_cbvCPUOffsetHandle;
-        constBuffer->m_gpuHandle = m_cbvGPUOffsetHandle;
+        HeapDesc& desc = *m_heapDesc[D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV];
+        constBuffer->m_cpuHandle = desc.m_cbvCPUOffsetHandle;
+        constBuffer->m_gpuHandle = desc.m_cbvGPUOffsetHandle;
 
         //Inc the offsets
-        m_cbvCPUOffsetHandle.Offset(m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
-        m_cbvGPUOffsetHandle.Offset(m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
+        desc.m_cbvCPUOffsetHandle.Offset(m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
+        desc.m_cbvGPUOffsetHandle.Offset(m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
 
 #endif
         m_constantBuffers.push_back(constBuffer);
@@ -178,6 +215,11 @@ void SharedDescriptorHeap::Destroy()
     for each(D3DConstantBuffer* buffer in m_constantBuffers)
     {
         XCDELETE(buffer);
+    }
+
+    for (u32 type = 0; type < D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES; ++type)
+    {
+        XCDELETE(m_heapDesc[type]);
     }
 
     m_constantBuffers.clear();

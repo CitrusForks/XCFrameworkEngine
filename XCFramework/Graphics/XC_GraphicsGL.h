@@ -28,8 +28,6 @@ public:
     
     ID3DDevice*                     GetDevice()         { return m_pD3DDevice; }
     ID3DDeviceContext*              GetDeviceContext() { return nullptr; }
-    CPU_DESCRIPTOR_HANDLE           GetRTVCPUDescHandler() { return nullptr; }
-    CPU_DESCRIPTOR_HANDLE           GetDSVCPUDescHandler() { return nullptr; }
 
     void                            GoFullscreen(bool go);
 

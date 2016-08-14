@@ -10,8 +10,7 @@
 
 #include "Engine/Resource/ResourceHandle.h"
 #include "Graphics/XC_Shaders/XC_VertexFormat.h"
-#include "Graphics/BasicGeometry/OrientedBoundingBox.h"
-#include "Graphics/XC_Shaders/XC_ShaderHandle.h"
+#include "Graphics/XC_Shaders/XC_ShaderBufferConstants.h"
 
 #include "MeshData.h"
 #include "SceneAnimator.h"
@@ -20,6 +19,9 @@
 #include "MeshNode.h"
 #include "MeshAnimator.h"
 #endif
+
+class XCShaderHandle;
+class OrientedBoundingBox;
 
 class XCMesh : public IResource
 {
@@ -42,8 +44,8 @@ public:
     void                                    RegisterDrawable();
     void                                    UnregisterDrawable();
 
-    //Load Dynamic. Make sure the MeshData is filled up before calling this.
     void                                    InitDynamic(std::string resPath, ShaderType shaderUsage, std::string textureName, XCVec3Unaligned scaling, XCVec3Unaligned rotation);
+    //Load Dynamic. Make sure the MeshData is filled up before calling this.
     void                                    LoadDynamic();
 
     MeshData*                               CreateAndGetSubMesh();

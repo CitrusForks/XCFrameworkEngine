@@ -9,19 +9,24 @@
 #include "XCMesh.h"
 
 #include "Engine/Resource/ResourceManager.h"
+
 #include "Graphics/XC_Graphics.h"
+#include "Graphics/XC_Shaders/XC_ShaderHandle.h"
 #include "Graphics/XC_Mesh/XC3DSMeshLoader.h"
 #include "Graphics/XC_Lighting/XC_LightManager.h"
+#include "Graphics/BasicGeometry/OrientedBoundingBox.h"
 
 XCMesh::XCMesh()
+    : m_shaderType(ShaderType_Default)
+    , m_shaderHandler(nullptr)
+    , m_texture(nullptr)
+    , m_isSkinnedMesh(false)
+    , m_scene(nullptr)
+    , m_sceneAnimator(nullptr)
+    , m_lastPlayedAnimTime(1.0f)
+    , m_instanceCount(0)
 {
     m_resourceType = RESOURCETYPE_MESH;
-    m_isSkinnedMesh = false;
-    m_scene = nullptr;
-    m_sceneAnimator = nullptr;
-
-    m_lastPlayedAnimTime = 1.0f;
-    m_instanceCount = 0;
 }
 
 void XCMesh::Init(i32 resourceId, std::string userFriendlyName)

@@ -123,14 +123,14 @@ void XC_GraphicsDx12::Init(HWND _mainWnd, i32 _width, i32 _height, bool _enable4
     m_pSwapChain = (IDXGISwapChain3*)swapChain;
     m_frameIndex = m_pSwapChain->GetCurrentBackBufferIndex();
 
+    //Create Descriptor heaps.
+    CreateDescriptorHeaps();
+
     //Setup ViewPorts
     SetupViewPort();
 
     //Setup render targets
     SetupRenderTargets();
-
-    //Create Descriptor heaps.
-    CreateDescriptorHeaps();
 
     //Create the depth view
     SetupDepthView();
@@ -170,15 +170,16 @@ void XC_GraphicsDx12::Init(HWND _mainWnd, i32 _width, i32 _height, bool _enable4
 
 void XC_GraphicsDx12::Destroy()
 {
+    m_sharedDescriptorHeap->Destroy();
+    SystemContainer& container = SystemLocator::GetInstance()->GetSystemContainer();
+    container.RemoveSystem("SharedDescriptorHeap");
+
     ReleaseCOM(m_pCommandAllocator);
     ReleaseCOM(m_pCommandQueue);
     ReleaseCOM(m_graphicsCommandList);
     ReleaseCOM(m_renderTarget[0]);
     ReleaseCOM(m_renderTarget[1]);
-    ReleaseCOM(m_pRTVDescriptorHeap);
     ReleaseCOM(m_depthStencilResource);
-    ReleaseCOM(m_pDSVDescriptorHeap);
-    ReleaseCOM(m_constantBuffersHeap);
     ReleaseCOM(m_rootSignature);
     ReleaseCOM(m_pipelineState);
 
@@ -192,6 +193,7 @@ void XC_GraphicsDx12::Destroy()
     ReleaseCOM(m_pSwapChain);
 }
 
+#pragma region Debug
 void XC_GraphicsDx12::DebugTestGraphicsPipeline()
 {
     // Create an empty root signature.
@@ -295,53 +297,48 @@ void XC_GraphicsDx12::DebugTestGraphicsPipeline()
     }
 #endif
 }
+#pragma endregion
 
 void XC_GraphicsDx12::SetupRenderTargets()
 {
-    //Two render targets. Acts like swapping render targets.
-    D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc = {};
-    rtvHeapDesc.NumDescriptors = 2;
-    rtvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-    rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-    ValidateResult(m_pD3DDevice->CreateDescriptorHeap(&rtvHeapDesc, IID_PPV_ARGS(&m_pRTVDescriptorHeap)));
-
-    m_rtvDescriptorSize = m_pD3DDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-    
-    CD3DX12_CPU_DESCRIPTOR_HANDLE rtvCPUHandle(m_pRTVDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+    CD3DX12_CPU_DESCRIPTOR_HANDLE& rtvCPUHandle = m_sharedDescriptorHeap->GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV).m_cbvCPUOffsetHandle;
     
     for (u32 frameIndex = 0; frameIndex < 2; ++frameIndex)
     {
         ValidateResult(m_pSwapChain->GetBuffer(frameIndex, IID_PPV_ARGS(&m_renderTarget[frameIndex])));
         m_pD3DDevice->CreateRenderTargetView(m_renderTarget[frameIndex], nullptr, rtvCPUHandle);
-        rtvCPUHandle.Offset(1, m_rtvDescriptorSize); //Move the handle to next rtv slot.
+        rtvCPUHandle.Offset(m_pD3DDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV)); //Move the handle to next rtv slot.
     }
 }
 
 void XC_GraphicsDx12::CreateDescriptorHeaps()
 {
-    //Create descriptor heap for constant buffers
-    D3D12_DESCRIPTOR_HEAP_DESC cbHeapDesc = {};
-    cbHeapDesc.NumDescriptors = 3;
-    cbHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-    cbHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-    ValidateResult(m_pD3DDevice->CreateDescriptorHeap(&cbHeapDesc, IID_PPV_ARGS(&m_constantBuffersHeap)));
-}
 
-void XC_GraphicsDx12::CreateGraphicPipelineStateObjects()
-{
-    //Not required. Every shader will have its own PSO.
+    //Initialize shader shared descriptor heap
+    SystemContainer& container = SystemLocator::GetInstance()->GetSystemContainer();
+    container.RegisterSystem<SharedDescriptorHeap>("SharedDescriptorHeap");
+    m_sharedDescriptorHeap = (SharedDescriptorHeap*)&container.CreateNewSystem("SharedDescriptorHeap");
+
+    m_sharedDescriptorHeap->Init(*m_pD3DDevice
+        , 2 //No of RTV's
+        , 1 //No of DSV's
+        , 1 //No of Samplers
+#if defined(LOAD_SHADERS_FROM_DATA)
+        , 100 //No of CBV, UAV combined
+#else
+        SolidColorShader::NbOfDescriptors
+        + LightTextureShader::NbOfDescriptors
+        + TerrainMultiTex::NbOfDescriptors
+        + CubeMapShader::NbOfDescriptors
+        + SkinnedCharacterShader::NbOfDescriptors
+        + NbOfTextureResources
+#endif
+        + 100
+    );
 }
 
 void XC_GraphicsDx12::SetupDepthView()
 {
-    //Allocate on heap
-    D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc = {};
-    dsvHeapDesc.NumDescriptors = 1;
-    dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
-    dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-
-    ValidateResult(m_pD3DDevice->CreateDescriptorHeap(&dsvHeapDesc, IID_PPV_ARGS(&m_pDSVDescriptorHeap)));
-
     D3D12_RESOURCE_DESC depthViewResDesc = {};
     depthViewResDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
     depthViewResDesc.Alignment = 0;
@@ -372,8 +369,7 @@ void XC_GraphicsDx12::SetupDepthView()
         &clearValue,
         IID_PPV_ARGS(&m_depthStencilResource)));
 
-    D3D12_CPU_DESCRIPTOR_HANDLE dsvCPUHandle = m_pDSVDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-
+    D3D12_CPU_DESCRIPTOR_HANDLE& dsvCPUHandle = m_sharedDescriptorHeap->GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV).m_cbvCPUOffsetHandle;
     m_pD3DDevice->CreateDepthStencilView(m_depthStencilResource, nullptr, dsvCPUHandle);
 
     //SetResourceBarrier(m_graphicsCommandList, m_depthStencilResource, D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_READ);
@@ -407,12 +403,14 @@ void XC_GraphicsDx12::BeginScene()
 
     SetResourceBarrier(m_graphicsCommandList, m_renderTarget[m_frameIndex], D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
-    CPU_DESCRIPTOR_HANDLE handle = GetRTVCPUDescHandler();
-    m_graphicsCommandList->OMSetRenderTargets(1, &handle, false, &m_pDSVDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
+    D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle(m_sharedDescriptorHeap->GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV).m_heapDesc->GetCPUDescriptorHandleForHeapStart());
+    rtvHandle.ptr = rtvHandle.ptr + (m_frameIndex * m_sharedDescriptorHeap->GetRTVDescHeapIncSize());
+
+    m_graphicsCommandList->OMSetRenderTargets(1, &rtvHandle, false, &m_sharedDescriptorHeap->GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV).m_heapDesc->GetCPUDescriptorHandleForHeapStart());
 
     //Set descriptor heaps
-    SharedDescriptorHeap& heap = SystemLocator::GetInstance()->RequestSystem<SharedDescriptorHeap>("SharedDescriptorHeap");
-    ID3D12DescriptorHeap* ppHeaps[] = { heap.GetDescriptorHeap(), m_XCShaderSystem->GetSamplerDescriptorHeap() };
+    ID3D12DescriptorHeap* ppHeaps[] = { m_sharedDescriptorHeap->GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV).m_heapDesc, 
+        m_sharedDescriptorHeap->GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER).m_heapDesc};
     m_graphicsCommandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 
 #if defined(DEBUG_GRAPHICS_PIPELINE)
@@ -459,26 +457,17 @@ void XC_GraphicsDx12::ClearRTVAndDSV(ID3D12GraphicsCommandList* cmdList)
     f32 variadic = 1.0f /*+ (float)(0.5 * (float)(rand() % 5) / 10)*/;
     const f32 clearColor[] = { variadic * m_clearColor.Get<X>(), variadic * m_clearColor.Get<Y>(), variadic * m_clearColor.Get<Z>(), m_clearColor.Get<W>() };
 
-    cmdList->ClearRenderTargetView(GetRTVCPUDescHandler(), clearColor, 0, nullptr);
-    cmdList->ClearDepthStencilView(m_pDSVDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+    D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle(m_sharedDescriptorHeap->GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV).m_heapDesc->GetCPUDescriptorHandleForHeapStart());
+    rtvHandle.ptr = rtvHandle.ptr + (m_frameIndex * m_sharedDescriptorHeap->GetRTVDescHeapIncSize());
+
+    cmdList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
+    cmdList->ClearDepthStencilView(m_sharedDescriptorHeap->GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV).m_heapDesc->GetCPUDescriptorHandleForHeapStart(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 }
 
 ID3DDepthStencilView* XC_GraphicsDx12::GetDepthStencilView(RenderTargetsType type)
 {
     XCASSERT(false);
     return nullptr;
-}
-
-CPU_DESCRIPTOR_HANDLE XC_GraphicsDx12::GetRTVCPUDescHandler()
-{
-    D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle(m_pRTVDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
-    rtvHandle.ptr = rtvHandle.ptr + (m_frameIndex * m_rtvDescriptorSize);
-    return rtvHandle;
-}
-
-CPU_DESCRIPTOR_HANDLE XC_GraphicsDx12::GetDSVCPUDescHandler()
-{
-    return m_pDSVDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 }
 
 void XC_GraphicsDx12::WaitForPreviousFrameCompletion()

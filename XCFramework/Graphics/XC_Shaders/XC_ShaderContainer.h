@@ -13,7 +13,6 @@
 #include "Engine/FlatBuffersInterface/FlatBuffersSystem.h"
 
 class IShader;
-class SharedDescriptorHeap;
 
 class XC_ShaderContainer
 {
@@ -33,9 +32,6 @@ public:
 
     IShader*                    GetShader(ShaderType shaderType);
     GlobalShaderData&           GetGlobalShaderData() { return m_globalShaderData; }
-#if defined(XCGRAPHICS_DX12)
-    ID3D12DescriptorHeap*       GetSamplerDescriptorHeap() { return m_samplerHeap; }
-#endif
 
     void                        SetRasterizerState(ID3DDeviceContext& context, RasterType type);
 
@@ -48,7 +44,6 @@ private:
     
     //Samplers
     D3D12_SAMPLER_DESC          m_samplerDesc;
-    ID3D12DescriptorHeap*       m_samplerHeap;
 
 #elif defined(XCGRAPHICS_DX11)
     D3D11_RASTERIZER_DESC                        m_rasterizerDesc;
@@ -58,7 +53,6 @@ private:
     ID3D11SamplerState*                          m_SamplerLinear;
 #endif
 
-    SharedDescriptorHeap*       m_sharedDescriptorHeap;
     ID3DDevice&                 m_device;
     RasterType                  m_rasterType;
     FlatBuffersSystem::FBBuffer m_fbBuffer;

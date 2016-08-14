@@ -34,8 +34,6 @@ public:
 
     ID3DDeviceContext*          GetDeviceContext() { return m_pD3DDeviceContext; }
     ID3DResource*               GetCurrentFrameRenderTarget() { return nullptr; }
-    CPU_DESCRIPTOR_HANDLE       GetRTVCPUDescHandler() { return 0; }
-    CPU_DESCRIPTOR_HANDLE       GetDSVCPUDescHandler() { return 0; }
 
     void                        GoFullscreen(bool go);
     void                        OnResize(i32 _width, i32 _height);

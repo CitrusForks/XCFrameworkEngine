@@ -29,40 +29,38 @@ public:
     RenderableTexture(ID3DDevice& device, ID3DDeviceContext& context);
     virtual ~RenderableTexture();
 
-    bool                        PreLoad(i32 msaaQuality, i32 texWidth, i32 texHeight);
-    void                        PreLoad(ID3DTexture2D* backbuffer);
-    void                        Update();
-    void                        Destroy();
-    void                        OnResize();
+    bool                             PreLoad(i32 msaaQuality, i32 texWidth, i32 texHeight);
+    void                             PreLoad(ID3DTexture2D* backbuffer);
+    void                             Update();
+    void                             Destroy();
+    void                             OnResize();
 
-    void                        SetRenderableTarget(ID3DDeviceContext& context, ID3DDepthStencilView* depthView);
-    void                        ClearRenderTarget(ID3DDeviceContext& context, ID3DDepthStencilView* depthView, const XCVec4& color);
+    void                             SetRenderableTarget(ID3DDeviceContext& context, ID3DDepthStencilView* depthView);
+    void                             ClearRenderTarget(ID3DDeviceContext& context, ID3DDepthStencilView* depthView, const XCVec4& color);
+                                     
+    D3DConstantBuffer*               GetShaderResourceView() { return m_pSRV; }
+    ID3DTexture2D*                   GetTexture2D() { return m_pRenderTargetTexture;  }
+                                     
+    RenderedTextureInfo*             GetRenderToTexture();
 
-    D3DConstantBuffer*          GetShaderResourceView() { return m_pSRV; }
-    ID3DTexture2D*              GetTexture2D() { return m_pRenderTargetTexture;  }
-
-    void                        DumpTextureToFile();
-    RenderedTextureInfo*        GetRenderToTexture();
-
-#if defined(XCGRAPHICS_GNM)
-    sce::Gnm::RenderTarget&          GetRenderTarget()        { return *m_pRenderTargetView; }
-    sce::Gnm::DepthRenderTarget&     GetDepthRenderTarget()   { return m_gnmDepthTarget; }
+protected:
+#if defined(XCGRAPHICS_DX11)
+    void                             CreateStagingTextures(D3D_TEXTURE2D_DESC texDesc);
 #endif
+
+    void                             DumpTextureToFile();
 
 private:
-    ID3DTexture2D*              m_pRenderTargetTexture;
-    ID3DRenderTargetView*       m_pRenderTargetView;
-    D3DConstantBuffer*          m_pSRV;
+    ID3DTexture2D*                   m_pRenderTargetTexture;
+    ID3DRenderTargetView*            m_pRenderTargetView;
+    D3DConstantBuffer*               m_pSRV;
 
-    ID3DTexture2D*              m_pRenderTargetTextureStaged;
-    ID3DTexture2D*              m_pSingleSampledTex;
-
-    RenderedTextureInfo*        m_renderableTexture;
-
-    ID3DDevice&                 m_device;
-    ID3DDeviceContext&          m_deviceContext;
-
-#if defined(XCGRAPHICS_GNM)
-    sce::Gnm::DepthRenderTarget m_gnmDepthTarget;
-#endif
+    //Staging textures and for resolving the textures
+    ID3DTexture2D*                   m_pRenderTargetTextureStaged;
+    ID3DTexture2D*                   m_pSingleSampledTex;
+                                     
+    RenderedTextureInfo*             m_renderableTexture;
+                                     
+    ID3DDevice&                      m_device;
+    ID3DDeviceContext&               m_deviceContext;
 };

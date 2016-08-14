@@ -26,9 +26,8 @@ public:
     virtual void                    Update(f32 dt);
     virtual void                    Destroy();
 
+    virtual u32                     GetCurrentRTVFrameIndex() { return 0; }
     virtual ID3DDeviceContext*      GetDeviceContext() = 0;
-    virtual CPU_DESCRIPTOR_HANDLE   GetRTVCPUDescHandler() = 0;
-    virtual CPU_DESCRIPTOR_HANDLE   GetDSVCPUDescHandler() = 0;
     virtual ID3DDepthStencilView*   GetDepthStencilView(RenderTargetsType type) = 0;
     virtual ID3DPipelineState*      GetPipelineState() { return nullptr; }
 

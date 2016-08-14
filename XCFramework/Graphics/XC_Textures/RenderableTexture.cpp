@@ -7,6 +7,7 @@
 #include "GraphicsPrecompiledHeader.h"
 
 #include "RenderableTexture.h"
+
 #include "Engine/Input/Directinput.h"
 #include "Graphics/SharedDescriptorHeap.h"
 
@@ -28,7 +29,6 @@ RenderableTexture::RenderableTexture(ID3DDevice& device, ID3DDeviceContext& cont
 #if defined(XCGRAPHICS_GNM)
     m_pRenderTargetView = new ID3DRenderTargetView;
 #endif
-    
 }
 
 RenderableTexture::~RenderableTexture()
@@ -67,7 +67,6 @@ bool RenderableTexture::PreLoad(i32 msaaQuality, i32 texWidth, i32 texHeight)
 #if defined(XCGRAPHICS_DX11)
     D3D_TEXTURE2D_DESC textureDesc;
     D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
-    D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
 
     // Initialize the render target texture description.
     ZeroMemory(&textureDesc, sizeof(textureDesc));
@@ -88,8 +87,26 @@ bool RenderableTexture::PreLoad(i32 msaaQuality, i32 texWidth, i32 texHeight)
     // Create the render target texture.
     ValidateResult(m_device.CreateTexture2D(&textureDesc, NULL, &m_pRenderTargetTexture));
 
+    // Setup the description of the render target view.
+    renderTargetViewDesc.Format = textureDesc.Format;
+    renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;
+    renderTargetViewDesc.Texture2D.MipSlice = 0;
+
+    // Create the render target view.
+    ValidateResult(m_device.CreateRenderTargetView(m_pRenderTargetTexture, &renderTargetViewDesc, &m_pRenderTargetView));
+
+    CreateStagingTextures(textureDesc);
+#endif
+
+    return true;
+}
+
+#pragma region StagingTexture
+#if defined(XCGRAPHICS_DX11)
+void RenderableTexture::CreateStagingTextures(D3D_TEXTURE2D_DESC texDesc)
+{
     D3D_TEXTURE2D_DESC stagedTexDesc = { 0 };
-    stagedTexDesc = textureDesc;
+    stagedTexDesc = texDesc;
     stagedTexDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
     stagedTexDesc.SampleDesc.Count = 1;
     stagedTexDesc.SampleDesc.Quality = 0;
@@ -103,16 +120,10 @@ bool RenderableTexture::PreLoad(i32 msaaQuality, i32 texWidth, i32 texHeight)
     ID3DTexture2D* singleSampledTex = nullptr;
     ValidateResult(m_device.CreateTexture2D(&stagedTexDesc, NULL, &m_pSingleSampledTex));
 
-    // Setup the description of the render target view.
-    renderTargetViewDesc.Format = textureDesc.Format;
-    renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;
-    renderTargetViewDesc.Texture2D.MipSlice = 0;
-
-    // Create the render target view.
-    ValidateResult(m_device.CreateRenderTargetView(m_pRenderTargetTexture, &renderTargetViewDesc, &m_pRenderTargetView));
-
     // Setup the description of the shader resource view.
-    shaderResourceViewDesc.Format = textureDesc.Format;
+    D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
+
+    shaderResourceViewDesc.Format = texDesc.Format;
     shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
     shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
     shaderResourceViewDesc.Texture2D.MipLevels = 1;
@@ -123,18 +134,18 @@ bool RenderableTexture::PreLoad(i32 msaaQuality, i32 texWidth, i32 texHeight)
     ValidateResult(m_device.CreateShaderResourceView(m_pRenderTargetTextureStaged, &shaderResourceViewDesc, &m_pSRV->m_cbResource));
 
     // RGB Texture for transferring over the network
-    m_renderableTexture->m_texData = XCNEW(u8)[texWidth * texHeight * 3];
-    m_renderableTexture->m_texSize = texWidth * texHeight * 3;
-#endif
-
-    return true;
+    m_renderableTexture->m_texSize = texDesc.Width * texDesc.Height * 3;
+    m_renderableTexture->m_texData = XCNEW(u8)[m_renderableTexture->m_texSize];
 }
+#endif
+#pragma endregion
 
 void RenderableTexture::PreLoad(ID3DTexture2D* backbuffer)
 {
 #if defined(XCGRAPHICS_DX11)
     m_pRenderTargetTexture = backbuffer;
-    (m_device.CreateRenderTargetView(backbuffer, 0, &m_pRenderTargetView));
+
+    ValidateResult(m_device.CreateRenderTargetView(backbuffer, 0, &m_pRenderTargetView));
 #endif
 }
 
@@ -171,6 +182,7 @@ void RenderableTexture::ClearRenderTarget(ID3DDeviceContext& context, ID3DDepthS
 #endif
 }
 
+#pragma region LiveDriveSpecifics
 void RenderableTexture::DumpTextureToFile()
 {
 #if defined(XCGRAPHICS_DX11)
@@ -237,3 +249,4 @@ RenderableTexture::RenderedTextureInfo* RenderableTexture::GetRenderToTexture()
 
     return m_renderableTexture;
 }
+#pragma endregion
