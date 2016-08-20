@@ -42,6 +42,11 @@ Directx11 supported hardware.
 Run "Premake5.exe vs2015" through commandline.
 Launch the solution and build it.
 
+# How to launch the game?
+After building the solution, you can either run it or launch it without debugger connected by -
+Copy the Assets folder to the bin/<BuildTarget>/
+Launch XCGame.exe
+
 # How to get data?
 Not required. Its already in the repo.
 
