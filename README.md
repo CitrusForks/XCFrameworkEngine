@@ -9,7 +9,7 @@ XCFramework is a cross platform Game engine written in C++ with DirectX12, Direc
 # Features
 - Rendering
 	- Multi threaded rendering technique using render pools and deferred rendering
--	- Reflection API, to fetch description of shaders and create respective layouts and slots.
+	- Reflection API, to fetch description of shaders and create respective layouts and slots.
 	- Offline Shader tools to build the shader binaries.
 	- All Mesh are Instance rendered
 	- Vector Font Rendering
@@ -26,7 +26,7 @@ XCFramework is a cross platform Game engine written in C++ with DirectX12, Direc
 	- Data Oriented loading of assets such as shaders, textures, gameplay data.
 	- VR support - Realtime rendering of frames from engine to a smartphone through network protocols (using socks) and provides Virtual Reality in a split screen that requires a Google Cardboard. Accelerometer inputs allows the user to move the objects in the engine. (Working with Dx11 enabled. With Dx12 to come soon.)
 	- XCFramework Editor - Runtime editor allows to edit the world, create levels, manage resources. (Non functional after Dx12 implementation. Stay tuned for this!)
--	- World Manager - multi threaded world architecture that includes actors such as Physics actors, Light actors, Animated actors and various other actors that this world can load into and act as a container of these actors.
+	- World Manager - multi threaded world architecture that includes actors such as Physics actors, Light actors, Animated actors and various other actors that this world can load into and act as a container of these actors.
 	- Terrain Generation from bitmaps.
 - Networking
 	- Server/Client implementation using win sock.
