@@ -1,14 +1,26 @@
-/* XCFrameworkEngine
- * Copyright (C) Abhishek Porwal, 2016
- * Any queries? Contact author <https://github.com/abhishekp314>
- * This program is complaint with GNU General Public License, version 3.
- * For complete license, read License.txt in source root directory. */
+/*
+ * Copyright 2015 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 #ifndef FLATBUFFERS_HASH_H_
 #define FLATBUFFERS_HASH_H_
 
 #include <cstdint>
 #include <cstring>
+
+#include "flatbuffers/flatbuffers.h"
 
 namespace flatbuffers {
 
@@ -26,8 +38,8 @@ struct FnvTraits<uint32_t> {
 
 template <>
 struct FnvTraits<uint64_t> {
-  static const uint64_t kFnvPrime = 0x00000100000001b3;
-  static const uint64_t kOffsetBasis = 0xcbf29ce484222645;
+  static const uint64_t kFnvPrime = 0x00000100000001b3ULL;
+  static const uint64_t kOffsetBasis = 0xcbf29ce484222645ULL;
 };
 
 template <typename T>

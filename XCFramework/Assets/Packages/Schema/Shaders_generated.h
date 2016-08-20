@@ -5,28 +5,32 @@
 
 #include "flatbuffers/flatbuffers.h"
 
+#include "BasicTypes_generated.h"
+#include "ShaderTypes_generated.h"
 
-
-struct Vec2;
-struct Vec3;
-struct Vec4;
-struct FBBasicMaterial;
 struct FBShader;
+
 struct FBRootShader;
 
 struct FBShader FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  ShaderType ShaderUsage() const { return static_cast<ShaderType>(GetField<int8_t>(4, 0)); }
-  const flatbuffers::String *VsPath() const { return GetPointer<const flatbuffers::String *>(6); }
-  const flatbuffers::String *PsPath() const { return GetPointer<const flatbuffers::String *>(8); }
-  uint8_t EnableDepth() const { return GetField<uint8_t>(10, 0); }
+  enum {
+    VT_SHADERUSAGE = 4,
+    VT_VSPATH = 6,
+    VT_PSPATH = 8,
+    VT_ENABLEDEPTH = 10
+  };
+  ShaderType ShaderUsage() const { return static_cast<ShaderType>(GetField<int8_t>(VT_SHADERUSAGE, 0)); }
+  const flatbuffers::String *VsPath() const { return GetPointer<const flatbuffers::String *>(VT_VSPATH); }
+  const flatbuffers::String *PsPath() const { return GetPointer<const flatbuffers::String *>(VT_PSPATH); }
+  bool EnableDepth() const { return GetField<uint8_t>(VT_ENABLEDEPTH, 0) != 0; }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<int8_t>(verifier, 4 /* ShaderUsage */) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 6 /* VsPath */) &&
+           VerifyField<int8_t>(verifier, VT_SHADERUSAGE) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_VSPATH) &&
            verifier.Verify(VsPath()) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 8 /* PsPath */) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_PSPATH) &&
            verifier.Verify(PsPath()) &&
-           VerifyField<uint8_t>(verifier, 10 /* EnableDepth */) &&
+           VerifyField<uint8_t>(verifier, VT_ENABLEDEPTH) &&
            verifier.EndTable();
   }
 };
@@ -34,10 +38,10 @@ struct FBShader FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct FBShaderBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_ShaderUsage(ShaderType ShaderUsage) { fbb_.AddElement<int8_t>(4, static_cast<int8_t>(ShaderUsage), 0); }
-  void add_VsPath(flatbuffers::Offset<flatbuffers::String> VsPath) { fbb_.AddOffset(6, VsPath); }
-  void add_PsPath(flatbuffers::Offset<flatbuffers::String> PsPath) { fbb_.AddOffset(8, PsPath); }
-  void add_EnableDepth(uint8_t EnableDepth) { fbb_.AddElement<uint8_t>(10, EnableDepth, 0); }
+  void add_ShaderUsage(ShaderType ShaderUsage) { fbb_.AddElement<int8_t>(FBShader::VT_SHADERUSAGE, static_cast<int8_t>(ShaderUsage), 0); }
+  void add_VsPath(flatbuffers::Offset<flatbuffers::String> VsPath) { fbb_.AddOffset(FBShader::VT_VSPATH, VsPath); }
+  void add_PsPath(flatbuffers::Offset<flatbuffers::String> PsPath) { fbb_.AddOffset(FBShader::VT_PSPATH, PsPath); }
+  void add_EnableDepth(bool EnableDepth) { fbb_.AddElement<uint8_t>(FBShader::VT_ENABLEDEPTH, static_cast<uint8_t>(EnableDepth), 0); }
   FBShaderBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
   FBShaderBuilder &operator=(const FBShaderBuilder &);
   flatbuffers::Offset<FBShader> Finish() {
@@ -47,10 +51,10 @@ struct FBShaderBuilder {
 };
 
 inline flatbuffers::Offset<FBShader> CreateFBShader(flatbuffers::FlatBufferBuilder &_fbb,
-   ShaderType ShaderUsage = ShaderType_Default,
-   flatbuffers::Offset<flatbuffers::String> VsPath = 0,
-   flatbuffers::Offset<flatbuffers::String> PsPath = 0,
-   uint8_t EnableDepth = 0) {
+    ShaderType ShaderUsage = ShaderType_Default,
+    flatbuffers::Offset<flatbuffers::String> VsPath = 0,
+    flatbuffers::Offset<flatbuffers::String> PsPath = 0,
+    bool EnableDepth = false) {
   FBShaderBuilder builder_(_fbb);
   builder_.add_PsPath(PsPath);
   builder_.add_VsPath(VsPath);
@@ -59,11 +63,22 @@ inline flatbuffers::Offset<FBShader> CreateFBShader(flatbuffers::FlatBufferBuild
   return builder_.Finish();
 }
 
+inline flatbuffers::Offset<FBShader> CreateFBShaderDirect(flatbuffers::FlatBufferBuilder &_fbb,
+    ShaderType ShaderUsage = ShaderType_Default,
+    const char *VsPath = nullptr,
+    const char *PsPath = nullptr,
+    bool EnableDepth = false) {
+  return CreateFBShader(_fbb, ShaderUsage, VsPath ? _fbb.CreateString(VsPath) : 0, PsPath ? _fbb.CreateString(PsPath) : 0, EnableDepth);
+}
+
 struct FBRootShader FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  const flatbuffers::Vector<flatbuffers::Offset<FBShader>> *FBShaders() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBShader>> *>(4); }
+  enum {
+    VT_FBSHADERS = 4
+  };
+  const flatbuffers::Vector<flatbuffers::Offset<FBShader>> *FBShaders() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBShader>> *>(VT_FBSHADERS); }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 4 /* FBShaders */) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_FBSHADERS) &&
            verifier.Verify(FBShaders()) &&
            verifier.VerifyVectorOfTables(FBShaders()) &&
            verifier.EndTable();
@@ -73,7 +88,7 @@ struct FBRootShader FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct FBRootShaderBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_FBShaders(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBShader>>> FBShaders) { fbb_.AddOffset(4, FBShaders); }
+  void add_FBShaders(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBShader>>> FBShaders) { fbb_.AddOffset(FBRootShader::VT_FBSHADERS, FBShaders); }
   FBRootShaderBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
   FBRootShaderBuilder &operator=(const FBRootShaderBuilder &);
   flatbuffers::Offset<FBRootShader> Finish() {
@@ -83,17 +98,21 @@ struct FBRootShaderBuilder {
 };
 
 inline flatbuffers::Offset<FBRootShader> CreateFBRootShader(flatbuffers::FlatBufferBuilder &_fbb,
-   flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBShader>>> FBShaders = 0) {
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBShader>>> FBShaders = 0) {
   FBRootShaderBuilder builder_(_fbb);
   builder_.add_FBShaders(FBShaders);
   return builder_.Finish();
 }
 
+inline flatbuffers::Offset<FBRootShader> CreateFBRootShaderDirect(flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<flatbuffers::Offset<FBShader>> *FBShaders = nullptr) {
+  return CreateFBRootShader(_fbb, FBShaders ? _fbb.CreateVector<flatbuffers::Offset<FBShader>>(*FBShaders) : 0);
+}
+
 inline const FBRootShader *GetFBRootShader(const void *buf) { return flatbuffers::GetRoot<FBRootShader>(buf); }
 
-inline bool VerifyFBRootShaderBuffer(flatbuffers::Verifier &verifier) { return verifier.VerifyBuffer<FBRootShader>(); }
+inline bool VerifyFBRootShaderBuffer(flatbuffers::Verifier &verifier) { return verifier.VerifyBuffer<FBRootShader>(nullptr); }
 
 inline void FinishFBRootShaderBuffer(flatbuffers::FlatBufferBuilder &fbb, flatbuffers::Offset<FBRootShader> root) { fbb.Finish(root); }
-
 
 #endif  // FLATBUFFERS_GENERATED_SHADERS_H_

@@ -9,7 +9,7 @@
 #include "Engine/Resource/IResource.h"
 #include "Graphics/D3DConstantBuffer.h"
 
-#include "Libs/DirectXTex/DirectXTex/DirectXTex.h"
+#include "Libs/DirectXTex/DirectXTex.h"
 
 class Texture2D : public IResource
 {

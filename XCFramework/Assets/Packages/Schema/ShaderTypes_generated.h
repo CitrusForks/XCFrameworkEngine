@@ -5,11 +5,8 @@
 
 #include "flatbuffers/flatbuffers.h"
 
+#include "BasicTypes_generated.h"
 
-
-struct Vec2;
-struct Vec3;
-struct Vec4;
 struct FBBasicMaterial;
 
 enum ShaderType {
@@ -20,7 +17,9 @@ enum ShaderType {
   ShaderType_SimpleCubeMap = 4,
   ShaderType_SkinnedCharacter = 5,
   ShaderType_VectorFont = 6,
-  ShaderType_Max = 7
+  ShaderType_Max = 7,
+  ShaderType_MIN = ShaderType_Default,
+  ShaderType_MAX = ShaderType_Max
 };
 
 inline const char **EnumNamesShaderType() {
@@ -28,7 +27,7 @@ inline const char **EnumNamesShaderType() {
   return names;
 }
 
-inline const char *EnumNameShaderType(ShaderType e) { return EnumNamesShaderType()[e]; }
+inline const char *EnumNameShaderType(ShaderType e) { return EnumNamesShaderType()[static_cast<int>(e)]; }
 
 enum VertexFormat {
   VertexFormat_Position = 0,
@@ -37,7 +36,9 @@ enum VertexFormat {
   VertexFormat_PositionNormalTexture = 3,
   VertexFormat_PositionNormalTextureBlendIndexBlendWeight = 4,
   VertexFormat_PositionColorInstanceIndex = 5,
-  VertexFormat_Invalid = 6
+  VertexFormat_Invalid = 6,
+  VertexFormat_MIN = VertexFormat_Position,
+  VertexFormat_MAX = VertexFormat_Invalid
 };
 
 inline const char **EnumNamesVertexFormat() {
@@ -45,12 +46,14 @@ inline const char **EnumNamesVertexFormat() {
   return names;
 }
 
-inline const char *EnumNameVertexFormat(VertexFormat e) { return EnumNamesVertexFormat()[e]; }
+inline const char *EnumNameVertexFormat(VertexFormat e) { return EnumNamesVertexFormat()[static_cast<int>(e)]; }
 
 enum RasterType {
   RasterType_FillWireframe = 0,
   RasterType_FillSolid = 1,
-  RasterType_Max = 2
+  RasterType_Max = 2,
+  RasterType_MIN = RasterType_FillWireframe,
+  RasterType_MAX = RasterType_Max
 };
 
 inline const char **EnumNamesRasterType() {
@@ -58,17 +61,22 @@ inline const char **EnumNamesRasterType() {
   return names;
 }
 
-inline const char *EnumNameRasterType(RasterType e) { return EnumNamesRasterType()[e]; }
+inline const char *EnumNameRasterType(RasterType e) { return EnumNamesRasterType()[static_cast<int>(e)]; }
 
 struct FBBasicMaterial FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  const Vec4 *Ambient() const { return GetStruct<const Vec4 *>(4); }
-  const Vec4 *Diffuse() const { return GetStruct<const Vec4 *>(6); }
-  const Vec4 *Specular() const { return GetStruct<const Vec4 *>(8); }
+  enum {
+    VT_AMBIENT = 4,
+    VT_DIFFUSE = 6,
+    VT_SPECULAR = 8
+  };
+  const Vec4 *Ambient() const { return GetStruct<const Vec4 *>(VT_AMBIENT); }
+  const Vec4 *Diffuse() const { return GetStruct<const Vec4 *>(VT_DIFFUSE); }
+  const Vec4 *Specular() const { return GetStruct<const Vec4 *>(VT_SPECULAR); }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<Vec4>(verifier, 4 /* Ambient */) &&
-           VerifyField<Vec4>(verifier, 6 /* Diffuse */) &&
-           VerifyField<Vec4>(verifier, 8 /* Specular */) &&
+           VerifyField<Vec4>(verifier, VT_AMBIENT) &&
+           VerifyField<Vec4>(verifier, VT_DIFFUSE) &&
+           VerifyField<Vec4>(verifier, VT_SPECULAR) &&
            verifier.EndTable();
   }
 };
@@ -76,9 +84,9 @@ struct FBBasicMaterial FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct FBBasicMaterialBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_Ambient(const Vec4 *Ambient) { fbb_.AddStruct(4, Ambient); }
-  void add_Diffuse(const Vec4 *Diffuse) { fbb_.AddStruct(6, Diffuse); }
-  void add_Specular(const Vec4 *Specular) { fbb_.AddStruct(8, Specular); }
+  void add_Ambient(const Vec4 *Ambient) { fbb_.AddStruct(FBBasicMaterial::VT_AMBIENT, Ambient); }
+  void add_Diffuse(const Vec4 *Diffuse) { fbb_.AddStruct(FBBasicMaterial::VT_DIFFUSE, Diffuse); }
+  void add_Specular(const Vec4 *Specular) { fbb_.AddStruct(FBBasicMaterial::VT_SPECULAR, Specular); }
   FBBasicMaterialBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
   FBBasicMaterialBuilder &operator=(const FBBasicMaterialBuilder &);
   flatbuffers::Offset<FBBasicMaterial> Finish() {
@@ -88,15 +96,14 @@ struct FBBasicMaterialBuilder {
 };
 
 inline flatbuffers::Offset<FBBasicMaterial> CreateFBBasicMaterial(flatbuffers::FlatBufferBuilder &_fbb,
-   const Vec4 *Ambient = 0,
-   const Vec4 *Diffuse = 0,
-   const Vec4 *Specular = 0) {
+    const Vec4 *Ambient = 0,
+    const Vec4 *Diffuse = 0,
+    const Vec4 *Specular = 0) {
   FBBasicMaterialBuilder builder_(_fbb);
   builder_.add_Specular(Specular);
   builder_.add_Diffuse(Diffuse);
   builder_.add_Ambient(Ambient);
   return builder_.Finish();
 }
-
 
 #endif  // FLATBUFFERS_GENERATED_SHADERTYPES_H_

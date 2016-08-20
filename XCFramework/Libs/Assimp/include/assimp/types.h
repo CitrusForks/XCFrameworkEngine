@@ -1,12 +1,48 @@
-/* XCFrameworkEngine
- * Copyright (C) Abhishek Porwal, 2016
- * Any queries? Contact author <https://github.com/abhishekp314>
- * This program is complaint with GNU General Public License, version 3.
- * For complete license, read License.txt in source root directory. */
+/*
+---------------------------------------------------------------------------
+Open Asset Import Library (assimp)
+---------------------------------------------------------------------------
+
+Copyright (c) 2006-2016, assimp team
+
+All rights reserved.
+
+Redistribution and use of this software in source and binary forms,
+with or without modification, are permitted provided that the following
+conditions are met:
+
+* Redistributions of source code must retain the above
+  copyright notice, this list of conditions and the
+  following disclaimer.
+
+* Redistributions in binary form must reproduce the above
+  copyright notice, this list of conditions and the
+  following disclaimer in the documentation and/or other
+  materials provided with the distribution.
+
+* Neither the name of the assimp team, nor the names of its
+  contributors may be used to endorse or promote products
+  derived from this software without specific prior
+  written permission of the assimp team.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+---------------------------------------------------------------------------
+*/
 
 /** @file types.h
  *  Basic data types and primitives, such as vectors or colors.
  */
+#pragma once
 #ifndef AI_TYPES_H_INC
 #define AI_TYPES_H_INC
 
@@ -88,7 +124,7 @@ struct aiPlane
 {
 #ifdef __cplusplus
     aiPlane () : a(0.f), b(0.f), c(0.f), d(0.f) {}
-    aiPlane (float _a, float _b, float _c, float _d)
+    aiPlane (ai_real _a, ai_real _b, ai_real _c, ai_real _d)
         : a(_a), b(_b), c(_c), d(_d) {}
 
     aiPlane (const aiPlane& o) : a(o.a), b(o.b), c(o.c), d(o.d) {}
@@ -96,7 +132,7 @@ struct aiPlane
 #endif // !__cplusplus
 
     //! Plane equation
-    float a,b,c,d;
+    ai_real a,b,c,d;
 } PACK_STRUCT; // !struct aiPlane
 
 // ----------------------------------------------------------------------------------
@@ -124,8 +160,8 @@ struct aiColor3D
 {
 #ifdef __cplusplus
     aiColor3D () : r(0.0f), g(0.0f), b(0.0f) {}
-    aiColor3D (float _r, float _g, float _b) : r(_r), g(_g), b(_b) {}
-    explicit aiColor3D (float _r) : r(_r), g(_r), b(_r) {}
+    aiColor3D (ai_real _r, ai_real _g, ai_real _b) : r(_r), g(_g), b(_b) {}
+    explicit aiColor3D (ai_real _r) : r(_r), g(_r), b(_r) {}
     aiColor3D (const aiColor3D& o) : r(o.r), g(o.g), b(o.b) {}
 
     /** Component-wise comparison */
@@ -164,30 +200,30 @@ struct aiColor3D
     }
 
     /** Multiply with a scalar */
-    aiColor3D operator*(float f) const {
+    aiColor3D operator*(ai_real f) const {
         return aiColor3D(r*f,g*f,b*f);
     }
 
     /** Access a specific color component */
-    float operator[](unsigned int i) const {
+    ai_real operator[](unsigned int i) const {
         return *(&r + i);
     }
 
     /** Access a specific color component */
-    float& operator[](unsigned int i) {
+    ai_real& operator[](unsigned int i) {
         return *(&r + i);
     }
 
     /** Check whether a color is black */
     bool IsBlack() const {
-        static const float epsilon = 10e-3f;
+        static const ai_real epsilon = ai_real(10e-3);
         return std::fabs( r ) < epsilon && std::fabs( g ) < epsilon && std::fabs( b ) < epsilon;
     }
 
 #endif // !__cplusplus
 
     //! Red, green and blue color values
-    float r, g, b;
+    ai_real r, g, b;
 } PACK_STRUCT;  // !struct aiColor3D
 #include "./Compiler/poppack1.h"
 
@@ -477,4 +513,5 @@ struct aiMemoryInfo
 #include "quaternion.inl"
 #include "matrix3x3.inl"
 #include "matrix4x4.inl"
-#endif
+
+#endif // AI_TYPES_H_INC

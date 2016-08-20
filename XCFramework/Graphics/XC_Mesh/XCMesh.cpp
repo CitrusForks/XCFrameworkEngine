@@ -129,7 +129,7 @@ void XCMesh::Load(const void* buffer)
         m_shaderType = fbXCMesh->ShaderUsage();
 
         XC_Graphics& graphicsSystem = (XC_Graphics&)SystemLocator::GetInstance()->RequestSystem<XC_Graphics>("GraphicsSystem");
-        m_shaderHandler = (XCShaderHandle*)graphicsSystem.GetShaderManagerSystem().GetShader(m_shaderType);
+        m_shaderHandler = (XCShaderHandle*)graphicsSystem.GetShaderContainer().GetShader(m_shaderType);
     }
 
     LoadDynamic();
@@ -152,7 +152,7 @@ void XCMesh::InitDynamic(std::string resPath, ShaderType shaderUsage, std::strin
     m_texture = &resMgr.AcquireResource(textureName.c_str());
 
     XC_Graphics& graphicsSystem = (XC_Graphics&)SystemLocator::GetInstance()->RequestSystem<XC_Graphics>("GraphicsSystem");
-    m_shaderHandler = (XCShaderHandle*)graphicsSystem.GetShaderManagerSystem().GetShader(m_shaderType);
+    m_shaderHandler = (XCShaderHandle*)graphicsSystem.GetShaderContainer().GetShader(m_shaderType);
 
     m_globalScaling = scaling;
     m_globalRotation = rotation;

@@ -1,13 +1,49 @@
-/* XCFrameworkEngine
- * Copyright (C) Abhishek Porwal, 2016
- * Any queries? Contact author <https://github.com/abhishekp314>
- * This program is complaint with GNU General Public License, version 3.
- * For complete license, read License.txt in source root directory. */
+/*
+---------------------------------------------------------------------------
+Open Asset Import Library (assimp)
+---------------------------------------------------------------------------
+
+Copyright (c) 2006-2016, assimp team
+
+All rights reserved.
+
+Redistribution and use of this software in source and binary forms,
+with or without modification, are permitted provided that the following
+conditions are met:
+
+* Redistributions of source code must retain the above
+  copyright notice, this list of conditions and the
+  following disclaimer.
+
+* Redistributions in binary form must reproduce the above
+  copyright notice, this list of conditions and the
+  following disclaimer in the documentation and/or other
+  materials provided with the distribution.
+
+* Neither the name of the assimp team, nor the names of its
+  contributors may be used to endorse or promote products
+  derived from this software without specific prior
+  written permission of the assimp team.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+---------------------------------------------------------------------------
+*/
 
 /** @file anim.h
  *  @brief Defines the data structures in which the imported animations
  *  are returned.
  */
+#pragma once
 #ifndef AI_ANIM_H_INC
 #define AI_ANIM_H_INC
 
@@ -374,7 +410,7 @@ namespace Assimp {
 // ---------------------------------------------------------------------------
 /** @brief CPP-API: Utility class to simplify interpolations of various data types.
  *
- *  The type of interpolation is choosen automatically depending on the
+ *  The type of interpolation is chosen automatically depending on the
  *  types of the arguments. */
 template <typename T>
 struct Interpolator
@@ -385,7 +421,7 @@ struct Interpolator
      *  The interpolation algorithm depends on the type of the operands.
      *  aiQuaternion's and aiQuatKey's SLERP, the rest does a simple
      *  linear interpolation. */
-    void operator () (T& out,const T& a, const T& b, float d) const {
+    void operator () (T& out,const T& a, const T& b, ai_real d) const {
         out = a + (b-a)*d;
     }
 }; // ! Interpolator <T>
@@ -395,7 +431,7 @@ struct Interpolator
 template <>
 struct Interpolator <aiQuaternion>  {
     void operator () (aiQuaternion& out,const aiQuaternion& a,
-        const aiQuaternion& b, float d) const
+        const aiQuaternion& b, ai_real d) const
     {
         aiQuaternion::Interpolate(out,a,b,d);
     }
@@ -404,7 +440,7 @@ struct Interpolator <aiQuaternion>  {
 template <>
 struct Interpolator <unsigned int>  {
     void operator () (unsigned int& out,unsigned int a,
-        unsigned int b, float d) const
+        unsigned int b, ai_real d) const
     {
         out = d>0.5f ? b : a;
     }
@@ -413,7 +449,7 @@ struct Interpolator <unsigned int>  {
 template <>
 struct Interpolator  <aiVectorKey>  {
     void operator () (aiVector3D& out,const aiVectorKey& a,
-        const aiVectorKey& b, float d) const
+        const aiVectorKey& b, ai_real d) const
     {
         Interpolator<aiVector3D> ipl;
         ipl(out,a.mValue,b.mValue,d);
@@ -423,7 +459,7 @@ struct Interpolator  <aiVectorKey>  {
 template <>
 struct Interpolator <aiQuatKey>     {
     void operator () (aiQuaternion& out, const aiQuatKey& a,
-        const aiQuatKey& b, float d) const
+        const aiQuatKey& b, ai_real d) const
     {
         Interpolator<aiQuaternion> ipl;
         ipl(out,a.mValue,b.mValue,d);
@@ -433,7 +469,7 @@ struct Interpolator <aiQuatKey>     {
 template <>
 struct Interpolator <aiMeshKey>     {
     void operator () (unsigned int& out, const aiMeshKey& a,
-        const aiMeshKey& b, float d) const
+        const aiMeshKey& b, ai_real d) const
     {
         Interpolator<unsigned int> ipl;
         ipl(out,a.mValue,b.mValue,d);

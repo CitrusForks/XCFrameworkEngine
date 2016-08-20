@@ -61,7 +61,7 @@ void XC_LightManager::Update(f32 dt)
 {
     // Build the view matrix.
     XC_Graphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XC_Graphics>("GraphicsSystem");
-    XC_ShaderContainer& shaderSystem = graphicsSystem.GetShaderManagerSystem();
+    XC_ShaderContainer& shaderSystem = graphicsSystem.GetShaderContainer();
 
     XCVec4 camPos = shaderSystem.GetGlobalShaderData().m_camera.GetPosition();
 

@@ -1,15 +1,51 @@
-/* XCFrameworkEngine
- * Copyright (C) Abhishek Porwal, 2016
- * Any queries? Contact author <https://github.com/abhishekp314>
- * This program is complaint with GNU General Public License, version 3.
- * For complete license, read License.txt in source root directory. */
+/*
+---------------------------------------------------------------------------
+Open Asset Import Library (assimp)
+---------------------------------------------------------------------------
+
+Copyright (c) 2006-2016, assimp team
+
+All rights reserved.
+
+Redistribution and use of this software in source and binary forms,
+with or without modification, are permitted provided that the following
+conditions are met:
+
+* Redistributions of source code must retain the above
+  copyright notice, this list of conditions and the
+  following disclaimer.
+
+* Redistributions in binary form must reproduce the above
+  copyright notice, this list of conditions and the
+  following disclaimer in the documentation and/or other
+  materials provided with the distribution.
+
+* Neither the name of the assimp team, nor the names of its
+  contributors may be used to endorse or promote products
+  derived from this software without specific prior
+  written permission of the assimp team.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+---------------------------------------------------------------------------
+*/
 
 /** @file light.h
  *  @brief Defines the aiLight data structure
  */
 
-#ifndef __AI_LIGHT_H_INC__
-#define __AI_LIGHT_H_INC__
+#pragma once
+#ifndef AI_LIGHT_H_INC
+#define AI_LIGHT_H_INC
 
 #include "types.h"
 
@@ -41,12 +77,16 @@ enum aiLightSourceType
     aiLightSource_SPOT          = 0x3,
 
     //! The generic light level of the world, including the bounces
-    //! of all other lightsources.
+    //! of all other light sources.
     //! Typically, there's at most one ambient light in a scene.
     //! This light type doesn't have a valid position, direction, or
     //! other properties, just a color.
     aiLightSource_AMBIENT       = 0x4,
 
+    //! An area light is a rectangle with predefined size that uniformly
+    //! emits light from one of its sides. The position is center of the
+    //! rectangle and direction is its normal vector.
+    aiLightSource_AREA          = 0x5,
 
     /** This value is not used. It is just there to force the
      *  compiler to map this enum to a 32 Bit integer.
@@ -99,6 +139,14 @@ struct aiLight
      *  may be normalized, but it needn't.
      */
     C_STRUCT aiVector3D mDirection;
+
+    /** Up direction of the light source in space. Relative to the
+     *  transformation of the node corresponding to the light.
+     *
+     *  The direction is undefined for point lights. The vector
+     *  may be normalized, but it needn't.
+     */
+    C_STRUCT aiVector3D mUp;
 
     /** Constant light attenuation factor.
      *
@@ -182,6 +230,9 @@ struct aiLight
      */
     float mAngleOuterCone;
 
+    /** Size of area light source. */
+    C_STRUCT aiVector2D mSize;
+
 #ifdef __cplusplus
 
     aiLight()
@@ -191,6 +242,7 @@ struct aiLight
         ,   mAttenuationQuadratic (0.f)
         ,   mAngleInnerCone       ((float)AI_MATH_TWO_PI)
         ,   mAngleOuterCone       ((float)AI_MATH_TWO_PI)
+        ,   mSize                 (0.f, 0.f)
     {
     }
 
@@ -199,7 +251,7 @@ struct aiLight
 
 #ifdef __cplusplus
 }
-#endif
+#endif 
 
 
-#endif // !! __AI_LIGHT_H_INC__
+#endif // !! AI_LIGHT_H_INC

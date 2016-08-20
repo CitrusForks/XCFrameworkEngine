@@ -4,7 +4,8 @@ print("Building C++ Win32 Project XCNetwork")
 	language "C++"
 	architecture "x86"
 	targetdir "bin/%{cfg.buildcfg}"
-	platformVersion "10.0.10586.0"
+	systemversion "10.0.10586.0"
+	characterset "MBCS"
 	
 	files { "**.h", "**.cpp", "**.hlsl", "**.licenseheader" }
 	
@@ -24,14 +25,14 @@ print("Building C++ Win32 Project XCNetwork")
 		pchheader "NetworkPrecompiledHeader.h"
 		pchsource "NetworkPrecompiledHeader.cpp"
 		
-		flags { "Symbols" }
+		symbols "On"
 		
 		targetdir "$(ProjectDir)bin/$(Configuration)/"
 		
 	--Configuration Release
 	print("Building Release")
 	filter "configurations:Release"
-		sysincludedirs {"$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir)Network;" }
+		sysincludedirs {"$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir);$(ProjectDir)Network;" }
 		
 		includedirs { "$(ProjectDir)Libs","$(ProjectDir)Libs/flatbuffers" }
 		libdirs { "$(ProjectDir)Libs" }
@@ -44,7 +45,7 @@ print("Building C++ Win32 Project XCNetwork")
 		pchheader "NetworkPrecompiledHeader.h"
 		pchsource "NetworkPrecompiledHeader.cpp"
 		
-		flags { "Symbols" }
+		symbols "On"
       	
 		optimize "On"
 		

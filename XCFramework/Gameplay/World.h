@@ -57,7 +57,7 @@ public:
     };
 
     WorldPendingTasks(World& world)
-        : AsyncTask("WorldCollisionTask")
+        : AsyncTask("WorldPendingTasks")
         , m_parentWorld(world)
     {
         m_pendingTaskLock.Create();

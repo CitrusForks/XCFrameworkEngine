@@ -42,7 +42,7 @@ public:
     virtual void                    ClearRTVAndDSV(ID3D12GraphicsCommandList* cmdList) {}
 
     ID3DDevice*                     GetDevice() { return m_pD3DDevice; }
-    XC_ShaderContainer&             GetShaderManagerSystem() { return *m_XCShaderSystem; }
+    XC_ShaderContainer&             GetShaderContainer() { return *m_XCShaderSystem; }
     RenderingPool&                  GetRenderingPool() { return *m_renderingPool; }
     RenderableTexture&              GetRenderTexture(RenderTargetsType type) { return *m_renderTargets[type]; }
 

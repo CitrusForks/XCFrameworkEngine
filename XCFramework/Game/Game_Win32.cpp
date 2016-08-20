@@ -187,7 +187,7 @@ void Game_Win32::Draw()
     m_graphicsSystem->GetRenderingPool().Render();
     m_graphicsSystem->EndSecondaryScene();
 
-    m_graphicsSystem->GetShaderManagerSystem().ClearShaderAndRenderStates(*m_graphicsSystem->GetDeviceContext());
+    m_graphicsSystem->GetShaderContainer().ClearShaderAndRenderStates(*m_graphicsSystem->GetDeviceContext());
 #endif
 
     //draw every other object
@@ -199,7 +199,7 @@ void Game_Win32::Draw()
     
     m_graphicsSystem->EndScene();
 
-    m_graphicsSystem->GetShaderManagerSystem().ClearShaderAndRenderStates(*m_graphicsSystem->GetDeviceContext());
+    m_graphicsSystem->GetShaderContainer().ClearShaderAndRenderStates(*m_graphicsSystem->GetDeviceContext());
 }
 
 void Game_Win32::EnableFullScreenMode(bool enable)

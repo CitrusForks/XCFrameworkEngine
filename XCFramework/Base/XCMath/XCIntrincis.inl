@@ -43,33 +43,33 @@
 namespace XCMath
 {
     //Operations
-    inline PackedVector4 Add(const PackedVector4& val1, const PackedVector4& val2)
+    inline PackedVector4 _vectorcall Add(const PackedVector4& val1, const PackedVector4& val2)
     {
         PackedVector4 result = _mm_add_ps(val1.m_intrData, val2.m_intrData);
         return result;
     }
 
-    inline PackedVector4 Sub(const PackedVector4& val1, const PackedVector4& val2)
+    inline PackedVector4 _vectorcall Sub(const PackedVector4& val1, const PackedVector4& val2)
     {
         return _mm_sub_ps(val1.m_intrData, val2.m_intrData);
     }
 
-    inline PackedVector4 Mul(const PackedVector4& val1, const PackedVector4& val2)
+    inline PackedVector4 _vectorcall Mul(const PackedVector4& val1, const PackedVector4& val2)
     {
         return _mm_mul_ps(val1.m_intrData, val2.m_intrData);
     }
 
-    inline PackedVector4 Div(const PackedVector4& val1, const PackedVector4& val2)
+    inline PackedVector4 _vectorcall Div(const PackedVector4& val1, const PackedVector4& val2)
     {
         return _mm_div_ps(val1.m_intrData, val2.m_intrData);
     }
 
-    inline PackedVector4 Min(const PackedVector4& val1, const PackedVector4& val2)
+    inline PackedVector4 _vectorcall Min(const PackedVector4& val1, const PackedVector4& val2)
     {
         return _mm_min_ps(val1.m_intrData, val2.m_intrData);
     }
 
-    inline PackedVector4 Max(const PackedVector4& val1, const PackedVector4& val2)
+    inline PackedVector4 _vectorcall Max(const PackedVector4& val1, const PackedVector4& val2)
     {
         return _mm_max_ps(val1.m_intrData, val2.m_intrData);
     }

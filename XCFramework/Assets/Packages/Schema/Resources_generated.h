@@ -5,25 +5,29 @@
 
 #include "flatbuffers/flatbuffers.h"
 
+#include "BasicTypes_generated.h"
+#include "ShaderTypes_generated.h"
 
-
-struct Vec2;
-struct Vec3;
-struct Vec4;
-struct FBBasicMaterial;
 struct FBTexture2D;
+
 struct FBCubeTexture3D;
+
 struct FBXCMesh;
+
 struct FBResources;
 
 struct FBTexture2D FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  const flatbuffers::String *ResourceName() const { return GetPointer<const flatbuffers::String *>(4); }
-  const flatbuffers::String *ResourcePath() const { return GetPointer<const flatbuffers::String *>(6); }
+  enum {
+    VT_RESOURCENAME = 4,
+    VT_RESOURCEPATH = 6
+  };
+  const flatbuffers::String *ResourceName() const { return GetPointer<const flatbuffers::String *>(VT_RESOURCENAME); }
+  const flatbuffers::String *ResourcePath() const { return GetPointer<const flatbuffers::String *>(VT_RESOURCEPATH); }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 4 /* ResourceName */) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_RESOURCENAME) &&
            verifier.Verify(ResourceName()) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 6 /* ResourcePath */) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_RESOURCEPATH) &&
            verifier.Verify(ResourcePath()) &&
            verifier.EndTable();
   }
@@ -32,8 +36,8 @@ struct FBTexture2D FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct FBTexture2DBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_ResourceName(flatbuffers::Offset<flatbuffers::String> ResourceName) { fbb_.AddOffset(4, ResourceName); }
-  void add_ResourcePath(flatbuffers::Offset<flatbuffers::String> ResourcePath) { fbb_.AddOffset(6, ResourcePath); }
+  void add_ResourceName(flatbuffers::Offset<flatbuffers::String> ResourceName) { fbb_.AddOffset(FBTexture2D::VT_RESOURCENAME, ResourceName); }
+  void add_ResourcePath(flatbuffers::Offset<flatbuffers::String> ResourcePath) { fbb_.AddOffset(FBTexture2D::VT_RESOURCEPATH, ResourcePath); }
   FBTexture2DBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
   FBTexture2DBuilder &operator=(const FBTexture2DBuilder &);
   flatbuffers::Offset<FBTexture2D> Finish() {
@@ -43,22 +47,32 @@ struct FBTexture2DBuilder {
 };
 
 inline flatbuffers::Offset<FBTexture2D> CreateFBTexture2D(flatbuffers::FlatBufferBuilder &_fbb,
-   flatbuffers::Offset<flatbuffers::String> ResourceName = 0,
-   flatbuffers::Offset<flatbuffers::String> ResourcePath = 0) {
+    flatbuffers::Offset<flatbuffers::String> ResourceName = 0,
+    flatbuffers::Offset<flatbuffers::String> ResourcePath = 0) {
   FBTexture2DBuilder builder_(_fbb);
   builder_.add_ResourcePath(ResourcePath);
   builder_.add_ResourceName(ResourceName);
   return builder_.Finish();
 }
 
+inline flatbuffers::Offset<FBTexture2D> CreateFBTexture2DDirect(flatbuffers::FlatBufferBuilder &_fbb,
+    const char *ResourceName = nullptr,
+    const char *ResourcePath = nullptr) {
+  return CreateFBTexture2D(_fbb, ResourceName ? _fbb.CreateString(ResourceName) : 0, ResourcePath ? _fbb.CreateString(ResourcePath) : 0);
+}
+
 struct FBCubeTexture3D FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  const flatbuffers::String *ResourceName() const { return GetPointer<const flatbuffers::String *>(4); }
-  const flatbuffers::String *ResourcePath() const { return GetPointer<const flatbuffers::String *>(6); }
+  enum {
+    VT_RESOURCENAME = 4,
+    VT_RESOURCEPATH = 6
+  };
+  const flatbuffers::String *ResourceName() const { return GetPointer<const flatbuffers::String *>(VT_RESOURCENAME); }
+  const flatbuffers::String *ResourcePath() const { return GetPointer<const flatbuffers::String *>(VT_RESOURCEPATH); }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 4 /* ResourceName */) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_RESOURCENAME) &&
            verifier.Verify(ResourceName()) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 6 /* ResourcePath */) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_RESOURCEPATH) &&
            verifier.Verify(ResourcePath()) &&
            verifier.EndTable();
   }
@@ -67,8 +81,8 @@ struct FBCubeTexture3D FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct FBCubeTexture3DBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_ResourceName(flatbuffers::Offset<flatbuffers::String> ResourceName) { fbb_.AddOffset(4, ResourceName); }
-  void add_ResourcePath(flatbuffers::Offset<flatbuffers::String> ResourcePath) { fbb_.AddOffset(6, ResourcePath); }
+  void add_ResourceName(flatbuffers::Offset<flatbuffers::String> ResourceName) { fbb_.AddOffset(FBCubeTexture3D::VT_RESOURCENAME, ResourceName); }
+  void add_ResourcePath(flatbuffers::Offset<flatbuffers::String> ResourcePath) { fbb_.AddOffset(FBCubeTexture3D::VT_RESOURCEPATH, ResourcePath); }
   FBCubeTexture3DBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
   FBCubeTexture3DBuilder &operator=(const FBCubeTexture3DBuilder &);
   flatbuffers::Offset<FBCubeTexture3D> Finish() {
@@ -78,32 +92,46 @@ struct FBCubeTexture3DBuilder {
 };
 
 inline flatbuffers::Offset<FBCubeTexture3D> CreateFBCubeTexture3D(flatbuffers::FlatBufferBuilder &_fbb,
-   flatbuffers::Offset<flatbuffers::String> ResourceName = 0,
-   flatbuffers::Offset<flatbuffers::String> ResourcePath = 0) {
+    flatbuffers::Offset<flatbuffers::String> ResourceName = 0,
+    flatbuffers::Offset<flatbuffers::String> ResourcePath = 0) {
   FBCubeTexture3DBuilder builder_(_fbb);
   builder_.add_ResourcePath(ResourcePath);
   builder_.add_ResourceName(ResourceName);
   return builder_.Finish();
 }
 
+inline flatbuffers::Offset<FBCubeTexture3D> CreateFBCubeTexture3DDirect(flatbuffers::FlatBufferBuilder &_fbb,
+    const char *ResourceName = nullptr,
+    const char *ResourcePath = nullptr) {
+  return CreateFBCubeTexture3D(_fbb, ResourceName ? _fbb.CreateString(ResourceName) : 0, ResourcePath ? _fbb.CreateString(ResourcePath) : 0);
+}
+
 struct FBXCMesh FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  const flatbuffers::String *ResourceName() const { return GetPointer<const flatbuffers::String *>(4); }
-  const flatbuffers::String *ResourcePath() const { return GetPointer<const flatbuffers::String *>(6); }
-  const flatbuffers::String *TextureRes() const { return GetPointer<const flatbuffers::String *>(8); }
-  const Vec3 *InitialScaling() const { return GetStruct<const Vec3 *>(10); }
-  const Vec3 *InitialRotation() const { return GetStruct<const Vec3 *>(12); }
-  ShaderType ShaderUsage() const { return static_cast<ShaderType>(GetField<int8_t>(14, 0)); }
+  enum {
+    VT_RESOURCENAME = 4,
+    VT_RESOURCEPATH = 6,
+    VT_TEXTURERES = 8,
+    VT_INITIALSCALING = 10,
+    VT_INITIALROTATION = 12,
+    VT_SHADERUSAGE = 14
+  };
+  const flatbuffers::String *ResourceName() const { return GetPointer<const flatbuffers::String *>(VT_RESOURCENAME); }
+  const flatbuffers::String *ResourcePath() const { return GetPointer<const flatbuffers::String *>(VT_RESOURCEPATH); }
+  const flatbuffers::String *TextureRes() const { return GetPointer<const flatbuffers::String *>(VT_TEXTURERES); }
+  const Vec3 *InitialScaling() const { return GetStruct<const Vec3 *>(VT_INITIALSCALING); }
+  const Vec3 *InitialRotation() const { return GetStruct<const Vec3 *>(VT_INITIALROTATION); }
+  ShaderType ShaderUsage() const { return static_cast<ShaderType>(GetField<int8_t>(VT_SHADERUSAGE, 0)); }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 4 /* ResourceName */) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_RESOURCENAME) &&
            verifier.Verify(ResourceName()) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 6 /* ResourcePath */) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_RESOURCEPATH) &&
            verifier.Verify(ResourcePath()) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 8 /* TextureRes */) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_TEXTURERES) &&
            verifier.Verify(TextureRes()) &&
-           VerifyField<Vec3>(verifier, 10 /* InitialScaling */) &&
-           VerifyField<Vec3>(verifier, 12 /* InitialRotation */) &&
-           VerifyField<int8_t>(verifier, 14 /* ShaderUsage */) &&
+           VerifyField<Vec3>(verifier, VT_INITIALSCALING) &&
+           VerifyField<Vec3>(verifier, VT_INITIALROTATION) &&
+           VerifyField<int8_t>(verifier, VT_SHADERUSAGE) &&
            verifier.EndTable();
   }
 };
@@ -111,12 +139,12 @@ struct FBXCMesh FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct FBXCMeshBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_ResourceName(flatbuffers::Offset<flatbuffers::String> ResourceName) { fbb_.AddOffset(4, ResourceName); }
-  void add_ResourcePath(flatbuffers::Offset<flatbuffers::String> ResourcePath) { fbb_.AddOffset(6, ResourcePath); }
-  void add_TextureRes(flatbuffers::Offset<flatbuffers::String> TextureRes) { fbb_.AddOffset(8, TextureRes); }
-  void add_InitialScaling(const Vec3 *InitialScaling) { fbb_.AddStruct(10, InitialScaling); }
-  void add_InitialRotation(const Vec3 *InitialRotation) { fbb_.AddStruct(12, InitialRotation); }
-  void add_ShaderUsage(ShaderType ShaderUsage) { fbb_.AddElement<int8_t>(14, static_cast<int8_t>(ShaderUsage), 0); }
+  void add_ResourceName(flatbuffers::Offset<flatbuffers::String> ResourceName) { fbb_.AddOffset(FBXCMesh::VT_RESOURCENAME, ResourceName); }
+  void add_ResourcePath(flatbuffers::Offset<flatbuffers::String> ResourcePath) { fbb_.AddOffset(FBXCMesh::VT_RESOURCEPATH, ResourcePath); }
+  void add_TextureRes(flatbuffers::Offset<flatbuffers::String> TextureRes) { fbb_.AddOffset(FBXCMesh::VT_TEXTURERES, TextureRes); }
+  void add_InitialScaling(const Vec3 *InitialScaling) { fbb_.AddStruct(FBXCMesh::VT_INITIALSCALING, InitialScaling); }
+  void add_InitialRotation(const Vec3 *InitialRotation) { fbb_.AddStruct(FBXCMesh::VT_INITIALROTATION, InitialRotation); }
+  void add_ShaderUsage(ShaderType ShaderUsage) { fbb_.AddElement<int8_t>(FBXCMesh::VT_SHADERUSAGE, static_cast<int8_t>(ShaderUsage), 0); }
   FBXCMeshBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
   FBXCMeshBuilder &operator=(const FBXCMeshBuilder &);
   flatbuffers::Offset<FBXCMesh> Finish() {
@@ -126,12 +154,12 @@ struct FBXCMeshBuilder {
 };
 
 inline flatbuffers::Offset<FBXCMesh> CreateFBXCMesh(flatbuffers::FlatBufferBuilder &_fbb,
-   flatbuffers::Offset<flatbuffers::String> ResourceName = 0,
-   flatbuffers::Offset<flatbuffers::String> ResourcePath = 0,
-   flatbuffers::Offset<flatbuffers::String> TextureRes = 0,
-   const Vec3 *InitialScaling = 0,
-   const Vec3 *InitialRotation = 0,
-   ShaderType ShaderUsage = ShaderType_Default) {
+    flatbuffers::Offset<flatbuffers::String> ResourceName = 0,
+    flatbuffers::Offset<flatbuffers::String> ResourcePath = 0,
+    flatbuffers::Offset<flatbuffers::String> TextureRes = 0,
+    const Vec3 *InitialScaling = 0,
+    const Vec3 *InitialRotation = 0,
+    ShaderType ShaderUsage = ShaderType_Default) {
   FBXCMeshBuilder builder_(_fbb);
   builder_.add_InitialRotation(InitialRotation);
   builder_.add_InitialScaling(InitialScaling);
@@ -142,31 +170,49 @@ inline flatbuffers::Offset<FBXCMesh> CreateFBXCMesh(flatbuffers::FlatBufferBuild
   return builder_.Finish();
 }
 
+inline flatbuffers::Offset<FBXCMesh> CreateFBXCMeshDirect(flatbuffers::FlatBufferBuilder &_fbb,
+    const char *ResourceName = nullptr,
+    const char *ResourcePath = nullptr,
+    const char *TextureRes = nullptr,
+    const Vec3 *InitialScaling = 0,
+    const Vec3 *InitialRotation = 0,
+    ShaderType ShaderUsage = ShaderType_Default) {
+  return CreateFBXCMesh(_fbb, ResourceName ? _fbb.CreateString(ResourceName) : 0, ResourcePath ? _fbb.CreateString(ResourcePath) : 0, TextureRes ? _fbb.CreateString(TextureRes) : 0, InitialScaling, InitialRotation, ShaderUsage);
+}
+
 struct FBResources FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  const flatbuffers::Vector<flatbuffers::Offset<FBTexture2D>> *FBTexture2DS() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBTexture2D>> *>(4); }
-  const flatbuffers::Vector<flatbuffers::Offset<FBXCMesh>> *FBXCMeshes() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBXCMesh>> *>(6); }
-  const flatbuffers::Vector<flatbuffers::Offset<FBXCMesh>> *FBMeshCustoms() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBXCMesh>> *>(8); }
-  const flatbuffers::Vector<flatbuffers::Offset<FBXCMesh>> *FBMeshFBX() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBXCMesh>> *>(10); }
-  const flatbuffers::Vector<flatbuffers::Offset<FBXCMesh>> *FBVectorFontMesh() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBXCMesh>> *>(12); }
-  const flatbuffers::Vector<flatbuffers::Offset<FBCubeTexture3D>> *FBCubeTexture3DS() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBCubeTexture3D>> *>(14); }
+  enum {
+    VT_FBTEXTURE2DS = 4,
+    VT_FBXCMESHES = 6,
+    VT_FBMESHCUSTOMS = 8,
+    VT_FBMESHFBX = 10,
+    VT_FBVECTORFONTMESH = 12,
+    VT_FBCUBETEXTURE3DS = 14
+  };
+  const flatbuffers::Vector<flatbuffers::Offset<FBTexture2D>> *FBTexture2DS() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBTexture2D>> *>(VT_FBTEXTURE2DS); }
+  const flatbuffers::Vector<flatbuffers::Offset<FBXCMesh>> *FBXCMeshes() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBXCMesh>> *>(VT_FBXCMESHES); }
+  const flatbuffers::Vector<flatbuffers::Offset<FBXCMesh>> *FBMeshCustoms() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBXCMesh>> *>(VT_FBMESHCUSTOMS); }
+  const flatbuffers::Vector<flatbuffers::Offset<FBXCMesh>> *FBMeshFBX() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBXCMesh>> *>(VT_FBMESHFBX); }
+  const flatbuffers::Vector<flatbuffers::Offset<FBXCMesh>> *FBVectorFontMesh() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBXCMesh>> *>(VT_FBVECTORFONTMESH); }
+  const flatbuffers::Vector<flatbuffers::Offset<FBCubeTexture3D>> *FBCubeTexture3DS() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBCubeTexture3D>> *>(VT_FBCUBETEXTURE3DS); }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 4 /* FBTexture2DS */) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_FBTEXTURE2DS) &&
            verifier.Verify(FBTexture2DS()) &&
            verifier.VerifyVectorOfTables(FBTexture2DS()) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 6 /* FBXCMeshes */) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_FBXCMESHES) &&
            verifier.Verify(FBXCMeshes()) &&
            verifier.VerifyVectorOfTables(FBXCMeshes()) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 8 /* FBMeshCustoms */) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_FBMESHCUSTOMS) &&
            verifier.Verify(FBMeshCustoms()) &&
            verifier.VerifyVectorOfTables(FBMeshCustoms()) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 10 /* FBMeshFBX */) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_FBMESHFBX) &&
            verifier.Verify(FBMeshFBX()) &&
            verifier.VerifyVectorOfTables(FBMeshFBX()) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 12 /* FBVectorFontMesh */) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_FBVECTORFONTMESH) &&
            verifier.Verify(FBVectorFontMesh()) &&
            verifier.VerifyVectorOfTables(FBVectorFontMesh()) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 14 /* FBCubeTexture3DS */) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_FBCUBETEXTURE3DS) &&
            verifier.Verify(FBCubeTexture3DS()) &&
            verifier.VerifyVectorOfTables(FBCubeTexture3DS()) &&
            verifier.EndTable();
@@ -176,12 +222,12 @@ struct FBResources FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct FBResourcesBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_FBTexture2DS(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBTexture2D>>> FBTexture2DS) { fbb_.AddOffset(4, FBTexture2DS); }
-  void add_FBXCMeshes(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBXCMesh>>> FBXCMeshes) { fbb_.AddOffset(6, FBXCMeshes); }
-  void add_FBMeshCustoms(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBXCMesh>>> FBMeshCustoms) { fbb_.AddOffset(8, FBMeshCustoms); }
-  void add_FBMeshFBX(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBXCMesh>>> FBMeshFBX) { fbb_.AddOffset(10, FBMeshFBX); }
-  void add_FBVectorFontMesh(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBXCMesh>>> FBVectorFontMesh) { fbb_.AddOffset(12, FBVectorFontMesh); }
-  void add_FBCubeTexture3DS(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBCubeTexture3D>>> FBCubeTexture3DS) { fbb_.AddOffset(14, FBCubeTexture3DS); }
+  void add_FBTexture2DS(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBTexture2D>>> FBTexture2DS) { fbb_.AddOffset(FBResources::VT_FBTEXTURE2DS, FBTexture2DS); }
+  void add_FBXCMeshes(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBXCMesh>>> FBXCMeshes) { fbb_.AddOffset(FBResources::VT_FBXCMESHES, FBXCMeshes); }
+  void add_FBMeshCustoms(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBXCMesh>>> FBMeshCustoms) { fbb_.AddOffset(FBResources::VT_FBMESHCUSTOMS, FBMeshCustoms); }
+  void add_FBMeshFBX(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBXCMesh>>> FBMeshFBX) { fbb_.AddOffset(FBResources::VT_FBMESHFBX, FBMeshFBX); }
+  void add_FBVectorFontMesh(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBXCMesh>>> FBVectorFontMesh) { fbb_.AddOffset(FBResources::VT_FBVECTORFONTMESH, FBVectorFontMesh); }
+  void add_FBCubeTexture3DS(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBCubeTexture3D>>> FBCubeTexture3DS) { fbb_.AddOffset(FBResources::VT_FBCUBETEXTURE3DS, FBCubeTexture3DS); }
   FBResourcesBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
   FBResourcesBuilder &operator=(const FBResourcesBuilder &);
   flatbuffers::Offset<FBResources> Finish() {
@@ -191,12 +237,12 @@ struct FBResourcesBuilder {
 };
 
 inline flatbuffers::Offset<FBResources> CreateFBResources(flatbuffers::FlatBufferBuilder &_fbb,
-   flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBTexture2D>>> FBTexture2DS = 0,
-   flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBXCMesh>>> FBXCMeshes = 0,
-   flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBXCMesh>>> FBMeshCustoms = 0,
-   flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBXCMesh>>> FBMeshFBX = 0,
-   flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBXCMesh>>> FBVectorFontMesh = 0,
-   flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBCubeTexture3D>>> FBCubeTexture3DS = 0) {
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBTexture2D>>> FBTexture2DS = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBXCMesh>>> FBXCMeshes = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBXCMesh>>> FBMeshCustoms = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBXCMesh>>> FBMeshFBX = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBXCMesh>>> FBVectorFontMesh = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBCubeTexture3D>>> FBCubeTexture3DS = 0) {
   FBResourcesBuilder builder_(_fbb);
   builder_.add_FBCubeTexture3DS(FBCubeTexture3DS);
   builder_.add_FBVectorFontMesh(FBVectorFontMesh);
@@ -207,11 +253,20 @@ inline flatbuffers::Offset<FBResources> CreateFBResources(flatbuffers::FlatBuffe
   return builder_.Finish();
 }
 
+inline flatbuffers::Offset<FBResources> CreateFBResourcesDirect(flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<flatbuffers::Offset<FBTexture2D>> *FBTexture2DS = nullptr,
+    const std::vector<flatbuffers::Offset<FBXCMesh>> *FBXCMeshes = nullptr,
+    const std::vector<flatbuffers::Offset<FBXCMesh>> *FBMeshCustoms = nullptr,
+    const std::vector<flatbuffers::Offset<FBXCMesh>> *FBMeshFBX = nullptr,
+    const std::vector<flatbuffers::Offset<FBXCMesh>> *FBVectorFontMesh = nullptr,
+    const std::vector<flatbuffers::Offset<FBCubeTexture3D>> *FBCubeTexture3DS = nullptr) {
+  return CreateFBResources(_fbb, FBTexture2DS ? _fbb.CreateVector<flatbuffers::Offset<FBTexture2D>>(*FBTexture2DS) : 0, FBXCMeshes ? _fbb.CreateVector<flatbuffers::Offset<FBXCMesh>>(*FBXCMeshes) : 0, FBMeshCustoms ? _fbb.CreateVector<flatbuffers::Offset<FBXCMesh>>(*FBMeshCustoms) : 0, FBMeshFBX ? _fbb.CreateVector<flatbuffers::Offset<FBXCMesh>>(*FBMeshFBX) : 0, FBVectorFontMesh ? _fbb.CreateVector<flatbuffers::Offset<FBXCMesh>>(*FBVectorFontMesh) : 0, FBCubeTexture3DS ? _fbb.CreateVector<flatbuffers::Offset<FBCubeTexture3D>>(*FBCubeTexture3DS) : 0);
+}
+
 inline const FBResources *GetFBResources(const void *buf) { return flatbuffers::GetRoot<FBResources>(buf); }
 
-inline bool VerifyFBResourcesBuffer(flatbuffers::Verifier &verifier) { return verifier.VerifyBuffer<FBResources>(); }
+inline bool VerifyFBResourcesBuffer(flatbuffers::Verifier &verifier) { return verifier.VerifyBuffer<FBResources>(nullptr); }
 
 inline void FinishFBResourcesBuffer(flatbuffers::FlatBufferBuilder &fbb, flatbuffers::Offset<FBResources> root) { fbb.Finish(root); }
-
 
 #endif  // FLATBUFFERS_GENERATED_RESOURCES_H_

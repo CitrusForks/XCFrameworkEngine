@@ -3,10 +3,6 @@ print("XC Framework Premake(Lua) Project Generation")
 workspace "XCFramework"
 	configurations { "Debug", "Release" }
 	
-print("Building C++ Win32 Project Game")
-include "Game"	
-print("Project Generation done...")
-
 print("Building C++ Win32 Project XCBase")
 include "Base"
 print("Project Generation done...")
@@ -25,8 +21,12 @@ print("Project Generation done...")
 
 print("Building C++ Win32 Project XCGameplay")
 include "Gameplay"
+print("Project Generation done...")
+
+print("Building C++ Win32 Project XCGame")
+include "Game"	
+print("Project Generation done...")
 
 print("Building C++ UniTest Project XCUnitTest")
 include "UnitTests"
-
 print("Project Generation done...")

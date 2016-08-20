@@ -5,27 +5,35 @@
 
 #include "flatbuffers/flatbuffers.h"
 
+#include "BasicTypes_generated.h"
+#include "ShaderTypes_generated.h"
 
-
-struct Vec2;
-struct Vec3;
-struct Vec4;
-struct FBBasicMaterial;
 struct FBFont;
+
 struct FBSimpleSkyBox;
+
 struct FBTexturePlane;
+
 struct FBLiveDriveTexturePlane;
+
 struct FBWaves;
+
 struct FBMultiTexturedTerrain;
+
 struct FBCar;
+
 struct FBDoor;
+
 struct FBSoldier;
 
 struct FBFont FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  const flatbuffers::String *FontResourceName() const { return GetPointer<const flatbuffers::String *>(4); }
+  enum {
+    VT_FONTRESOURCENAME = 4
+  };
+  const flatbuffers::String *FontResourceName() const { return GetPointer<const flatbuffers::String *>(VT_FONTRESOURCENAME); }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 4 /* FontResourceName */) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_FONTRESOURCENAME) &&
            verifier.Verify(FontResourceName()) &&
            verifier.EndTable();
   }
@@ -34,7 +42,7 @@ struct FBFont FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct FBFontBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_FontResourceName(flatbuffers::Offset<flatbuffers::String> FontResourceName) { fbb_.AddOffset(4, FontResourceName); }
+  void add_FontResourceName(flatbuffers::Offset<flatbuffers::String> FontResourceName) { fbb_.AddOffset(FBFont::VT_FONTRESOURCENAME, FontResourceName); }
   FBFontBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
   FBFontBuilder &operator=(const FBFontBuilder &);
   flatbuffers::Offset<FBFont> Finish() {
@@ -44,29 +52,42 @@ struct FBFontBuilder {
 };
 
 inline flatbuffers::Offset<FBFont> CreateFBFont(flatbuffers::FlatBufferBuilder &_fbb,
-   flatbuffers::Offset<flatbuffers::String> FontResourceName = 0) {
+    flatbuffers::Offset<flatbuffers::String> FontResourceName = 0) {
   FBFontBuilder builder_(_fbb);
   builder_.add_FontResourceName(FontResourceName);
   return builder_.Finish();
 }
 
+inline flatbuffers::Offset<FBFont> CreateFBFontDirect(flatbuffers::FlatBufferBuilder &_fbb,
+    const char *FontResourceName = nullptr) {
+  return CreateFBFont(_fbb, FontResourceName ? _fbb.CreateString(FontResourceName) : 0);
+}
+
 struct FBSimpleSkyBox FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  const Vec4 *Position() const { return GetStruct<const Vec4 *>(4); }
-  const Vec4 *Rotation() const { return GetStruct<const Vec4 *>(6); }
-  const Vec4 *Scaling() const { return GetStruct<const Vec4 *>(8); }
-  const FBBasicMaterial *Material() const { return GetPointer<const FBBasicMaterial *>(10); }
-  const flatbuffers::String *CubeTexture3DResourceName() const { return GetPointer<const flatbuffers::String *>(12); }
-  RasterType RasterizerType() const { return static_cast<RasterType>(GetField<int16_t>(14, 0)); }
+  enum {
+    VT_POSITION = 4,
+    VT_ROTATION = 6,
+    VT_SCALING = 8,
+    VT_MATERIAL = 10,
+    VT_CUBETEXTURE3DRESOURCENAME = 12,
+    VT_RASTERIZERTYPE = 14
+  };
+  const Vec4 *Position() const { return GetStruct<const Vec4 *>(VT_POSITION); }
+  const Vec4 *Rotation() const { return GetStruct<const Vec4 *>(VT_ROTATION); }
+  const Vec4 *Scaling() const { return GetStruct<const Vec4 *>(VT_SCALING); }
+  const FBBasicMaterial *Material() const { return GetPointer<const FBBasicMaterial *>(VT_MATERIAL); }
+  const flatbuffers::String *CubeTexture3DResourceName() const { return GetPointer<const flatbuffers::String *>(VT_CUBETEXTURE3DRESOURCENAME); }
+  RasterType RasterizerType() const { return static_cast<RasterType>(GetField<int16_t>(VT_RASTERIZERTYPE, 0)); }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<Vec4>(verifier, 4 /* Position */) &&
-           VerifyField<Vec4>(verifier, 6 /* Rotation */) &&
-           VerifyField<Vec4>(verifier, 8 /* Scaling */) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 10 /* Material */) &&
+           VerifyField<Vec4>(verifier, VT_POSITION) &&
+           VerifyField<Vec4>(verifier, VT_ROTATION) &&
+           VerifyField<Vec4>(verifier, VT_SCALING) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_MATERIAL) &&
            verifier.VerifyTable(Material()) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 12 /* CubeTexture3DResourceName */) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_CUBETEXTURE3DRESOURCENAME) &&
            verifier.Verify(CubeTexture3DResourceName()) &&
-           VerifyField<int16_t>(verifier, 14 /* RasterizerType */) &&
+           VerifyField<int16_t>(verifier, VT_RASTERIZERTYPE) &&
            verifier.EndTable();
   }
 };
@@ -74,12 +95,12 @@ struct FBSimpleSkyBox FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct FBSimpleSkyBoxBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_Position(const Vec4 *Position) { fbb_.AddStruct(4, Position); }
-  void add_Rotation(const Vec4 *Rotation) { fbb_.AddStruct(6, Rotation); }
-  void add_Scaling(const Vec4 *Scaling) { fbb_.AddStruct(8, Scaling); }
-  void add_Material(flatbuffers::Offset<FBBasicMaterial> Material) { fbb_.AddOffset(10, Material); }
-  void add_CubeTexture3DResourceName(flatbuffers::Offset<flatbuffers::String> CubeTexture3DResourceName) { fbb_.AddOffset(12, CubeTexture3DResourceName); }
-  void add_RasterizerType(RasterType RasterizerType) { fbb_.AddElement<int16_t>(14, static_cast<int16_t>(RasterizerType), 0); }
+  void add_Position(const Vec4 *Position) { fbb_.AddStruct(FBSimpleSkyBox::VT_POSITION, Position); }
+  void add_Rotation(const Vec4 *Rotation) { fbb_.AddStruct(FBSimpleSkyBox::VT_ROTATION, Rotation); }
+  void add_Scaling(const Vec4 *Scaling) { fbb_.AddStruct(FBSimpleSkyBox::VT_SCALING, Scaling); }
+  void add_Material(flatbuffers::Offset<FBBasicMaterial> Material) { fbb_.AddOffset(FBSimpleSkyBox::VT_MATERIAL, Material); }
+  void add_CubeTexture3DResourceName(flatbuffers::Offset<flatbuffers::String> CubeTexture3DResourceName) { fbb_.AddOffset(FBSimpleSkyBox::VT_CUBETEXTURE3DRESOURCENAME, CubeTexture3DResourceName); }
+  void add_RasterizerType(RasterType RasterizerType) { fbb_.AddElement<int16_t>(FBSimpleSkyBox::VT_RASTERIZERTYPE, static_cast<int16_t>(RasterizerType), 0); }
   FBSimpleSkyBoxBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
   FBSimpleSkyBoxBuilder &operator=(const FBSimpleSkyBoxBuilder &);
   flatbuffers::Offset<FBSimpleSkyBox> Finish() {
@@ -89,12 +110,12 @@ struct FBSimpleSkyBoxBuilder {
 };
 
 inline flatbuffers::Offset<FBSimpleSkyBox> CreateFBSimpleSkyBox(flatbuffers::FlatBufferBuilder &_fbb,
-   const Vec4 *Position = 0,
-   const Vec4 *Rotation = 0,
-   const Vec4 *Scaling = 0,
-   flatbuffers::Offset<FBBasicMaterial> Material = 0,
-   flatbuffers::Offset<flatbuffers::String> CubeTexture3DResourceName = 0,
-   RasterType RasterizerType = RasterType_FillWireframe) {
+    const Vec4 *Position = 0,
+    const Vec4 *Rotation = 0,
+    const Vec4 *Scaling = 0,
+    flatbuffers::Offset<FBBasicMaterial> Material = 0,
+    flatbuffers::Offset<flatbuffers::String> CubeTexture3DResourceName = 0,
+    RasterType RasterizerType = RasterType_FillWireframe) {
   FBSimpleSkyBoxBuilder builder_(_fbb);
   builder_.add_CubeTexture3DResourceName(CubeTexture3DResourceName);
   builder_.add_Material(Material);
@@ -105,23 +126,41 @@ inline flatbuffers::Offset<FBSimpleSkyBox> CreateFBSimpleSkyBox(flatbuffers::Fla
   return builder_.Finish();
 }
 
+inline flatbuffers::Offset<FBSimpleSkyBox> CreateFBSimpleSkyBoxDirect(flatbuffers::FlatBufferBuilder &_fbb,
+    const Vec4 *Position = 0,
+    const Vec4 *Rotation = 0,
+    const Vec4 *Scaling = 0,
+    flatbuffers::Offset<FBBasicMaterial> Material = 0,
+    const char *CubeTexture3DResourceName = nullptr,
+    RasterType RasterizerType = RasterType_FillWireframe) {
+  return CreateFBSimpleSkyBox(_fbb, Position, Rotation, Scaling, Material, CubeTexture3DResourceName ? _fbb.CreateString(CubeTexture3DResourceName) : 0, RasterizerType);
+}
+
 struct FBTexturePlane FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  const Vec4 *Position() const { return GetStruct<const Vec4 *>(4); }
-  const Vec4 *Rotation() const { return GetStruct<const Vec4 *>(6); }
-  const Vec4 *Scaling() const { return GetStruct<const Vec4 *>(8); }
-  const FBBasicMaterial *Material() const { return GetPointer<const FBBasicMaterial *>(10); }
-  const flatbuffers::String *ResourceName() const { return GetPointer<const flatbuffers::String *>(12); }
-  RasterType RasterizerType() const { return static_cast<RasterType>(GetField<int16_t>(14, 0)); }
+  enum {
+    VT_POSITION = 4,
+    VT_ROTATION = 6,
+    VT_SCALING = 8,
+    VT_MATERIAL = 10,
+    VT_RESOURCENAME = 12,
+    VT_RASTERIZERTYPE = 14
+  };
+  const Vec4 *Position() const { return GetStruct<const Vec4 *>(VT_POSITION); }
+  const Vec4 *Rotation() const { return GetStruct<const Vec4 *>(VT_ROTATION); }
+  const Vec4 *Scaling() const { return GetStruct<const Vec4 *>(VT_SCALING); }
+  const FBBasicMaterial *Material() const { return GetPointer<const FBBasicMaterial *>(VT_MATERIAL); }
+  const flatbuffers::String *ResourceName() const { return GetPointer<const flatbuffers::String *>(VT_RESOURCENAME); }
+  RasterType RasterizerType() const { return static_cast<RasterType>(GetField<int16_t>(VT_RASTERIZERTYPE, 0)); }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<Vec4>(verifier, 4 /* Position */) &&
-           VerifyField<Vec4>(verifier, 6 /* Rotation */) &&
-           VerifyField<Vec4>(verifier, 8 /* Scaling */) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 10 /* Material */) &&
+           VerifyField<Vec4>(verifier, VT_POSITION) &&
+           VerifyField<Vec4>(verifier, VT_ROTATION) &&
+           VerifyField<Vec4>(verifier, VT_SCALING) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_MATERIAL) &&
            verifier.VerifyTable(Material()) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 12 /* ResourceName */) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_RESOURCENAME) &&
            verifier.Verify(ResourceName()) &&
-           VerifyField<int16_t>(verifier, 14 /* RasterizerType */) &&
+           VerifyField<int16_t>(verifier, VT_RASTERIZERTYPE) &&
            verifier.EndTable();
   }
 };
@@ -129,12 +168,12 @@ struct FBTexturePlane FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct FBTexturePlaneBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_Position(const Vec4 *Position) { fbb_.AddStruct(4, Position); }
-  void add_Rotation(const Vec4 *Rotation) { fbb_.AddStruct(6, Rotation); }
-  void add_Scaling(const Vec4 *Scaling) { fbb_.AddStruct(8, Scaling); }
-  void add_Material(flatbuffers::Offset<FBBasicMaterial> Material) { fbb_.AddOffset(10, Material); }
-  void add_ResourceName(flatbuffers::Offset<flatbuffers::String> ResourceName) { fbb_.AddOffset(12, ResourceName); }
-  void add_RasterizerType(RasterType RasterizerType) { fbb_.AddElement<int16_t>(14, static_cast<int16_t>(RasterizerType), 0); }
+  void add_Position(const Vec4 *Position) { fbb_.AddStruct(FBTexturePlane::VT_POSITION, Position); }
+  void add_Rotation(const Vec4 *Rotation) { fbb_.AddStruct(FBTexturePlane::VT_ROTATION, Rotation); }
+  void add_Scaling(const Vec4 *Scaling) { fbb_.AddStruct(FBTexturePlane::VT_SCALING, Scaling); }
+  void add_Material(flatbuffers::Offset<FBBasicMaterial> Material) { fbb_.AddOffset(FBTexturePlane::VT_MATERIAL, Material); }
+  void add_ResourceName(flatbuffers::Offset<flatbuffers::String> ResourceName) { fbb_.AddOffset(FBTexturePlane::VT_RESOURCENAME, ResourceName); }
+  void add_RasterizerType(RasterType RasterizerType) { fbb_.AddElement<int16_t>(FBTexturePlane::VT_RASTERIZERTYPE, static_cast<int16_t>(RasterizerType), 0); }
   FBTexturePlaneBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
   FBTexturePlaneBuilder &operator=(const FBTexturePlaneBuilder &);
   flatbuffers::Offset<FBTexturePlane> Finish() {
@@ -144,12 +183,12 @@ struct FBTexturePlaneBuilder {
 };
 
 inline flatbuffers::Offset<FBTexturePlane> CreateFBTexturePlane(flatbuffers::FlatBufferBuilder &_fbb,
-   const Vec4 *Position = 0,
-   const Vec4 *Rotation = 0,
-   const Vec4 *Scaling = 0,
-   flatbuffers::Offset<FBBasicMaterial> Material = 0,
-   flatbuffers::Offset<flatbuffers::String> ResourceName = 0,
-   RasterType RasterizerType = RasterType_FillWireframe) {
+    const Vec4 *Position = 0,
+    const Vec4 *Rotation = 0,
+    const Vec4 *Scaling = 0,
+    flatbuffers::Offset<FBBasicMaterial> Material = 0,
+    flatbuffers::Offset<flatbuffers::String> ResourceName = 0,
+    RasterType RasterizerType = RasterType_FillWireframe) {
   FBTexturePlaneBuilder builder_(_fbb);
   builder_.add_ResourceName(ResourceName);
   builder_.add_Material(Material);
@@ -160,20 +199,37 @@ inline flatbuffers::Offset<FBTexturePlane> CreateFBTexturePlane(flatbuffers::Fla
   return builder_.Finish();
 }
 
+inline flatbuffers::Offset<FBTexturePlane> CreateFBTexturePlaneDirect(flatbuffers::FlatBufferBuilder &_fbb,
+    const Vec4 *Position = 0,
+    const Vec4 *Rotation = 0,
+    const Vec4 *Scaling = 0,
+    flatbuffers::Offset<FBBasicMaterial> Material = 0,
+    const char *ResourceName = nullptr,
+    RasterType RasterizerType = RasterType_FillWireframe) {
+  return CreateFBTexturePlane(_fbb, Position, Rotation, Scaling, Material, ResourceName ? _fbb.CreateString(ResourceName) : 0, RasterizerType);
+}
+
 struct FBLiveDriveTexturePlane FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  const Vec4 *Position() const { return GetStruct<const Vec4 *>(4); }
-  const Vec4 *Rotation() const { return GetStruct<const Vec4 *>(6); }
-  const Vec4 *Scaling() const { return GetStruct<const Vec4 *>(8); }
-  const FBBasicMaterial *Material() const { return GetPointer<const FBBasicMaterial *>(10); }
-  RasterType RasterizerType() const { return static_cast<RasterType>(GetField<int16_t>(12, 0)); }
+  enum {
+    VT_POSITION = 4,
+    VT_ROTATION = 6,
+    VT_SCALING = 8,
+    VT_MATERIAL = 10,
+    VT_RASTERIZERTYPE = 12
+  };
+  const Vec4 *Position() const { return GetStruct<const Vec4 *>(VT_POSITION); }
+  const Vec4 *Rotation() const { return GetStruct<const Vec4 *>(VT_ROTATION); }
+  const Vec4 *Scaling() const { return GetStruct<const Vec4 *>(VT_SCALING); }
+  const FBBasicMaterial *Material() const { return GetPointer<const FBBasicMaterial *>(VT_MATERIAL); }
+  RasterType RasterizerType() const { return static_cast<RasterType>(GetField<int16_t>(VT_RASTERIZERTYPE, 0)); }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<Vec4>(verifier, 4 /* Position */) &&
-           VerifyField<Vec4>(verifier, 6 /* Rotation */) &&
-           VerifyField<Vec4>(verifier, 8 /* Scaling */) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 10 /* Material */) &&
+           VerifyField<Vec4>(verifier, VT_POSITION) &&
+           VerifyField<Vec4>(verifier, VT_ROTATION) &&
+           VerifyField<Vec4>(verifier, VT_SCALING) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_MATERIAL) &&
            verifier.VerifyTable(Material()) &&
-           VerifyField<int16_t>(verifier, 12 /* RasterizerType */) &&
+           VerifyField<int16_t>(verifier, VT_RASTERIZERTYPE) &&
            verifier.EndTable();
   }
 };
@@ -181,11 +237,11 @@ struct FBLiveDriveTexturePlane FLATBUFFERS_FINAL_CLASS : private flatbuffers::Ta
 struct FBLiveDriveTexturePlaneBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_Position(const Vec4 *Position) { fbb_.AddStruct(4, Position); }
-  void add_Rotation(const Vec4 *Rotation) { fbb_.AddStruct(6, Rotation); }
-  void add_Scaling(const Vec4 *Scaling) { fbb_.AddStruct(8, Scaling); }
-  void add_Material(flatbuffers::Offset<FBBasicMaterial> Material) { fbb_.AddOffset(10, Material); }
-  void add_RasterizerType(RasterType RasterizerType) { fbb_.AddElement<int16_t>(12, static_cast<int16_t>(RasterizerType), 0); }
+  void add_Position(const Vec4 *Position) { fbb_.AddStruct(FBLiveDriveTexturePlane::VT_POSITION, Position); }
+  void add_Rotation(const Vec4 *Rotation) { fbb_.AddStruct(FBLiveDriveTexturePlane::VT_ROTATION, Rotation); }
+  void add_Scaling(const Vec4 *Scaling) { fbb_.AddStruct(FBLiveDriveTexturePlane::VT_SCALING, Scaling); }
+  void add_Material(flatbuffers::Offset<FBBasicMaterial> Material) { fbb_.AddOffset(FBLiveDriveTexturePlane::VT_MATERIAL, Material); }
+  void add_RasterizerType(RasterType RasterizerType) { fbb_.AddElement<int16_t>(FBLiveDriveTexturePlane::VT_RASTERIZERTYPE, static_cast<int16_t>(RasterizerType), 0); }
   FBLiveDriveTexturePlaneBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
   FBLiveDriveTexturePlaneBuilder &operator=(const FBLiveDriveTexturePlaneBuilder &);
   flatbuffers::Offset<FBLiveDriveTexturePlane> Finish() {
@@ -195,11 +251,11 @@ struct FBLiveDriveTexturePlaneBuilder {
 };
 
 inline flatbuffers::Offset<FBLiveDriveTexturePlane> CreateFBLiveDriveTexturePlane(flatbuffers::FlatBufferBuilder &_fbb,
-   const Vec4 *Position = 0,
-   const Vec4 *Rotation = 0,
-   const Vec4 *Scaling = 0,
-   flatbuffers::Offset<FBBasicMaterial> Material = 0,
-   RasterType RasterizerType = RasterType_FillWireframe) {
+    const Vec4 *Position = 0,
+    const Vec4 *Rotation = 0,
+    const Vec4 *Scaling = 0,
+    flatbuffers::Offset<FBBasicMaterial> Material = 0,
+    RasterType RasterizerType = RasterType_FillWireframe) {
   FBLiveDriveTexturePlaneBuilder builder_(_fbb);
   builder_.add_Material(Material);
   builder_.add_Scaling(Scaling);
@@ -210,18 +266,25 @@ inline flatbuffers::Offset<FBLiveDriveTexturePlane> CreateFBLiveDriveTexturePlan
 }
 
 struct FBWaves FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  const Vec3 *Position() const { return GetStruct<const Vec3 *>(4); }
-  int32_t Rows() const { return GetField<int32_t>(6, 0); }
-  int32_t Column() const { return GetField<int32_t>(8, 0); }
-  int32_t RowSpacing() const { return GetField<int32_t>(10, 0); }
-  int32_t ColSpacing() const { return GetField<int32_t>(12, 0); }
+  enum {
+    VT_POSITION = 4,
+    VT_ROWS = 6,
+    VT_COLUMN = 8,
+    VT_ROWSPACING = 10,
+    VT_COLSPACING = 12
+  };
+  const Vec3 *Position() const { return GetStruct<const Vec3 *>(VT_POSITION); }
+  int32_t Rows() const { return GetField<int32_t>(VT_ROWS, 0); }
+  int32_t Column() const { return GetField<int32_t>(VT_COLUMN, 0); }
+  int32_t RowSpacing() const { return GetField<int32_t>(VT_ROWSPACING, 0); }
+  int32_t ColSpacing() const { return GetField<int32_t>(VT_COLSPACING, 0); }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<Vec3>(verifier, 4 /* Position */) &&
-           VerifyField<int32_t>(verifier, 6 /* Rows */) &&
-           VerifyField<int32_t>(verifier, 8 /* Column */) &&
-           VerifyField<int32_t>(verifier, 10 /* RowSpacing */) &&
-           VerifyField<int32_t>(verifier, 12 /* ColSpacing */) &&
+           VerifyField<Vec3>(verifier, VT_POSITION) &&
+           VerifyField<int32_t>(verifier, VT_ROWS) &&
+           VerifyField<int32_t>(verifier, VT_COLUMN) &&
+           VerifyField<int32_t>(verifier, VT_ROWSPACING) &&
+           VerifyField<int32_t>(verifier, VT_COLSPACING) &&
            verifier.EndTable();
   }
 };
@@ -229,11 +292,11 @@ struct FBWaves FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct FBWavesBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_Position(const Vec3 *Position) { fbb_.AddStruct(4, Position); }
-  void add_Rows(int32_t Rows) { fbb_.AddElement<int32_t>(6, Rows, 0); }
-  void add_Column(int32_t Column) { fbb_.AddElement<int32_t>(8, Column, 0); }
-  void add_RowSpacing(int32_t RowSpacing) { fbb_.AddElement<int32_t>(10, RowSpacing, 0); }
-  void add_ColSpacing(int32_t ColSpacing) { fbb_.AddElement<int32_t>(12, ColSpacing, 0); }
+  void add_Position(const Vec3 *Position) { fbb_.AddStruct(FBWaves::VT_POSITION, Position); }
+  void add_Rows(int32_t Rows) { fbb_.AddElement<int32_t>(FBWaves::VT_ROWS, Rows, 0); }
+  void add_Column(int32_t Column) { fbb_.AddElement<int32_t>(FBWaves::VT_COLUMN, Column, 0); }
+  void add_RowSpacing(int32_t RowSpacing) { fbb_.AddElement<int32_t>(FBWaves::VT_ROWSPACING, RowSpacing, 0); }
+  void add_ColSpacing(int32_t ColSpacing) { fbb_.AddElement<int32_t>(FBWaves::VT_COLSPACING, ColSpacing, 0); }
   FBWavesBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
   FBWavesBuilder &operator=(const FBWavesBuilder &);
   flatbuffers::Offset<FBWaves> Finish() {
@@ -243,11 +306,11 @@ struct FBWavesBuilder {
 };
 
 inline flatbuffers::Offset<FBWaves> CreateFBWaves(flatbuffers::FlatBufferBuilder &_fbb,
-   const Vec3 *Position = 0,
-   int32_t Rows = 0,
-   int32_t Column = 0,
-   int32_t RowSpacing = 0,
-   int32_t ColSpacing = 0) {
+    const Vec3 *Position = 0,
+    int32_t Rows = 0,
+    int32_t Column = 0,
+    int32_t RowSpacing = 0,
+    int32_t ColSpacing = 0) {
   FBWavesBuilder builder_(_fbb);
   builder_.add_ColSpacing(ColSpacing);
   builder_.add_RowSpacing(RowSpacing);
@@ -258,33 +321,45 @@ inline flatbuffers::Offset<FBWaves> CreateFBWaves(flatbuffers::FlatBufferBuilder
 }
 
 struct FBMultiTexturedTerrain FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  const flatbuffers::String *BitmapFileName() const { return GetPointer<const flatbuffers::String *>(4); }
-  const flatbuffers::String *Texture2DResourceName() const { return GetPointer<const flatbuffers::String *>(6); }
-  const flatbuffers::String *Texture2DResourceName1() const { return GetPointer<const flatbuffers::String *>(8); }
-  const flatbuffers::String *Texture2DResourceName2() const { return GetPointer<const flatbuffers::String *>(10); }
-  const flatbuffers::String *Texture2DBlendResourceName3() const { return GetPointer<const flatbuffers::String *>(12); }
-  const Vec3 *Position() const { return GetStruct<const Vec3 *>(14); }
-  int32_t Rows() const { return GetField<int32_t>(16, 0); }
-  int32_t Column() const { return GetField<int32_t>(18, 0); }
-  int32_t RowSpacing() const { return GetField<int32_t>(20, 0); }
-  int32_t ColSpacing() const { return GetField<int32_t>(22, 0); }
+  enum {
+    VT_BITMAPFILENAME = 4,
+    VT_TEXTURE2DRESOURCENAME = 6,
+    VT_TEXTURE2DRESOURCENAME1 = 8,
+    VT_TEXTURE2DRESOURCENAME2 = 10,
+    VT_TEXTURE2DBLENDRESOURCENAME3 = 12,
+    VT_POSITION = 14,
+    VT_ROWS = 16,
+    VT_COLUMN = 18,
+    VT_ROWSPACING = 20,
+    VT_COLSPACING = 22
+  };
+  const flatbuffers::String *BitmapFileName() const { return GetPointer<const flatbuffers::String *>(VT_BITMAPFILENAME); }
+  const flatbuffers::String *Texture2DResourceName() const { return GetPointer<const flatbuffers::String *>(VT_TEXTURE2DRESOURCENAME); }
+  const flatbuffers::String *Texture2DResourceName1() const { return GetPointer<const flatbuffers::String *>(VT_TEXTURE2DRESOURCENAME1); }
+  const flatbuffers::String *Texture2DResourceName2() const { return GetPointer<const flatbuffers::String *>(VT_TEXTURE2DRESOURCENAME2); }
+  const flatbuffers::String *Texture2DBlendResourceName3() const { return GetPointer<const flatbuffers::String *>(VT_TEXTURE2DBLENDRESOURCENAME3); }
+  const Vec3 *Position() const { return GetStruct<const Vec3 *>(VT_POSITION); }
+  int32_t Rows() const { return GetField<int32_t>(VT_ROWS, 0); }
+  int32_t Column() const { return GetField<int32_t>(VT_COLUMN, 0); }
+  int32_t RowSpacing() const { return GetField<int32_t>(VT_ROWSPACING, 0); }
+  int32_t ColSpacing() const { return GetField<int32_t>(VT_COLSPACING, 0); }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 4 /* BitmapFileName */) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_BITMAPFILENAME) &&
            verifier.Verify(BitmapFileName()) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 6 /* Texture2DResourceName */) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_TEXTURE2DRESOURCENAME) &&
            verifier.Verify(Texture2DResourceName()) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 8 /* Texture2DResourceName1 */) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_TEXTURE2DRESOURCENAME1) &&
            verifier.Verify(Texture2DResourceName1()) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 10 /* Texture2DResourceName2 */) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_TEXTURE2DRESOURCENAME2) &&
            verifier.Verify(Texture2DResourceName2()) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 12 /* Texture2DBlendResourceName3 */) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_TEXTURE2DBLENDRESOURCENAME3) &&
            verifier.Verify(Texture2DBlendResourceName3()) &&
-           VerifyField<Vec3>(verifier, 14 /* Position */) &&
-           VerifyField<int32_t>(verifier, 16 /* Rows */) &&
-           VerifyField<int32_t>(verifier, 18 /* Column */) &&
-           VerifyField<int32_t>(verifier, 20 /* RowSpacing */) &&
-           VerifyField<int32_t>(verifier, 22 /* ColSpacing */) &&
+           VerifyField<Vec3>(verifier, VT_POSITION) &&
+           VerifyField<int32_t>(verifier, VT_ROWS) &&
+           VerifyField<int32_t>(verifier, VT_COLUMN) &&
+           VerifyField<int32_t>(verifier, VT_ROWSPACING) &&
+           VerifyField<int32_t>(verifier, VT_COLSPACING) &&
            verifier.EndTable();
   }
 };
@@ -292,16 +367,16 @@ struct FBMultiTexturedTerrain FLATBUFFERS_FINAL_CLASS : private flatbuffers::Tab
 struct FBMultiTexturedTerrainBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_BitmapFileName(flatbuffers::Offset<flatbuffers::String> BitmapFileName) { fbb_.AddOffset(4, BitmapFileName); }
-  void add_Texture2DResourceName(flatbuffers::Offset<flatbuffers::String> Texture2DResourceName) { fbb_.AddOffset(6, Texture2DResourceName); }
-  void add_Texture2DResourceName1(flatbuffers::Offset<flatbuffers::String> Texture2DResourceName1) { fbb_.AddOffset(8, Texture2DResourceName1); }
-  void add_Texture2DResourceName2(flatbuffers::Offset<flatbuffers::String> Texture2DResourceName2) { fbb_.AddOffset(10, Texture2DResourceName2); }
-  void add_Texture2DBlendResourceName3(flatbuffers::Offset<flatbuffers::String> Texture2DBlendResourceName3) { fbb_.AddOffset(12, Texture2DBlendResourceName3); }
-  void add_Position(const Vec3 *Position) { fbb_.AddStruct(14, Position); }
-  void add_Rows(int32_t Rows) { fbb_.AddElement<int32_t>(16, Rows, 0); }
-  void add_Column(int32_t Column) { fbb_.AddElement<int32_t>(18, Column, 0); }
-  void add_RowSpacing(int32_t RowSpacing) { fbb_.AddElement<int32_t>(20, RowSpacing, 0); }
-  void add_ColSpacing(int32_t ColSpacing) { fbb_.AddElement<int32_t>(22, ColSpacing, 0); }
+  void add_BitmapFileName(flatbuffers::Offset<flatbuffers::String> BitmapFileName) { fbb_.AddOffset(FBMultiTexturedTerrain::VT_BITMAPFILENAME, BitmapFileName); }
+  void add_Texture2DResourceName(flatbuffers::Offset<flatbuffers::String> Texture2DResourceName) { fbb_.AddOffset(FBMultiTexturedTerrain::VT_TEXTURE2DRESOURCENAME, Texture2DResourceName); }
+  void add_Texture2DResourceName1(flatbuffers::Offset<flatbuffers::String> Texture2DResourceName1) { fbb_.AddOffset(FBMultiTexturedTerrain::VT_TEXTURE2DRESOURCENAME1, Texture2DResourceName1); }
+  void add_Texture2DResourceName2(flatbuffers::Offset<flatbuffers::String> Texture2DResourceName2) { fbb_.AddOffset(FBMultiTexturedTerrain::VT_TEXTURE2DRESOURCENAME2, Texture2DResourceName2); }
+  void add_Texture2DBlendResourceName3(flatbuffers::Offset<flatbuffers::String> Texture2DBlendResourceName3) { fbb_.AddOffset(FBMultiTexturedTerrain::VT_TEXTURE2DBLENDRESOURCENAME3, Texture2DBlendResourceName3); }
+  void add_Position(const Vec3 *Position) { fbb_.AddStruct(FBMultiTexturedTerrain::VT_POSITION, Position); }
+  void add_Rows(int32_t Rows) { fbb_.AddElement<int32_t>(FBMultiTexturedTerrain::VT_ROWS, Rows, 0); }
+  void add_Column(int32_t Column) { fbb_.AddElement<int32_t>(FBMultiTexturedTerrain::VT_COLUMN, Column, 0); }
+  void add_RowSpacing(int32_t RowSpacing) { fbb_.AddElement<int32_t>(FBMultiTexturedTerrain::VT_ROWSPACING, RowSpacing, 0); }
+  void add_ColSpacing(int32_t ColSpacing) { fbb_.AddElement<int32_t>(FBMultiTexturedTerrain::VT_COLSPACING, ColSpacing, 0); }
   FBMultiTexturedTerrainBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
   FBMultiTexturedTerrainBuilder &operator=(const FBMultiTexturedTerrainBuilder &);
   flatbuffers::Offset<FBMultiTexturedTerrain> Finish() {
@@ -311,16 +386,16 @@ struct FBMultiTexturedTerrainBuilder {
 };
 
 inline flatbuffers::Offset<FBMultiTexturedTerrain> CreateFBMultiTexturedTerrain(flatbuffers::FlatBufferBuilder &_fbb,
-   flatbuffers::Offset<flatbuffers::String> BitmapFileName = 0,
-   flatbuffers::Offset<flatbuffers::String> Texture2DResourceName = 0,
-   flatbuffers::Offset<flatbuffers::String> Texture2DResourceName1 = 0,
-   flatbuffers::Offset<flatbuffers::String> Texture2DResourceName2 = 0,
-   flatbuffers::Offset<flatbuffers::String> Texture2DBlendResourceName3 = 0,
-   const Vec3 *Position = 0,
-   int32_t Rows = 0,
-   int32_t Column = 0,
-   int32_t RowSpacing = 0,
-   int32_t ColSpacing = 0) {
+    flatbuffers::Offset<flatbuffers::String> BitmapFileName = 0,
+    flatbuffers::Offset<flatbuffers::String> Texture2DResourceName = 0,
+    flatbuffers::Offset<flatbuffers::String> Texture2DResourceName1 = 0,
+    flatbuffers::Offset<flatbuffers::String> Texture2DResourceName2 = 0,
+    flatbuffers::Offset<flatbuffers::String> Texture2DBlendResourceName3 = 0,
+    const Vec3 *Position = 0,
+    int32_t Rows = 0,
+    int32_t Column = 0,
+    int32_t RowSpacing = 0,
+    int32_t ColSpacing = 0) {
   FBMultiTexturedTerrainBuilder builder_(_fbb);
   builder_.add_ColSpacing(ColSpacing);
   builder_.add_RowSpacing(RowSpacing);
@@ -335,13 +410,31 @@ inline flatbuffers::Offset<FBMultiTexturedTerrain> CreateFBMultiTexturedTerrain(
   return builder_.Finish();
 }
 
+inline flatbuffers::Offset<FBMultiTexturedTerrain> CreateFBMultiTexturedTerrainDirect(flatbuffers::FlatBufferBuilder &_fbb,
+    const char *BitmapFileName = nullptr,
+    const char *Texture2DResourceName = nullptr,
+    const char *Texture2DResourceName1 = nullptr,
+    const char *Texture2DResourceName2 = nullptr,
+    const char *Texture2DBlendResourceName3 = nullptr,
+    const Vec3 *Position = 0,
+    int32_t Rows = 0,
+    int32_t Column = 0,
+    int32_t RowSpacing = 0,
+    int32_t ColSpacing = 0) {
+  return CreateFBMultiTexturedTerrain(_fbb, BitmapFileName ? _fbb.CreateString(BitmapFileName) : 0, Texture2DResourceName ? _fbb.CreateString(Texture2DResourceName) : 0, Texture2DResourceName1 ? _fbb.CreateString(Texture2DResourceName1) : 0, Texture2DResourceName2 ? _fbb.CreateString(Texture2DResourceName2) : 0, Texture2DBlendResourceName3 ? _fbb.CreateString(Texture2DBlendResourceName3) : 0, Position, Rows, Column, RowSpacing, ColSpacing);
+}
+
 struct FBCar FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  const Vec3 *Position() const { return GetStruct<const Vec3 *>(4); }
-  const flatbuffers::String *XCMeshResourceName() const { return GetPointer<const flatbuffers::String *>(6); }
+  enum {
+    VT_POSITION = 4,
+    VT_XCMESHRESOURCENAME = 6
+  };
+  const Vec3 *Position() const { return GetStruct<const Vec3 *>(VT_POSITION); }
+  const flatbuffers::String *XCMeshResourceName() const { return GetPointer<const flatbuffers::String *>(VT_XCMESHRESOURCENAME); }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<Vec3>(verifier, 4 /* Position */) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 6 /* XCMeshResourceName */) &&
+           VerifyField<Vec3>(verifier, VT_POSITION) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_XCMESHRESOURCENAME) &&
            verifier.Verify(XCMeshResourceName()) &&
            verifier.EndTable();
   }
@@ -350,8 +443,8 @@ struct FBCar FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct FBCarBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_Position(const Vec3 *Position) { fbb_.AddStruct(4, Position); }
-  void add_XCMeshResourceName(flatbuffers::Offset<flatbuffers::String> XCMeshResourceName) { fbb_.AddOffset(6, XCMeshResourceName); }
+  void add_Position(const Vec3 *Position) { fbb_.AddStruct(FBCar::VT_POSITION, Position); }
+  void add_XCMeshResourceName(flatbuffers::Offset<flatbuffers::String> XCMeshResourceName) { fbb_.AddOffset(FBCar::VT_XCMESHRESOURCENAME, XCMeshResourceName); }
   FBCarBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
   FBCarBuilder &operator=(const FBCarBuilder &);
   flatbuffers::Offset<FBCar> Finish() {
@@ -361,21 +454,31 @@ struct FBCarBuilder {
 };
 
 inline flatbuffers::Offset<FBCar> CreateFBCar(flatbuffers::FlatBufferBuilder &_fbb,
-   const Vec3 *Position = 0,
-   flatbuffers::Offset<flatbuffers::String> XCMeshResourceName = 0) {
+    const Vec3 *Position = 0,
+    flatbuffers::Offset<flatbuffers::String> XCMeshResourceName = 0) {
   FBCarBuilder builder_(_fbb);
   builder_.add_XCMeshResourceName(XCMeshResourceName);
   builder_.add_Position(Position);
   return builder_.Finish();
 }
 
+inline flatbuffers::Offset<FBCar> CreateFBCarDirect(flatbuffers::FlatBufferBuilder &_fbb,
+    const Vec3 *Position = 0,
+    const char *XCMeshResourceName = nullptr) {
+  return CreateFBCar(_fbb, Position, XCMeshResourceName ? _fbb.CreateString(XCMeshResourceName) : 0);
+}
+
 struct FBDoor FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  const Vec4 *Position() const { return GetStruct<const Vec4 *>(4); }
-  const flatbuffers::String *XCMeshResourceName() const { return GetPointer<const flatbuffers::String *>(6); }
+  enum {
+    VT_POSITION = 4,
+    VT_XCMESHRESOURCENAME = 6
+  };
+  const Vec4 *Position() const { return GetStruct<const Vec4 *>(VT_POSITION); }
+  const flatbuffers::String *XCMeshResourceName() const { return GetPointer<const flatbuffers::String *>(VT_XCMESHRESOURCENAME); }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<Vec4>(verifier, 4 /* Position */) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 6 /* XCMeshResourceName */) &&
+           VerifyField<Vec4>(verifier, VT_POSITION) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_XCMESHRESOURCENAME) &&
            verifier.Verify(XCMeshResourceName()) &&
            verifier.EndTable();
   }
@@ -384,8 +487,8 @@ struct FBDoor FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct FBDoorBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_Position(const Vec4 *Position) { fbb_.AddStruct(4, Position); }
-  void add_XCMeshResourceName(flatbuffers::Offset<flatbuffers::String> XCMeshResourceName) { fbb_.AddOffset(6, XCMeshResourceName); }
+  void add_Position(const Vec4 *Position) { fbb_.AddStruct(FBDoor::VT_POSITION, Position); }
+  void add_XCMeshResourceName(flatbuffers::Offset<flatbuffers::String> XCMeshResourceName) { fbb_.AddOffset(FBDoor::VT_XCMESHRESOURCENAME, XCMeshResourceName); }
   FBDoorBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
   FBDoorBuilder &operator=(const FBDoorBuilder &);
   flatbuffers::Offset<FBDoor> Finish() {
@@ -395,21 +498,31 @@ struct FBDoorBuilder {
 };
 
 inline flatbuffers::Offset<FBDoor> CreateFBDoor(flatbuffers::FlatBufferBuilder &_fbb,
-   const Vec4 *Position = 0,
-   flatbuffers::Offset<flatbuffers::String> XCMeshResourceName = 0) {
+    const Vec4 *Position = 0,
+    flatbuffers::Offset<flatbuffers::String> XCMeshResourceName = 0) {
   FBDoorBuilder builder_(_fbb);
   builder_.add_XCMeshResourceName(XCMeshResourceName);
   builder_.add_Position(Position);
   return builder_.Finish();
 }
 
+inline flatbuffers::Offset<FBDoor> CreateFBDoorDirect(flatbuffers::FlatBufferBuilder &_fbb,
+    const Vec4 *Position = 0,
+    const char *XCMeshResourceName = nullptr) {
+  return CreateFBDoor(_fbb, Position, XCMeshResourceName ? _fbb.CreateString(XCMeshResourceName) : 0);
+}
+
 struct FBSoldier FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  const Vec3 *Position() const { return GetStruct<const Vec3 *>(4); }
-  const flatbuffers::String *XCMeshResourceName() const { return GetPointer<const flatbuffers::String *>(6); }
+  enum {
+    VT_POSITION = 4,
+    VT_XCMESHRESOURCENAME = 6
+  };
+  const Vec3 *Position() const { return GetStruct<const Vec3 *>(VT_POSITION); }
+  const flatbuffers::String *XCMeshResourceName() const { return GetPointer<const flatbuffers::String *>(VT_XCMESHRESOURCENAME); }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<Vec3>(verifier, 4 /* Position */) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 6 /* XCMeshResourceName */) &&
+           VerifyField<Vec3>(verifier, VT_POSITION) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_XCMESHRESOURCENAME) &&
            verifier.Verify(XCMeshResourceName()) &&
            verifier.EndTable();
   }
@@ -418,8 +531,8 @@ struct FBSoldier FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct FBSoldierBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_Position(const Vec3 *Position) { fbb_.AddStruct(4, Position); }
-  void add_XCMeshResourceName(flatbuffers::Offset<flatbuffers::String> XCMeshResourceName) { fbb_.AddOffset(6, XCMeshResourceName); }
+  void add_Position(const Vec3 *Position) { fbb_.AddStruct(FBSoldier::VT_POSITION, Position); }
+  void add_XCMeshResourceName(flatbuffers::Offset<flatbuffers::String> XCMeshResourceName) { fbb_.AddOffset(FBSoldier::VT_XCMESHRESOURCENAME, XCMeshResourceName); }
   FBSoldierBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
   FBSoldierBuilder &operator=(const FBSoldierBuilder &);
   flatbuffers::Offset<FBSoldier> Finish() {
@@ -429,13 +542,18 @@ struct FBSoldierBuilder {
 };
 
 inline flatbuffers::Offset<FBSoldier> CreateFBSoldier(flatbuffers::FlatBufferBuilder &_fbb,
-   const Vec3 *Position = 0,
-   flatbuffers::Offset<flatbuffers::String> XCMeshResourceName = 0) {
+    const Vec3 *Position = 0,
+    flatbuffers::Offset<flatbuffers::String> XCMeshResourceName = 0) {
   FBSoldierBuilder builder_(_fbb);
   builder_.add_XCMeshResourceName(XCMeshResourceName);
   builder_.add_Position(Position);
   return builder_.Finish();
 }
 
+inline flatbuffers::Offset<FBSoldier> CreateFBSoldierDirect(flatbuffers::FlatBufferBuilder &_fbb,
+    const Vec3 *Position = 0,
+    const char *XCMeshResourceName = nullptr) {
+  return CreateFBSoldier(_fbb, Position, XCMeshResourceName ? _fbb.CreateString(XCMeshResourceName) : 0);
+}
 
 #endif  // FLATBUFFERS_GENERATED_GAMEPLAYACTORS_H_

@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "Gameplay/GameActors/IActor.h"
+class IActor;
 
 class SubActor
 {

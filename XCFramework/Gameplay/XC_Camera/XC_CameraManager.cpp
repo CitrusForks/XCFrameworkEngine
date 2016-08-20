@@ -98,7 +98,7 @@ void XC_CameraManager::Update(f32 dt)
     m_Cameras[m_currentCameraType]->Update(dt);
 
     //Set the global camera with the current camera values.
-    XC_ShaderContainer& shaderSystem = m_graphicsSystem->GetShaderManagerSystem();
+    XC_ShaderContainer& shaderSystem = m_graphicsSystem->GetShaderContainer();
     shaderSystem.GetGlobalShaderData().m_camera.SetProjectionMatrix(GetProjMatrix());
     shaderSystem.GetGlobalShaderData().m_camera.SetViewMatrix(GetViewMatrix());
     shaderSystem.GetGlobalShaderData().m_camera.SetPosition(GetCameraPosition());

@@ -5,10 +5,10 @@
 
 #include "flatbuffers/flatbuffers.h"
 
-
-
 struct Vec2;
+
 struct Vec3;
+
 struct Vec4;
 
 MANUALLY_ALIGNED_STRUCT(4) Vec2 FLATBUFFERS_FINAL_CLASS {
@@ -17,8 +17,10 @@ MANUALLY_ALIGNED_STRUCT(4) Vec2 FLATBUFFERS_FINAL_CLASS {
   float y_;
 
  public:
-  Vec2(float x, float y)
-    : x_(flatbuffers::EndianScalar(x)), y_(flatbuffers::EndianScalar(y)) { }
+  Vec2() { memset(this, 0, sizeof(Vec2)); }
+  Vec2(const Vec2 &_o) { memcpy(this, &_o, sizeof(Vec2)); }
+  Vec2(float _x, float _y)
+    : x_(flatbuffers::EndianScalar(_x)), y_(flatbuffers::EndianScalar(_y)) { }
 
   float x() const { return flatbuffers::EndianScalar(x_); }
   float y() const { return flatbuffers::EndianScalar(y_); }
@@ -32,8 +34,10 @@ MANUALLY_ALIGNED_STRUCT(4) Vec3 FLATBUFFERS_FINAL_CLASS {
   float z_;
 
  public:
-  Vec3(float x, float y, float z)
-    : x_(flatbuffers::EndianScalar(x)), y_(flatbuffers::EndianScalar(y)), z_(flatbuffers::EndianScalar(z)) { }
+  Vec3() { memset(this, 0, sizeof(Vec3)); }
+  Vec3(const Vec3 &_o) { memcpy(this, &_o, sizeof(Vec3)); }
+  Vec3(float _x, float _y, float _z)
+    : x_(flatbuffers::EndianScalar(_x)), y_(flatbuffers::EndianScalar(_y)), z_(flatbuffers::EndianScalar(_z)) { }
 
   float x() const { return flatbuffers::EndianScalar(x_); }
   float y() const { return flatbuffers::EndianScalar(y_); }
@@ -49,8 +53,10 @@ MANUALLY_ALIGNED_STRUCT(4) Vec4 FLATBUFFERS_FINAL_CLASS {
   float w_;
 
  public:
-  Vec4(float x, float y, float z, float w)
-    : x_(flatbuffers::EndianScalar(x)), y_(flatbuffers::EndianScalar(y)), z_(flatbuffers::EndianScalar(z)), w_(flatbuffers::EndianScalar(w)) { }
+  Vec4() { memset(this, 0, sizeof(Vec4)); }
+  Vec4(const Vec4 &_o) { memcpy(this, &_o, sizeof(Vec4)); }
+  Vec4(float _x, float _y, float _z, float _w)
+    : x_(flatbuffers::EndianScalar(_x)), y_(flatbuffers::EndianScalar(_y)), z_(flatbuffers::EndianScalar(_z)), w_(flatbuffers::EndianScalar(_w)) { }
 
   float x() const { return flatbuffers::EndianScalar(x_); }
   float y() const { return flatbuffers::EndianScalar(y_); }
@@ -58,6 +64,5 @@ MANUALLY_ALIGNED_STRUCT(4) Vec4 FLATBUFFERS_FINAL_CLASS {
   float w() const { return flatbuffers::EndianScalar(w_); }
 };
 STRUCT_END(Vec4, 16);
-
 
 #endif  // FLATBUFFERS_GENERATED_BASICTYPES_H_

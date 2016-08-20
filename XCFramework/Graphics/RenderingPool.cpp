@@ -23,7 +23,7 @@ void RenderingPool::Init()
 
     //Initialize the staged render contexts
     //These staging render context are used per frame states which are common and not be deferred. Such as clear rtv, execute deferred contexts...
-    m_FrameCommandList[0].Init(m_graphicsSystem->GetDevice(), &m_graphicsSystem->GetShaderManagerSystem(), false, true);
+    m_FrameCommandList[0].Init(m_graphicsSystem->GetDevice(), &m_graphicsSystem->GetShaderContainer(), false, true);
 
 #if defined(XCGRAPHICS_DX12)
     m_ppCmdList[0] = &m_FrameCommandList[0].GetDeviceContext();
@@ -35,7 +35,7 @@ void RenderingPool::Init()
         m_renderWorkers[workerIndex].Init();
         m_renderWorkers[workerIndex].m_workerId = workerIndex;
         m_renderWorkers[workerIndex].m_running = true;
-        m_renderWorkers[workerIndex].m_renderContext.Init(m_graphicsSystem->GetDevice(), &m_graphicsSystem->GetShaderManagerSystem(), false, true);
+        m_renderWorkers[workerIndex].m_renderContext.Init(m_graphicsSystem->GetDevice(), &m_graphicsSystem->GetShaderContainer(), false, true);
 
 #if !defined(SINGLE_THREAD_RENDER)
         m_renderWorkers[workerIndex].m_workerThread.CreateThread(m_renderWorkers[workerIndex].WorkerThreadFunc, &m_renderWorkers[workerIndex]);

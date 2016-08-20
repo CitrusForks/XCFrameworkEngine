@@ -39,6 +39,9 @@ void MemorySystemWin32::Destroy()
         _aligned_free(m_pChunkFront);
     }
 
+    //Null it here. The system container will destruct the instance of memory system.
+    ms_pMemorySystem = nullptr;
+
     m_threadLock.Release();
 }
 
@@ -58,6 +61,10 @@ bool MemorySystemWin32::AllocateChunk()
 void* MemorySystemWin32::AllocateBytes(size_t size)
 {
     m_threadLock.Enter();
+
+    //Align the size to request for min Alignment boundary.
+    //Note : On win32, the intrinsic functions requires the boundary to be 16 byte aligned and also the object that contains it need to be aligned.
+    size = (size + (AlignmentBoundary - 1)) & ~(AlignmentBoundary - 1);
 
     //Find the best block and assign it to the Type
     u32 allocatedBlockNumber = FindBlockFromAllocated(size);
@@ -86,6 +93,8 @@ void* MemorySystemWin32::AllocateBytes(size_t size)
 
         m_freeSize = m_freeSize - size;
 
+        //Logger("[Mem] Alloc %x\n", ptrToBlock);
+
         return (void*)ptrToBlock;
     }
 
@@ -101,6 +110,9 @@ void* MemorySystemWin32::NewAlloc(size_t size)
     {
         Logger("[Memory] OUT OF MEMORY");
         XCASSERT(false);
+
+        u32* crashHere = nullptr;
+        *crashHere;
         return 0;
     }
 
@@ -129,6 +141,8 @@ void MemorySystemWin32::DeleteAlloc(void** ptrToBlock)
 
             //Found the block, make it invalid by negating the block
             m_allocatedBytesList[i].m_nbOfBytes *= -1;
+
+            //Logger("[Mem] DeAlloc %x\n", t);
 
             (*ptrToBlock) = nullptr;
             t = nullptr;

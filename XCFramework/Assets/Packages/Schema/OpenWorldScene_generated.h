@@ -5,64 +5,65 @@
 
 #include "flatbuffers/flatbuffers.h"
 
+#include "BasicTypes_generated.h"
+#include "GameplayActors_generated.h"
+#include "ShaderTypes_generated.h"
 
-
-struct Vec2;
-struct Vec3;
-struct Vec4;
-struct FBBasicMaterial;
-struct FBFont;
-struct FBSimpleSkyBox;
-struct FBTexturePlane;
-struct FBLiveDriveTexturePlane;
-struct FBWaves;
-struct FBMultiTexturedTerrain;
-struct FBCar;
-struct FBDoor;
-struct FBSoldier;
 struct FBOpenWorldScene;
 
 struct FBOpenWorldScene FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  const flatbuffers::Vector<flatbuffers::Offset<FBFont>> *FBFonts() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBFont>> *>(4); }
-  const flatbuffers::Vector<flatbuffers::Offset<FBSoldier>> *FBPCSoldiers() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBSoldier>> *>(6); }
-  const flatbuffers::Vector<flatbuffers::Offset<FBSoldier>> *FBNPCSoldiers() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBSoldier>> *>(8); }
-  const flatbuffers::Vector<flatbuffers::Offset<FBCar>> *FBPCCars() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBCar>> *>(10); }
-  const flatbuffers::Vector<flatbuffers::Offset<FBCar>> *FBNPCCars() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBCar>> *>(12); }
-  const flatbuffers::Vector<flatbuffers::Offset<FBTexturePlane>> *FBTexturePlanes() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBTexturePlane>> *>(14); }
-  const flatbuffers::Vector<flatbuffers::Offset<FBLiveDriveTexturePlane>> *FBLiveDriveTexturePlanes() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBLiveDriveTexturePlane>> *>(16); }
-  const flatbuffers::Vector<flatbuffers::Offset<FBMultiTexturedTerrain>> *FBMultiTexturedTerrains() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBMultiTexturedTerrain>> *>(18); }
-  const flatbuffers::Vector<flatbuffers::Offset<FBWaves>> *FBWavess() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBWaves>> *>(20); }
-  const flatbuffers::Vector<flatbuffers::Offset<FBSimpleSkyBox>> *FBSimpleSkyBoxes() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBSimpleSkyBox>> *>(22); }
+  enum {
+    VT_FBFONTS = 4,
+    VT_FBPCSOLDIERS = 6,
+    VT_FBNPCSOLDIERS = 8,
+    VT_FBPCCARS = 10,
+    VT_FBNPCCARS = 12,
+    VT_FBTEXTUREPLANES = 14,
+    VT_FBLIVEDRIVETEXTUREPLANES = 16,
+    VT_FBMULTITEXTUREDTERRAINS = 18,
+    VT_FBWAVESS = 20,
+    VT_FBSIMPLESKYBOXES = 22
+  };
+  const flatbuffers::Vector<flatbuffers::Offset<FBFont>> *FBFonts() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBFont>> *>(VT_FBFONTS); }
+  const flatbuffers::Vector<flatbuffers::Offset<FBSoldier>> *FBPCSoldiers() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBSoldier>> *>(VT_FBPCSOLDIERS); }
+  const flatbuffers::Vector<flatbuffers::Offset<FBSoldier>> *FBNPCSoldiers() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBSoldier>> *>(VT_FBNPCSOLDIERS); }
+  const flatbuffers::Vector<flatbuffers::Offset<FBCar>> *FBPCCars() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBCar>> *>(VT_FBPCCARS); }
+  const flatbuffers::Vector<flatbuffers::Offset<FBCar>> *FBNPCCars() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBCar>> *>(VT_FBNPCCARS); }
+  const flatbuffers::Vector<flatbuffers::Offset<FBTexturePlane>> *FBTexturePlanes() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBTexturePlane>> *>(VT_FBTEXTUREPLANES); }
+  const flatbuffers::Vector<flatbuffers::Offset<FBLiveDriveTexturePlane>> *FBLiveDriveTexturePlanes() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBLiveDriveTexturePlane>> *>(VT_FBLIVEDRIVETEXTUREPLANES); }
+  const flatbuffers::Vector<flatbuffers::Offset<FBMultiTexturedTerrain>> *FBMultiTexturedTerrains() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBMultiTexturedTerrain>> *>(VT_FBMULTITEXTUREDTERRAINS); }
+  const flatbuffers::Vector<flatbuffers::Offset<FBWaves>> *FBWavess() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBWaves>> *>(VT_FBWAVESS); }
+  const flatbuffers::Vector<flatbuffers::Offset<FBSimpleSkyBox>> *FBSimpleSkyBoxes() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBSimpleSkyBox>> *>(VT_FBSIMPLESKYBOXES); }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 4 /* FBFonts */) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_FBFONTS) &&
            verifier.Verify(FBFonts()) &&
            verifier.VerifyVectorOfTables(FBFonts()) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 6 /* FBPCSoldiers */) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_FBPCSOLDIERS) &&
            verifier.Verify(FBPCSoldiers()) &&
            verifier.VerifyVectorOfTables(FBPCSoldiers()) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 8 /* FBNPCSoldiers */) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_FBNPCSOLDIERS) &&
            verifier.Verify(FBNPCSoldiers()) &&
            verifier.VerifyVectorOfTables(FBNPCSoldiers()) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 10 /* FBPCCars */) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_FBPCCARS) &&
            verifier.Verify(FBPCCars()) &&
            verifier.VerifyVectorOfTables(FBPCCars()) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 12 /* FBNPCCars */) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_FBNPCCARS) &&
            verifier.Verify(FBNPCCars()) &&
            verifier.VerifyVectorOfTables(FBNPCCars()) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 14 /* FBTexturePlanes */) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_FBTEXTUREPLANES) &&
            verifier.Verify(FBTexturePlanes()) &&
            verifier.VerifyVectorOfTables(FBTexturePlanes()) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 16 /* FBLiveDriveTexturePlanes */) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_FBLIVEDRIVETEXTUREPLANES) &&
            verifier.Verify(FBLiveDriveTexturePlanes()) &&
            verifier.VerifyVectorOfTables(FBLiveDriveTexturePlanes()) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 18 /* FBMultiTexturedTerrains */) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_FBMULTITEXTUREDTERRAINS) &&
            verifier.Verify(FBMultiTexturedTerrains()) &&
            verifier.VerifyVectorOfTables(FBMultiTexturedTerrains()) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 20 /* FBWavess */) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_FBWAVESS) &&
            verifier.Verify(FBWavess()) &&
            verifier.VerifyVectorOfTables(FBWavess()) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, 22 /* FBSimpleSkyBoxes */) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_FBSIMPLESKYBOXES) &&
            verifier.Verify(FBSimpleSkyBoxes()) &&
            verifier.VerifyVectorOfTables(FBSimpleSkyBoxes()) &&
            verifier.EndTable();
@@ -72,16 +73,16 @@ struct FBOpenWorldScene FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct FBOpenWorldSceneBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_FBFonts(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBFont>>> FBFonts) { fbb_.AddOffset(4, FBFonts); }
-  void add_FBPCSoldiers(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBSoldier>>> FBPCSoldiers) { fbb_.AddOffset(6, FBPCSoldiers); }
-  void add_FBNPCSoldiers(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBSoldier>>> FBNPCSoldiers) { fbb_.AddOffset(8, FBNPCSoldiers); }
-  void add_FBPCCars(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBCar>>> FBPCCars) { fbb_.AddOffset(10, FBPCCars); }
-  void add_FBNPCCars(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBCar>>> FBNPCCars) { fbb_.AddOffset(12, FBNPCCars); }
-  void add_FBTexturePlanes(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBTexturePlane>>> FBTexturePlanes) { fbb_.AddOffset(14, FBTexturePlanes); }
-  void add_FBLiveDriveTexturePlanes(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBLiveDriveTexturePlane>>> FBLiveDriveTexturePlanes) { fbb_.AddOffset(16, FBLiveDriveTexturePlanes); }
-  void add_FBMultiTexturedTerrains(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBMultiTexturedTerrain>>> FBMultiTexturedTerrains) { fbb_.AddOffset(18, FBMultiTexturedTerrains); }
-  void add_FBWavess(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBWaves>>> FBWavess) { fbb_.AddOffset(20, FBWavess); }
-  void add_FBSimpleSkyBoxes(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBSimpleSkyBox>>> FBSimpleSkyBoxes) { fbb_.AddOffset(22, FBSimpleSkyBoxes); }
+  void add_FBFonts(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBFont>>> FBFonts) { fbb_.AddOffset(FBOpenWorldScene::VT_FBFONTS, FBFonts); }
+  void add_FBPCSoldiers(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBSoldier>>> FBPCSoldiers) { fbb_.AddOffset(FBOpenWorldScene::VT_FBPCSOLDIERS, FBPCSoldiers); }
+  void add_FBNPCSoldiers(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBSoldier>>> FBNPCSoldiers) { fbb_.AddOffset(FBOpenWorldScene::VT_FBNPCSOLDIERS, FBNPCSoldiers); }
+  void add_FBPCCars(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBCar>>> FBPCCars) { fbb_.AddOffset(FBOpenWorldScene::VT_FBPCCARS, FBPCCars); }
+  void add_FBNPCCars(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBCar>>> FBNPCCars) { fbb_.AddOffset(FBOpenWorldScene::VT_FBNPCCARS, FBNPCCars); }
+  void add_FBTexturePlanes(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBTexturePlane>>> FBTexturePlanes) { fbb_.AddOffset(FBOpenWorldScene::VT_FBTEXTUREPLANES, FBTexturePlanes); }
+  void add_FBLiveDriveTexturePlanes(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBLiveDriveTexturePlane>>> FBLiveDriveTexturePlanes) { fbb_.AddOffset(FBOpenWorldScene::VT_FBLIVEDRIVETEXTUREPLANES, FBLiveDriveTexturePlanes); }
+  void add_FBMultiTexturedTerrains(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBMultiTexturedTerrain>>> FBMultiTexturedTerrains) { fbb_.AddOffset(FBOpenWorldScene::VT_FBMULTITEXTUREDTERRAINS, FBMultiTexturedTerrains); }
+  void add_FBWavess(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBWaves>>> FBWavess) { fbb_.AddOffset(FBOpenWorldScene::VT_FBWAVESS, FBWavess); }
+  void add_FBSimpleSkyBoxes(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBSimpleSkyBox>>> FBSimpleSkyBoxes) { fbb_.AddOffset(FBOpenWorldScene::VT_FBSIMPLESKYBOXES, FBSimpleSkyBoxes); }
   FBOpenWorldSceneBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
   FBOpenWorldSceneBuilder &operator=(const FBOpenWorldSceneBuilder &);
   flatbuffers::Offset<FBOpenWorldScene> Finish() {
@@ -91,16 +92,16 @@ struct FBOpenWorldSceneBuilder {
 };
 
 inline flatbuffers::Offset<FBOpenWorldScene> CreateFBOpenWorldScene(flatbuffers::FlatBufferBuilder &_fbb,
-   flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBFont>>> FBFonts = 0,
-   flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBSoldier>>> FBPCSoldiers = 0,
-   flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBSoldier>>> FBNPCSoldiers = 0,
-   flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBCar>>> FBPCCars = 0,
-   flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBCar>>> FBNPCCars = 0,
-   flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBTexturePlane>>> FBTexturePlanes = 0,
-   flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBLiveDriveTexturePlane>>> FBLiveDriveTexturePlanes = 0,
-   flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBMultiTexturedTerrain>>> FBMultiTexturedTerrains = 0,
-   flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBWaves>>> FBWavess = 0,
-   flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBSimpleSkyBox>>> FBSimpleSkyBoxes = 0) {
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBFont>>> FBFonts = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBSoldier>>> FBPCSoldiers = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBSoldier>>> FBNPCSoldiers = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBCar>>> FBPCCars = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBCar>>> FBNPCCars = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBTexturePlane>>> FBTexturePlanes = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBLiveDriveTexturePlane>>> FBLiveDriveTexturePlanes = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBMultiTexturedTerrain>>> FBMultiTexturedTerrains = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBWaves>>> FBWavess = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBSimpleSkyBox>>> FBSimpleSkyBoxes = 0) {
   FBOpenWorldSceneBuilder builder_(_fbb);
   builder_.add_FBSimpleSkyBoxes(FBSimpleSkyBoxes);
   builder_.add_FBWavess(FBWavess);
@@ -115,11 +116,24 @@ inline flatbuffers::Offset<FBOpenWorldScene> CreateFBOpenWorldScene(flatbuffers:
   return builder_.Finish();
 }
 
+inline flatbuffers::Offset<FBOpenWorldScene> CreateFBOpenWorldSceneDirect(flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<flatbuffers::Offset<FBFont>> *FBFonts = nullptr,
+    const std::vector<flatbuffers::Offset<FBSoldier>> *FBPCSoldiers = nullptr,
+    const std::vector<flatbuffers::Offset<FBSoldier>> *FBNPCSoldiers = nullptr,
+    const std::vector<flatbuffers::Offset<FBCar>> *FBPCCars = nullptr,
+    const std::vector<flatbuffers::Offset<FBCar>> *FBNPCCars = nullptr,
+    const std::vector<flatbuffers::Offset<FBTexturePlane>> *FBTexturePlanes = nullptr,
+    const std::vector<flatbuffers::Offset<FBLiveDriveTexturePlane>> *FBLiveDriveTexturePlanes = nullptr,
+    const std::vector<flatbuffers::Offset<FBMultiTexturedTerrain>> *FBMultiTexturedTerrains = nullptr,
+    const std::vector<flatbuffers::Offset<FBWaves>> *FBWavess = nullptr,
+    const std::vector<flatbuffers::Offset<FBSimpleSkyBox>> *FBSimpleSkyBoxes = nullptr) {
+  return CreateFBOpenWorldScene(_fbb, FBFonts ? _fbb.CreateVector<flatbuffers::Offset<FBFont>>(*FBFonts) : 0, FBPCSoldiers ? _fbb.CreateVector<flatbuffers::Offset<FBSoldier>>(*FBPCSoldiers) : 0, FBNPCSoldiers ? _fbb.CreateVector<flatbuffers::Offset<FBSoldier>>(*FBNPCSoldiers) : 0, FBPCCars ? _fbb.CreateVector<flatbuffers::Offset<FBCar>>(*FBPCCars) : 0, FBNPCCars ? _fbb.CreateVector<flatbuffers::Offset<FBCar>>(*FBNPCCars) : 0, FBTexturePlanes ? _fbb.CreateVector<flatbuffers::Offset<FBTexturePlane>>(*FBTexturePlanes) : 0, FBLiveDriveTexturePlanes ? _fbb.CreateVector<flatbuffers::Offset<FBLiveDriveTexturePlane>>(*FBLiveDriveTexturePlanes) : 0, FBMultiTexturedTerrains ? _fbb.CreateVector<flatbuffers::Offset<FBMultiTexturedTerrain>>(*FBMultiTexturedTerrains) : 0, FBWavess ? _fbb.CreateVector<flatbuffers::Offset<FBWaves>>(*FBWavess) : 0, FBSimpleSkyBoxes ? _fbb.CreateVector<flatbuffers::Offset<FBSimpleSkyBox>>(*FBSimpleSkyBoxes) : 0);
+}
+
 inline const FBOpenWorldScene *GetFBOpenWorldScene(const void *buf) { return flatbuffers::GetRoot<FBOpenWorldScene>(buf); }
 
-inline bool VerifyFBOpenWorldSceneBuffer(flatbuffers::Verifier &verifier) { return verifier.VerifyBuffer<FBOpenWorldScene>(); }
+inline bool VerifyFBOpenWorldSceneBuffer(flatbuffers::Verifier &verifier) { return verifier.VerifyBuffer<FBOpenWorldScene>(nullptr); }
 
 inline void FinishFBOpenWorldSceneBuffer(flatbuffers::FlatBufferBuilder &fbb, flatbuffers::Offset<FBOpenWorldScene> root) { fbb.Finish(root); }
-
 
 #endif  // FLATBUFFERS_GENERATED_OPENWORLDSCENE_H_

@@ -1,16 +1,52 @@
-/* XCFrameworkEngine
- * Copyright (C) Abhishek Porwal, 2016
- * Any queries? Contact author <https://github.com/abhishekp314>
- * This program is complaint with GNU General Public License, version 3.
- * For complete license, read License.txt in source root directory. */
+/*
+---------------------------------------------------------------------------
+Open Asset Import Library (assimp)
+---------------------------------------------------------------------------
+
+Copyright (c) 2006-2016, assimp team
+
+All rights reserved.
+
+Redistribution and use of this software in source and binary forms,
+with or without modification, are permitted provided that the following
+conditions are met:
+
+* Redistributions of source code must retain the above
+  copyright notice, this list of conditions and the
+  following disclaimer.
+
+* Redistributions in binary form must reproduce the above
+  copyright notice, this list of conditions and the
+  following disclaimer in the documentation and/or other
+  materials provided with the distribution.
+
+* Neither the name of the assimp team, nor the names of its
+  contributors may be used to endorse or promote products
+  derived from this software without specific prior
+  written permission of the assimp team.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+---------------------------------------------------------------------------
+*/
 
 /** @file defs.h
  *  @brief Assimp build configuration setup. See the notes in the comment
  *  blocks to find out how to customize _your_ Assimp build.
  */
 
-#ifndef INCLUDED_AI_DEFINES_H
-#define INCLUDED_AI_DEFINES_H
+#pragma once
+#ifndef AI_DEFINES_H_INC
+#define AI_DEFINES_H_INC
 
     //////////////////////////////////////////////////////////////////////////
     /* Define ASSIMP_BUILD_NO_XX_IMPORTER to disable a specific
@@ -177,27 +213,12 @@
 // "W8059 Packgr��e der Struktur ge�ndert"
 
 #endif
-    //////////////////////////////////////////////////////////////////////////
-    /* Define 'ASSIMP_BUILD_BOOST_WORKAROUND' to compile assimp
-     * without boost. This is done by using a few workaround
-     * classes and brings some limitations (e.g. some logging won't be done,
-     * the library won't utilize threads or be threadsafe at all).
-     * This implies the 'ASSIMP_BUILD_SINGLETHREADED' setting. */
-     //////////////////////////////////////////////////////////////////////////
-#ifdef ASSIMP_BUILD_BOOST_WORKAROUND
 
-    // threading support requires boost
-#ifndef ASSIMP_BUILD_SINGLETHREADED
-#   define ASSIMP_BUILD_SINGLETHREADED
-#endif
-
-#endif // !! ASSIMP_BUILD_BOOST_WORKAROUND
 
     //////////////////////////////////////////////////////////////////////////
     /* Define ASSIMP_BUILD_SINGLETHREADED to compile assimp
      * without threading support. The library doesn't utilize
-     * threads then and is itself not threadsafe.
-     * If this flag is specified boost::threads is *not* required. */
+     * threads then and is itself not threadsafe. */
     //////////////////////////////////////////////////////////////////////////
 #ifndef ASSIMP_BUILD_SINGLETHREADED
 #   define ASSIMP_BUILD_SINGLETHREADED
@@ -206,6 +227,21 @@
 #if defined(_DEBUG) || ! defined(NDEBUG)
 #   define ASSIMP_BUILD_DEBUG
 #endif
+
+    //////////////////////////////////////////////////////////////////////////
+    /* Define AI_DOUBLE_PRECISION to compile assimp
+     * with double precision support (64-bit). */
+    //////////////////////////////////////////////////////////////////////////
+
+#ifdef AI_DOUBLE_PRECISION
+    typedef double ai_real;
+    typedef signed long long int ai_int;
+    typedef unsigned long long int ai_uint;
+#else // AI_DOUBLE_PRECISION
+    typedef float ai_real;
+    typedef signed int ai_int;
+    typedef unsigned int ai_uint;
+#endif // AI_DOUBLE_PRECISION
 
     //////////////////////////////////////////////////////////////////////////
     /* Useful constants */
@@ -222,8 +258,8 @@
 #define AI_MATH_HALF_PI_F   (AI_MATH_PI_F * 0.5f)
 
 /* Tiny macro to convert from radians to degrees and back */
-#define AI_DEG_TO_RAD(x) ((x)*0.0174532925f)
-#define AI_RAD_TO_DEG(x) ((x)*57.2957795f)
+#define AI_DEG_TO_RAD(x) ((x)*(ai_real)0.0174532925)
+#define AI_RAD_TO_DEG(x) ((x)*(ai_real)57.2957795)
 
 /* Support for big-endian builds */
 #if defined(__BYTE_ORDER__)
@@ -248,5 +284,4 @@
  */
 #define AI_MAX_ALLOC(type) ((256U * 1024 * 1024) / sizeof(type))
 
-
-#endif // !! INCLUDED_AI_DEFINES_H
+#endif // !! AI_DEFINES_H_INC

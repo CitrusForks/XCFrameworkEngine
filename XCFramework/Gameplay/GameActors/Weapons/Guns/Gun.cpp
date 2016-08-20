@@ -11,11 +11,11 @@
 #include "Gameplay/World.h"
 #include "Gameplay/GameActors/GameActorsFactory.h"
 #include "Gameplay/GameActors/Weapons/Bullets/Bullet.h"
+#include "Gameplay/XC_Camera/XC_CameraManager.h"
 
 #include "Engine/Resource/ResourceManager.h"
 #include "Graphics/XC_Shaders/XC_ShaderBufferConstants.h"
 #include "Graphics/XC_Shaders/XC_ShaderHandle.h"
-#include "Gameplay/XC_Camera/XC_CameraManager.h"
 
 Gun::Gun(void)
 {

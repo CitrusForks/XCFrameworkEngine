@@ -8,12 +8,12 @@
 
 #include "Gameplay/GameActors/AnimatedActor.h"
 #include "Gameplay/XCPhysics/CollisionDetectionTypes.h"
-#include "AI/INavigator.h"
+#include "Gameplay/AI/INavigator.h"
+#include "Gameplay/XCPhysics/XPhysics.h"
 
 #include "Graphics/XC_Mesh/XCMesh.h"
 #include "Graphics/BasicGeometry/RenderableOBB.h"
 
-#include "XCPhysics/XPhysics.h"
 
 class PhysicsActor : public AnimatedActor, public XPhysics, public INavigator
 {

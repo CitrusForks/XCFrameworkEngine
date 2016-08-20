@@ -7,11 +7,12 @@
 #pragma once
 
 #include "Engine/Input/Directinput.h"
-#include "Graphics/XC_Shaders/XC_VertexFormat.h"
-#include "Gameplay/GameActors/SimpleMeshActor.h"
-#include "Graphics/XC_GraphicsDx11.h"
 
+#include "Graphics/XC_Shaders/XC_VertexFormat.h"
+#include "Graphics/XC_GraphicsDx11.h"
 #include "Graphics/XC_Materials/MaterialTypes.h"
+
+#include "Gameplay/GameActors/SimpleMeshActor.h"
 #include "Gameplay/GameActors/SubActor.h"
 #include "Gameplay/GameActors/Weapons/Bullets/Bullet.h"
 
@@ -46,10 +47,10 @@ protected:
     XCVec4             m_secondaryUpAxis;
     XCVec4             m_secondaryRightAxis;
 
-    u32       m_noOfBullets;
-    f32              m_recoilDelta;
+    u32                m_noOfBullets;
+    f32                m_recoilDelta;
 
-    f32              m_recoilMaxTime;
+    f32                m_recoilMaxTime;
     bool               m_canShootBullet;
 
     DirectInput*       m_directInput;

@@ -44,7 +44,7 @@ void MeshData::Init()
     m_initialScaling = XCVec3Unaligned(1.0f, 1.0f, 1.0f);
 
     XC_Graphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XC_Graphics>("GraphicsSystem");
-    XCShaderHandle* shaderHandle = (XCShaderHandle*)graphicsSystem.GetShaderManagerSystem().GetShader(m_shaderType);
+    XCShaderHandle* shaderHandle = (XCShaderHandle*)graphicsSystem.GetShaderContainer().GetShader(m_shaderType);
     m_vertexBuffer = shaderHandle->CreateVertexBuffer();
 }
 

@@ -313,7 +313,6 @@ void XC_GraphicsDx12::SetupRenderTargets()
 
 void XC_GraphicsDx12::CreateDescriptorHeaps()
 {
-
     //Initialize shader shared descriptor heap
     SystemContainer& container = SystemLocator::GetInstance()->GetSystemContainer();
     container.RegisterSystem<SharedDescriptorHeap>("SharedDescriptorHeap");

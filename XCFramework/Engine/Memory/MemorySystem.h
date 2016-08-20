@@ -33,6 +33,5 @@ public:
 protected:
     u64                     m_chunkSize;
 
-private:
     static MemorySystem*    ms_pMemorySystem;
 };

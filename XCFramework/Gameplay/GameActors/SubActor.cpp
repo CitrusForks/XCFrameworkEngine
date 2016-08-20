@@ -7,6 +7,8 @@
 #include "GameplayPrecompiledHeader.h"
 
 #include "Gameplay/GameActors/SubActor.h"
+#include "Gameplay/GameActors/IActor.h"
+
 
 SubActor::SubActor()
 {

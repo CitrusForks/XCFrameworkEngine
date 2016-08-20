@@ -4,7 +4,8 @@ print("Building C++ Win32 Project XCUnitTest")
 	language "C++"
 	architecture "x86"
 	targetdir "bin/%{cfg.buildcfg}"
-	platformVersion "10.0.10586.0"
+	systemversion "10.0.10586.0"
+	characterset "MBCS"
 	
 	files { "**.h", "**.cpp", "**.hlsl", "**.licenseheader" }
 	
@@ -13,18 +14,19 @@ print("Building C++ Win32 Project XCUnitTest")
 	filter "configurations:Debug"
 		sysincludedirs {"$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir);$(ProjectDir)UnitTests;" }
 		
-		includedirs { "$(VCInstallDir)UnitTest/include", "$(ProjectDir)Libs", "$(ProjectDir)Libs/flatbuffers" }
-		libdirs { "$(VCInstallDir)UnitTest/lib;", "$(ProjectDir)Libs" }
+		includedirs { "$(VCInstallDir)UnitTest/include", "$(ProjectDir)", "$(ProjectDir)bin/$(Configuration)/", "$(ProjectDir)Libs", "$(ProjectDir)Libs/flatbuffers", "$(ProjectDir)Libs/assimp/include/", "$(ProjectDir)Libs/AdobeFBX/include/" }
+	    libdirs { "$(VCInstallDir)UnitTest/lib;", "$(ProjectDir)Libs", "$(ProjectDir)Libs/DirectXTex/$(Configuration)/", "$(ProjectDir)Libs/flatbuffers/$(Configuration)/", "$(ProjectDir)Libs/Assimp/$(Configuration)/", "$(ProjectDir)Libs/AdobeFBX/x86/$(Configuration)/" }
 
 		excludes { "**/Orbis/**", "**orbis.cpp", "**/Durango/**", "**durango.cpp", "**editor.cpp", "**/Editor/**", "**Editor.cpp", "**Editor**.*", "**/DDSTextureLoader_Legacy/**", "**.pssl", "**/XC_Shaders/src/**"}
 		
-		links { "XCEngine", "XCBase", "XCGraphics" }
+		links { "d3d12", "d2d1", "dwrite", "d3dcompiler", "FlatBuffers", "ws2_32", "DirectXTex", "dxguid", "dinput8", "dxgi", "d3d11", "glut32", "glew32", "assimp.lib","zlibstaticd.lib", "libfbxsdk.lib",
+			    "XCBase", "XCEngine", "XCGraphics", "XCNetwork", "XCGameplay" }
 		
 		defines { "DEBUG", "WIN_32", "WIN32", "_DEBUG", "_WINDOWS" }
 		pchheader "UnitTestPrecompiledHeader.h"
 		pchsource "UnitTestPrecompiledHeader.cpp"
 		
-		flags { "Symbols" }
+		symbols "On"
 		
 		targetdir "$(ProjectDir)bin/$(Configuration)/"
 		
@@ -33,18 +35,19 @@ print("Building C++ Win32 Project XCUnitTest")
 	filter "configurations:Release"
 		sysincludedirs {"$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir);$(ProjectDir)UnitTests;" }
 		
-		includedirs { "$(VCInstallDir)UnitTest/include", "$(ProjectDir)Libs", "$(ProjectDir)Libs/flatbuffers" }
-		libdirs { "$(VCInstallDir)UnitTest/lib;", "$(ProjectDir)Libs" }
+		includedirs { "$(VCInstallDir)UnitTest/include", "$(ProjectDir)", "$(ProjectDir)bin/$(Configuration)/", "$(ProjectDir)Libs", "$(ProjectDir)Libs/flatbuffers", "$(ProjectDir)Libs/assimp/include/", "$(ProjectDir)Libs/AdobeFBX/include/" }
+	    libdirs { "$(VCInstallDir)UnitTest/lib;", "$(ProjectDir)Libs", "$(ProjectDir)Libs/DirectXTex/$(Configuration)/", "$(ProjectDir)Libs/flatbuffers/$(Configuration)/", "$(ProjectDir)Libs/Assimp/$(Configuration)/", "$(ProjectDir)Libs/AdobeFBX/x86/$(Configuration)/" }
 
 		excludes { "**/Orbis/**", "**orbis.cpp", "**/Durango/**", "**durango.cpp", "**editor.cpp", "**/Editor/**", "**Editor.cpp", "**Editor**.*", "**/DDSTextureLoader_Legacy/**", "**.pssl", "**/XC_Shaders/src/**"}
 		
-		links { "XCEngine", "XCBase", "XCGraphics" }
+		links { "d3d12", "d2d1", "dwrite", "d3dcompiler", "FlatBuffers", "ws2_32", "DirectXTex", "dxguid", "dinput8", "dxgi", "d3d11", "glut32", "glew32", "assimp.lib","zlibstatic.lib", "libfbxsdk.lib",
+			    "XCBase", "XCEngine", "XCGraphics", "XCNetwork", "XCGameplay" }
 		
 		defines { "NDEBUG", "WIN_32", "WIN32", "_WINDOWS" }
 		pchheader "UnitTestPrecompiledHeader.h"
 		pchsource "UnitTestPrecompiledHeader.cpp"
 		
-		flags { "Symbols" }
+		symbols "On"
       	
 		optimize "On"
 		

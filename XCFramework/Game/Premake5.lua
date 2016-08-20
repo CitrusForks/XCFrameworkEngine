@@ -4,7 +4,8 @@ print("Building C++ Win32 Project XCGame")
 	language "C++"
 	architecture "x86"
 	targetdir "bin/%{cfg.buildcfg}"
-	platformVersion "10.0.10586.0"
+	systemversion "10.0.10586.0"
+	characterset "MBCS"
 	
 	files { "**.h", "**.cpp", "**.hlsl", "**.licenseheader" }
 	
@@ -14,7 +15,7 @@ print("Building C++ Win32 Project XCGame")
 		sysincludedirs {"$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir);$(ProjectDir)Game;" }
 		
 		includedirs { "$(ProjectDir)", "$(ProjectDir)bin/$(Configuration)/", "$(ProjectDir)Libs", "$(ProjectDir)Libs/flatbuffers", "$(ProjectDir)Libs/assimp/include/", "$(ProjectDir)Libs/AdobeFBX/include/" }
-		libdirs { "$(ProjectDir)Libs", "$(ProjectDir)Libs/flatbuffers", "$(ProjectDir)Libs/Assimp", "$(ProjectDir)Libs/AdobeFBX/x86/Debug/" }
+		libdirs { "$(ProjectDir)Libs", "$(ProjectDir)Libs/DirectXTex/$(Configuration)/", "$(ProjectDir)Libs/flatbuffers/$(Configuration)/", "$(ProjectDir)Libs/Assimp/$(Configuration)/", "$(ProjectDir)Libs/AdobeFBX/x86/$(Configuration)/" }
 
 		excludes { "**/Orbis/**", "**orbis.cpp", "**/Durango/**", "**durango.cpp", "**editor.cpp", "**/Editor/**", "**Editor.cpp", "**Editor**.*", "**/DDSTextureLoader_Legacy/**", "**.pssl", "**/XC_Shaders/src/**"}
 		
@@ -27,7 +28,7 @@ print("Building C++ Win32 Project XCGame")
 		pchheader "GamePrecompiledHeader.h"
 		pchsource "GamePrecompiledHeader.cpp"
 		
-		flags { "Symbols" }
+		symbols "On"
 		
 		targetdir "$(ProjectDir)bin/$(Configuration)/"
 		
@@ -37,11 +38,11 @@ print("Building C++ Win32 Project XCGame")
 		sysincludedirs {"$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir);$(ProjectDir)Game;" }
 		
 	    includedirs { "$(ProjectDir)", "$(ProjectDir)bin/$(Configuration)/", "$(ProjectDir)Libs", "$(ProjectDir)Libs/flatbuffers", "$(ProjectDir)Libs/assimp/include/", "$(ProjectDir)Libs/AdobeFBX/include/" }
-	    libdirs { "$(ProjectDir)Libs", "$(ProjectDir)Libs/flatbuffers",  "$(ProjectDir)Libs/Assimp", "$(ProjectDir)Libs/AdobeFBX/x86/Debug/" }
+	    libdirs { "$(ProjectDir)Libs", "$(ProjectDir)Libs/DirectXTex/$(Configuration)/", "$(ProjectDir)Libs/flatbuffers/$(Configuration)/", "$(ProjectDir)Libs/Assimp/$(Configuration)/", "$(ProjectDir)Libs/AdobeFBX/x86/$(Configuration)/" }
 	  
 	    excludes { "**/Orbis/**", "**orbis.cpp", "**/Durango/**", "**durango.cpp", "**editor.cpp", "**/Editor/**", "**Editor.cpp", "**Editor**.*", "**/DDSTextureLoader_Legacy/**", "**.pssl", "**/XC_Shaders/src/**"}
 				
-	  	links { "d3d12", "d2d1", "dwrite", "d3dcompiler", "FlatBuffers", "ws2_32", "DirectXTex", "dxguid", "dinput8", "dxgi", "d3d11", "glut32", "glew32", "assimp.lib","zlibstaticd.lib", "libfbxsdk.lib",
+	  	links { "d3d12", "d2d1", "dwrite", "d3dcompiler", "FlatBuffers", "ws2_32", "DirectXTex", "dxguid", "dinput8", "dxgi", "d3d11", "glut32", "glew32", "assimp.lib","zlibstatic.lib", "libfbxsdk.lib",
 			    "XCBase", "XCEngine", "XCGraphics", "XCNetwork", "XCGameplay" }
 	  
 		entrypoint("")
@@ -50,6 +51,8 @@ print("Building C++ Win32 Project XCGame")
 	  	pchheader "GamePrecompiledHeader.h"
 		pchsource "GamePrecompiledHeader.cpp"
       	
+		symbols "On"
+		
 		optimize "On"
 				
 		targetdir "$(ProjectDir)bin/$(Configuration)/"
