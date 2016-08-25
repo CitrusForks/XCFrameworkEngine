@@ -27,12 +27,10 @@ void XC_LightManager::InitializeLights()
     //Add Lights - To remove. Need a LightManager- Manages all types of light, allows to add and remove lights from world. Maybe we can add this light actors directly into the world
     //Directional light
     DirectionalLight* directionalLight = XCNEW(DirectionalLight)();
-
     directionalLight->Ambient = XCVec4Unaligned(1.0f, 1.0f, 1.0f, 1.0f);
     directionalLight->Diffuse = XCVec4Unaligned(0.2f, 0.2f, 0.2f, 1.0f);
     directionalLight->Specular = XCVec4Unaligned(0.2f, 0.2f, 0.2f, 1.0f);
     directionalLight->Direction = XCVec3Unaligned(0.577f, -0.577f, 0.577f);
-
     m_Lights[LIGHTTYPE_DIRECTIONAL] = (ILight*)directionalLight;
 
     //Point Light
@@ -88,10 +86,10 @@ void XC_LightManager::Update(f32 dt)
 void XC_LightManager::Draw(XC_Graphics& graphicsSystem)
 {
     cbLightsPerFrame lightsPerFrame = { 
-                                        *(DirectionalLight*)m_Lights[LIGHTTYPE_DIRECTIONAL], 
-                                        *(PointLight*)m_Lights[LIGHTTYPE_POINT], 
-                                        *(SpotLight*)m_Lights[LIGHTTYPE_SPOT], 
-                                        m_eyePos.GetUnaligned3(), 
+                                        *(DirectionalLight*)m_Lights[LIGHTTYPE_DIRECTIONAL],
+                                        *(PointLight*)m_Lights[LIGHTTYPE_POINT],
+                                        *(SpotLight*)m_Lights[LIGHTTYPE_SPOT],
+                                        m_eyePos.GetUnaligned3(),
                                       };
 
     m_pCBLightsPerFrame->UploadDataOnGPU(*graphicsSystem.GetDeviceContext(), &lightsPerFrame, sizeof(cbLightsPerFrame));

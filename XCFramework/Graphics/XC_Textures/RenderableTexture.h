@@ -7,6 +7,7 @@
 #pragma once
 
 #include "Graphics/D3DConstantBuffer.h"
+#include "Graphics/RenderTargetTypes.h"
 
 class RenderableTexture
 {
@@ -26,11 +27,13 @@ public:
         u32     m_texSize;
     };
 
-    RenderableTexture(ID3DDevice& device, ID3DDeviceContext& context);
+    RenderableTexture(RenderTargetsType type, ID3DDevice& device, ID3DDeviceContext& context);
     virtual ~RenderableTexture();
 
     bool                             PreLoad(i32 msaaQuality, i32 texWidth, i32 texHeight);
-    void                             PreLoad(ID3DTexture2D* backbuffer);
+
+    //Creates a Render target from the swap chain's back buffer.
+    void                             PreLoad(ID3DSwapChain* backbuffer);
     void                             Update();
     void                             Destroy();
     void                             OnResize();
@@ -63,4 +66,5 @@ private:
                                      
     ID3DDevice&                      m_device;
     ID3DDeviceContext&               m_deviceContext;
+    RenderTargetsType                m_renderTargetType;
 };

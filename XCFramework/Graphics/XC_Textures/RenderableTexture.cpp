@@ -12,10 +12,10 @@
 #include "Graphics/SharedDescriptorHeap.h"
 
 #if defined(XCGRAPHICS_DX11) 
-#include "Libs/DirectXTex/DirectXTex/DirectXTex.h"
+#include "Libs/DirectXTex/DirectXTex.h"
 #endif
 
-RenderableTexture::RenderableTexture(ID3DDevice& device, ID3DDeviceContext& context)
+RenderableTexture::RenderableTexture(RenderTargetsType type, ID3DDevice& device, ID3DDeviceContext& context)
     : m_pRenderTargetTexture(nullptr)
     , m_pRenderTargetView(nullptr)
     , m_pSRV(nullptr)
@@ -23,6 +23,7 @@ RenderableTexture::RenderableTexture(ID3DDevice& device, ID3DDeviceContext& cont
     , m_pSingleSampledTex(nullptr)
     , m_device(device)
     , m_deviceContext(context)
+    , m_renderTargetType(type)
 {
     m_renderableTexture = XCNEW(RenderedTextureInfo)();
 
@@ -33,7 +34,7 @@ RenderableTexture::RenderableTexture(ID3DDevice& device, ID3DDeviceContext& cont
 
 RenderableTexture::~RenderableTexture()
 {
-#if defined(XCGRAPHICS_DX11)
+#if defined(XCGRAPHICS_DX11) || defined(XCGRAPHICS_DX12)
     ReleaseCOM(m_pRenderTargetView);
     ReleaseCOM(m_pRenderTargetTexture);
     ReleaseCOM(m_pSRV);
@@ -57,7 +58,7 @@ void RenderableTexture::Destroy()
 
 void RenderableTexture::OnResize()
 {
-#if defined(XCGRAPHICS_DX11)
+#if defined(XCGRAPHICS_DX11) || defined(XCGRAPHICS_DX12)
     m_pRenderTargetView->Release();
 #endif
 }
@@ -140,12 +141,25 @@ void RenderableTexture::CreateStagingTextures(D3D_TEXTURE2D_DESC texDesc)
 #endif
 #pragma endregion
 
-void RenderableTexture::PreLoad(ID3DTexture2D* backbuffer)
+void RenderableTexture::PreLoad(ID3DSwapChain* swapChain)
 {
 #if defined(XCGRAPHICS_DX11)
-    m_pRenderTargetTexture = backbuffer;
+    ID3DTexture2D* backBufferTexture;
+    swapChain->GetBuffer(0, __uuidof(ID3DTexture2D), (void**)&backBufferTexture);
 
-    ValidateResult(m_device.CreateRenderTargetView(backbuffer, 0, &m_pRenderTargetView));
+    m_pRenderTargetTexture = backBufferTexture;
+
+    ValidateResult(m_device.CreateRenderTargetView(backBufferTexture, 0, &m_pRenderTargetView));
+
+    ReleaseCOM(backBufferTexture);
+#elif defined(XCGRAPHICS_DX12)
+    SharedDescriptorHeap& descHeap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
+    CD3DX12_CPU_DESCRIPTOR_HANDLE& rtvCPUHandle = descHeap.GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV).m_cbvCPUOffsetHandle;
+
+    ValidateResult(swapChain->GetBuffer(m_renderTargetType, IID_PPV_ARGS(&m_pRenderTargetTexture)));
+
+    m_device.CreateRenderTargetView(m_pRenderTargetTexture, nullptr, rtvCPUHandle);
+    rtvCPUHandle.Offset(m_device.GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV)); //Move the handle to next rtv slot.
 #endif
 }
 
@@ -166,6 +180,12 @@ void RenderableTexture::SetRenderableTarget(ID3DDeviceContext& context, ID3DDept
 {
 #if defined(XCGRAPHICS_DX11)
     context.OMSetRenderTargets(1, &m_pRenderTargetView, depthView);
+#elif defined(XCGRAPHICS_DX12)
+    SharedDescriptorHeap& descHeap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
+    D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle(descHeap.GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV).m_heapDesc->GetCPUDescriptorHandleForHeapStart());
+    rtvHandle.ptr = rtvHandle.ptr + (m_renderTargetType * descHeap.GetRTVDescHeapIncSize());
+
+    context.OMSetRenderTargets(1, &rtvHandle, false, &descHeap.GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV).m_heapDesc->GetCPUDescriptorHandleForHeapStart());
 #elif defined(XCGRAPHICS_GNM)
     context.setRenderTarget(0, m_pRenderTargetView);
     context.setDepthRenderTarget(&m_gnmDepthTarget);
@@ -174,11 +194,18 @@ void RenderableTexture::SetRenderableTarget(ID3DDeviceContext& context, ID3DDept
 
 void RenderableTexture::ClearRenderTarget(ID3DDeviceContext& context, ID3DDepthStencilView* depthView, const XCVec4& xmColor)
 {
-#if defined(XCGRAPHICS_DX11)
     const f32 color[] = { xmColor.Get<X>(), xmColor.Get<Y>(), xmColor.Get<Z>(), xmColor.Get<W>() };
 
+#if defined(XCGRAPHICS_DX11)
     context.ClearRenderTargetView(m_pRenderTargetView, color);
     context.ClearDepthStencilView(depthView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+#elif defined(XCGRAPHICS_DX12)
+    SharedDescriptorHeap& descHeap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
+    D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle(descHeap.GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV).m_heapDesc->GetCPUDescriptorHandleForHeapStart());
+    rtvHandle.ptr = rtvHandle.ptr + (m_renderTargetType * descHeap.GetRTVDescHeapIncSize());
+
+    context.ClearRenderTargetView(rtvHandle, color, 0, nullptr);
+    context.ClearDepthStencilView(descHeap.GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV).m_heapDesc->GetCPUDescriptorHandleForHeapStart(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 #endif
 }
 

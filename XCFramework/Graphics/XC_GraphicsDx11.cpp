@@ -10,6 +10,7 @@
 
 #include "XC_GraphicsDx11.h"
 #include "Graphics/XC_Shaders/XC_VertexShaderLayout.h"
+#include "Graphics/SharedDescriptorHeap.h"
 
 XC_GraphicsDx11::XC_GraphicsDx11(void)
 {
@@ -36,11 +37,9 @@ void XC_GraphicsDx11::Destroy()
 {
     XC_Graphics::Destroy();
 
-    m_renderTargets[RENDERTARGET_MAIN_0]->Destroy();
-    m_renderTargets[RENDERTARGET_LIVEDRIVE]->Destroy();
-
-    XCDELETE(m_renderTargets[RENDERTARGET_MAIN_0]);
-    XCDELETE(m_renderTargets[RENDERTARGET_LIVEDRIVE]);
+    m_sharedDescriptorHeap->Destroy();
+    SystemContainer& container = SystemLocator::GetInstance()->GetSystemContainer();
+    container.RemoveSystem("SharedDescriptorHeap");
 
     ReleaseCOM(m_pD3DDeviceContext);
     ReleaseCOM(m_pD3DDevice);
@@ -64,6 +63,9 @@ void XC_GraphicsDx11::SetupPipeline()
 {
     SetupDevice();
     SetupSwapChain();
+
+    CreateDescriptorHeaps();
+    
     SetupRenderTargets();
     SetupDepthStencilBuffer();
     SetupDepthStencilStates();
@@ -71,6 +73,21 @@ void XC_GraphicsDx11::SetupPipeline()
     SetupViewPort();
 
     SetupShadersAndRenderPool();
+}
+
+void XC_GraphicsDx11::CreateDescriptorHeaps()
+{
+    //Initialize shader shared descriptor heap
+    SystemContainer& container = SystemLocator::GetInstance()->GetSystemContainer();
+    container.RegisterSystem<SharedDescriptorHeap>("SharedDescriptorHeap");
+    m_sharedDescriptorHeap = (SharedDescriptorHeap*)&container.CreateNewSystem("SharedDescriptorHeap");
+
+    m_sharedDescriptorHeap->Init(*m_pD3DDevice
+        , 2 //No of RTV's
+        , 1 //No of DSV's
+        , 1 //No of Samplers
+        , 100 //No of CBV, UAV combined
+    );
 }
 
 void XC_GraphicsDx11::SetupDevice()
@@ -145,18 +162,12 @@ void XC_GraphicsDx11::SetupSwapChain()
 
 void XC_GraphicsDx11::SetupRenderTargets()
 {
-    //Create RenderTargetView
-    ID3DTexture2D* backBuffer;
-    m_pSwapChain->GetBuffer(0, __uuidof(ID3DTexture2D), (void**)&backBuffer);
-
     //Initiate RenderableTextures
-    m_renderTargets[RENDERTARGET_MAIN_0] = XCNEW(RenderableTexture)(*m_pD3DDevice, *m_pD3DDeviceContext);
-    m_renderTargets[RENDERTARGET_MAIN_0]->PreLoad(backBuffer);
+    m_renderTargets[RENDERTARGET_MAIN_0] = XCNEW(RenderableTexture)(RENDERTARGET_MAIN_0, *m_pD3DDevice, *m_pD3DDeviceContext);
+    m_renderTargets[RENDERTARGET_MAIN_0]->PreLoad(m_pSwapChain);
 
-    m_renderTargets[RENDERTARGET_LIVEDRIVE] = XCNEW(RenderableTexture)(*m_pD3DDevice, *m_pD3DDeviceContext);
+    m_renderTargets[RENDERTARGET_LIVEDRIVE] = XCNEW(RenderableTexture)(RENDERTARGET_LIVEDRIVE, *m_pD3DDevice, *m_pD3DDeviceContext);
     m_renderTargets[RENDERTARGET_LIVEDRIVE]->PreLoad(m_4xMsaaQuality, 256, 256);
-
-    ReleaseCOM(backBuffer);
 }
 
 void XC_GraphicsDx11::SetupDepthStencilBuffer()
@@ -374,12 +385,7 @@ void XC_GraphicsDx11::OnResize(i32 _width, i32 _height)
         m_pSwapChain->ResizeBuffers(1, m_ClientWidth, m_ClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
 
         //Create RenderTargetView
-        ID3DTexture2D *backBuffer;
-
-        m_pSwapChain->GetBuffer(0, __uuidof(ID3DTexture2D), reinterpret_cast<void**>(&backBuffer));
-        m_renderTargets[RENDERTARGET_MAIN_0]->PreLoad(backBuffer);
-
-        ReleaseCOM(backBuffer);
+        m_renderTargets[RENDERTARGET_MAIN_0]->PreLoad(m_pSwapChain);
 
         //Reset the Backbuffer and depth buffer
         m_depthBufferDesc.Width = m_ClientWidth;

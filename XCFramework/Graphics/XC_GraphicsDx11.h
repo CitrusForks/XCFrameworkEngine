@@ -16,6 +16,8 @@
 #include "Graphics/XC_Textures/RenderableTexture.h"
 #include "Graphics/RenderTargetTypes.h"
 
+class SharedDescriptorHeap;
+
 class XC_GraphicsDx11 : public XC_Graphics
 {
 public:
@@ -33,7 +35,7 @@ public:
     void                        Destroy();
 
     ID3DDeviceContext*          GetDeviceContext() { return m_pD3DDeviceContext; }
-    ID3DResource*               GetCurrentFrameRenderTarget() { return nullptr; }
+    u32                         GetCurrentRTVFrameIndex() { return RENDERTARGET_MAIN_0; }
 
     void                        GoFullscreen(bool go);
     void                        OnResize(i32 _width, i32 _height);
@@ -44,6 +46,7 @@ public:
     ID3DDepthStencilView*       GetDepthStencilView(RenderTargetsType type) { return type == RENDERTARGET_MAIN_0 ? m_pDepthStencilView : m_pDepthStencilViewLiveDrive; }
 
 protected:
+    void                        CreateDescriptorHeaps();
     void                        SetupPipeline();
     void                        SetupDevice();
     void                        SetupSwapChain();
@@ -55,7 +58,7 @@ protected:
     void                        SetupViewPort();
 
 private:
-    IDXGISwapChain*             m_pSwapChain;
+    ID3DSwapChain*              m_pSwapChain;
     DXGI_SWAP_CHAIN_DESC        m_SwapChainDesc;
     IDXGIFactory*               m_pdxgiFactory;
     D3D_TEXTURE2D_DESC          m_depthBufferDesc;
@@ -74,5 +77,6 @@ private:
     ID3DDepthStencilState*      m_depthStencilLessEqualState;
     
     D3D_FEATURE_LEVEL           m_featureLevel;
+    SharedDescriptorHeap*       m_sharedDescriptorHeap;
 };
 #endif

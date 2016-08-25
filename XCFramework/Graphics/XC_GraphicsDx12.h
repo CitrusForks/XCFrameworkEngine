@@ -57,13 +57,13 @@ protected:
 
     void                        DebugTestGraphicsPipeline();
 
-    ID3D12Resource*             GetCurrentFrameRenderTarget() { return m_renderTarget[m_frameIndex]; }
+    ID3D12Resource*             GetCurrentFrameRenderTarget() { return m_renderTargets[m_frameIndex]->GetTexture2D(); }
     void                        WaitForPreviousFrameCompletion();
 
     void                        PresentRenderTarget(ID3D12GraphicsCommandList* cmdList);
 
 private:
-    IDXGISwapChain3*            m_pSwapChain;
+    ID3DSwapChain*              m_pSwapChain;
     DXGI_SWAP_CHAIN_DESC        m_SwapChainDesc;
 
     IDXGIFactory4*              m_pdxgiFactory;
@@ -71,9 +71,6 @@ private:
     ID3DCommandAllocator*       m_pCommandAllocator;
     ID3D12CommandQueue*         m_pCommandQueue;
     ID3D12GraphicsCommandList*  m_graphicsCommandList;
-
-    //RTV - 2 main render targets. Works in swaps
-    ID3D12Resource*             m_renderTarget[2];
 
     //DepthStencilResource
     ID3D12Resource*             m_depthStencilResource;

@@ -10,7 +10,9 @@
 
 
 SharedDescriptorHeap::SharedDescriptorHeap()
+#if defined(XCGRAPHICS_DX12)
     : m_rtvDescriptorSize(0)
+#endif
 {
 }
 
@@ -217,10 +219,12 @@ void SharedDescriptorHeap::Destroy()
         XCDELETE(buffer);
     }
 
+#if defined(XCGRAPHICS_DX12)
     for (u32 type = 0; type < D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES; ++type)
     {
         XCDELETE(m_heapDesc[type]);
     }
+#endif
 
     m_constantBuffers.clear();
 }

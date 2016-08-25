@@ -99,9 +99,9 @@ private:
     LARGE_INTEGER m_startTime;
     LARGE_INTEGER m_lastTime;
 
-    f32         m_total;
-    f32         m_delta;
-    f32         m_perFrameTime;
+    f32           m_total;
+    f32           m_delta;
+    f32           m_perFrameTime;
     i32           m_fps;
 };
 

@@ -31,6 +31,15 @@ void XC_Graphics::Destroy()
         m_renderingPool->Destroy();
         XCDELETE(m_renderingPool);
     }
+
+    for (u32 rIndex = 0; rIndex < RENDERTARGET_MAX; ++rIndex)
+    {
+        if (m_renderTargets[rIndex])
+        {
+            m_renderTargets[rIndex]->Destroy();
+            XCDELETE(m_renderTargets[rIndex]);
+        }
+    }
 }
 
 void XC_Graphics::Init(HWND _mainWnd, i32 _width, i32 _height, bool _enable4xMsaa)

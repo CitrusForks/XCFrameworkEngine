@@ -20,6 +20,7 @@
 
 #define LOAD_SHADERS_FROM_DATA 1
 
+typedef IDXGISwapChain3                 ID3DSwapChain;
 typedef ID3D12Device                    ID3DDevice;
 typedef ID3D12GraphicsCommandList       ID3DDeviceContext;
 typedef ID3D12CommandList               ID3DCommandList;
@@ -59,6 +60,7 @@ typedef D3D12_GPU_DESCRIPTOR_HANDLE     GPU_DESCRIPTOR_HANDLE;
 //#define LIVE_DRIVE_ENABLED 1
 #define LOAD_SHADERS_FROM_DATA 1
 
+typedef IDXGISwapChain                  ID3DSwapChain;
 typedef ID3D11Device                    ID3DDevice;
 typedef ID3D11DeviceContext             ID3DDeviceContext;
 typedef ID3D11CommandList               ID3DCommandList;

@@ -30,3 +30,4 @@ XCFramework/.vs/*
 /XCFramework/Debug
 /XCFramworkEditor/obj/Debug
 /XCFramworkEditor/bin/Debug
+/XCFramework/.settings

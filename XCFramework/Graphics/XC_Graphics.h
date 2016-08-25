@@ -26,7 +26,7 @@ public:
     virtual void                    Update(f32 dt);
     virtual void                    Destroy();
 
-    virtual u32                     GetCurrentRTVFrameIndex() { return 0; }
+    virtual u32                     GetCurrentRTVFrameIndex() = 0;
     virtual ID3DDeviceContext*      GetDeviceContext() = 0;
     virtual ID3DDepthStencilView*   GetDepthStencilView(RenderTargetsType type) = 0;
     virtual ID3DPipelineState*      GetPipelineState() { return nullptr; }
@@ -57,7 +57,7 @@ public:
     void                            SetSecondaryDrawCall(bool isSecondary) { m_secondaryDrawCall = isSecondary; }
 
 protected:
-
+    virtual void                    CreateDescriptorHeaps() = 0;
     virtual void                    SetupPipeline();
     virtual void                    SetupDevice();
     virtual void                    SetupSwapChain();
