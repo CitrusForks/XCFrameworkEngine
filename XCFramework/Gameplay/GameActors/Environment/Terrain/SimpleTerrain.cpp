@@ -176,7 +176,6 @@ void SimpleTerrain::Update(f32 dt)
 
 void SimpleTerrain::Draw(RenderContext& context)
 {
-    context.SetRasterizerState(RasterType_FillSolid);
     context.ApplyShader(m_useShaderType);
     
     // Set constants

@@ -11,30 +11,29 @@
 #include "Assets/Packages/Schema/BasicTypes_generated.h"
 #include "Assets/Packages/Schema/GameplayActors_generated.h"
 
+#include "Graphics/D3DConstantBuffer.h"
 #include "Graphics/XC_Shaders/XC_VertexShaderLayout.h"
 #include "Graphics/XC_Shaders/XC_ShaderHandle.h"
 #include "Graphics/XC_Shaders/XC_ShaderBufferConstants.h"
+#include "Graphics/XC_Textures/RenderableTexture.h"
 
 #include "Engine/Resource/ResourceManager.h"
+#include "Engine/Resource/ResourceHandle.h"
 
 TexturedPlane::TexturedPlane()
+    : m_useShaderType(ShaderType_LightTexture)
+    , m_texture(nullptr)
+    , m_pCBPerObject(nullptr)
 {
 }
 
 TexturedPlane::TexturedPlane(XCVec4& p1, XCVec4& p2, XCVec4& p3)
     : Plane(p1, p2, p3)
 {
-    m_texture = nullptr;
 }
 
 TexturedPlane::~TexturedPlane()
 {
-}
-
-void TexturedPlane::Init(i32 actorId)
-{
-    m_useShaderType = ShaderType_LightTexture;
-    m_rasterType = RasterType_FillSolid;
 }
 
 void TexturedPlane::PreLoad(const void* fbBuffer)
@@ -51,8 +50,6 @@ void TexturedPlane::PreLoad(const void* fbBuffer)
     ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
     m_texture = &resMgr.AcquireResource(texPlaneBuff->ResourceName()->c_str());
 
-    m_rasterType = (RasterType) texPlaneBuff->RasterizerType();
-
     SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
     m_pCBPerObject = heap.CreateBufferView(D3DBufferDesc(BUFFERTYPE_CBV, sizeof(PerObjectBuffer)));
 }
@@ -66,8 +63,6 @@ void TexturedPlane::PreLoad(XCVec4& initialPosition, XCVec4& initialRotation, XC
 
     ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
     m_texture = &resMgr.AcquireResource(texture.c_str());
-
-    m_rasterType      = rasterType;
 }
 
 void TexturedPlane::Load()
@@ -100,10 +95,6 @@ void TexturedPlane::Update(f32 dt)
 
 void TexturedPlane::Draw(RenderContext& context)
 {
-    u32 stride = sizeof(VertexPosNormTex);
-    u32 offset = 0;
-
-    context.SetRasterizerState(m_rasterType);
     context.ApplyShader(m_useShaderType);
 
     // Set constants

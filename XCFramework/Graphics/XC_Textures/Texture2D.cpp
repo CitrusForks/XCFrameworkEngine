@@ -20,8 +20,6 @@ Texture2D::Texture2D()
 {
     m_resourceType = RESOURCETYPE_TEXTURE2D;
     m_diffuseMapTextureSRV = nullptr;
-
-
 }
 
 Texture2D::Texture2D(D3DConstantBuffer* srv)

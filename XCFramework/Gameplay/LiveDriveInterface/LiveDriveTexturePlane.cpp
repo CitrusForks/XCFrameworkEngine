@@ -7,19 +7,22 @@
 #include "GameplayPrecompiledHeader.h"
 
 #include "LiveDriveTexturePlane.h"
+
 #include "Assets/Packages/Schema/BasicTypes_generated.h"
 #include "Assets/Packages/Schema/GameplayActors_generated.h"
+
 #include "Graphics/XC_Graphics.h"
 
+#include "Engine/Resource/ResourceHandle.h"
+
 LiveDriveTexturePlane::LiveDriveTexturePlane()
+    : m_liveDriveTexture(nullptr)
 {
 }
 
 LiveDriveTexturePlane::LiveDriveTexturePlane(XCVec4& p1, XCVec4& p2, XCVec4& p3)
     : TexturedPlane(p1, p2, p3)
 {
-    m_texture = nullptr;
-    m_liveDriveTexture = nullptr;
 }
 
 LiveDriveTexturePlane::~LiveDriveTexturePlane()
@@ -37,12 +40,8 @@ void LiveDriveTexturePlane::PreLoad(const void* fbBuffer)
     m_material.Diffuse  = XCVec4(texPlaneBuff->Material()->Diffuse()->x(), texPlaneBuff->Material()->Diffuse()->y(), texPlaneBuff->Material()->Diffuse()->z(), texPlaneBuff->Material()->Diffuse()->w());
     m_material.Specular = XCVec4(texPlaneBuff->Material()->Specular()->x(), texPlaneBuff->Material()->Specular()->y(), texPlaneBuff->Material()->Specular()->z(), texPlaneBuff->Material()->Specular()->w());
 
-    m_rasterType = (RasterType) texPlaneBuff->RasterizerType();
-
     XC_Graphics& graphicsSystem = (XC_Graphics&)SystemLocator::GetInstance()->RequestSystem("GraphicsSystem");
-#if defined(XCGRAPHICS_DX11)
     m_liveDriveTexture = XCNEW(Texture2D)(graphicsSystem.GetRenderTexture(RENDERTARGET_LIVEDRIVE).GetShaderResourceView());
-#endif
     m_texture->m_Resource = m_liveDriveTexture;
 }
 
@@ -63,6 +62,9 @@ void LiveDriveTexturePlane::Destroy()
 {
     TexturedPlane::Destroy();
 
-    m_liveDriveTexture->Destroy();
-    XCDELETE(m_liveDriveTexture);
+    if (m_liveDriveTexture)
+    {
+        m_liveDriveTexture->Destroy();
+        XCDELETE(m_liveDriveTexture);
+    }
 }

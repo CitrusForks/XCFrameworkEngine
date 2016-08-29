@@ -16,7 +16,14 @@ class VertexBuffer : public IResource
 {
 public:
 
-    VertexBuffer() 
+    VertexBuffer()
+        :
+#if defined(XCGRAPHICS_DX12)
+          m_pVertexBufferResource(nullptr)
+        , m_pVertexBufferUploadResource(nullptr)
+#elif defined(XCGRAPHICS_DX11)
+          m_pVB(nullptr)
+#endif
     {
         m_resourceType = RESOURCETYPE_VERTEXBUFFER;
     }

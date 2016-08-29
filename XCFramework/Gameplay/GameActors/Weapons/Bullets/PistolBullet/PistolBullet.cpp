@@ -104,7 +104,6 @@ void PistolBullet::ApplyOffsetRotation()
 
 void PistolBullet::Draw(RenderContext& context)
 {
-    context.SetRasterizerState(RasterType_FillSolid);
     context.ApplyShader(m_useShaderType);
 #if defined(XCGRAPHICS_DX11)
     context.GetDeviceContext().IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);

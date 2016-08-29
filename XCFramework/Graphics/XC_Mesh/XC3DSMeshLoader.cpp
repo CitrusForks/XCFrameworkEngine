@@ -26,11 +26,9 @@ XC3DSMeshLoader::XC3DSMeshLoader(void)
 {
 }
 
-
 XC3DSMeshLoader::~XC3DSMeshLoader(void)
 {
 }
-
 
 bool XC3DSMeshLoader::loadMeshFromFile(std::string fileName, XCMesh* const outMesh)
 {
@@ -113,7 +111,6 @@ bool XC3DSMeshLoader::loadMeshFromFile(std::string fileName, XCMesh* const outMe
         case CHUNK_VERTICESLIST:
             {
                 fread(&tempChunk.amtOfData, sizeof(u16), 1, fp);
-                subMesh->SetNoOfVertices(tempChunk.amtOfData);
 
                 //cout<<"No of vertices : "<< obj.noOfVertices;
 #if defined(WRITE_DATA_TO_FILE)
@@ -143,7 +140,6 @@ bool XC3DSMeshLoader::loadMeshFromFile(std::string fileName, XCMesh* const outMe
             {
 
                 fread(&tempChunk.amtOfData, sizeof(u16), 1, fp);
-                subMesh->SetNoOfFaces(tempChunk.amtOfData);
 
                 //cout<<"No of Faces : "<< obj.noOfFaces;
 #if defined(WRITE_DATA_TO_FILE)

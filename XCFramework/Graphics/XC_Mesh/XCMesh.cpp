@@ -18,6 +18,7 @@
 
 XCMesh::XCMesh()
     : m_shaderType(ShaderType_Default)
+    , m_rasterType(RasterType_FillSolid)
     , m_shaderHandler(nullptr)
     , m_texture(nullptr)
     , m_isSkinnedMesh(false)
@@ -451,8 +452,6 @@ void XCMesh::CreateBuffers()
         {
             VertexBuffer<VertexPosColorInstanceIndex>* vertexBuffer = (VertexBuffer<VertexPosColorInstanceIndex>*)submesh->GetVertexBuffer();
             std::vector<VertexPosColorInstanceIndex>& vertices = vertexBuffer->m_vertexData;
-            //std::vector<VertexPosColorInstanceIndex::InstanceBuffer>& instanceData = m_subMeshes[objIndex]->getInstanceBuffer<VertexPosColorInstanceIndex::InstanceBuffer>().m_vertexData;
-            //VertexPosColorInstanceIndex::InstanceBuffer sampleData = { XCVec4Unaligned(0.0f, 0.0f, 0.0f, 0.0f) };
 
             XCVec4Unaligned vertexPos = { 0.0f, 0.0f, 0.0f, 0.0f };
             VertexPosColorInstanceIndex vertex;
@@ -483,9 +482,6 @@ void XCMesh::CreateBuffers()
 
                 vMin = VectorMin(vMin, transformedVertex);
                 vMax = VectorMax(vMax, transformedVertex);
-
-                //sampleData.SamplePad.x = rand() % 4;
-                //instanceData.push_back(sampleData);
             }
 
             std::vector<u32>& indices = submesh->GetIndexBuffer().m_indexData;
@@ -498,7 +494,6 @@ void XCMesh::CreateBuffers()
             }
 
             vertexBuffer->BuildVertexBuffer();
-            //m_subMeshes[objIndex]->getInstanceBuffer<VertexPosColorInstanceIndex::InstanceBuffer>().BuildVertexBuffer();
             submesh->GetIndexBuffer().BuildIndexBuffer();
             break;
         }
@@ -506,7 +501,7 @@ void XCMesh::CreateBuffers()
         default:
             break;
         }
-        submesh->m_width = abs(max - min);
+        submesh->SetMeshAbsWidth(abs(max - min));
     }
 
     //Got the min max, compute the centre and extends
@@ -628,8 +623,7 @@ void XCMesh::Draw(RenderContext& context)
 {
     if (m_instanceCount > 0)
     {
-        context.SetRasterizerState(RasterType_FillSolid);
-        context.ApplyShader(m_shaderType);
+        context.ApplyShader(m_shaderType, m_rasterType);
 
         XC_LightManager* lightMgr = (XC_LightManager*)&SystemLocator::GetInstance()->RequestSystem("LightsManager");
         m_shaderHandler->SetConstantBuffer("cbLightsPerFrame", context.GetDeviceContext(), lightMgr->GetLightConstantBuffer());

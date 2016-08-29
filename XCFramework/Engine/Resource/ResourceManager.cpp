@@ -100,6 +100,8 @@ ResourceHandle& ResourceManager::AcquireResource(const char* userFriendlyName)
 
 void ResourceManager::ReleaseResource(ResourceHandle * resHandle)
 {
+    XCASSERT(resHandle);
+
     if (resHandle->m_refCount > 0)
     {
         resHandle->m_refCount--;

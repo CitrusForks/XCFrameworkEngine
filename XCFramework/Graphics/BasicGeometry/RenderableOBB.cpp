@@ -27,6 +27,8 @@ void RenderableOBB::Init()
 #if defined(DEBUG_OBB)
     ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
     m_cubeMesh = &resMgr.AcquireResource("CubeMesh");
+
+    m_cubeMesh->GetResource<XCMesh>()->SetRasterType(RasterType_FillWireframe);
 #endif
 
     m_material.Ambient = XCVec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -37,14 +39,15 @@ void RenderableOBB::Init()
 void RenderableOBB::Update(f32 dt)
 {
 #if defined(DEBUG_OBB)
-    m_MScaling     = XMMatrixScaling(m_TransformedBox.Extents.x, m_TransformedBox.Extents.y, m_TransformedBox.Extents.z);
-    m_MRotation    = XMMatrixRotationQuaternion(XMLoadFloat4(&m_TransformedBox.Orientation));
-    m_MTranslation = XMMatrixTranslation(m_TransformedBox.Center.x, m_TransformedBox.Center.y, m_TransformedBox.Center.z);
+    m_MScaling     = MatrixScale(m_TransformedBox.Extents.x, m_TransformedBox.Extents.y, m_TransformedBox.Extents.z);
+    m_MRotation    = MatrixRotationQuaternion(XCVec4(m_TransformedBox.Orientation));
+    m_MTranslation = MatrixTranslate(m_TransformedBox.Center.x, m_TransformedBox.Center.y, m_TransformedBox.Center.z);
 
     m_World = m_MScaling * m_MRotation * m_MTranslation;
 #endif
 
-    /* Another way of updating the world.
+#if defined(UNUSED)
+    //Another way of updating the world.
     XMVECTOR position = XMLoadFloat3(&m_TransformedBox.Center);
     XMMATRIX matWorld = XMMatrixScaling(m_TransformedBox.Extents.x, m_TransformedBox.Extents.y, m_TransformedBox.Extents.z);
 
@@ -72,21 +75,21 @@ void RenderableOBB::Update(f32 dt)
         out.Pos = value;
         v[vertexIndex] = out;
     }
-    graphicsSystem.GetDeviceContext()->Unmap(m_pVB, 0);*/
+    graphicsSystem.GetDeviceContext()->Unmap(m_pVB, 0);
+#endif
 }
 
 void RenderableOBB::Draw(RenderContext& context)
 {
 #if defined(DEBUG_OBB)
     // Set constants
-    XC_CameraManager* cam = (XC_CameraManager*)&SystemLocator::GetInstance()->RequestSystem("CameraManager");
-    PerObjectBuffer perObject = {};
-
-    perObject = {
-        ToXCMatrix4Unaligned(XMMatrixTranspose(m_World)),
-        ToXCMatrix4Unaligned(XMMatrixTranspose(m_World * cam->GetViewMatrix() * cam->GetProjMatrix())),
-        ToXCMatrix4Unaligned(MatrixInverseTranspose(m_World)),
-        ToXCMatrix4Unaligned(XMMatrixTranspose(XMMatrixIdentity())),
+    ICamera& cam = context.GetGlobalShaderData().m_camera;
+    PerObjectBuffer perObject = 
+    {
+        MatrixTranspose(m_World).GetUnaligned(),
+        MatrixTranspose(m_World * cam.GetViewMatrix() * cam.GetProjectionMatrix()).GetUnaligned(),
+        MatrixInverseTranspose(m_World).GetUnaligned(),
+        XCMatrix4::XCMatrixIdentity.GetUnaligned(),
         m_material
     };
 

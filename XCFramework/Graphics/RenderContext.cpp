@@ -20,7 +20,7 @@ void RenderContext::Init(ID3DDevice* device, XC_ShaderContainer* shaderMgr, bool
 {
     m_clearColor = XCVec4(1.0f, 1.0f, 1.0f, 1.0f);
 
-    m_shaderManager = shaderMgr;
+    m_shaderContainer = shaderMgr;
     m_clearStateOnBegin = clearStateOnBegin;
     m_clearStateOnFinish = clearStateOnFinish;
 
@@ -36,7 +36,7 @@ void RenderContext::Init(ID3DDevice* device, XC_ShaderContainer* shaderMgr, bool
             0,
             D3D12_COMMAND_LIST_TYPE_DIRECT,
             m_commandAllocator,
-            m_shaderManager->GetShader(ShaderType_SolidColor)->GetPso().m_psos[PSOType_RASTER_FILL_SOLID].m_pPso,
+            m_shaderContainer->GetShader(ShaderType_SolidColor)->GetPso().m_psos[PSOType_RASTER_FILL_SOLID].m_pPso,
             IID_PPV_ARGS(&m_deviceContext)));
     
         ValidateResult(m_deviceContext->Close());
@@ -103,7 +103,7 @@ void RenderContext::FinishRender()
 
         //Execute on main device context
         m_graphicsSystem->GetDeviceContext()->ExecuteCommandList(m_commandList, false);
-        m_shaderManager->ClearShaderAndRenderStates(*m_deviceContext);
+        m_shaderContainer->ClearShaderAndRenderStates(*m_deviceContext);
 
         ReleaseCommandList();
     #endif
@@ -117,21 +117,14 @@ void RenderContext::ReleaseCommandList()
 #endif
 }
 
-void RenderContext::SetRasterizerState(RasterType type)
+void RenderContext::ApplyShader(ShaderType shaderType, RasterType type)
 {
-#if defined(XCGRAPHICS_DX11)
-    m_shaderManager->SetRasterizerState(*m_deviceContext, type);
-#endif
-}
-
-void RenderContext::ApplyShader(ShaderType shaderType)
-{
-    m_shaderManager->ApplyShader(*m_deviceContext, shaderType);
+    m_shaderContainer->ApplyShader(*m_deviceContext, shaderType, type);
 }
 
 IShader* RenderContext::GetShader(ShaderType shaderType)
 {
-    return m_shaderManager->GetShader(shaderType);
+    return m_shaderContainer->GetShader(shaderType);
 }
 
 void RenderContext::DrawNonIndexed(ID3DDeviceContext& context, u32 vertexCount)
@@ -150,5 +143,5 @@ void RenderContext::DrawIndexedInstanced(ID3DDeviceContext& context, u32 _indexC
 
 GlobalShaderData& RenderContext::GetGlobalShaderData()
 {
-    return m_shaderManager->GetGlobalShaderData();
+    return m_shaderContainer->GetGlobalShaderData();
 }

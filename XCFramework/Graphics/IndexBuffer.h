@@ -15,7 +15,14 @@ class IndexBuffer : public IResource
 {
 public:
 
-    IndexBuffer() 
+    IndexBuffer()
+        :
+#if defined(XCGRAPHICS_DX11)
+          m_pIB(nullptr)
+#elif defined(XCGRAPHICS_DX12)
+          m_pIndexBufferResource(nullptr)
+        , m_pIndexBufferUploadResource(nullptr)
+#endif
     {
         m_resourceType = RESOURCETYPE_INDEXBUFFER;
     }

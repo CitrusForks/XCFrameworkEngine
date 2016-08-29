@@ -64,7 +64,7 @@ void VectorFontMesh::DrawText(std::string text, XCVec3Unaligned& position, Rende
             });
 
             XCMatrix4 world =  MatrixScale(scale, scale, scale) * MatrixTranslate(position.x + computePos /*(charPosition * CharacterSpacing)*/, position.y, position.z);
-            computePos += (scale * (*findSubMesh)->m_width);
+            computePos += (scale * (*findSubMesh)->GetMeshAbsWidth());
 
             if (subMeshExists != m_subMeshesIdBuffer.end())
             {
@@ -130,7 +130,6 @@ void VectorFontMesh::CreateConstantBuffer()
 
 void VectorFontMesh::Draw(RenderContext& context)
 {
-    context.SetRasterizerState(RasterType_FillSolid);
     context.ApplyShader(m_shaderType);
 
     XCShaderHandle* shader = (XCShaderHandle*)context.GetShader(m_shaderType);

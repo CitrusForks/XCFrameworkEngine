@@ -25,6 +25,11 @@ void MemorySystemWin32::Init(u64 chunkSize)
     bool res = AllocateChunk();
     XCASSERT(res);
 
+    if (!res)
+    {
+        abort();
+    }
+
     res ? MemorySystem::Init(chunkSize) : false;
 }
 

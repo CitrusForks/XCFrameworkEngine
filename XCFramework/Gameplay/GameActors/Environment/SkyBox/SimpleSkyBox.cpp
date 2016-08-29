@@ -132,7 +132,6 @@ void SimpleSkyBox::Draw(RenderContext& context)
 {
     IActor::Draw(context);
     
-    context.SetRasterizerState(m_rasterType);
     context.ApplyShader(m_useShaderType);
 
     XC_Graphics& graphicsSystem = (XC_Graphics&)SystemLocator::GetInstance()->RequestSystem("GraphicsSystem");

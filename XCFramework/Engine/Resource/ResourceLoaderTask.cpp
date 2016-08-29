@@ -49,7 +49,7 @@ void ResourceLoaderTask::Run()
 
             XCASSERT(!resRequest.m_resourceHandle.m_Resource->IsLoaded());
 
-            if (resRequest.m_resourceHandle.m_serializerBuffer != nullptr && !resRequest.m_resourceHandle.m_Resource->IsLoaded())
+            if (!resRequest.m_resourceHandle.m_Resource->IsLoaded())
             {
                 resRequest.m_resourceHandle.m_Resource->Load(resRequest.m_resourceHandle.m_serializerBuffer);
             }

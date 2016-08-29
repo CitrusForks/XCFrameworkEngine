@@ -31,7 +31,7 @@ void MeshGeneratorSystem::Load()
     //Set up vertices
     XCMesh* mesh = (XCMesh*) resMgr.CreateResource("XCMesh", "CubeMesh");
     {
-        mesh->InitDynamic("CubeMesh", ShaderType_LightTexture, "Placeholder", XCVec3Unaligned(1.0f, 1.0f, 1.0f), XCVec3Unaligned(0.0f, 0.0f, 0.0f));
+        mesh->InitDynamic("Runtime\\CubeMesh", ShaderType_LightTexture, "Placeholder", XCVec3Unaligned(1.0f, 1.0f, 1.0f), XCVec3Unaligned(0.0f, 0.0f, 0.0f));
 
         MeshData* meshData = mesh->CreateAndGetSubMesh();
         {
@@ -71,11 +71,41 @@ void MeshGeneratorSystem::Load()
             meshData->AddMapCoord(1.0f, 0.0f);
             meshData->AddMapCoord(1.0f, 1.0f);
         }
-        //mesh->LoadDynamic();
     }
 
     ResourceHandle resHandle = {};
     resHandle.m_Resource = mesh;
+    resHandle.m_serializerBuffer = nullptr;
+
+    resMgr.AddResource(resHandle);
+
+    //Build the basic Plane mesh.
+    //Set up vertices
+    XCMesh* planeMesh = (XCMesh*)resMgr.CreateResource("XCMesh", "PlaneMesh");
+    {
+        planeMesh->InitDynamic("Runtime\\PlaneMesh", ShaderType_LightTexture, "Placeholder", XCVec3Unaligned(1.0f, 1.0f, 1.0f), XCVec3Unaligned(0.0f, 0.0f, 0.0f));
+
+        MeshData* meshData = planeMesh->CreateAndGetSubMesh();
+        {
+            //Add vertices
+            meshData->AddVertex(-1.0f, 1.0f, 0.0f);
+            meshData->AddVertex(1.0f, -1.0f, 0.0f);
+            meshData->AddVertex(-1.0f, -1.0f, 0.0f);
+            meshData->AddVertex(1.0f, 1.0f, 0.0f);
+            
+            //Add indices
+            meshData->AddFace(MeshData::Face(0, 1, 2));
+            meshData->AddFace(MeshData::Face(0, 3, 1));
+
+            //Add UV's
+            meshData->AddMapCoord(0.0f, 0.0f);
+            meshData->AddMapCoord(1.0f, 1.0f);
+            meshData->AddMapCoord(0.0f, 1.0f);
+            meshData->AddMapCoord(1.0f, 0.0f);
+        }
+    }
+
+    resHandle.m_Resource = planeMesh;
     resHandle.m_serializerBuffer = nullptr;
 
     resMgr.AddResource(resHandle);

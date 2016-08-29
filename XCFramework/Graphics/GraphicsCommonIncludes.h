@@ -13,8 +13,8 @@
 #endif
 
  //Define Graphics API to use Dx/Opengl
-#define XCGRAPHICS_DX12
-//#define XCGRAPHICS_DX11
+//#define XCGRAPHICS_DX12
+#define XCGRAPHICS_DX11
 //#define XCGRAPHICS_GL
 
 #if defined(XCGRAPHICS_DX12)

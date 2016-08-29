@@ -11,8 +11,12 @@
 #include "Graphics/XC_Graphics.h"
 
 MeshData::MeshData(ShaderType shaderType)
+    : m_vertexBuffer(nullptr)
+    , m_instanceBuffer(nullptr)
+    , m_objectName("")
+    , m_shaderType(shaderType)
+    , m_meshAbsWidth(0.0f)
 {
-    m_shaderType = shaderType;
     Init();
 }
 
@@ -30,14 +34,9 @@ void MeshData::Destroy()
 
 void MeshData::Init()
 {
-    m_noOfVertices = 0;
-    m_noOfFaces = 0;
-
     m_vertices.clear();
     m_faces.clear();
     m_mapCoord.clear();
-
-    m_width = 0.0f;
 
     m_initialTranslation = XCVec3Unaligned(0.0f, 0.0f, 0.0f);
     m_initialRotation = XCVec3Unaligned(0.0f, 0.0f, 0.0f);

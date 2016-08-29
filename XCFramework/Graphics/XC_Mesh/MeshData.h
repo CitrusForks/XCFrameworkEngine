@@ -26,8 +26,8 @@ public:
 
     struct MapCoord
     {
-        f32           u;
-        f32           v;
+        f32 u;
+        f32 v;
     };
 
     struct Face
@@ -59,20 +59,17 @@ public:
     void        AddFace(u16 a, u16 b, u16 c, u16 flag);
     void        AddBoneInfo(XCVec4Unaligned boneIndex, XCVec4Unaligned boneWeight);
 
-
-
-    void        SetNoOfVertices(u32 noVerts) { m_noOfVertices = noVerts; }
-    void        SetNoOfFaces(u32 noFaces) { m_noOfFaces = noFaces; }
     void        SetObjectName(const char* objName) { m_objectName = objName; }
-    void        SetNoOfBones(u32 noBones) { m_noOfBones = noBones; }
 
     void        SetGeometryTranslation(XCVec3Unaligned trans) { m_initialTranslation = trans; }
     void        SetGeometryRotation(XCVec3Unaligned rot) { m_initialRotation = rot; }
     void        SetGeometryScaling(XCVec3Unaligned scale) { m_initialScaling = scale; }
+    void        SetMeshAbsWidth(f32 width) { m_meshAbsWidth = width; }
 
-    i32                    GetNoOfVertices() { return m_noOfVertices; }
-    i32                    GetNoOfFaces() { return m_noOfFaces; }
-    std::string            GetSubMeshName() { return m_objectName; }
+    i32                    GetNoOfVertices() { return m_vertices.size(); }
+    i32                    GetNoOfFaces()    { return m_faces.size(); }
+    std::string            GetSubMeshName()  { return m_objectName; }
+    f32                    GetMeshAbsWidth() { return m_meshAbsWidth; }
 
     const XCVec3Unaligned& GetGeometryTranslation()     { return m_initialTranslation; }
     const XCVec3Unaligned& GetGeometryRotation()        { return m_initialRotation; }
@@ -81,7 +78,7 @@ public:
     //Get Geometry buffers
     void*                       GetVertexBuffer()   { return m_vertexBuffer; }
     void*                       GetInstanceBuffer() { return m_instanceBuffer; }
-    IndexBuffer<u32>&  GetIndexBuffer()    { return m_indexBuffer; }
+    IndexBuffer<u32>&           GetIndexBuffer()    { return m_indexBuffer; }
 
     //Raw Geometry containers. TODO : Clear them when buffers are created.
     std::vector<Vertex>                m_vertices;
@@ -95,24 +92,20 @@ public:
     MeshNode*                          m_meshNodeStructure;
 #endif
 
-    f32                               m_width;
 
 private:
-
-    //Geometry Buffers
-    void*                              m_vertexBuffer;
-    void*                              m_instanceBuffer;
-    IndexBuffer<u32>          m_indexBuffer;
-
-    u32                       m_noOfBones;
-    u32                       m_noOfVertices;
-    u32                       m_noOfFaces;
-
-    std::string                        m_objectName;
-    ShaderType                         m_shaderType;
-
     //These will be applied in model space of the mesh, that is transformation on vertex based to align with the world.
     XCVec3Unaligned                    m_initialScaling;
     XCVec3Unaligned                    m_initialRotation;
     XCVec3Unaligned                    m_initialTranslation;
+
+    //Geometry Buffers
+    IndexBuffer<u32>                   m_indexBuffer;
+
+    void*                              m_vertexBuffer;
+    void*                              m_instanceBuffer;
+
+    std::string                        m_objectName;
+    ShaderType                         m_shaderType;
+    f32                                m_meshAbsWidth;
 };

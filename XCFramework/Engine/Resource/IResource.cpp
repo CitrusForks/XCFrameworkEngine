@@ -48,10 +48,12 @@ void IResource::UpdateState()
     if (!m_isResourceReady && m_resourceState == ResourceState_Loaded)
     {
         m_isResourceReady = true;
+        Logger("[IResource] %s is ready and loaded\n", m_userFriendlyName.c_str());
     }
     else if (m_isResourceReady && m_resourceState == ResourceState_UnLoaded)
     {
         m_isResourceReady = false;
+        Logger("[IResource] %s is unloaded\n", m_userFriendlyName.c_str());
     }
 }
 

@@ -358,8 +358,6 @@ void Terrain::Update(f32 dt)
 
 void Terrain::Draw(RenderContext& context)
 {
-    context.SetRasterizerState(RasterType_FillSolid);
-
     context.ApplyShader(m_useShaderType);
 
     XCShaderHandle* shaderHandle = nullptr;

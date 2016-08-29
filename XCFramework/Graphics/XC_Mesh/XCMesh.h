@@ -60,6 +60,8 @@ public:
     MeshAnimator*                           GetMeshAnimator() { return m_meshAnimator; }
 #endif
 
+    void                                    SetRasterType(RasterType type) { m_rasterType = type; }
+
 protected:
 
     virtual bool                            LoadMesh();
@@ -76,6 +78,7 @@ protected:
     //Member Variables--------------------------------------------------------------------------------------------------------------------------------------------------
     std::vector<MeshData*>                  m_subMeshes;
     ShaderType                              m_shaderType;
+    RasterType                              m_rasterType;
     XCShaderHandle*                         m_shaderHandler;
     ResourceHandle*                         m_texture;
 

@@ -24,7 +24,7 @@ public:
     void                        LoadShaders();
     void                        Destroy();
 
-    void                        ApplyShader(ID3DDeviceContext& context, ShaderType _ShaderType);
+    void                        ApplyShader(ID3DDeviceContext& context, ShaderType _ShaderType, RasterType rasterType = RasterType_FillSolid);
     void                        ClearShaderAndRenderStates(ID3DDeviceContext& context);
 
     void                        LoadRasterizers();
@@ -32,8 +32,6 @@ public:
 
     IShader*                    GetShader(ShaderType shaderType);
     GlobalShaderData&           GetGlobalShaderData() { return m_globalShaderData; }
-
-    void                        SetRasterizerState(ID3DDeviceContext& context, RasterType type);
 
 private:
 
@@ -54,7 +52,6 @@ private:
 #endif
 
     ID3DDevice&                 m_device;
-    RasterType                  m_rasterType;
     FlatBuffersSystem::FBBuffer m_fbBuffer;
     GlobalShaderData            m_globalShaderData;
 };

@@ -105,9 +105,6 @@ bool XCMeshAssimp::LoadMesh()
         MeshData* submesh = CreateAndGetSubMesh();
         {
             submesh->SetObjectName(m_userFriendlyName.c_str());
-            submesh->SetNoOfVertices(mesh[meshIndex]->mNumVertices);
-            submesh->SetNoOfFaces(mesh[meshIndex]->mNumFaces);
-            submesh->SetNoOfBones(mesh[meshIndex]->mNumBones);
 
             if (mesh[meshIndex]->HasBones())
             {

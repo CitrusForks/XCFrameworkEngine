@@ -27,8 +27,7 @@ public:
 
     ID3DDeviceContext&                  GetDeviceContext() { return *m_deviceContext; }
 
-    void                                SetRasterizerState(RasterType type);
-    void                                ApplyShader(ShaderType shaderType);
+    void                                ApplyShader(ShaderType shaderType, RasterType type = RasterType_FillSolid);
     IShader*                            GetShader(ShaderType shaderType);
 
     GlobalShaderData&                   GetGlobalShaderData();
@@ -40,7 +39,7 @@ protected:
     void                                ReleaseCommandList();
 
 private:
-    XC_ShaderContainer*                   m_shaderManager;
+    XC_ShaderContainer*                   m_shaderContainer;
     ID3DDeviceContext*                  m_deviceContext;
 
 #if defined(XCGRAPHICS_DX12)

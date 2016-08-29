@@ -27,7 +27,6 @@
 XC_ShaderContainer::XC_ShaderContainer(ID3DDevice& device)
     : m_device(device)
 {
-    m_rasterType = RasterType_FillSolid;
 }
 
 XC_ShaderContainer::~XC_ShaderContainer(void)
@@ -207,18 +206,11 @@ void XC_ShaderContainer::LoadSamplers()
 #endif
 }
 
-void XC_ShaderContainer::SetRasterizerState(ID3DDeviceContext& context, RasterType type)
+void XC_ShaderContainer::ApplyShader(ID3DDeviceContext& context, ShaderType _ShaderType, RasterType rasterType)
 {
-    m_rasterType = type;
+    m_Shaders[_ShaderType]->ApplyShader(context, rasterType);
 #if defined(XCGRAPHICS_DX11)
-    context.RSSetState(m_rasterizerStates[m_rasterType]);
-#endif
-}
-
-void XC_ShaderContainer::ApplyShader(ID3DDeviceContext& context, ShaderType _ShaderType)
-{
-    m_Shaders[_ShaderType]->ApplyShader(context);
-#if defined(XCGRAPHICS_DX11)
+    context.RSSetState(m_rasterizerStates[rasterType]);
     ((XCShaderHandle*)m_Shaders[_ShaderType])->SetSampler("samLinear", context, m_SamplerLinear);
 #elif defined(XCGRAPHICS_DX12)
     //Set sampler
