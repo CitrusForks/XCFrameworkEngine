@@ -12,6 +12,8 @@
 
 #include "Graphics/D3DConstantBuffer.h"
 
+#include "Engine/Thread/CriticalSection.h"
+
 class SharedDescriptorHeap : public ISystem
 {
 public:
@@ -73,4 +75,5 @@ private:
 
     ID3DDevice*                     m_device;
     std::vector<D3DConstantBuffer*> m_constantBuffers;
+    CriticalSection                 m_cs;
 };

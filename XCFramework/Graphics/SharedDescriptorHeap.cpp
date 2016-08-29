@@ -14,6 +14,7 @@ SharedDescriptorHeap::SharedDescriptorHeap()
     : m_rtvDescriptorSize(0)
 #endif
 {
+    m_cs.Create(true, "SharedDescLock");
 }
 
 void SharedDescriptorHeap::Init(ID3DDevice& device, u32 nbOfRTVDesc, u32 nbOfDSVDesc, u32 nbOfSamplerDesc, u32 nbOfCBVDesc)
@@ -68,6 +69,8 @@ SharedDescriptorHeap::HeapDesc* SharedDescriptorHeap::CreateHeapDesc(D3D12_DESCR
 
 D3DConstantBuffer* SharedDescriptorHeap::CreateBufferView(D3DBufferDesc& desc)
 {
+    m_cs.Enter();
+
     desc.m_bufferSize = (desc.m_bufferSize + 255) & ~255;     //Must be a multiple of 256
 
     D3DConstantBuffer* constBuffer = FindFreeConstantBuffer(desc.m_bufferType, desc.m_bufferSize);
@@ -75,7 +78,6 @@ D3DConstantBuffer* SharedDescriptorHeap::CreateBufferView(D3DBufferDesc& desc)
     if (constBuffer != nullptr)
     {
         constBuffer->m_isInUse = true;
-        return constBuffer;
     }
     else
     {
@@ -134,17 +136,17 @@ D3DConstantBuffer* SharedDescriptorHeap::CreateBufferView(D3DBufferDesc& desc)
 
 #endif
             m_constantBuffers.push_back(constBuffer);
-
-            return m_constantBuffers.back();
         }
         else
         {
             XCDELETE(constBuffer);
+            constBuffer = nullptr;
         }
     }
 
-    XCASSERT(false);
-    return nullptr;
+    m_cs.Exit();
+
+    return constBuffer;
 }
 
 #if defined(XCGRAPHICS_DX12)
@@ -153,6 +155,8 @@ D3DConstantBuffer* SharedDescriptorHeap::CreateShaderResourceView(CD3DX12_RESOUR
 D3DConstantBuffer* SharedDescriptorHeap::CreateShaderResourceView()
 #endif
 {
+    m_cs.Enter();
+
     D3DConstantBuffer* constBuffer = FindFreeConstantBuffer(BUFFERTYPE_SRV, 0);
 
     if (constBuffer != nullptr)
@@ -190,9 +194,10 @@ D3DConstantBuffer* SharedDescriptorHeap::CreateShaderResourceView()
 
 #endif
         m_constantBuffers.push_back(constBuffer);
-
-        return m_constantBuffers.back();
     }
+
+    m_cs.Exit();
+    return constBuffer;
 }
 
 D3DConstantBuffer* SharedDescriptorHeap::FindFreeConstantBuffer(BufferType type, u32 size)
@@ -209,7 +214,9 @@ D3DConstantBuffer* SharedDescriptorHeap::FindFreeConstantBuffer(BufferType type,
 
 void SharedDescriptorHeap::DestroyBuffer(D3DConstantBuffer* buffer)
 {
+    m_cs.Enter();
     buffer->m_isInUse = false;
+    m_cs.Exit();
 }
 
 void SharedDescriptorHeap::Destroy()
