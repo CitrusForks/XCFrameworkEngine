@@ -38,26 +38,26 @@ void ComputeDirectionalLight(Material mat, DirectionalLight L, float3 normal, fl
     ambient = mat.Ambient * L.Ambient;
 
     //Add diffuse and specular term, provided the surface is in the line of sight
-    //float lightIntensity = max(dot(lightVec, normal), 0.0f);
-    float lightIntensity = dot(lightVec, normal);
+    float lightIntensity = max(dot(lightVec, normal), 0.0f);
+    //float lightIntensity = dot(lightVec, normal);
 
     if(lightIntensity > 0.0f)
     {
         diffuse = lightIntensity * (mat.Diffuse * L.Diffuse);
     }
-    //float3 v = reflect(-lightVec, normal);
-    //float specFactor = pow( max( dot(v, toEye), 0.0f), mat.Specular.w);
-    /*
+    float3 v = reflect(-lightVec, normal);
+    float specFactor = pow( max( dot(v, toEye), 0.0f), mat.Specular.w);
+    
     //Flatten to avoid dynamic branching
     [flatten]
-    if(diffuseFactor > 0.0f)
+    if(diffuse.r > 0.0f)
     {
         float3 v = reflect(-lightVec, normal);
         float specFactor = pow( max( dot(v, toEye), 0.0f), mat.Specular.w);
 
-        diffuse = diffuseFactor * mat.Diffuse * L.Diffuse;
+        diffuse = diffuse * mat.Diffuse * L.Diffuse;
         specular = specFactor * mat.Specular * L.Specular; 
-    }*/
+    }
 }
 
 #endif

@@ -54,7 +54,7 @@ void TexturedPlane::PreLoad(const void* fbBuffer)
     m_pCBPerObject = heap.CreateBufferView(D3DBufferDesc(BUFFERTYPE_CBV, sizeof(PerObjectBuffer)));
 }
 
-void TexturedPlane::PreLoad(XCVec4& initialPosition, XCVec4& initialRotation, XCVec4& initialScaling, BasicMaterial& material, std::string texture, RasterType rasterType)
+void TexturedPlane::PreLoad(XCVec4& initialPosition, XCVec4& initialRotation, XCVec4& initialScaling, Material& material, std::string texture, RasterType rasterType)
 {
     m_currentPosition = initialPosition;
     m_initialRotation = initialRotation;

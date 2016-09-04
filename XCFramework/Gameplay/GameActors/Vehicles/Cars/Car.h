@@ -31,6 +31,6 @@ public:
                         
 protected:              
     ShaderType          m_useShaderType;
-    BasicMaterial       m_material;
+    Material       m_material;
     bool                m_isMainCharacter;
 };

@@ -37,16 +37,17 @@ struct cbInvTransposeWorld
 
 struct cbLightsPerFrame
 {
-    DirectionalLight gDirLight;
-    PointLight       gPointLight;
-    SpotLight        gSpotLight;
-    XCVec3Unaligned  gEyePosW;
+    LightSource      gLightSource[10];
+    XCVec4Unaligned  gNoOfLights;
+    XCVec4Unaligned  padding1;
+    XCVec4Unaligned  padding2;
+    XCVec4Unaligned  padding3;
 };
 
 struct cbMatTexPerObject
 {
     XCMatrix4Unaligned         gTexTransform;
-    BasicMaterial              gMaterial;
+    Material                   gMaterial;
 };
 
 struct PerObjectBuffer
@@ -55,7 +56,7 @@ struct PerObjectBuffer
     XCMatrix4Unaligned    gWVP;
     XCMatrix4Unaligned    gWorldInvTranspose;
     XCMatrix4Unaligned    gTexTransform;
-    BasicMaterial         gMaterial;
+    Material              gMaterial;
 };
 
 struct cbInstancedBuffer

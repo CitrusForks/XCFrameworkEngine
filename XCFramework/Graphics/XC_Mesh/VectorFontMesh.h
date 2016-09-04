@@ -50,5 +50,5 @@ private:
     //This buffer is actual text to be drawn
     std::string                m_buffer;
 
-    BasicMaterial              m_material;
+    Material              m_material;
 };

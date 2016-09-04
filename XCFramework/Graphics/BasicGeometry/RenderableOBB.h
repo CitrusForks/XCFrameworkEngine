@@ -32,5 +32,5 @@ private:
     ResourceHandle*            m_cubeMesh;
 #endif
 
-    BasicMaterial              m_material;
+    Material              m_material;
 };

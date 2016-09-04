@@ -4,9 +4,7 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
-#include "..\LightingShaders\DirectionalLight.hlsl"
-#include "..\LightingShaders\PointLight.hlsl"
-#include "..\LightingShaders\SpotLight.hlsl"
+#pragma once
 
 cbuffer cbWVP : register(b0)
 {
@@ -18,7 +16,7 @@ SamplerState    samLinear : register(s0);
 
 struct VertexIn
 {
-	float3 PosL     : POSITION;
+    float3 PosL     : POSITION;
 };
 
 struct VertexOut

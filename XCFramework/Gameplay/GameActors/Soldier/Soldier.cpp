@@ -35,7 +35,7 @@ void Soldier::PreLoad(const void* fbBuffer)
     //Get initial position
     m_currentPosition.SetValues(soldierBuff->Position()->x(), soldierBuff->Position()->y(), soldierBuff->Position()->z(), 0.0f);
 
-    m_material.Ambient  = XCVec4(1.0f, 1.0f, 1.0f, 1.0f);
+    m_material.Ambient  = XCVec4(0.1f, 0.1f, 0.1f, 1.0f);
     m_material.Diffuse  = XCVec4(0.5f, 0.8f, 0.0f, 1.0f);
     m_material.Specular = XCVec4(0.2f, 0.2f, 0.2f, 16.0f);
 

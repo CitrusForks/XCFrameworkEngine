@@ -4,12 +4,7 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
-#ifndef __CUBEMAPPS_HLSL__
-#define __CUBEMAPPS_HLSL__
-
-#include "..\LightingShaders\DirectionalLight.hlsl"
-#include "..\LightingShaders\PointLight.hlsl"
-#include "..\LightingShaders\SpotLight.hlsl"
+#pragma once
 
 cbuffer cbWVP : register(b0)
 {
@@ -40,5 +35,3 @@ float4 PSMain(VertexOut pin) : SV_TARGET
 {
     return gCubeMap.Sample(samLinear, pin.PosW);
 }
-
-#endif

@@ -40,7 +40,7 @@ protected:
     ResourceHandle*                 m_cubeMapTexture;
 
     ShaderType                      m_useShaderType;
-    BasicMaterial                   m_material;
+    Material                   m_material;
     
     VertexBuffer<VertexPos>         m_vertexBuffer;
     IndexBuffer<u32>       m_indexBuffer;

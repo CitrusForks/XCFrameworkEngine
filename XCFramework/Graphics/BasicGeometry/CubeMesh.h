@@ -32,7 +32,7 @@ public:
     virtual void                    Destroy();
     virtual void                    BuildBuffers();
 
-    void                            PreLoad(XCVec4 initialPosition, XCVec4 initialRotation, XCVec4 initialScaling, BasicMaterial material, Texture2D* texture, RasterType rasterType);
+    void                            PreLoad(XCVec4 initialPosition, XCVec4 initialRotation, XCVec4 initialScaling, Material material, Texture2D* texture, RasterType rasterType);
     void                            CreateMeshBuffer();
 
 protected:
@@ -43,7 +43,7 @@ protected:
     u32                    m_Offset;
 
     ShaderType                      m_useShaderType;
-    BasicMaterial                   m_material;
+    Material                   m_material;
     Texture2D*                      m_texture;
 
     VertexBuffer<VertexPosNormTex>  m_vertexBuffer;

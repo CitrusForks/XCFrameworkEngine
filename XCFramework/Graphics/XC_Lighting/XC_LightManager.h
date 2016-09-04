@@ -27,9 +27,11 @@ public:
 
     D3DConstantBuffer&              GetLightConstantBuffer() { return *m_pCBLightsPerFrame; }
 
+protected:
+    static const u32                NoOfLights = 5;
 private:
 
-    std::map<ELightType, ILight*>   m_Lights;
+    std::vector<ILight*>            m_Lights;
     XCVec4                          m_eyePos;
 
     D3DConstantBuffer*              m_pCBLightsPerFrame;

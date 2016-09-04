@@ -58,11 +58,11 @@ void RunningState::Init()
 #endif
 
     std::unique_ptr<SimpleSkyBox> pSkyBox = (std::unique_ptr<SimpleSkyBox>)(SimpleSkyBox*)actorFactory.CreateActor("SimpleSkyBox");
-    pSkyBox->PreLoad(toXMVECTOR(0.0f, 0.0f, 0.0f, 1.0f), toXMVECTOR(0.0f, 0.0f, 0.0f, 1.0f), toXMVECTOR(1000.0f, 1000.0f, 1000.0f, 1.0f), BasicMaterial(), (CubeTexture3D*)resMgr.AcquireResource("cubemap_bright"), RasterType_FillSolid);
+    pSkyBox->PreLoad(toXMVECTOR(0.0f, 0.0f, 0.0f, 1.0f), toXMVECTOR(0.0f, 0.0f, 0.0f, 1.0f), toXMVECTOR(1000.0f, 1000.0f, 1000.0f, 1.0f), Material(), (CubeTexture3D*)resMgr.AcquireResource("cubemap_bright"), RasterType_FillSolid);
     m_worldSystem->RequestAddActor(std::move(pSkyBox));
 
     std::unique_ptr<TexturedPlane> pTexturedPlane = (std::unique_ptr<TexturedPlane>)(TexturedPlane*)actorFactory.CreateActor("TexturedPlane");
-    pTexturedPlane->PreLoad(toXMVECTOR(0.0f, 5.0f, 10.0f, 1.0f), toXMVECTOR(0.0f, 0.0f, 0.0f, 1.0f), toXMVECTOR(5.0f, 5.0f, 0.0f, 1.0f), BasicMaterial(), graphicsSystem.GetRenderTexture(RENDERTARGET_LIVEDRIVE), RasterType_FillSolid);
+    pTexturedPlane->PreLoad(toXMVECTOR(0.0f, 5.0f, 10.0f, 1.0f), toXMVECTOR(0.0f, 0.0f, 0.0f, 1.0f), toXMVECTOR(5.0f, 5.0f, 0.0f, 1.0f), Material(), graphicsSystem.GetRenderTexture(RENDERTARGET_LIVEDRIVE), RasterType_FillSolid);
     m_worldSystem->RequestAddActor(std::move(pTexturedPlane));
 
     std::unique_ptr<Waves> pWave = (std::unique_ptr<Waves>)(Waves*)actorFactory.CreateActor("Waves");

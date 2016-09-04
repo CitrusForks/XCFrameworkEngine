@@ -4,9 +4,7 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
-#include "..\LightingShaders\DirectionalLight.hlsl"
-#include "..\LightingShaders\PointLight.hlsl"
-#include "..\LightingShaders\SpotLight.hlsl"
+#include "..\LightingShaders\LightSource.hlsl"
 
 struct PerObjectBuffer
 {
@@ -19,10 +17,11 @@ struct PerObjectBuffer
 
 cbuffer cbLightsPerFrame : register(b0)
 {
-    DirectionalLight gDirLight;
-    PointLight       gPointLight;
-    SpotLight        gSpotLight;
-    float3           gEyePosW;
+    LightSource      gLightSource[10];
+    float4           gNoOfLights;
+    float4           padding1;
+    float4           padding2;
+    float4           padding3;
 };
 
 cbuffer cbInstancedBuffer : register(b1)
@@ -35,9 +34,8 @@ cbuffer cbBoneBuffer : register(b2)
     float4x4    gBoneMatrix[60];
 };
 
-
 Texture2D       gDiffuseMap : register(t0);    //Mapped with ShaderResource Variable
-SamplerState	samLinear : register( s0 );
+SamplerState    samLinear : register( s0 );
 
 struct VertexIn
 {
@@ -68,9 +66,9 @@ VertexOut VSMain(VertexIn vin)
     
     float4 localPos = float4(vin.PosL, 1.0f);
     float3 objPos    = mul(localPos, gBoneMatrix[vin.BlendIndices.x]) * weight.x;
-    //objPos          += mul(localPos, gBoneMatrix[vin.BlendIndices.y]) * weight.y;
-    //objPos          += mul(localPos, gBoneMatrix[vin.BlendIndices.z]) * weight.z;
-    //objPos          += mul(localPos, gBoneMatrix[vin.BlendIndices.w]) * weight.w;
+    objPos          += mul(localPos, gBoneMatrix[vin.BlendIndices.y]) * weight.y;
+    objPos          += mul(localPos, gBoneMatrix[vin.BlendIndices.z]) * weight.z;
+    objPos          += mul(localPos, gBoneMatrix[vin.BlendIndices.w]) * weight.w;
 
     // Transform to world space.
     vout.PosW = mul(float4(objPos, 1.0), gPerObject[vin.InstanceIndex].gWorld).xyz;

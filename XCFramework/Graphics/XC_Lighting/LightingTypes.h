@@ -22,15 +22,21 @@
 
 enum ELightType
 {
-    LIGHTTYPE_DIRECTIONAL,
-    LIGHTTYPE_POINT,
-    LIGHTTYPE_SPOT,
+    LIGHTTYPE_SOURCE,
     
     LIGHTTYPE_MAX
 };
 
 struct ILight
 {
+};
+
+struct LightSource : public ILight
+{
+    XCVec4Unaligned            LightColor;  //Color of the light that emits
+    XCVec4Unaligned            Direction;   //Direction the light is pointing at
+    XCVec4Unaligned            Intensity;   //Intensity of light in all 3 axis
+    XCVec4Unaligned            Position;    //Physical position of light
 };
 
 struct DirectionalLight : public ILight
@@ -59,7 +65,7 @@ struct PointLight : public ILight
 
     //Packed in 4D vector : (Position, Range)
     XCVec3Unaligned            Position;
-    f32                      Range;
+    f32                        Range;
 
     //Packed into 4D vector: (A0, A1, A2)
     XCVec3Unaligned            Att;
@@ -78,11 +84,11 @@ struct SpotLight : public ILight
 
     //Packed into 4D vector : (Position, Range)
     XCVec3Unaligned            Position;
-    f32                      Range;
+    f32                        Range;
 
     //Packed into 4D : (Direction, Spot)
     XCVec3Unaligned            Direction;
-    f32                      Spot;
+    f32                        Spot;
 
     //Packed into 4D vector: (A0, A1, A2)
     XCVec3Unaligned            Att;

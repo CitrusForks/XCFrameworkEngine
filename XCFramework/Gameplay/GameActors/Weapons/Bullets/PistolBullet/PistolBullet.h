@@ -36,7 +36,7 @@ public:
 protected:
 
     ShaderType                 m_useShaderType;
-    BasicMaterial              m_material;
+    Material              m_material;
     XCVec4                     m_secondaryLookAxis;
     XCVec4                     m_secondaryUpAxis;
     XCVec4                     m_secondaryRightAxis;

@@ -4,16 +4,17 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
-#include "..\LightingShaders\DirectionalLight.hlsl"
-#include "..\LightingShaders\PointLight.hlsl"
-#include "..\LightingShaders\SpotLight.hlsl"
+#pragma once
+
+#include "..\LightingShaders\LightSource.hlsl"
 
 cbuffer cbLightsPerFrame : register(b0)
 {
-    DirectionalLight gDirLight;
-    PointLight       gPointLight;
-    SpotLight        gSpotLight;
-    float3           gEyePosW;
+    LightSource      gLightSource[10];
+    float4           gNoOfLights;
+    float4           padding1;
+    float4           padding2;
+    float4           padding3;
 };
 
 cbuffer PerObjectBuffer : register(b1)

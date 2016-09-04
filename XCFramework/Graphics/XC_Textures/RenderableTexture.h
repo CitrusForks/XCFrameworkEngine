@@ -17,10 +17,7 @@ public:
     {
         ~RenderedTextureInfo()
         {
-            if (m_texData)
-            {
-                XCDELETE(m_texData);
-            }
+            XCDELETE(m_texData);
         }
 
         u8*     m_texData;

@@ -25,32 +25,17 @@ void XC_LightManager::InitializeLights()
     m_pCBLightsPerFrame = heap.CreateBufferView(D3DBufferDesc(BUFFERTYPE_CBV, sizeof(cbLightsPerFrame)));
 
     //Add Lights - To remove. Need a LightManager- Manages all types of light, allows to add and remove lights from world. Maybe we can add this light actors directly into the world
-    //Directional light
-    DirectionalLight* directionalLight = XCNEW(DirectionalLight)();
-    directionalLight->Ambient = XCVec4Unaligned(1.0f, 1.0f, 1.0f, 1.0f);
-    directionalLight->Diffuse = XCVec4Unaligned(0.2f, 0.2f, 0.2f, 1.0f);
-    directionalLight->Specular = XCVec4Unaligned(0.2f, 0.2f, 0.2f, 1.0f);
-    directionalLight->Direction = XCVec3Unaligned(0.577f, -0.577f, 0.577f);
-    m_Lights[LIGHTTYPE_DIRECTIONAL] = (ILight*)directionalLight;
+    for (u32 index = 0; index < NoOfLights; ++index)
+    {
+        LightSource* lightSource = XCNEW(LightSource)();
 
-    //Point Light
-    PointLight* pointLight = XCNEW(PointLight)();
-    pointLight->Ambient = XCVec4Unaligned(0.3f, 0.3f, 0.3f, 1.0f);
-    pointLight->Diffuse = XCVec4Unaligned(0.7f, 0.7f, 0.7f, 1.0f);
-    pointLight->Specular = XCVec4Unaligned(0.7f, 0.7f, 0.7f, 1.0f);
-    pointLight->Att = XCVec3Unaligned(0.0f, 0.9f, 0.0f);
-    pointLight->Range = 10000.0f;
-    m_Lights[LIGHTTYPE_POINT] = (ILight*)pointLight;
+        lightSource->LightColor  = XCVec4Unaligned(1.0f, 1.0f, 1.0f, 1.0f);
+        lightSource->Intensity   = XCVec4Unaligned(10.0f, 10.0f, 10.0f, 1.0f);
+        lightSource->Direction   = XCVec4Unaligned(0.0f, 1.0f, 0.0f, 0.0f);
+        lightSource->Position    = XCVec4Unaligned(0.0f, 10.0f, index * 50.0f, 1.0f);
 
-    //Spot Light
-    SpotLight* spotLight = XCNEW(SpotLight)();
-    spotLight->Ambient = XCVec4Unaligned(0.0f, 0.0f, 0.0f, 1.0f);
-    spotLight->Diffuse = XCVec4Unaligned(1.0f, 1.0f, 0.0f, 1.0f);
-    spotLight->Specular = XCVec4Unaligned(1.0f, 1.0f, 1.0f, 1.0f);
-    spotLight->Att = XCVec3Unaligned(1.0f, 0.0f, 0.0f);
-    spotLight->Spot = 96.0f;
-    spotLight->Range = 10000.0f;
-    m_Lights[LIGHTTYPE_SPOT] = (ILight*)spotLight;
+        m_Lights.push_back((ILight*)lightSource);
+    }
 
     m_eyePos = XCVec4(0, 0, 0, 0);
 }
@@ -68,38 +53,26 @@ void XC_LightManager::Update(f32 dt)
     XCVec4 target  = shaderSystem.GetGlobalShaderData().m_camera.GetTarget();
     XCVec4 up(0.0f, 1.0f, 0.0f, 0.0f);
     XCVec4 direction = VectorNormalize<3>(target - m_eyePos);
-    // Circle light over the land surface.
-    PointLight* pointLight  = (PointLight*)m_Lights[LIGHTTYPE_POINT];
-    pointLight->Position    = XCVec3Unaligned(70.0f*cosf(0.2f), 10.0f, 70.0f*sinf(0.2f));
-
-    // The spotlight takes on the camera position and is aimed in the
-    // same direction the camera is looking. In this way, it looks
-    // like we are holding a flashlight.
-    SpotLight* spotLight = (SpotLight*)m_Lights[LIGHTTYPE_SPOT];
-    spotLight->Position  = m_eyePos.GetUnaligned3();
-    spotLight->Direction = direction.GetUnaligned3();
-
-    DirectionalLight* directionalLight = (DirectionalLight*)m_Lights[LIGHTTYPE_DIRECTIONAL];
-    directionalLight->Direction        = direction.GetUnaligned3();
 }
 
 void XC_LightManager::Draw(XC_Graphics& graphicsSystem)
 {
-    cbLightsPerFrame lightsPerFrame = { 
-                                        *(DirectionalLight*)m_Lights[LIGHTTYPE_DIRECTIONAL],
-                                        *(PointLight*)m_Lights[LIGHTTYPE_POINT],
-                                        *(SpotLight*)m_Lights[LIGHTTYPE_SPOT],
-                                        m_eyePos.GetUnaligned3(),
-                                      };
+    cbLightsPerFrame lightsPerFrame = {};
+
+    for (u32 index = 0; index < NoOfLights; ++index)
+    {
+        lightsPerFrame.gLightSource[index] = *(LightSource*)m_Lights[index];
+    }
+    lightsPerFrame.gNoOfLights = XCVec4Unaligned(NoOfLights, NoOfLights, NoOfLights, 1.0f);
 
     m_pCBLightsPerFrame->UploadDataOnGPU(*graphicsSystem.GetDeviceContext(), &lightsPerFrame, sizeof(cbLightsPerFrame));
 }
 
 void XC_LightManager::Destroy()
 {
-    for (i32 index = 0; index < LIGHTTYPE_MAX; index++)
+    for (i32 index = 0; index < NoOfLights; index++)
     {
-        XCDELETE(m_Lights[(ELightType)index]);
+        XCDELETE(m_Lights[index]);
     }
     m_Lights.clear();
 

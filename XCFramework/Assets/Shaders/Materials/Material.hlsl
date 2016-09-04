@@ -4,9 +4,12 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
+#pragma once
+
 struct Material
 {
     float4  Ambient;
     float4  Diffuse;
     float4  Specular;
+    float4  Padding;
 };

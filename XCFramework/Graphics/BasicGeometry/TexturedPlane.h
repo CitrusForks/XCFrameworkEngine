@@ -27,7 +27,7 @@ public:
     virtual ~TexturedPlane();
 
     virtual void                     PreLoad(const void* fbBuffer);
-    virtual void                     PreLoad(XCVec4& initialPosition, XCVec4& initialRotation, XCVec4& initialScaling, BasicMaterial& material, std::string texture, RasterType rasterType);
+    virtual void                     PreLoad(XCVec4& initialPosition, XCVec4& initialRotation, XCVec4& initialScaling, Material& material, std::string texture, RasterType rasterType);
     virtual void                     Load();
     virtual void                     Update(f32 dt);
     virtual void                     Draw(RenderContext& renderContext);
@@ -40,5 +40,5 @@ protected:
     ResourceHandle*                   m_texture;
     D3DConstantBuffer*                m_pCBPerObject;
     VertexBuffer<VertexPosNormTex>    m_vertexBuffer;
-    BasicMaterial                     m_material;
+    Material                     m_material;
 };

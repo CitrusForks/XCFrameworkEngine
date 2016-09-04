@@ -33,6 +33,6 @@ protected:
 
     ShaderType                          m_useShaderType;
 
-    BasicMaterial                       m_material;
+    Material                       m_material;
     DirectInput*                        m_directInput;
 };

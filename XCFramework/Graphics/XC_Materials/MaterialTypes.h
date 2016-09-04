@@ -6,21 +6,24 @@
 
 #pragma once
 
-struct BasicMaterial
+struct Material
 {
     XCVec4        Ambient;
     XCVec4        Diffuse;
     XCVec4        Specular;
+    XCVec4        Padding;
 
-    BasicMaterial() :
+    Material() :
         Ambient(0, 0, 0, 0),
         Diffuse(0, 0, 0, 0),
-        Specular(0, 0, 0, 0)
+        Specular(0, 0, 0, 0),
+        Padding(0, 0, 0, 0)
     { }
 
-    BasicMaterial(const XCVec4& ambient, const XCVec4& diffuse, const XCVec4& specular) :
+    Material(const XCVec4& ambient, const XCVec4& diffuse, const XCVec4& specular) :
         Ambient(ambient),
         Diffuse(diffuse),
-        Specular(specular)
+        Specular(specular),
+        Padding(0, 0, 0, 0)
     { }
 };

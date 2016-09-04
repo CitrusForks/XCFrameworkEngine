@@ -69,6 +69,10 @@ protected:
     virtual void                            CreateConstantBuffer();
     void                                    FilterSubMeshes();
 
+    //Computations
+    template<class VertexFormat>
+    void                                    CalculateMeshNormals(std::vector<VertexFormat>& vertices, std::vector<u32>& indices);
+
     //Draw calls
     virtual void                            Draw(RenderContext& context);
     virtual void                            DrawSubMesh(RenderContext& renderContext, u32 meshIndex);
@@ -121,3 +125,29 @@ protected:
     std::vector<InstanceBuffer>             m_instanceBuffers;
     std::vector<BoneBuffer>                 m_boneBuffers;
 };
+
+
+template<class VertexFormat>
+void XCMesh::CalculateMeshNormals(std::vector<VertexFormat>& vertices, std::vector<u32>& indices)
+{
+    //Calculate the normals of the mesh.
+    for (u32 vertexIndex = 0; vertexIndex < indices.size() - 3; vertexIndex += 3)
+    {
+        XCVec4 v1(vertices[indices[vertexIndex]].Pos);
+        XCVec4 v2(vertices[indices[vertexIndex + 1]].Pos);
+        XCVec4 v3(vertices[indices[vertexIndex + 2]].Pos);
+
+        v1.Set<W>(1.0f); v2.Set<W>(1.0f); v3.Set<W>(1.0f);
+
+        //Average the normals if the vertex is shared in multiple faces.
+        XCVec4 vertexNormal = GetNormalFromPoints(v1, v2, v3);
+        vertexNormal += GetNormalFromPoints(v2, v1, v3);
+        vertexNormal += GetNormalFromPoints(v3, v1, v2);
+
+        vertexNormal = VectorNormalize<3>(vertexNormal);
+
+        vertices[indices[vertexIndex]].Norm = vertexNormal.GetUnaligned3();
+        vertices[indices[vertexIndex + 1]].Norm = vertexNormal.GetUnaligned3();
+        vertices[indices[vertexIndex + 2]].Norm = vertexNormal.GetUnaligned3();
+    }
+}

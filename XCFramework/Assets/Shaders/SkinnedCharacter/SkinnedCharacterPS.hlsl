@@ -4,9 +4,7 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
-#include "..\LightingShaders\DirectionalLight.hlsl"
-#include "..\LightingShaders\PointLight.hlsl"
-#include "..\LightingShaders\SpotLight.hlsl"
+#include "..\LightingShaders\LightSource.hlsl"
 
 struct PerObjectBuffer
 {
@@ -19,10 +17,11 @@ struct PerObjectBuffer
 
 cbuffer cbLightsPerFrame : register(b0)
 {
-    DirectionalLight gDirLight;
-    PointLight       gPointLight;
-    SpotLight        gSpotLight;
-    float3           gEyePosW;
+    LightSource      gLightSource[10];
+    float4           gNoOfLights;
+    float4           padding1;
+    float4           padding2;
+    float4           padding3;
 };
 
 cbuffer cbInstancedBuffer : register(b1)
@@ -36,7 +35,7 @@ cbuffer cbBoneBuffer : register(b2)
 };
 
 Texture2D       gDiffuseMap : register(t0);    //Mapped with ShaderResource Variable
-SamplerState	samLinear : register(s0);
+SamplerState    samLinear : register(s0);
 
 struct VertexIn
 {
@@ -62,41 +61,28 @@ float4 PSMain(VertexOut pin) : SV_Target
     //Interpolating normal can unmormalize it, so normalize it
     pin.NormalW = normalize(pin.NormalW);
 
-    float3 toEye = normalize(gEyePosW - pin.PosW);
-
     float4 texColor = float4(1, 1, 1, 1);
 
     texColor = gDiffuseMap.Sample(samLinear, pin.Tex);
     
-    float4 litColor = texColor;
+    float4 finalColor = texColor;
 
-    //Start with a sum of zero
-    float4 ambient  = float4(0.0f, 0.0f, 0.0f, 0.0f);
-    float4 diffuse  = float4(0.0f, 0.0f, 0.0f, 0.0f);
-    float4 specular = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    float4 lightImpact = float4(0, 0, 0, 0);
 
-    //Sum the light contribution from each light source.
-    float4 A, D, S;
+    for (unsigned int index = 0; index < gNoOfLights.x; ++index)
+    {
+        lightImpact += CalculateLightImpact(gLightSource[index], float4(pin.PosW, 0.0), float4(pin.NormalW, 0.0));
+    }
 
-    ComputeDirectionalLight(gPerObject[0].gMaterial, gDirLight, pin.NormalW, toEye, A, D, S);
-    ambient += A;
-    diffuse += D;
-    specular+= S;
+    lightImpact = lightImpact / gNoOfLights.x;
 
-    ComputePointLight(gPerObject[0].gMaterial, gPointLight, pin.PosW, pin.NormalW, toEye, A, D, S);
-    ambient += A;
-    diffuse += D;
-    specular+= S;
+    finalColor += lightImpact;
 
-    ComputeSpotLight(gPerObject[0].gMaterial, gSpotLight, pin.PosW, pin.NormalW, toEye, A, D, S);
-    ambient += A;
-    diffuse += D;
-    specular+= S;
-
-    litColor = texColor * (ambient + diffuse) + specular;
+    //Add the ambient light
+    finalColor += gPerObject[0].gMaterial.Ambient;
 
     //Common to take alpha from diffuse material
-    litColor.a = gPerObject[0].gMaterial.Diffuse.a * texColor.a;
+    finalColor.a = gPerObject[0].gMaterial.Diffuse.a * texColor.a;
     
-    return litColor;
+    return finalColor;
 }

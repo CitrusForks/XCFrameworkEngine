@@ -34,7 +34,7 @@ void Gun::PreLoad(IActor* parentActor, XCVec3& initialPosition, std::string pMes
 
     m_directInput = (DirectInput*)&SystemLocator::GetInstance()->RequestSystem("InputSystem");
 
-    m_material.Ambient  = XCVec4(1.0f, 1.0f, 1.0f, 1.0f);
+    m_material.Ambient  = XCVec4(0.1f, 0.1f, 0.1f, 1.0f);
     m_material.Diffuse  = XCVec4(0.5f, 0.8f, 0.0f, 1.0f);
     m_material.Specular = XCVec4(0.2f, 0.2f, 0.2f, 16.0f);
 

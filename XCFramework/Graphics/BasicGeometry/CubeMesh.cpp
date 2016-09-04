@@ -25,7 +25,7 @@ CubeMesh::~CubeMesh(void)
 
 void CubeMesh::Init()
 {
-    m_material.Ambient  = XCVec4(1.0f, 1.0f, 1.0f, 1.0f);
+    m_material.Ambient  = XCVec4(0.2f, 0.2f, 0.2f, 1.0f);
     m_material.Diffuse  = XCVec4(0.5f, 0.8f, 0.0f, 1.0f);
     m_material.Specular = XCVec4(0.2f, 0.2f, 0.2f, 16.0f);
 
@@ -39,7 +39,7 @@ void CubeMesh::Init()
     Logger("[CubeMesh] Init done");
 }
 
-void CubeMesh::PreLoad(XCVec4 initialPosition, XCVec4 initialRotation, XCVec4 initialScaling, BasicMaterial material, Texture2D* texture, RasterType rasterType)
+void CubeMesh::PreLoad(XCVec4 initialPosition, XCVec4 initialRotation, XCVec4 initialScaling, Material material, Texture2D* texture, RasterType rasterType)
 {
     m_currentPosition = initialPosition;
     m_MTranslation = XMMatrixTranslation(XMVectorGetX(initialPosition), XMVectorGetY(initialPosition), XMVectorGetZ(initialPosition));
