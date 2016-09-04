@@ -7,8 +7,10 @@
 #pragma once
 
 #define XCNEW(x)         new (true) x
-#define XCDELETE(x)      delete x
-#define XCDELETEARRAY(x) delete[] x
+
+//Safe deletes : checks for nullptr.
+#define XCDELETE(x)      if(x != nullptr) delete x
+#define XCDELETEARRAY(x) if(x != nullptr) delete[] x
 
 //new overrides
 void* operator new(size_t classSize);
