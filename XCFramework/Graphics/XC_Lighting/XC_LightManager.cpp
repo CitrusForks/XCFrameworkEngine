@@ -8,6 +8,7 @@
 
 #include "XC_LightManager.h"
 
+#include "Graphics/GPUResourceSystem.h"
 #include "Graphics/XC_Shaders/XC_ShaderHandle.h"
 #include "Graphics/XC_Shaders/XC_ShaderBufferConstants.h"
 
@@ -21,8 +22,8 @@ XC_LightManager::~XC_LightManager()
 
 void XC_LightManager::InitializeLights()
 {
-    SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
-    m_pCBLightsPerFrame = heap.CreateBufferView(D3DBufferDesc(BUFFERTYPE_CBV, sizeof(cbLightsPerFrame)));
+    GPUResourceSystem& gpuSys = (GPUResourceSystem&)SystemLocator::GetInstance()->RequestSystem("GPUResourceSystem");
+    m_pCBLightsPerFrame = gpuSys.CreateConstantBufferResourceView(GPUResourceDesc(GPUResourceType_CBV, sizeof(cbLightsPerFrame)));
 
     //Add Lights - To remove. Need a LightManager- Manages all types of light, allows to add and remove lights from world. Maybe we can add this light actors directly into the world
     for (u32 index = 0; index < NoOfLights; ++index)
@@ -76,6 +77,6 @@ void XC_LightManager::Destroy()
     }
     m_Lights.clear();
 
-    SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
-    heap.DestroyBuffer(m_pCBLightsPerFrame);
+    GPUResourceSystem& gpuSys = (GPUResourceSystem&)SystemLocator::GetInstance()->RequestSystem("GPUResourceSystem");
+    gpuSys.DestroyResource(m_pCBLightsPerFrame);
 }

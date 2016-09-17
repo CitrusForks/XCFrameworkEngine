@@ -11,6 +11,7 @@
 #include "Graphics/XC_Graphics.h"
 #include "Graphics/XC_Shaders/XC_ShaderBufferConstants.h"
 #include "Graphics/XC_Shaders/XC_ShaderHandle.h"
+#include "Graphics/GPUResourceSystem.h"
 
 #include "Engine/Resource/ResourceManager.h"
 
@@ -52,8 +53,8 @@ void SimpleSkyBox::PreLoad(const void* fbBuffer)
 
     m_rasterType = (RasterType) skyBoxBuff->RasterizerType();
 
-    SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
-    m_CBwvp = heap.CreateBufferView(D3DBufferDesc(BUFFERTYPE_CBV, sizeof(cbWVP)));
+    GPUResourceSystem& gpuSys = (GPUResourceSystem&)SystemLocator::GetInstance()->RequestSystem("GPUResourceSystem");
+    m_CBwvp = gpuSys.CreateConstantBufferResourceView(GPUResourceDesc(GPUResourceType_CBV, sizeof(cbWVP)));
 
     SimpleActor::PreLoad(fbBuffer);
 }
@@ -153,13 +154,16 @@ void SimpleSkyBox::Draw(RenderContext& context)
     cubeMapShader->SetConstantBuffer("cbWVP", context.GetDeviceContext(), *m_CBwvp);
     cubeMapShader->SetResource("gCubeMap", context.GetDeviceContext(), m_cubeMapTexture);
     
-    context.DrawIndexedInstanced(context.GetDeviceContext(), 36, m_indexBuffer.GetIndexBufferInGPUMem());
+    context.DrawIndexedInstanced(36, m_indexBuffer.GetIndexBufferInGPUMem());
     graphicsSystem.SetLessEqualDepthStencilView(context.GetDeviceContext(), false);
 }
 
 void SimpleSkyBox::Destroy()
 {
     SimpleActor::Destroy();
+
+    GPUResourceSystem& gpuSys = (GPUResourceSystem&)SystemLocator::GetInstance()->RequestSystem("GPUResourceSystem");
+    gpuSys.DestroyResource(m_CBwvp);
 
     ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
     resMgr.ReleaseResource(m_cubeMapTexture);

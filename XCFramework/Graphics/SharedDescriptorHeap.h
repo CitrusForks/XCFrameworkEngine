@@ -10,9 +10,12 @@
 #include "Libs/Dx12Helpers/d3dx12.h"
 #endif
 
-#include "Graphics/D3DConstantBuffer.h"
-
+#include "Graphics/GPUResourceType.h"
+#include "Graphics/RenderTargetTypes.h"
 #include "Engine/Thread/CriticalSection.h"
+
+class GPUResource;
+class GPUResourceView;
 
 class SharedDescriptorHeap : public ISystem
 {
@@ -40,23 +43,22 @@ public:
 #endif
 
     //TODO: Get count of FBTexture2DS from data
-    static const i32        nbOfTexturesFromData = 14;
+    static const i32                nbOfTexturesFromData = 14;
 
     SharedDescriptorHeap();
     ~SharedDescriptorHeap()    {}
 
     void                            Init(ID3DDevice& device, u32 nbOfRTVDesc, u32 nbOfDSVDesc, u32 nbOfSamplerDesc, u32 nbOfCBVDesc);
-    D3DConstantBuffer*              CreateBufferView(D3DBufferDesc& desc);
 
 #if defined(XCGRAPHICS_DX12)
-    D3DConstantBuffer*              CreateShaderResourceView(CD3DX12_RESOURCE_DESC& textureDesc, D3D12_SHADER_RESOURCE_VIEW_DESC& viewDesc);
     HeapDesc&                       GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE type) { return *m_heapDesc[type]; }
     u32                             GetRTVDescHeapIncSize() { return m_rtvDescriptorSize; }
-#elif defined(XCGRAPHICS_DX11)
-    D3DConstantBuffer*              CreateShaderResourceView();
 #endif
 
-    void                            DestroyBuffer(D3DConstantBuffer* buffer);
+    GPUResource*                    AllocateGPUResource(GPUResourceType type, u32 sizeOfBuffer);
+    GPUResourceView*                AllocateGPUResourceView(GPUResourceType type);
+
+    void                            DestroyGPUResource(GPUResource* resource);
     void                            Destroy();
 
 protected:
@@ -66,7 +68,6 @@ protected:
 
 private:
 
-    D3DConstantBuffer*              FindFreeConstantBuffer(BufferType type, u32 size);
 
 #if defined(XCGRAPHICS_DX12)
     HeapDesc*                       m_heapDesc[D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES];
@@ -74,6 +75,7 @@ private:
 #endif
 
     ID3DDevice*                     m_device;
-    std::vector<D3DConstantBuffer*> m_constantBuffers;
+    std::vector<GPUResource*>       m_gpuResources;
+    std::vector<GPUResourceView*>   m_gpuResourcesView;
     CriticalSection                 m_cs;
 };

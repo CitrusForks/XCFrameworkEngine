@@ -23,7 +23,7 @@ void RenderingPool::Init()
 
     //Initialize the staged render contexts
     //These staging render context are used per frame states which are common and not be deferred. Such as clear rtv, execute deferred contexts...
-    m_FrameCommandList[0].Init(m_graphicsSystem->GetDevice(), &m_graphicsSystem->GetShaderContainer(), false, true);
+    m_FrameCommandList[0].Init(m_graphicsSystem->GetDevice(), &m_graphicsSystem->GetShaderContainer());
 
 #if defined(XCGRAPHICS_DX12)
     m_ppCmdList[0] = &m_FrameCommandList[0].GetDeviceContext();
@@ -35,7 +35,7 @@ void RenderingPool::Init()
         m_renderWorkers[workerIndex].Init();
         m_renderWorkers[workerIndex].m_workerId = workerIndex;
         m_renderWorkers[workerIndex].m_running = true;
-        m_renderWorkers[workerIndex].m_renderContext.Init(m_graphicsSystem->GetDevice(), &m_graphicsSystem->GetShaderContainer(), false, true);
+        m_renderWorkers[workerIndex].m_renderContext.Init(m_graphicsSystem->GetDevice(), &m_graphicsSystem->GetShaderContainer());
 
 #if !defined(SINGLE_THREAD_RENDER)
         m_renderWorkers[workerIndex].m_workerThread.CreateThread(m_renderWorkers[workerIndex].WorkerThreadFunc, &m_renderWorkers[workerIndex]);
@@ -115,9 +115,7 @@ void RenderingPool::RemoveResourceDrawable(IResource* obj)
         Logger("Unkown resource draw request");
         XCASSERT(false);
     }
-
 }
-
 
 void RenderingPool::RequestResourceDeviceContext(IResource* graphicsBuffer)
 {
@@ -129,7 +127,7 @@ void RenderingPool::Begin(RenderTargetsType targetType)
 #if defined(XCGRAPHICS_DX12)
     //Clear the rtv and dsv
     m_FrameCommandList[0].BeginRender(targetType);
-    m_graphicsSystem->ClearRTVAndDSV(&m_FrameCommandList[0].GetDeviceContext());
+    m_graphicsSystem->ClearRTVAndDSV(&m_FrameCommandList[0].GetDeviceContext(), targetType);
 #endif
 
     for (auto& workers : m_renderWorkers)
@@ -248,7 +246,7 @@ i32 RenderingPool::RenderWorker::WorkerThreadFunc(void* param)
                 case RESOURCETYPE_INDEXBUFFER:
                 case RESOURCETYPE_TEXTURE2D:
                 case RESOURCETYPE_CUBETEXTURE3D:
-                    res->RenderContextCallback(worker->m_renderContext);
+                    res->RenderContextCallback(worker->m_renderContext.GetDeviceContext());
                     break;
 
                 default:

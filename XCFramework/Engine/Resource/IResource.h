@@ -41,7 +41,7 @@ public:
     virtual void            Draw() {}
     virtual void            Draw(RenderContext& context) {}
 
-    virtual void            RenderContextCallback(RenderContext& renderContext);
+    virtual void            RenderContextCallback(ID3DDeviceContext& renderContext);
 
     virtual void            Destroy();
 

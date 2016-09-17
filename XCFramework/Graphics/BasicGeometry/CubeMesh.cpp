@@ -169,7 +169,7 @@ void CubeMesh::Draw(RenderContext& context)
         solidColorShader->setCBWorld(context.GetDeviceContext(), wbuffer);
     }
 
-    context.DrawIndexedInstanced(context.GetDeviceContext(), 36);
+    context.DrawIndexedInstanced(36);
 #endif
 }
 

@@ -29,7 +29,7 @@ private:
 #if defined(XCGRAPHICS_DX11)
     D3D11_TEXTURECUBE_FACE              m_textureCubeFace;
     D3D_TEXTURE2D_DESC                  m_texture2DDesc;
-    ID3DTexture2D*                      m_texture2D;
+    ID3DResource*                       m_texture2D;
     ID3DRenderTargetView*               m_cubeMapRTV[6];
 #endif
 };

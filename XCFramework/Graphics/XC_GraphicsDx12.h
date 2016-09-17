@@ -9,6 +9,10 @@
 #if defined(XCGRAPHICS_DX12)
 
 #include "Graphics/XC_Graphics.h"
+#include "Graphics/XC_Shaders/XC_VertexFormat.h"
+#include "Graphics/VertexBuffer.h"
+#include "Graphics/IndexBuffer.h"
+
 #include "Engine/Thread/CriticalSection.h"
 
 class SharedDescriptorHeap;
@@ -45,22 +49,23 @@ public:
     ID3DPipelineState*          GetPipelineState() { return m_pipelineState; }
     ID3DDepthStencilView*       GetDepthStencilView(RenderTargetsType type);
 
-    void                        ClearRTVAndDSV(ID3D12GraphicsCommandList* cmdList);
+    void                        ClearRTVAndDSV(ID3DDeviceContext* context, RenderTargetsType type);
 
 protected:
     
     static void                 SetResourceBarrier(ID3D12GraphicsCommandList* commandList, ID3D12Resource* resource, D3D12_RESOURCE_STATES StateBefore, D3D12_RESOURCE_STATES StateAfter);
     
     void                        CreateDescriptorHeaps();
+    void                        CreateGPUResourceSystem();
+
     void                        SetupRenderTargets();
     void                        SetupDepthView();
+    void                        SetupRenderQuad();
 
     void                        DebugTestGraphicsPipeline();
 
-    ID3D12Resource*             GetCurrentFrameRenderTarget() { return m_renderTargets[m_frameIndex]->GetTexture2D(); }
+    ID3D12Resource*             GetCurrentFrameRenderTarget() { return m_renderTargets[m_frameIndex]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(); }
     void                        WaitForPreviousFrameCompletion();
-
-    void                        PresentRenderTarget(ID3D12GraphicsCommandList* cmdList);
 
 private:
     ID3DSwapChain*              m_pSwapChain;
@@ -83,12 +88,16 @@ private:
     //FrameIndex
     u32                         m_frameIndex;
 
-    std::atomic<i32>            m_cmdListRefCount;
-    CriticalSection             m_acquireCmdListRefCount;
-
     ID3D12RootSignature*        m_rootSignature;
     ID3DPipelineState*          m_pipelineState;
     SharedDescriptorHeap*       m_sharedDescriptorHeap;
+    GPUResourceSystem*          m_gpuResourceSystem;
+
+    VertexBuffer<VertexPosTex>* m_renderQuadVB;
+    IndexBuffer<u32>*           m_renderQuadIB;
+
+    std::atomic<i32>            m_cmdListRefCount;
+    CriticalSection             m_acquireCmdListRefCount;
 
 #if defined(DEBUG_GRAPHICS_PIPELINE)
     // App resources.

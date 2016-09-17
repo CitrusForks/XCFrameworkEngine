@@ -19,6 +19,7 @@
 #include "Graphics/XC_Shaders/XC_ShaderBufferConstants.h"
 #include "Graphics/XC_Shaders/XC_ShaderHandle.h"
 #include "Graphics/XC_Lighting/XC_LightManager.h"
+#include "Graphics/GPUResourceSystem.h"
 
 #include "Engine/Resource/ResourceManager.h"
 #include "Engine/Event/EventBroadcaster.h"
@@ -66,8 +67,8 @@ void Terrain::PreLoad(const void* fbBuffer)
 
     PhysicsActor::PreLoad(fbBuffer);
 
-    SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
-    m_pCBPerObject = heap.CreateBufferView(D3DBufferDesc(BUFFERTYPE_CBV, sizeof(PerObjectBuffer)));
+    GPUResourceSystem& gpuSys = (GPUResourceSystem&)SystemLocator::GetInstance()->RequestSystem("GPUResourceSystem");
+    m_pCBPerObject = gpuSys.CreateConstantBufferResourceView(GPUResourceDesc(GPUResourceType_CBV, sizeof(PerObjectBuffer)));
 }
 
 //Multi Textured Terrain
@@ -98,8 +99,8 @@ void Terrain::PreLoad(const char* _pHeightMapFileName,
 
     ComputeVertices();
 
-    SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
-    m_pCBPerObject = heap.CreateBufferView(D3DBufferDesc(BUFFERTYPE_CBV, sizeof(PerObjectBuffer)));
+    GPUResourceSystem& gpuSys = (GPUResourceSystem&)SystemLocator::GetInstance()->RequestSystem("GPUResourceSystem");
+    m_pCBPerObject = gpuSys.CreateConstantBufferResourceView(GPUResourceDesc(GPUResourceType_CBV, sizeof(PerObjectBuffer)));
 }
 
 void Terrain::Load()
@@ -395,7 +396,7 @@ void Terrain::Draw(RenderContext& context)
     shaderHandle->SetVertexBuffer(context.GetDeviceContext(), &m_vertexPosNormTexBuffer);
     shaderHandle->SetIndexBuffer(context.GetDeviceContext(), m_indexBuffer);
 
-    context.DrawIndexedInstanced(context.GetDeviceContext(), m_indexBuffer.m_indexData.size(), m_indexBuffer.GetIndexBufferInGPUMem());
+    context.DrawIndexedInstanced(m_indexBuffer.m_indexData.size(), m_indexBuffer.GetIndexBufferInGPUMem());
 
     m_OBBHierarchy->Draw(context);
 }
@@ -411,8 +412,8 @@ void Terrain::Destroy()
         resMgr.ReleaseResource(tex);
     }
     
-    SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
-    heap.DestroyBuffer(m_pCBPerObject);
+    GPUResourceSystem& gpuSys = (GPUResourceSystem&)SystemLocator::GetInstance()->RequestSystem("GPUResourceSystem");
+    gpuSys.DestroyResource(m_pCBPerObject);
 }
 
 XCVec3 Terrain::GetTerrainNormal(f32 x, f32 z) const

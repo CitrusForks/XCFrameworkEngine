@@ -16,13 +16,11 @@ RenderContext::RenderContext()
 {
 }
 
-void RenderContext::Init(ID3DDevice* device, XC_ShaderContainer* shaderMgr, bool clearStateOnBegin, bool clearStateOnFinish)
+void RenderContext::Init(ID3DDevice* device, XC_ShaderContainer* shaderMgr)
 {
     m_clearColor = XCVec4(1.0f, 1.0f, 1.0f, 1.0f);
 
     m_shaderContainer = shaderMgr;
-    m_clearStateOnBegin = clearStateOnBegin;
-    m_clearStateOnFinish = clearStateOnFinish;
 
     m_graphicsSystem = &SystemLocator::GetInstance()->RequestSystem<XC_Graphics>("GraphicsSystem");
 
@@ -59,31 +57,33 @@ void RenderContext::BeginRender(RenderTargetsType targetType)
 
 #else
     #if defined(XCGRAPHICS_DX12)
+
         ValidateResult(m_commandAllocator->Reset());
         ValidateResult(m_deviceContext->Reset(m_commandAllocator, m_graphicsSystem->GetPipelineState()));
     
-        m_deviceContext->RSSetViewports(1, &m_graphicsSystem->GetViewPort(RENDERTARGET_MAIN_0));
+        m_deviceContext->RSSetViewports(1, &m_graphicsSystem->GetViewPort(targetType));
         m_deviceContext->RSSetScissorRects(1, &m_graphicsSystem->GetScissorRect());
     
         SharedDescriptorHeap& heap = SystemLocator::GetInstance()->RequestSystem<SharedDescriptorHeap>("SharedDescriptorHeap");
-        D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle(heap.GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV).m_heapDesc->GetCPUDescriptorHandleForHeapStart());
-        rtvHandle.ptr = rtvHandle.ptr + (m_graphicsSystem->GetCurrentRTVFrameIndex() * heap.GetRTVDescHeapIncSize());
 
-        m_deviceContext->OMSetRenderTargets(1, &rtvHandle, false, &heap.GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV).m_cbvCPUOffsetHandle);
+        m_deviceContext->OMSetRenderTargets(1,
+            &m_graphicsSystem->GetRenderTexture(targetType).GetRenderTargetResource()->GetResourceView(GPUResourceType_RTV)->GetCPUResourceViewHandle(),
+            false,
+            &heap.GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV).m_cbvCPUOffsetHandle);
     
         //Set descriptor heaps
         ID3D12DescriptorHeap* ppHeaps[] = { heap.GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV).m_heapDesc, 
             heap.GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER).m_heapDesc };
 
         m_deviceContext->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
-    #elif defined(XCGRAPHICS_DX11)
-        if (m_clearStateOnBegin)
-        {
-            m_deviceContext->ClearState();
-        }
     
+    #elif defined(XCGRAPHICS_DX11)
+    
+        m_deviceContext->ClearState();
         m_deviceContext->RSSetViewports(1, &m_graphicsSystem->GetViewPort(targetType));
+
         m_graphicsSystem->GetRenderTexture(targetType).SetRenderableTarget(*m_deviceContext, m_graphicsSystem->GetDepthStencilView(targetType));
+    
     #elif defined(XCGRAPHICS_GNM)
         m_graphicsSystem->GetRenderTexture(targetType).SetRenderableTarget(m_deviceContext, nullptr);
     #endif
@@ -99,7 +99,7 @@ void RenderContext::FinishRender()
         //Cmdlist Close can happen here when in multiple render context.
         ValidateResult(m_deviceContext->Close());
     #elif defined(XCGRAPHICS_DX11)
-        m_deviceContext->FinishCommandList(m_clearStateOnFinish, &m_commandList);
+        m_deviceContext->FinishCommandList(false, &m_commandList);
 
         //Execute on main device context
         m_graphicsSystem->GetDeviceContext()->ExecuteCommandList(m_commandList, false);
@@ -127,7 +127,7 @@ IShader* RenderContext::GetShader(ShaderType shaderType)
     return m_shaderContainer->GetShader(shaderType);
 }
 
-void RenderContext::DrawNonIndexed(ID3DDeviceContext& context, u32 vertexCount)
+void RenderContext::DrawNonIndexed(u32 vertexCount)
 {
 #if defined(XCGRAPHICS_DX12)
     m_deviceContext->DrawInstanced(vertexCount, 1, 0, 0);
@@ -136,7 +136,7 @@ void RenderContext::DrawNonIndexed(ID3DDeviceContext& context, u32 vertexCount)
 #endif
 }
 
-void RenderContext::DrawIndexedInstanced(ID3DDeviceContext& context, u32 _indexCount, void* indexGpuAddr, u32 instanceCount)
+void RenderContext::DrawIndexedInstanced(u32 _indexCount, void* indexGpuAddr, u32 instanceCount)
 {
     m_deviceContext->DrawIndexedInstanced(_indexCount, instanceCount, 0, 0, 0);
 }

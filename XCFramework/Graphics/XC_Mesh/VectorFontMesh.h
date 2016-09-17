@@ -15,7 +15,7 @@ public:
 
     struct VectorFontInstanceBuffer
     {
-        D3DConstantBuffer*      m_instanceBufferGPU;
+        GPUResource*            m_instanceBufferGPU;
         cbVectorFontInstanced   m_instanceBuffer;
     };
 

@@ -7,6 +7,7 @@
 #pragma once
 
 #include "Assets/Packages/PackageConsts.h"
+
 #include "Graphics/XC_Shaders/XC_VertexShaderLayout.h"
 
 #if defined(XC_ORBIS)
@@ -45,6 +46,7 @@ static const SemanticVariable gs_sematicVariables[] = {
     SemanticVariable(VertexFormat_Position,                                   { "POSITION" }),
     SemanticVariable(VertexFormat_PositionColor,                              { "POSITION", "COLOR" }), 
     SemanticVariable(VertexFormat_PositionNormal,                             { "POSITION", "NORMAL" }),
+    SemanticVariable(VertexFormat_PositionTexture,                            { "POSITION", "TEXCOORD" }),
     SemanticVariable(VertexFormat_PositionNormalTexture,                      { "POSITION", "NORMAL", "TEXCOORD" }),
     SemanticVariable(VertexFormat_PositionNormalTexture,                      { "POSITION", "NORMAL", "TEXCOORD", "SV_InstanceID" }),
     SemanticVariable(VertexFormat_PositionNormalTextureBlendIndexBlendWeight, { "POSITION", "NORMAL", "TEXCOORD", "BLENDINDICES", "BLENDWEIGHT", "SV_InstanceID" }),
@@ -82,6 +84,11 @@ static D3D_INPUT_LAYOUT_DESC GetInputLayoutFromVertexFormat(VertexFormat format)
     case VertexFormat_PositionNormal:
         layout.pInputElementDescs = VertexPosNormInputLayoutDesc;
         layout.NumElements = ARRAYSIZE(VertexPosNormInputLayoutDesc);
+        break;
+
+    case VertexFormat_PositionTexture:
+        layout.pInputElementDescs = VertexPosTexInputLayoutDesc;
+        layout.NumElements = ARRAYSIZE(VertexPosTexInputLayoutDesc);
         break;
 
     case VertexFormat_PositionNormalTexture:
@@ -177,6 +184,24 @@ struct VertexPosNorm
     VertexPosNorm(XCVec3Unaligned pos, XCVec3Unaligned norm) :
         Pos(pos),
         Norm(norm)
+    {
+    }
+};
+
+struct VertexPosTex
+{
+    XCVec3Unaligned Pos;
+    XCVec2Unaligned Tex;
+
+    VertexPosTex() :
+        Pos(0, 0, 0),
+        Tex(0, 0)
+    {
+    }
+
+    VertexPosTex(XCVec3Unaligned _pos, XCVec2Unaligned _tex) :
+        Pos(_pos),
+        Tex(_tex)
     {
     }
 };

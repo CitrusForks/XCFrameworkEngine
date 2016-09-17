@@ -10,9 +10,11 @@
 #include "Libs/Dx12Helpers/d3dx12.h"
 #endif
 
-#include "Graphics/D3DConstantBuffer.h"
+#include "Graphics/GPUResourceType.h"
 #include "Graphics/XC_PipelineStateObject/PSO_Dx12.h"
 #include "Graphics/XC_Shaders/XC_ShaderBufferConstants.h"
+
+class GPUResource;
 
 class IShader
 {
@@ -42,15 +44,15 @@ public:
     PSO_Dx12&                        GetPso() { return *m_pso; }
 #endif
 
-    D3DConstantBuffer*               CreateBuffer(BufferType bufferType, i32 sizeOfType = 0);
+    GPUResource*                     CreateBuffer(GPUResourceType bufferType, i32 sizeOfType = 0);
                                      
 protected:                           
     ID3DDevice&                      m_device;
 
     UINT8*                           m_pVS;
     UINT8*                           m_pPS;
-    u32                     m_vsSize;
-    u32                     m_psSize;
+    u32                              m_vsSize;
+    u32                              m_psSize;
 
 #if defined(XCGRAPHICS_DX12)
     PSO_Dx12*                        m_pso;

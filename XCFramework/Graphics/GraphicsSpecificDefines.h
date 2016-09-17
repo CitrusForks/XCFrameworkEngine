@@ -30,10 +30,10 @@ typedef ID3D12PipelineState             ID3DPipelineState;
 
 typedef ID3D12Resource                  ID3DResource;
 typedef ID3D12Resource                  ID3DRenderTargetView;
-typedef ID3D12Resource                  ID3DTexture2D;
 typedef ID3D12Resource                  ID3DDepthStencilView;
 typedef ID3D12Resource                  ID3DShaderResourceView;
 typedef ID3D12ShaderReflection          ID3DShaderReflection;
+typedef void*                           ID3DResourceView;
 
 #if defined(USE_D3D_COMPILER)
 typedef ID3DBlob                        ID3DVertexShader;
@@ -51,6 +51,10 @@ typedef D3D12_SHADER_INPUT_BIND_DESC    D3D_SHADER_INPUT_BIND_DESC;
 typedef D3D12_SIGNATURE_PARAMETER_DESC  D3D_SIGNATURE_PARAMETER_DESC;
 typedef D3D12_SHADER_DESC               D3D_SHADER_DESC;
 typedef D3D12_INPUT_LAYOUT_DESC         D3D_INPUT_LAYOUT_DESC;
+typedef D3D12_SUBRESOURCE_DATA          D3D_SUBRESOURCE_DATA;
+
+typedef D3D12_RESOURCE_DESC             D3D_TEXTURE2D_DESC;
+typedef D3D12_SHADER_RESOURCE_VIEW_DESC D3D_SHADER_RESOURCE_VIEW_DESC;
 
 typedef D3D12_CPU_DESCRIPTOR_HANDLE     CPU_DESCRIPTOR_HANDLE;
 typedef D3D12_GPU_DESCRIPTOR_HANDLE     GPU_DESCRIPTOR_HANDLE;
@@ -65,17 +69,16 @@ typedef ID3D11Device                    ID3DDevice;
 typedef ID3D11DeviceContext             ID3DDeviceContext;
 typedef ID3D11CommandList               ID3DCommandList;
 typedef ID3D11RenderTargetView          ID3DRenderTargetView;
-typedef ID3D11Texture2D                 ID3DTexture2D;
+typedef ID3D11Resource                  ID3DResource;
 typedef ID3D11ShaderReflection          ID3DShaderReflection;
 typedef ID3D11DepthStencilView          ID3DDepthStencilView;
 typedef ID3D11DepthStencilState         ID3DDepthStencilState;
 typedef ID3D11VertexShader              ID3DVertexShader;
 typedef ID3D11PixelShader               ID3DPixelShader;
-typedef ID3D11ShaderResourceView        ID3DShaderResourceView;
+typedef ID3D11View                      ID3DResourceView;
 
 typedef void*                           ID3DCommandAllocator;
 typedef void*                           ID3DCommandQueue;
-typedef void*                           ID3DResource;
 typedef void*                           ID3DPipelineState;
 typedef void*                           ID3D12GraphicsCommandList;
 
@@ -90,6 +93,8 @@ typedef D3D11_SHADER_BUFFER_DESC        D3D_SHADER_BUFFER_DESC;
 typedef D3D11_SHADER_INPUT_BIND_DESC    D3D_SHADER_INPUT_BIND_DESC;
 typedef D3D11_SIGNATURE_PARAMETER_DESC  D3D_SIGNATURE_PARAMETER_DESC;
 typedef D3D11_SHADER_DESC               D3D_SHADER_DESC;
+typedef D3D11_SHADER_RESOURCE_VIEW_DESC D3D_SHADER_RESOURCE_VIEW_DESC;
+typedef D3D11_SUBRESOURCE_DATA          D3D_SUBRESOURCE_DATA;
 
 typedef struct D3D11_INPUT_LAYOUT_DESC
 {
@@ -140,9 +145,8 @@ typedef void*      ID3DShaderResourceView;
 typedef void*      ID3DPipelineState;
 typedef void*      ID3D12GraphicsCommandList;
 typedef void*      ID3DDepthStencilView;
-typedef void*      ID3DTexture2D;
 typedef void*      ID3DShaderResourceView;
 typedef void*      ID3DRenderTargetView;
-typedef void*      D3DConstantBuffer;
+typedef void*      GPUResourceView;
 
 #endif

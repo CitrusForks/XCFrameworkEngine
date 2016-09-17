@@ -12,6 +12,7 @@
 
 #include "Graphics/XC_Textures/Texture2D.h"
 #include "Graphics/XC_Textures/CubeTexture3D.h"
+#include "Graphics/GPUResourceSystem.h"
 
 #include "Assets/Packages/PackageConsts.h"
 
@@ -232,18 +233,18 @@ void XCShaderHandle::GenerateRootSignature()
     for (u32 slotIndex = 0; slotIndex < m_shaderSlots.size(); ++slotIndex)
     {
         //What type?
-        BufferType type = m_shaderSlots[slotIndex].m_bufferType;
+        GPUResourceType type = m_shaderSlots[slotIndex].m_bufferType;
 
         switch (type)
         {
-        case BUFFERTYPE_CBV:
+        case GPUResourceType_CBV:
         {
             descRanges[slotIndex].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, cbCt++);
             rootParams[slotIndex].InitAsDescriptorTable(1, &descRanges[slotIndex], D3D12_SHADER_VISIBILITY_ALL);
         }
         break;
 
-        case BUFFERTYPE_SRV:
+        case GPUResourceType_SRV:
         {
             switch (m_shaderSlots[slotIndex].m_bufferDesc.resourceBufferDesc.Type)
             {
@@ -402,7 +403,7 @@ void XCShaderHandle::ApplyShader(ID3DDeviceContext& context, RasterType rasterTy
 #endif
 }
 
-void XCShaderHandle::SetConstantBuffer(std::string bufferName, ID3DDeviceContext& context, D3DConstantBuffer& constantBuffer)
+void XCShaderHandle::SetConstantBuffer(std::string bufferName, ID3DDeviceContext& context, GPUResource& constantBuffer)
 {
     auto bufferRes = std::find_if(m_shaderSlots.begin(), m_shaderSlots.end(), 
         [&bufferName](ShaderSlot slot) -> bool 
@@ -415,10 +416,11 @@ void XCShaderHandle::SetConstantBuffer(std::string bufferName, ID3DDeviceContext
         u32 slotNb = bufferRes - m_shaderSlots.begin();
 
 #if defined(XCGRAPHICS_DX12)
-        context.SetGraphicsRootDescriptorTable(slotNb, constantBuffer.m_gpuHandle);
+        context.SetGraphicsRootDescriptorTable(slotNb, constantBuffer.GetResourceView(GPUResourceType_CBV)->GetGPUResourceViewHandle());
 #elif defined(XCGRAPHICS_DX11)
-        context.VSSetConstantBuffers(slotNb, 1, &constantBuffer.m_gpuHandle);
-        context.PSSetConstantBuffers(slotNb, 1, &constantBuffer.m_gpuHandle);
+        ID3D11Buffer* res = constantBuffer.GetResource<ID3D11Buffer*>();
+        context.VSSetConstantBuffers(slotNb, 1, &constantBuffer.GetPointerToResource<ID3D11Buffer*>());
+        context.PSSetConstantBuffers(slotNb, 1, &constantBuffer.GetPointerToResource<ID3D11Buffer*>());
 #endif
 
 #if defined(LOG_SHADER_SLOTS)
@@ -464,6 +466,33 @@ void XCShaderHandle::SetSampler(std::string bufferName, ID3DDeviceContext& conte
     //XCASSERT(false);
 }
 
+void XCShaderHandle::SetResource(std::string bufferName, ID3DDeviceContext& context, GPUResource* tex)
+{
+    auto bufferRes = std::find_if(m_shaderSlots.begin(), m_shaderSlots.end(),
+        [&bufferName](ShaderSlot slot) -> bool
+    {
+        return strcmp(bufferName.c_str(), slot.GetBufferName().c_str()) == 0;
+    });
+
+    if (tex && bufferRes != m_shaderSlots.end())
+    {
+        u32 slotNb = bufferRes - m_shaderSlots.begin();
+
+#if defined(XCGRAPHICS_DX12)
+        context.SetGraphicsRootDescriptorTable(slotNb, tex->GetResourceView(GPUResourceType_SRV)->GetGPUResourceViewHandle());
+#elif defined(XCGRAPHICS_DX11)
+        context.VSSetShaderResources((*bufferRes).m_shaderSlotId, 1, &tex->GetPointerToGPUResourceViewTyped<ID3D11ShaderResourceView*>(GPUResourceType_SRV));
+        context.PSSetShaderResources((*bufferRes).m_shaderSlotId, 1, &tex->GetPointerToGPUResourceViewTyped<ID3D11ShaderResourceView*>(GPUResourceType_SRV));
+#endif
+        return;
+     }
+
+#if defined(LOG_SHADER_SLOTS)
+        Logger("[SLOT] Setting %s @ slot %d", bufferName.c_str(), slotNb);
+#endif
+    XCASSERT(false);
+}
+
 void XCShaderHandle::SetResource(std::string bufferName, ID3DDeviceContext& context, ResourceHandle* tex)
 {
     auto bufferRes = std::find_if(m_shaderSlots.begin(), m_shaderSlots.end(),
@@ -480,19 +509,19 @@ void XCShaderHandle::SetResource(std::string bufferName, ID3DDeviceContext& cont
         {
         case RESOURCETYPE_TEXTURE2D:
 #if defined(XCGRAPHICS_DX12)
-            context.SetGraphicsRootDescriptorTable(slotNb, static_cast<Texture2D*>(tex->m_Resource)->GetTextureResource()->m_gpuHandle);
+            context.SetGraphicsRootDescriptorTable(slotNb, static_cast<Texture2D*>(tex->m_Resource)->GetTextureResource()->GetResourceView(GPUResourceType_SRV)->GetGPUResourceViewHandle());
 #elif defined(XCGRAPHICS_DX11)
-            context.VSSetShaderResources((*bufferRes).m_shaderSlotId, 1, &static_cast<Texture2D*>(tex->m_Resource)->GetTextureResource()->m_cbResource);
-            context.PSSetShaderResources((*bufferRes).m_shaderSlotId, 1, &static_cast<Texture2D*>(tex->m_Resource)->GetTextureResource()->m_cbResource);
+            context.VSSetShaderResources((*bufferRes).m_shaderSlotId, 1, &static_cast<Texture2D*>(tex->m_Resource)->GetTextureResource()->GetPointerToGPUResourceViewTyped<ID3D11ShaderResourceView*>(GPUResourceType_SRV));
+            context.PSSetShaderResources((*bufferRes).m_shaderSlotId, 1, &static_cast<Texture2D*>(tex->m_Resource)->GetTextureResource()->GetPointerToGPUResourceViewTyped<ID3D11ShaderResourceView*>(GPUResourceType_SRV));
 #endif
             break;
 
         case RESOURCETYPE_CUBETEXTURE3D:
 #if defined(XCGRAPHICS_DX12)
-            context.SetGraphicsRootDescriptorTable(slotNb, static_cast<CubeTexture3D*>(tex->m_Resource)->GetTextureResource()->m_gpuHandle);
+            context.SetGraphicsRootDescriptorTable(slotNb, static_cast<CubeTexture3D*>(tex->m_Resource)->GetTextureResource()->GetResourceView(GPUResourceType_SRV)->GetGPUResourceViewHandle());
 #elif defined(XCGRAPHICS_DX11)
-            context.VSSetShaderResources((*bufferRes).m_shaderSlotId, 1, &static_cast<CubeTexture3D*>(tex->m_Resource)->GetTextureResource()->m_cbResource);
-            context.PSSetShaderResources((*bufferRes).m_shaderSlotId, 1, &static_cast<CubeTexture3D*>(tex->m_Resource)->GetTextureResource()->m_cbResource);
+            context.VSSetShaderResources((*bufferRes).m_shaderSlotId, 1, &static_cast<CubeTexture3D*>(tex->m_Resource)->GetTextureResource()->GetPointerToGPUResourceViewTyped<ID3D11ShaderResourceView*>(GPUResourceType_SRV));
+            context.PSSetShaderResources((*bufferRes).m_shaderSlotId, 1, &static_cast<CubeTexture3D*>(tex->m_Resource)->GetTextureResource()->GetPointerToGPUResourceViewTyped<ID3D11ShaderResourceView*>(GPUResourceType_SRV));
 #endif
             break;
 
@@ -507,4 +536,97 @@ void XCShaderHandle::SetResource(std::string bufferName, ID3DDeviceContext& cont
     }
 
     XCASSERT(false);
+}
+
+void* XCShaderHandle::CreateVertexBuffer()
+{
+    void* buffer = nullptr;
+    switch (m_vertexFormat)
+    {
+    case VertexFormat_Position:
+        buffer = XCNEW(VertexBuffer<VertexPos>)();
+        break;
+
+    case VertexFormat_PositionColor:
+        buffer = XCNEW(VertexBuffer<VertexPosColor>)();
+        break;
+
+    case VertexFormat_PositionTexture:
+        buffer = XCNEW(VertexBuffer<VertexPosTex>)();
+        break;
+
+    case VertexFormat_PositionNormalTexture:
+        buffer = XCNEW(VertexBuffer<VertexPosNormTex>)();
+        break;
+
+    case VertexFormat_PositionNormalTextureBlendIndexBlendWeight:
+        buffer = XCNEW(VertexBuffer<VertexPosNormTexBIndexBWeight>)();
+        break;
+
+    case VertexFormat_PositionColorInstanceIndex:
+        buffer = XCNEW(VertexBuffer<VertexPosColorInstanceIndex>)();
+        break;
+
+    default:
+        XCASSERT(false);
+    }
+
+    return buffer;
+}
+
+GPUResource*  XCShaderHandle::CreateConstantBuffer(std::string constantBufferName)
+{
+    GPUResourceSystem& gpuSys = (GPUResourceSystem&)SystemLocator::GetInstance()->RequestSystem("GPUResourceSystem");
+    return gpuSys.CreateConstantBufferResourceView(GPUResourceDesc(GPUResourceType_CBV, GetSizeOfConstantBuffer(constantBufferName)));
+}
+
+void XCShaderHandle::DestroyConstantBuffer(GPUResource* constantBuffer)
+{
+    GPUResourceSystem& gpuSys = (GPUResourceSystem&)SystemLocator::GetInstance()->RequestSystem("GPUResourceSystem");
+    gpuSys.DestroyResource(constantBuffer);
+}
+
+void XCShaderHandle::SetVertexBuffer(ID3DDeviceContext& context, void* vertexBuffer)
+{
+    switch (m_vertexFormat)
+    {
+    case VertexFormat_Position:
+        ((VertexBuffer<VertexPos>*)vertexBuffer)->SetVertexBuffer(context);
+        break;
+
+    case VertexFormat_PositionColor:
+        ((VertexBuffer<VertexPosColor>*)vertexBuffer)->SetVertexBuffer(context);
+        break;
+
+    case VertexFormat_PositionTexture:
+        ((VertexBuffer<VertexPosTex>*)vertexBuffer)->SetVertexBuffer(context);
+        break;
+
+    case VertexFormat_PositionNormalTexture:
+        ((VertexBuffer<VertexPosNormTex>*)vertexBuffer)->SetVertexBuffer(context);
+        break;
+
+    case VertexFormat_PositionNormalTextureBlendIndexBlendWeight:
+        ((VertexBuffer<VertexPosNormTexBIndexBWeight>*)vertexBuffer)->SetVertexBuffer(context);
+        break;
+
+    case VertexFormat_PositionColorInstanceIndex:
+        ((VertexBuffer<VertexPosColorInstanceIndex>*)vertexBuffer)->SetVertexBuffer(context);
+        break;
+
+    default:
+        XCASSERT(false);
+    }
+}
+
+void XCShaderHandle::SetIndexBuffer(ID3DDeviceContext& context, IndexBuffer<u32>& indexBuffer)
+{
+#if defined(XCGRAPHICS_DX12)
+    context.IASetIndexBuffer(&indexBuffer.GetIndexBufferView());
+#elif defined(XCGRAPHICS_DX11)
+    UINT32 offset = 0;
+    context.IASetIndexBuffer(indexBuffer.m_pIB, DXGI_FORMAT_R32_UINT, offset);
+#elif defined(XCGRAPHICS_GNM)
+    //Specified while drawIndex() call. See below GetIndexBufferInGPUMem
+#endif
 }

@@ -469,10 +469,6 @@ void XCMeshFBX::ParseMesh(FbxNode* pNode)
     MeshData* submesh = CreateAndGetSubMesh();
     {
         submesh->SetObjectName(pNode->GetName());
-        //submesh->SetNoOfVertices(lMesh->GetPolygonCount() * 3);
-        //submesh->SetNoOfFaces(lMesh->GetPolygonCount());
-
-        SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
 
         //Get the geometry transform
         FbxVector4 translation = pNode->GetGeometricTranslation(FbxNode::eSourcePivot);

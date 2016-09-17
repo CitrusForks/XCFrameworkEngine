@@ -86,7 +86,7 @@ i32 Game_Win32::Init()
 
     //Graphics Dx11
     m_graphicsSystem = (XC_Graphics*)&m_systemContainer->CreateNewSystem("GraphicsSystem");
-    m_graphicsSystem->Init(m_hMainWnd, m_clientWidth, m_clientHeight, true);
+    m_graphicsSystem->Init(m_hMainWnd, m_clientWidth, m_clientHeight, false);
 
     //Init Input Handlers which depend on above window created.
     m_directInputSystem = (DirectInput*)&m_systemContainer->CreateNewSystem("InputSystem");

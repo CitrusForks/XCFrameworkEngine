@@ -7,7 +7,9 @@
 #pragma once
 
 #include "Gameplay/GameActors/SimpleActor.h"
+
 #include "Engine/Resource/ResourceHandle.h"
+
 #include "Graphics/XC_Shaders/XC_ShaderTypes.h"
 #include "Graphics/XC_Shaders/XC_VertexFormat.h"
 #include "Graphics/XC_Materials/MaterialTypes.h"
@@ -34,18 +36,18 @@ public:
     void                            BuildBuffers();
 
 protected:
-    u32                    m_Stride;
-    u32                    m_Offset;
+    u32                             m_Stride;
+    u32                             m_Offset;
 
     ResourceHandle*                 m_cubeMapTexture;
 
     ShaderType                      m_useShaderType;
-    Material                   m_material;
+    Material                        m_material;
     
     VertexBuffer<VertexPos>         m_vertexBuffer;
-    IndexBuffer<u32>       m_indexBuffer;
+    IndexBuffer<u32>                m_indexBuffer;
 
     RasterType                      m_rasterType;
 
-    D3DConstantBuffer*              m_CBwvp;
+    GPUResource*                    m_CBwvp;
 };

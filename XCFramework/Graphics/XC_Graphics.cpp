@@ -7,11 +7,21 @@
 #include "GraphicsPrecompiledHeader.h"
 
 #include "XC_Graphics.h"
+#include "GPUResourceSystem.h"
 
 XC_Graphics::XC_Graphics(void)
+    : m_pD3DDevice(nullptr)
+    , m_XCShaderSystem(nullptr)
+    , m_renderingPool(nullptr)
+    , m_secondaryDrawCall(false)
+    , m_4xMsaaQuality(false)
+    , m_Enable4xMsaa(false)
+    , m_ClientWidth(1024)
+    , m_ClientHeight(768)
+    , m_initDone(false)
 {
     m_clearColor = XCVec4(1.0f, 1.0f, 1.0f, 1.0f);
-    m_initDone = false;
+    ZeroMemory(&m_ScreenViewPort, sizeof(D3D_VIEWPORT));
 }
 
 XC_Graphics::~XC_Graphics(void)
@@ -40,6 +50,8 @@ void XC_Graphics::Destroy()
             XCDELETE(m_renderTargets[rIndex]);
         }
     }
+
+    ReleaseCOM(m_pD3DDevice);
 }
 
 void XC_Graphics::Init(HWND _mainWnd, i32 _width, i32 _height, bool _enable4xMsaa)
@@ -101,6 +113,22 @@ void XC_Graphics::SetupViewPort()
     m_ScreenViewPort[RENDERTARGET_MAIN_0].Height = (f32)m_ClientHeight;
     m_ScreenViewPort[RENDERTARGET_MAIN_0].MinDepth = 0.0f;
     m_ScreenViewPort[RENDERTARGET_MAIN_0].MaxDepth = 1.0f;
+
+    //Set the Viewport
+    m_ScreenViewPort[RENDERTARGET_MAIN_1].TopLeftX = 0.0f;
+    m_ScreenViewPort[RENDERTARGET_MAIN_1].TopLeftY = 0.0f;
+    m_ScreenViewPort[RENDERTARGET_MAIN_1].Width = (f32)m_ClientWidth;
+    m_ScreenViewPort[RENDERTARGET_MAIN_1].Height = (f32)m_ClientHeight;
+    m_ScreenViewPort[RENDERTARGET_MAIN_1].MinDepth = 0.0f;
+    m_ScreenViewPort[RENDERTARGET_MAIN_1].MaxDepth = 1.0f;
+
+    //Set the Viewport
+    m_ScreenViewPort[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL].TopLeftX = 0.0f;
+    m_ScreenViewPort[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL].TopLeftY = 0.0f;
+    m_ScreenViewPort[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL].Width = (f32)m_ClientWidth;
+    m_ScreenViewPort[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL].Height = (f32)m_ClientHeight;
+    m_ScreenViewPort[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL].MinDepth = 0.0f;
+    m_ScreenViewPort[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL].MaxDepth = 1.0f;
 
     //Set the Viewport Live Drive
     m_ScreenViewPort[RENDERTARGET_LIVEDRIVE].TopLeftX = 0.0f;

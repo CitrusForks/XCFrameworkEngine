@@ -9,24 +9,31 @@
 #if defined(XCGRAPHICS_DX11)
 
 #include "XC_GraphicsDx11.h"
+
+#include "Graphics/RenderingPool.h"
 #include "Graphics/XC_Shaders/XC_VertexShaderLayout.h"
 #include "Graphics/SharedDescriptorHeap.h"
+#include "Graphics/XC_Textures/RenderableTexture.h"
+#include "Graphics/XC_Shaders/XC_ShaderHandle.h"
+#include "Graphics/GPUResourceSystem.h"
 
 XC_GraphicsDx11::XC_GraphicsDx11(void)
+    : m_pSwapChain(nullptr)
+    , m_pdxgiFactory(nullptr)
+    , m_pD3DDeviceContext(nullptr)
+    , m_pRenderTargetView(nullptr)
+    , m_renderQuadVB(nullptr)
+    , m_renderQuadIB(nullptr)
+    , m_pDepthStencilBuffer(nullptr)
+    , m_pDepthStencilView(nullptr)
+    , m_pDepthStencilBufferLiveDrive(nullptr)
+    , m_pDepthStencilViewLiveDrive(nullptr)
+    , m_depthStencilState(nullptr)
+    , m_depthDisabledStencilState(nullptr)
+    , m_depthStencilLessEqualState(nullptr)
+    , m_sharedDescriptorHeap(nullptr)
+    , m_gpuResourceSystem(nullptr)
 {
-    m_clearColor = XCVec4(1.0f, 1.0f, 1.0f, 1.0f);
-
-    m_pdxgiFactory = 0;
-    m_pD3DDeviceContext = 0;
-    m_pD3DDevice = 0;
-    m_pRenderTargetView = 0;
-    m_pDepthStencilBuffer = 0;
-    m_pDepthStencilView = 0;
-    m_depthDisabledStencilState = 0;
-    m_XCShaderSystem = nullptr;
-
-    ZeroMemory(&m_ScreenViewPort, sizeof(D3D_VIEWPORT));
-    m_initDone = false;
 }
 
 XC_GraphicsDx11::~XC_GraphicsDx11(void)
@@ -37,9 +44,12 @@ void XC_GraphicsDx11::Destroy()
 {
     XC_Graphics::Destroy();
 
-    m_sharedDescriptorHeap->Destroy();
     SystemContainer& container = SystemLocator::GetInstance()->GetSystemContainer();
     container.RemoveSystem("SharedDescriptorHeap");
+    container.RemoveSystem("GPUResourceSystem");
+
+    XCDELETE(m_sharedDescriptorHeap);
+    XCDELETE(m_gpuResourceSystem);
 
     ReleaseCOM(m_pD3DDeviceContext);
     ReleaseCOM(m_pD3DDevice);
@@ -65,7 +75,8 @@ void XC_GraphicsDx11::SetupPipeline()
     SetupSwapChain();
 
     CreateDescriptorHeaps();
-    
+    CreateGPUResourceSystem();
+
     SetupRenderTargets();
     SetupDepthStencilBuffer();
     SetupDepthStencilStates();
@@ -73,6 +84,8 @@ void XC_GraphicsDx11::SetupPipeline()
     SetupViewPort();
 
     SetupShadersAndRenderPool();
+
+    SetupRenderQuad();
 }
 
 void XC_GraphicsDx11::CreateDescriptorHeaps()
@@ -88,6 +101,15 @@ void XC_GraphicsDx11::CreateDescriptorHeaps()
         , 1 //No of Samplers
         , 100 //No of CBV, UAV combined
     );
+}
+
+void XC_GraphicsDx11::CreateGPUResourceSystem()
+{
+    //GPU Resource system
+    SystemContainer& container = SystemLocator::GetInstance()->GetSystemContainer();
+    container.RegisterSystem<GPUResourceSystem>("GPUResourceSystem");
+    m_gpuResourceSystem = (GPUResourceSystem*) &container.CreateNewSystem("GPUResourceSystem");
+    m_gpuResourceSystem->Init(*m_pD3DDevice);
 }
 
 void XC_GraphicsDx11::SetupDevice()
@@ -130,7 +152,7 @@ void XC_GraphicsDx11::SetupSwapChain()
     m_SwapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
     m_SwapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     m_SwapChainDesc.BufferCount = 1;
-    if (m_4xMsaaQuality)
+    if (m_Enable4xMsaa && m_4xMsaaQuality)
     {
         m_SwapChainDesc.SampleDesc.Count = 4;
         m_SwapChainDesc.SampleDesc.Quality = m_4xMsaaQuality - 1;
@@ -166,8 +188,33 @@ void XC_GraphicsDx11::SetupRenderTargets()
     m_renderTargets[RENDERTARGET_MAIN_0] = XCNEW(RenderableTexture)(RENDERTARGET_MAIN_0, *m_pD3DDevice, *m_pD3DDeviceContext);
     m_renderTargets[RENDERTARGET_MAIN_0]->PreLoad(m_pSwapChain);
 
+    m_renderTargets[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL] = XCNEW(RenderableTexture)(RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL, *m_pD3DDevice, *m_pD3DDeviceContext);
+    m_renderTargets[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL]->PreLoad(m_Enable4xMsaa && m_4xMsaaQuality, m_ClientWidth, m_ClientHeight);
+
     m_renderTargets[RENDERTARGET_LIVEDRIVE] = XCNEW(RenderableTexture)(RENDERTARGET_LIVEDRIVE, *m_pD3DDevice, *m_pD3DDeviceContext);
-    m_renderTargets[RENDERTARGET_LIVEDRIVE]->PreLoad(m_4xMsaaQuality, 256, 256);
+    m_renderTargets[RENDERTARGET_LIVEDRIVE]->PreLoad(m_Enable4xMsaa && m_4xMsaaQuality, 256, 256);
+}
+
+void XC_GraphicsDx11::SetupRenderQuad()
+{
+    m_renderQuadVB = XCNEW(VertexBuffer<VertexPosTex>);
+    m_renderQuadIB = XCNEW(IndexBuffer<u32>);
+
+    m_renderQuadVB->m_vertexData.push_back(VertexPosTex(XCVec3Unaligned(-1.0f, 1.0f, 0.0f), XCVec2Unaligned(0.0f, 0.0f)));
+    m_renderQuadVB->m_vertexData.push_back(VertexPosTex(XCVec3Unaligned(1.0f, -1.0f, 0.0f), XCVec2Unaligned(1.0f, 1.0f)));
+    m_renderQuadVB->m_vertexData.push_back(VertexPosTex(XCVec3Unaligned(-1.0f, -1.0f, 0.0f), XCVec2Unaligned(0.0f, 1.0f)));
+    m_renderQuadVB->m_vertexData.push_back(VertexPosTex(XCVec3Unaligned(1.0f, 1.0f, 0.0f), XCVec2Unaligned(1.0f, 0.0f)));
+
+    m_renderQuadVB->BuildVertexBuffer(m_pD3DDeviceContext);
+
+    //Set up index buffer
+    m_renderQuadIB->AddIndicesVA
+    ({
+        0, 1, 2,
+        0, 3, 1,
+    });
+
+    m_renderQuadIB->BuildIndexBuffer(m_pD3DDeviceContext);
 }
 
 void XC_GraphicsDx11::SetupDepthStencilBuffer()
@@ -320,19 +367,14 @@ void XC_GraphicsDx11::BeginScene()
     m_renderTargets[RENDERTARGET_MAIN_0]->SetRenderableTarget(*m_pD3DDeviceContext, m_pDepthStencilView);
     m_renderTargets[RENDERTARGET_MAIN_0]->ClearRenderTarget(*m_pD3DDeviceContext, m_pDepthStencilView, m_clearColor);
 
-    m_renderingPool->Begin(RENDERTARGET_MAIN_0);
+    m_renderingPool->Begin(RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL);
 }
 
 void XC_GraphicsDx11::BeginSecondaryScene()
 {
     SetSecondaryDrawCall(true);
-
-    m_pD3DDeviceContext->RSSetViewports(1, &m_ScreenViewPort[RENDERTARGET_LIVEDRIVE]);
-
+    
     //TurnOffZ();
-    m_renderTargets[RENDERTARGET_LIVEDRIVE]->SetRenderableTarget(*m_pD3DDeviceContext, m_pDepthStencilViewLiveDrive);
-    m_renderTargets[RENDERTARGET_LIVEDRIVE]->ClearRenderTarget(*m_pD3DDeviceContext, m_pDepthStencilViewLiveDrive, XCVec4(0.0f, 1.0f, 0.0f, 0.0f));
-
     m_renderingPool->Begin(RENDERTARGET_LIVEDRIVE);
 }
 
@@ -345,6 +387,23 @@ void XC_GraphicsDx11::EndSecondaryScene()
 void XC_GraphicsDx11::EndScene()
 {
     m_renderingPool->End();
+
+    //Draw post processed render target
+    m_pD3DDeviceContext->RSSetViewports(1, &m_ScreenViewPort[RENDERTARGET_MAIN_0]);
+
+    m_renderTargets[RENDERTARGET_MAIN_0]->SetRenderableTarget(*m_pD3DDeviceContext, m_pDepthStencilView);
+    m_renderTargets[RENDERTARGET_MAIN_0]->ClearRenderTarget(*m_pD3DDeviceContext, m_pDepthStencilView, m_clearColor);
+
+    m_XCShaderSystem->ApplyShader(*m_pD3DDeviceContext, ShaderType_RenderTexture);
+
+    XCShaderHandle* shaderHandle = (XCShaderHandle*)m_XCShaderSystem->GetShader(ShaderType_RenderTexture);
+    shaderHandle->SetResource("gTexture", *m_pD3DDeviceContext, m_renderTargets[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL]->GetRenderTargetResource());
+
+    shaderHandle->SetVertexBuffer(*m_pD3DDeviceContext, m_renderQuadVB);
+    shaderHandle->SetIndexBuffer(*m_pD3DDeviceContext, *m_renderQuadIB);
+
+    m_pD3DDeviceContext->DrawIndexedInstanced(m_renderQuadIB->m_indexData.size(), 1, 0, 0, 0);
+
     ValidateResult(m_pSwapChain->Present(1, 0));
 }
 

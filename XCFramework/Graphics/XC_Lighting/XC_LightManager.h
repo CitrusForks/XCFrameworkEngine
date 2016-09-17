@@ -10,7 +10,7 @@
 
 #include "Graphics/XC_Lighting/LightingTypes.h"
 #include "Graphics/XC_Graphics.h"
-#include "Graphics/D3DConstantBuffer.h"
+#include "Graphics/GPUResource.h"
 
 class XC_LightManager : public ISystem
 {
@@ -25,7 +25,7 @@ public:
     void                            Draw(XC_Graphics& graphicsSystem);
     void                            Destroy();
 
-    D3DConstantBuffer&              GetLightConstantBuffer() { return *m_pCBLightsPerFrame; }
+    GPUResource&                    GetLightConstantBuffer() { return *m_pCBLightsPerFrame; }
 
 protected:
     static const u32                NoOfLights = 5;
@@ -34,5 +34,5 @@ private:
     std::vector<ILight*>            m_Lights;
     XCVec4                          m_eyePos;
 
-    D3DConstantBuffer*              m_pCBLightsPerFrame;
+    GPUResource*                    m_pCBLightsPerFrame;
 };

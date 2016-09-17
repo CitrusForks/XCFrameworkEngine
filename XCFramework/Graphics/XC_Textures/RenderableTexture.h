@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "Graphics/D3DConstantBuffer.h"
+#include "Graphics/GPUResource.h"
 #include "Graphics/RenderTargetTypes.h"
 
 class RenderableTexture
@@ -38,9 +38,8 @@ public:
     void                             SetRenderableTarget(ID3DDeviceContext& context, ID3DDepthStencilView* depthView);
     void                             ClearRenderTarget(ID3DDeviceContext& context, ID3DDepthStencilView* depthView, const XCVec4& color);
                                      
-    D3DConstantBuffer*               GetShaderResourceView() { return m_pSRV; }
-    ID3DTexture2D*                   GetTexture2D() { return m_pRenderTargetTexture;  }
-                                     
+    GPUResource*                     GetRenderTargetResource() { return m_pRenderTargetResource; }
+
     RenderedTextureInfo*             GetRenderToTexture();
 
 protected:
@@ -51,13 +50,11 @@ protected:
     void                             DumpTextureToFile();
 
 private:
-    ID3DTexture2D*                   m_pRenderTargetTexture;
-    ID3DRenderTargetView*            m_pRenderTargetView;
-    D3DConstantBuffer*               m_pSRV;
+    GPUResource*                     m_pRenderTargetResource;
 
     //Staging textures and for resolving the textures
-    ID3DTexture2D*                   m_pRenderTargetTextureStaged;
-    ID3DTexture2D*                   m_pSingleSampledTex;
+    GPUResource*                     m_pRenderTargetTextureStaged;
+    GPUResource*                     m_pSingleSampledTex;
                                      
     RenderedTextureInfo*             m_renderableTexture;
                                      

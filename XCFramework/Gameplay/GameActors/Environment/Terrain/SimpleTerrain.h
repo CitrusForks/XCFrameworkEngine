@@ -45,5 +45,5 @@ protected:
     IndexBuffer<u32>                    m_indexBuffer;
 
     ShaderType                          m_useShaderType;
-    D3DConstantBuffer*                  m_pCBPerObject;
+    GPUResource*                        m_pCBPerObject;
 };

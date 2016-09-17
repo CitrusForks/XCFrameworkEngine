@@ -7,7 +7,8 @@
 #include "GraphicsPrecompiledHeader.h"
 
 #include "Graphics/XC_Shaders/IShader.h"
-#include "Graphics/SharedDescriptorHeap.h"
+#include "Graphics/GPUResourceSystem.h"
+#include "Graphics/GPUResource.h"
 
 #include "Assets/Packages/PackageConsts.h"
 
@@ -26,15 +27,13 @@ void IShader::ApplyShader(ID3DDeviceContext& context, RasterType rasterType)
 {
 }
 
-D3DConstantBuffer* IShader::CreateBuffer(BufferType bufferType, i32 sizeOfType)
+GPUResource* IShader::CreateBuffer(GPUResourceType bufferType, i32 sizeOfType)
 {
-    D3DConstantBuffer* constantBuff = nullptr;
-    if (bufferType == BUFFERTYPE_CBV)
+    GPUResource* constantBuff = nullptr;
+    if (bufferType == GPUResourceType_CBV)
     {
-        SharedDescriptorHeap& heap = SystemLocator::GetInstance()->RequestSystem<SharedDescriptorHeap>("SharedDescriptorHeap");
-
-        D3DBufferDesc bufferDesc(bufferType, sizeOfType);
-        constantBuff = heap.CreateBufferView(bufferDesc);
+        GPUResourceSystem& gpuSys = (GPUResourceSystem&)SystemLocator::GetInstance()->RequestSystem("GPUResourceSystem");
+        constantBuff = gpuSys.CreateConstantBufferResourceView(GPUResourceDesc(bufferType, sizeOfType));
     }
     else
     {

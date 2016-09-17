@@ -62,7 +62,7 @@ void IResource::WaitResourceUpdate()
     while (!m_resourceUpdated);
 }
 
-void IResource::RenderContextCallback(RenderContext& renderContext)
+void IResource::RenderContextCallback(ID3DDeviceContext& renderContext)
 {
     m_resourceUpdated = true;
 }

@@ -7,9 +7,10 @@
 #pragma once
 
 #include "Engine/Resource/IResource.h"
-#include "Graphics/D3DConstantBuffer.h"
 
 #include "Libs/DirectXTex/DirectXTex.h"
+
+class GPUResource;
 
 class Texture2D : public IResource
 {
@@ -17,7 +18,7 @@ public:
     DECLARE_OBJECT_CREATION(Texture2D)
 
     Texture2D();
-    Texture2D(D3DConstantBuffer* srv);
+    Texture2D(GPUResource* srv);
 
     virtual ~Texture2D();
 
@@ -27,26 +28,26 @@ public:
     virtual void                 Unload()                       override;
     virtual void                 Destroy()                      override;
     
-    void                         RenderContextCallback(RenderContext& renderContext);
+    //RenderContextCallback is a callback from main thread, which is required for dx12 resources to move the data from cpu to gpu memory.
+    void                         RenderContextCallback(ID3DDeviceContext& renderContext);
     void                         LoadTexture();
     
-    D3DConstantBuffer*           GetTextureResource()               { return m_diffuseMapTextureSRV; }
-    void                         SetSRV(D3DConstantBuffer* srv)     { m_diffuseMapTextureSRV = srv; }
+    GPUResource*                 GetTextureResource()                       { return m_diffuseMapTextureSRV; }
+    void                         SetTextureResource(GPUResource* srv)       { m_diffuseMapTextureSRV = srv; }
     
     XCMatrix4*                   GetTextureCoordinateMatrix() { return &m_textureCoordinateMatrix; }
     void                         SetTextureCoordinateMatrix(const XCMatrix4& matrix) { m_textureCoordinateMatrix = matrix; }
 
 protected:
 
-    D3DConstantBuffer*           m_diffuseMapTextureSRV;
+    GPUResource*                 m_diffuseMapTextureSRV;
     XCMatrix4                    m_textureCoordinateMatrix;
 
     DirectX::TexMetadata         m_texMetaData;
     DirectX::ScratchImage        m_scratchImage;
 
 #if defined(XCGRAPHICS_DX12)
-    D3DConstantBuffer*           m_diffuseMapTextureSRVUpload;
-    CD3DX12_RESOURCE_DESC        m_textureDesc;
+    GPUResource*                 m_diffuseMapTextureSRVUpload;
     D3D12_CPU_DESCRIPTOR_HANDLE  m_srvHandle;
 #endif
 };

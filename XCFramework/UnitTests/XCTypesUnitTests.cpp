@@ -29,6 +29,10 @@ namespace XCFrameworkUnitTest
 
             Assert::IsTrue(sizeof(f32) == 4);
             Assert::IsTrue(sizeof(f64) == 8);
+
+            Assert::IsTrue(sizeof(XCFloat2Unaligned) == sizeof(f32) * 2);
+            Assert::IsTrue(sizeof(XCFloat3Unaligned) == sizeof(f32) * 3);
+            Assert::IsTrue(sizeof(XCFloat4Unaligned) == sizeof(f32) * 4);
         }
 
     };

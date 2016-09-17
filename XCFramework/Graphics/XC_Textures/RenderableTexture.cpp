@@ -9,16 +9,16 @@
 #include "RenderableTexture.h"
 
 #include "Engine/Input/Directinput.h"
+
 #include "Graphics/SharedDescriptorHeap.h"
+#include "Graphics/GPUResourceSystem.h"
 
 #if defined(XCGRAPHICS_DX11) 
 #include "Libs/DirectXTex/DirectXTex.h"
 #endif
 
 RenderableTexture::RenderableTexture(RenderTargetsType type, ID3DDevice& device, ID3DDeviceContext& context)
-    : m_pRenderTargetTexture(nullptr)
-    , m_pRenderTargetView(nullptr)
-    , m_pSRV(nullptr)
+    : m_pRenderTargetResource(nullptr)
     , m_pRenderTargetTextureStaged(nullptr)
     , m_pSingleSampledTex(nullptr)
     , m_device(device)
@@ -34,11 +34,7 @@ RenderableTexture::RenderableTexture(RenderTargetsType type, ID3DDevice& device,
 
 RenderableTexture::~RenderableTexture()
 {
-#if defined(XCGRAPHICS_DX11) || defined(XCGRAPHICS_DX12)
-    ReleaseCOM(m_pRenderTargetView);
-    ReleaseCOM(m_pRenderTargetTexture);
-    ReleaseCOM(m_pSRV);
-#elif defined(XCGRAPHICS_GNM)
+#if defined(XCGRAPHICS_GNM)
     XCDELETE(m_pRenderTargetView);
 #endif
 }
@@ -50,27 +46,65 @@ void RenderableTexture::Destroy()
         XCDELETE(m_renderableTexture);
     }
 
-    if (m_pSRV)
+    if (m_pRenderTargetResource)
     {
-        XCDELETE(m_pSRV);
+        GPUResourceSystem& gpuSys = (GPUResourceSystem&) SystemLocator::GetInstance()->RequestSystem("GPUResourceSystem");
+        gpuSys.DestroyResource(m_pRenderTargetResource);
     }
 }
 
 void RenderableTexture::OnResize()
 {
 #if defined(XCGRAPHICS_DX11) || defined(XCGRAPHICS_DX12)
-    m_pRenderTargetView->Release();
+    m_pRenderTargetResource->GetResource<ID3D11Resource*>()->Release();
 #endif
 }
 
 bool RenderableTexture::PreLoad(i32 msaaQuality, i32 texWidth, i32 texHeight)
 {
-#if defined(XCGRAPHICS_DX11)
-    D3D_TEXTURE2D_DESC textureDesc;
-    D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
+    GPUResourceSystem& descHeap = (GPUResourceSystem&)SystemLocator::GetInstance()->RequestSystem("GPUResourceSystem");
 
     // Initialize the render target texture description.
+    D3D_TEXTURE2D_DESC textureDesc;
     ZeroMemory(&textureDesc, sizeof(textureDesc));
+
+#if defined(XCGRAPHICS_DX12)
+
+    // Setup the render target texture description.
+    textureDesc = CD3DX12_RESOURCE_DESC
+    (
+        D3D12_RESOURCE_DIMENSION_TEXTURE2D,
+        0,
+        texWidth,
+        texHeight,
+        1,
+        1,
+        DXGI_FORMAT_R8G8B8A8_UNORM,
+        1,
+        0,
+        D3D12_TEXTURE_LAYOUT_UNKNOWN,
+        D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
+
+    m_pRenderTargetResource = descHeap.CreateTextureResource(textureDesc, nullptr);
+
+    //Create srv view.
+    D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
+    ZeroMemory(&desc, sizeof(D3D12_SHADER_RESOURCE_VIEW_DESC));
+
+    desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+    desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    desc.Texture2D.MipLevels = 1;
+    desc.Texture2D.MostDetailedMip = 0;
+    desc.Texture2D.ResourceMinLODClamp = 0.0f;
+
+    //Create SRV of the render texture
+    descHeap.CreateShaderResourceView(desc, m_pRenderTargetResource);
+
+    // Create the render target texture.
+    descHeap.CreateRenderTargetView(m_pRenderTargetResource);
+
+#elif defined(XCGRAPHICS_DX11)
 
     // Setup the render target texture description.
     textureDesc.Width = texWidth;
@@ -78,23 +112,37 @@ bool RenderableTexture::PreLoad(i32 msaaQuality, i32 texWidth, i32 texHeight)
     textureDesc.MipLevels = 1;
     textureDesc.ArraySize = 1;
     textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    textureDesc.SampleDesc.Count = 4;
-    textureDesc.SampleDesc.Quality = msaaQuality - 1;
+    if (msaaQuality)
+    {
+        textureDesc.SampleDesc.Count = 4;
+        textureDesc.SampleDesc.Quality = msaaQuality - 1;
+    }
+    else
+    {
+        textureDesc.SampleDesc.Count = 1;
+        textureDesc.SampleDesc.Quality = 0;
+    }
+
     textureDesc.Usage = D3D11_USAGE_DEFAULT;
     textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
     textureDesc.CPUAccessFlags = 0;
     textureDesc.MiscFlags = 0;
 
-    // Create the render target texture.
-    ValidateResult(m_device.CreateTexture2D(&textureDesc, NULL, &m_pRenderTargetTexture));
+    m_pRenderTargetResource = descHeap.CreateTextureResource(textureDesc, nullptr);
 
-    // Setup the description of the render target view.
-    renderTargetViewDesc.Format = textureDesc.Format;
-    renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;
-    renderTargetViewDesc.Texture2D.MipSlice = 0;
+    D3D11_SHADER_RESOURCE_VIEW_DESC desc = {};
+    ZeroMemory(&desc, sizeof(D3D11_SHADER_RESOURCE_VIEW_DESC));
+
+    desc.ViewDimension = msaaQuality ? D3D11_SRV_DIMENSION_TEXTURE2DMS : D3D11_SRV_DIMENSION_TEXTURE2D;
+    desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    desc.Texture2D.MipLevels = 1;
+    desc.Texture2D.MostDetailedMip = 0;
+
+    //Create SRV of the render texture
+    descHeap.CreateShaderResourceView(desc, m_pRenderTargetResource);
 
     // Create the render target view.
-    ValidateResult(m_device.CreateRenderTargetView(m_pRenderTargetTexture, &renderTargetViewDesc, &m_pRenderTargetView));
+    descHeap.CreateRenderTargetView(m_pRenderTargetResource);
 
     CreateStagingTextures(textureDesc);
 #endif
@@ -106,6 +154,8 @@ bool RenderableTexture::PreLoad(i32 msaaQuality, i32 texWidth, i32 texHeight)
 #if defined(XCGRAPHICS_DX11)
 void RenderableTexture::CreateStagingTextures(D3D_TEXTURE2D_DESC texDesc)
 {
+    GPUResourceSystem& descHeap = (GPUResourceSystem&)SystemLocator::GetInstance()->RequestSystem("GPUResourceSystem");
+
     D3D_TEXTURE2D_DESC stagedTexDesc = { 0 };
     stagedTexDesc = texDesc;
     stagedTexDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
@@ -113,13 +163,14 @@ void RenderableTexture::CreateStagingTextures(D3D_TEXTURE2D_DESC texDesc)
     stagedTexDesc.SampleDesc.Quality = 0;
     stagedTexDesc.CPUAccessFlags = 0;
     stagedTexDesc.Usage = D3D11_USAGE_DEFAULT;
-    ValidateResult(m_device.CreateTexture2D(&stagedTexDesc, NULL, &m_pRenderTargetTextureStaged));
+
+    m_pRenderTargetTextureStaged = descHeap.CreateTextureResource(stagedTexDesc, nullptr);
 
     stagedTexDesc.BindFlags = 0;
     stagedTexDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
     stagedTexDesc.Usage = D3D11_USAGE_STAGING;
-    ID3DTexture2D* singleSampledTex = nullptr;
-    ValidateResult(m_device.CreateTexture2D(&stagedTexDesc, NULL, &m_pSingleSampledTex));
+    
+    m_pSingleSampledTex = descHeap.CreateTextureResource(stagedTexDesc, nullptr);
 
     // Setup the description of the shader resource view.
     D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
@@ -130,9 +181,7 @@ void RenderableTexture::CreateStagingTextures(D3D_TEXTURE2D_DESC texDesc)
     shaderResourceViewDesc.Texture2D.MipLevels = 1;
 
     // Create the shader resource view.
-    m_pSRV = XCNEW(D3DConstantBuffer)(BUFFERTYPE_SRV);
-
-    ValidateResult(m_device.CreateShaderResourceView(m_pRenderTargetTextureStaged, &shaderResourceViewDesc, &m_pSRV->m_cbResource));
+    descHeap.CreateShaderResourceView(shaderResourceViewDesc, m_pRenderTargetTextureStaged);
 
     // RGB Texture for transferring over the network
     m_renderableTexture->m_texSize = texDesc.Width * texDesc.Height * 3;
@@ -143,24 +192,9 @@ void RenderableTexture::CreateStagingTextures(D3D_TEXTURE2D_DESC texDesc)
 
 void RenderableTexture::PreLoad(ID3DSwapChain* swapChain)
 {
-#if defined(XCGRAPHICS_DX11)
-    ID3DTexture2D* backBufferTexture;
-    swapChain->GetBuffer(0, __uuidof(ID3DTexture2D), (void**)&backBufferTexture);
-
-    m_pRenderTargetTexture = backBufferTexture;
-
-    ValidateResult(m_device.CreateRenderTargetView(backBufferTexture, 0, &m_pRenderTargetView));
-
-    ReleaseCOM(backBufferTexture);
-#elif defined(XCGRAPHICS_DX12)
-    SharedDescriptorHeap& descHeap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
-    CD3DX12_CPU_DESCRIPTOR_HANDLE& rtvCPUHandle = descHeap.GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV).m_cbvCPUOffsetHandle;
-
-    ValidateResult(swapChain->GetBuffer(m_renderTargetType, IID_PPV_ARGS(&m_pRenderTargetTexture)));
-
-    m_device.CreateRenderTargetView(m_pRenderTargetTexture, nullptr, rtvCPUHandle);
-    rtvCPUHandle.Offset(m_device.GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV)); //Move the handle to next rtv slot.
-#endif
+    GPUResourceSystem& gpuSys = (GPUResourceSystem&)SystemLocator::GetInstance()->RequestSystem("GPUResourceSystem");
+    m_pRenderTargetResource = gpuSys.CreateRenderTextureResource(swapChain, m_renderTargetType);
+    gpuSys.CreateRenderTargetView(m_pRenderTargetResource);
 }
 
 void RenderableTexture::Update()
@@ -172,20 +206,19 @@ void RenderableTexture::Update()
         DumpTextureToFile();
     }
 
-    m_deviceContext.ResolveSubresource(m_pRenderTargetTextureStaged, 0, m_pRenderTargetTexture, 0, DXGI_FORMAT_R8G8B8A8_UNORM);
+    m_deviceContext.ResolveSubresource(m_pRenderTargetTextureStaged->GetResource<ID3D11Texture2D*>(), 0, m_pRenderTargetResource->GetResource<ID3D11Texture2D*>(), 0, DXGI_FORMAT_R8G8B8A8_UNORM);
 #endif
 }
 
 void RenderableTexture::SetRenderableTarget(ID3DDeviceContext& context, ID3DDepthStencilView* depthView)
 {
 #if defined(XCGRAPHICS_DX11)
-    context.OMSetRenderTargets(1, &m_pRenderTargetView, depthView);
+    context.OMSetRenderTargets(1, &m_pRenderTargetResource->GetPointerToGPUResourceViewTyped<ID3D11RenderTargetView*>(GPUResourceType_RTV), depthView);
 #elif defined(XCGRAPHICS_DX12)
     SharedDescriptorHeap& descHeap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
-    D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle(descHeap.GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV).m_heapDesc->GetCPUDescriptorHandleForHeapStart());
-    rtvHandle.ptr = rtvHandle.ptr + (m_renderTargetType * descHeap.GetRTVDescHeapIncSize());
-
-    context.OMSetRenderTargets(1, &rtvHandle, false, &descHeap.GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV).m_heapDesc->GetCPUDescriptorHandleForHeapStart());
+    context.OMSetRenderTargets(1, &m_pRenderTargetResource->GetResourceView(GPUResourceType_RTV)->GetCPUResourceViewHandle()
+        , false
+        , &descHeap.GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV).m_heapDesc->GetCPUDescriptorHandleForHeapStart());
 #elif defined(XCGRAPHICS_GNM)
     context.setRenderTarget(0, m_pRenderTargetView);
     context.setDepthRenderTarget(&m_gnmDepthTarget);
@@ -197,14 +230,15 @@ void RenderableTexture::ClearRenderTarget(ID3DDeviceContext& context, ID3DDepthS
     const f32 color[] = { xmColor.Get<X>(), xmColor.Get<Y>(), xmColor.Get<Z>(), xmColor.Get<W>() };
 
 #if defined(XCGRAPHICS_DX11)
-    context.ClearRenderTargetView(m_pRenderTargetView, color);
+    context.ClearRenderTargetView(m_pRenderTargetResource->GetGPUResourceViewTyped<ID3D11RenderTargetView*>(GPUResourceType_RTV), color);
     context.ClearDepthStencilView(depthView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 #elif defined(XCGRAPHICS_DX12)
     SharedDescriptorHeap& descHeap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
-    D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle(descHeap.GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV).m_heapDesc->GetCPUDescriptorHandleForHeapStart());
-    rtvHandle.ptr = rtvHandle.ptr + (m_renderTargetType * descHeap.GetRTVDescHeapIncSize());
 
-    context.ClearRenderTargetView(rtvHandle, color, 0, nullptr);
+    context.ClearRenderTargetView(m_pRenderTargetResource->GetResourceView(GPUResourceType_RTV)->GetCPUResourceViewHandle()
+        , color
+        , 0
+        , nullptr);
     context.ClearDepthStencilView(descHeap.GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV).m_heapDesc->GetCPUDescriptorHandleForHeapStart(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 #endif
 }
@@ -213,16 +247,16 @@ void RenderableTexture::ClearRenderTarget(ID3DDeviceContext& context, ID3DDepthS
 void RenderableTexture::DumpTextureToFile()
 {
 #if defined(XCGRAPHICS_DX11)
-    m_deviceContext.ResolveSubresource(m_pRenderTargetTextureStaged, 0, m_pRenderTargetTexture, 0, DXGI_FORMAT_R8G8B8A8_UNORM);
+    m_deviceContext.ResolveSubresource(m_pRenderTargetTextureStaged->GetResource<ID3D11Texture2D*>(), 0, m_pRenderTargetResource->GetResource<ID3D11Texture2D*>(), 0, DXGI_FORMAT_R8G8B8A8_UNORM);
 
     D3D11_MAPPED_SUBRESOURCE subResource = { 0 };
 
     D3D_TEXTURE2D_DESC texDesc = { 0 };
-    m_pRenderTargetTexture->GetDesc(&texDesc);
+    m_pRenderTargetResource->GetResource<ID3D11Texture2D*>()->GetDesc(&texDesc);
 
-    m_deviceContext.CopyResource(m_pSingleSampledTex, m_pRenderTargetTextureStaged);
+    m_deviceContext.CopyResource(m_pSingleSampledTex->GetResource<ID3D11Texture2D*>(), m_pRenderTargetTextureStaged->GetResource<ID3D11Texture2D*>());
 
-    ValidateResult(m_deviceContext.Map(m_pSingleSampledTex, 0, D3D11_MAP_READ, 0, &subResource));
+    ValidateResult(m_deviceContext.Map(m_pSingleSampledTex->GetResource<ID3D11Texture2D*>(), 0, D3D11_MAP_READ, 0, &subResource));
 
     u8* pData = (u8*)subResource.pData;
 
@@ -240,23 +274,23 @@ void RenderableTexture::DumpTextureToFile()
     fwrite(pData, sizeof(u8), texDesc.Height * texDesc.Width * 4, fp);
     fclose(fp);
 
-    m_deviceContext.Unmap(m_pSingleSampledTex, 0);
+    m_deviceContext.Unmap(m_pSingleSampledTex->GetResource<ID3D11Texture2D*>(), 0);
 #endif
 }
 
 RenderableTexture::RenderedTextureInfo* RenderableTexture::GetRenderToTexture()
 {
 #if defined(XCGRAPHICS_DX11)
-    m_deviceContext.ResolveSubresource(m_pRenderTargetTextureStaged, 0, m_pRenderTargetTexture, 0, DXGI_FORMAT_R8G8B8A8_UNORM);
+    m_deviceContext.ResolveSubresource(m_pRenderTargetTextureStaged->GetResource<ID3D11Texture2D*>(), 0, m_pRenderTargetResource->GetResource<ID3D11Texture2D*>(), 0, DXGI_FORMAT_R8G8B8A8_UNORM);
 
     D3D11_MAPPED_SUBRESOURCE subResource = { 0 };
 
     D3D_TEXTURE2D_DESC texDesc = { 0 };
-    m_pRenderTargetTexture->GetDesc(&texDesc);
+    m_pRenderTargetResource->GetResource<ID3D11Texture2D*>()->GetDesc(&texDesc);
 
-    m_deviceContext.CopyResource(m_pSingleSampledTex, m_pRenderTargetTextureStaged);
+    m_deviceContext.CopyResource(m_pSingleSampledTex->GetResource<ID3D11Texture2D*>(), m_pRenderTargetTextureStaged->GetResource<ID3D11Texture2D*>());
 
-    ValidateResult(m_deviceContext.Map(m_pSingleSampledTex, 0, D3D11_MAP_READ, 0, &subResource));
+    ValidateResult(m_deviceContext.Map(m_pSingleSampledTex->GetResource<ID3D11Texture2D*>(), 0, D3D11_MAP_READ, 0, &subResource));
 
     u8* pData = (u8*)subResource.pData;
 
@@ -271,7 +305,7 @@ RenderableTexture::RenderedTextureInfo* RenderableTexture::GetRenderToTexture()
     }
     */
 
-    m_deviceContext.Unmap(m_pSingleSampledTex, 0);
+    m_deviceContext.Unmap(m_pSingleSampledTex->GetResource<ID3D11Texture2D*>(), 0);
 #endif
 
     return m_renderableTexture;

@@ -12,18 +12,19 @@ struct FBBasicMaterial;
 enum ShaderType {
   ShaderType_Default = 0,
   ShaderType_SolidColor = 1,
-  ShaderType_LightTexture = 2,
-  ShaderType_TerrainMultiTexture = 3,
-  ShaderType_SimpleCubeMap = 4,
-  ShaderType_SkinnedCharacter = 5,
-  ShaderType_VectorFont = 6,
-  ShaderType_Max = 7,
+  ShaderType_RenderTexture = 2,
+  ShaderType_LightTexture = 3,
+  ShaderType_TerrainMultiTexture = 4,
+  ShaderType_SimpleCubeMap = 5,
+  ShaderType_SkinnedCharacter = 6,
+  ShaderType_VectorFont = 7,
+  ShaderType_Max = 8,
   ShaderType_MIN = ShaderType_Default,
   ShaderType_MAX = ShaderType_Max
 };
 
 inline const char **EnumNamesShaderType() {
-  static const char *names[] = { "Default", "SolidColor", "LightTexture", "TerrainMultiTexture", "SimpleCubeMap", "SkinnedCharacter", "VectorFont", "Max", nullptr };
+  static const char *names[] = { "Default", "SolidColor", "RenderTexture", "LightTexture", "TerrainMultiTexture", "SimpleCubeMap", "SkinnedCharacter", "VectorFont", "Max", nullptr };
   return names;
 }
 
@@ -33,16 +34,17 @@ enum VertexFormat {
   VertexFormat_Position = 0,
   VertexFormat_PositionColor = 1,
   VertexFormat_PositionNormal = 2,
-  VertexFormat_PositionNormalTexture = 3,
-  VertexFormat_PositionNormalTextureBlendIndexBlendWeight = 4,
-  VertexFormat_PositionColorInstanceIndex = 5,
-  VertexFormat_Invalid = 6,
+  VertexFormat_PositionTexture = 3,
+  VertexFormat_PositionNormalTexture = 4,
+  VertexFormat_PositionNormalTextureBlendIndexBlendWeight = 5,
+  VertexFormat_PositionColorInstanceIndex = 6,
+  VertexFormat_Invalid = 7,
   VertexFormat_MIN = VertexFormat_Position,
   VertexFormat_MAX = VertexFormat_Invalid
 };
 
 inline const char **EnumNamesVertexFormat() {
-  static const char *names[] = { "Position", "PositionColor", "PositionNormal", "PositionNormalTexture", "PositionNormalTextureBlendIndexBlendWeight", "PositionColorInstanceIndex", "Invalid", nullptr };
+  static const char *names[] = { "Position", "PositionColor", "PositionNormal", "PositionTexture", "PositionNormalTexture", "PositionNormalTextureBlendIndexBlendWeight", "PositionColorInstanceIndex", "Invalid", nullptr };
   return names;
 }
 

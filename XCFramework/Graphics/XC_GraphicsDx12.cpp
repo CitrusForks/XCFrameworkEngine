@@ -14,20 +14,28 @@
 
 #include "Graphics/XC_Shaders/XC_VertexShaderLayout.h"
 #include "Graphics/SharedDescriptorHeap.h"
+#include "Graphics/GPUResourceSystem.h"
+#include "Graphics/XC_Shaders/XC_ShaderHandle.h"
 
+#include "Assets/Packages/PackageConsts.h"
 #include "Libs/Dx12Helpers/d3dx12.h"
 
 XC_GraphicsDx12::XC_GraphicsDx12(void)
+    : m_pSwapChain(nullptr)
+    , m_pdxgiFactory(nullptr)
+    , m_pCommandAllocator(nullptr)
+    , m_pCommandQueue(nullptr)
+    , m_graphicsCommandList(nullptr)
+    , m_depthStencilResource(nullptr)
+    , m_pFence(nullptr)
+    , m_frameIndex(0)
+    , m_rootSignature(nullptr)
+    , m_pipelineState(nullptr)
+    , m_sharedDescriptorHeap(nullptr)
+    , m_gpuResourceSystem(nullptr)
+    , m_renderQuadVB(nullptr)
+    , m_renderQuadIB(nullptr)
 {
-    m_clearColor = XCVec4(1.0f, 1.0f, 1.0f, 1.0f);
-
-    m_pdxgiFactory = 0;
-    m_pD3DDevice = 0;
-    m_frameIndex = 0;
-
-    ZeroMemory(&m_ScreenViewPort, sizeof(D3D12_VIEWPORT));
-
-    m_initDone = false;
 }
 
 XC_GraphicsDx12::~XC_GraphicsDx12(void)
@@ -125,6 +133,7 @@ void XC_GraphicsDx12::Init(HWND _mainWnd, i32 _width, i32 _height, bool _enable4
 
     //Create Descriptor heaps.
     CreateDescriptorHeaps();
+    CreateGPUResourceSystem();
 
     //Setup ViewPorts
     SetupViewPort();
@@ -148,11 +157,17 @@ void XC_GraphicsDx12::Init(HWND _mainWnd, i32 _width, i32 _height, bool _enable4
         IID_PPV_ARGS(&m_graphicsCommandList));
 
     //Setup the PipelineStateObjects
-    //CreateGraphicPipelineStateObjects();
     SetupShadersAndRenderPool();
+
+    //Create the render quad
+    SetupRenderQuad();
 
     //Need to close the cmmd list as nothing is to be recorded now.
     ValidateResult(m_graphicsCommandList->Close());
+
+    //Execute any pending work on m_graphicsCommandList.
+    ID3D12CommandList* ppCmdList[] = { m_graphicsCommandList };
+    m_pCommandQueue->ExecuteCommandLists(_countof(ppCmdList), ppCmdList);
 
     //Create fencing for sync each frame
     ValidateResult(m_pD3DDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_pFence)));
@@ -172,6 +187,9 @@ void XC_GraphicsDx12::Destroy()
 {
     XC_Graphics::Destroy();
 
+    XCDELETE(m_renderQuadVB);
+    XCDELETE(m_renderQuadIB);
+
     m_sharedDescriptorHeap->Destroy();
     SystemContainer& container = SystemLocator::GetInstance()->GetSystemContainer();
     container.RemoveSystem("SharedDescriptorHeap");
@@ -185,7 +203,6 @@ void XC_GraphicsDx12::Destroy()
 
 #if defined(DEBUG_GRAPHICS_PIPELINE)
     ReleaseCOM(m_vertexBuffer);
-    ReleaseCOM(m_vertexBufferView);
 #endif
 
     ReleaseCOM(m_pD3DDevice);
@@ -265,9 +282,9 @@ void XC_GraphicsDx12::DebugTestGraphicsPipeline()
         const f32 aspectRatio = 1024 / 786;
         Vertex triangleVertices[] =
         {
-            { { 0.0f, 0.25f * aspectRatio, 0.0f },{ 1.0f, 0.0f, 0.0f, 1.0f } },
-            { { 0.25f, -0.25f * aspectRatio, 0.0f },{ 0.0f, 1.0f, 0.0f, 1.0f } },
-            { { -0.25f, -0.25f * aspectRatio, 0.0f },{ 0.0f, 0.0f, 1.0f, 1.0f } }
+            { XCVec3{ 0.0f, 0.25f * aspectRatio, 0.0f },    XCVec4{ 1.0f, 0.0f, 0.0f, 1.0f } },
+            { XCVec3{ 0.25f, -0.25f * aspectRatio, 0.0f },  XCVec4{ 0.0f, 1.0f, 0.0f, 1.0f } },
+            { XCVec3{ -0.25f, -0.25f * aspectRatio, 0.0f }, XCVec4{ 0.0f, 0.0f, 1.0f, 1.0f } }
         };
 
         const UINT vertexBufferSize = sizeof(triangleVertices);
@@ -308,6 +325,9 @@ void XC_GraphicsDx12::SetupRenderTargets()
     m_renderTargets[RENDERTARGET_MAIN_1] = XCNEW(RenderableTexture)(RENDERTARGET_MAIN_1, *m_pD3DDevice, *m_graphicsCommandList);
     m_renderTargets[RENDERTARGET_MAIN_1]->PreLoad(m_pSwapChain);
 
+    m_renderTargets[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL] = XCNEW(RenderableTexture)(RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL, *m_pD3DDevice, *m_graphicsCommandList);
+    m_renderTargets[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL]->PreLoad(false, m_ClientWidth, m_ClientHeight);
+
     m_renderTargets[RENDERTARGET_LIVEDRIVE] = XCNEW(RenderableTexture)(RENDERTARGET_LIVEDRIVE, *m_pD3DDevice, *m_graphicsCommandList);
     m_renderTargets[RENDERTARGET_LIVEDRIVE]->PreLoad(m_4xMsaaQuality, 256, 256);
 }
@@ -320,7 +340,7 @@ void XC_GraphicsDx12::CreateDescriptorHeaps()
     m_sharedDescriptorHeap = (SharedDescriptorHeap*)&container.CreateNewSystem("SharedDescriptorHeap");
 
     m_sharedDescriptorHeap->Init(*m_pD3DDevice
-        , 2 //No of RTV's
+        , RENDERTARGET_MAX //No of RTV's
         , 1 //No of DSV's
         , 1 //No of Samplers
 #if defined(LOAD_SHADERS_FROM_DATA)
@@ -335,6 +355,15 @@ void XC_GraphicsDx12::CreateDescriptorHeaps()
 #endif
         + 100
     );
+}
+
+void XC_GraphicsDx12::CreateGPUResourceSystem()
+{
+    //GPU Resource system
+    SystemContainer& container = SystemLocator::GetInstance()->GetSystemContainer();
+    container.RegisterSystem<GPUResourceSystem>("GPUResourceSystem");
+    m_gpuResourceSystem = (GPUResourceSystem*)&container.CreateNewSystem("GPUResourceSystem");
+    m_gpuResourceSystem->Init(*m_pD3DDevice);
 }
 
 void XC_GraphicsDx12::SetupDepthView()
@@ -375,6 +404,28 @@ void XC_GraphicsDx12::SetupDepthView()
     //SetResourceBarrier(m_graphicsCommandList, m_depthStencilResource, D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_READ);
 }
 
+void XC_GraphicsDx12::SetupRenderQuad()
+{
+    m_renderQuadVB = XCNEW(VertexBuffer<VertexPosTex>);
+    m_renderQuadIB = XCNEW(IndexBuffer<u32>);
+
+    m_renderQuadVB->m_vertexData.push_back(VertexPosTex(XCVec3Unaligned(-1.0f, 1.0f, 0.0f), XCVec2Unaligned(0.0f, 0.0f)));
+    m_renderQuadVB->m_vertexData.push_back(VertexPosTex(XCVec3Unaligned(1.0f, -1.0f, 0.0f), XCVec2Unaligned(1.0f, 1.0f)));
+    m_renderQuadVB->m_vertexData.push_back(VertexPosTex(XCVec3Unaligned(-1.0f, -1.0f, 0.0f), XCVec2Unaligned(0.0f, 1.0f)));
+    m_renderQuadVB->m_vertexData.push_back(VertexPosTex(XCVec3Unaligned(1.0f, 1.0f, 0.0f), XCVec2Unaligned(1.0f, 0.0f)));
+
+    m_renderQuadVB->BuildVertexBuffer(m_graphicsCommandList);
+
+    //Set up index buffer
+    m_renderQuadIB->AddIndicesVA
+    ({  
+        0, 1, 2,
+        0, 3, 1,
+    });
+
+    m_renderQuadIB->BuildIndexBuffer(m_graphicsCommandList);
+}
+
 void XC_GraphicsDx12::SetResourceBarrier(ID3D12GraphicsCommandList* commandList, ID3D12Resource* resource, D3D12_RESOURCE_STATES StateBefore, D3D12_RESOURCE_STATES StateAfter)
 {
     D3D12_RESOURCE_BARRIER barrierDesc = {};
@@ -401,9 +452,11 @@ void XC_GraphicsDx12::BeginScene()
     m_graphicsCommandList->RSSetViewports(1, &m_ScreenViewPort[RENDERTARGET_MAIN_0]);
     m_graphicsCommandList->RSSetScissorRects(1, &m_scissorRect);
 
-    SetResourceBarrier(m_graphicsCommandList, m_renderTargets[m_frameIndex]->GetTexture2D(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+    SetResourceBarrier(m_graphicsCommandList, m_renderTargets[m_frameIndex]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+    SetResourceBarrier(m_graphicsCommandList, m_renderTargets[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
     m_renderTargets[m_frameIndex]->SetRenderableTarget(*m_graphicsCommandList, nullptr);
+    m_renderTargets[m_frameIndex]->ClearRenderTarget(*m_graphicsCommandList, m_depthStencilResource, XCVec4(1.0f, 0.0f, 0.0f, 1.0f));
 
     //Set descriptor heaps
     ID3D12DescriptorHeap* ppHeaps[] = { m_sharedDescriptorHeap->GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV).m_heapDesc, 
@@ -417,7 +470,7 @@ void XC_GraphicsDx12::BeginScene()
     m_graphicsCommandList->DrawInstanced(3, 1, 0, 0);
 #endif
 
-    m_renderingPool->Begin(RENDERTARGET_MAIN_0);
+    m_renderingPool->Begin(RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL);
 }
 
 void XC_GraphicsDx12::EndScene()
@@ -429,7 +482,20 @@ void XC_GraphicsDx12::EndScene()
     //Execute rendering pool context's
     m_renderingPool->Execute(m_pCommandQueue);
 
-    SetResourceBarrier(m_graphicsCommandList, m_renderTargets[m_frameIndex]->GetTexture2D(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+    //Draw post processed render target
+    SetResourceBarrier(m_graphicsCommandList, m_renderTargets[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+
+    m_XCShaderSystem->ApplyShader(*m_graphicsCommandList, ShaderType_RenderTexture);
+
+    XCShaderHandle* shaderHandle = (XCShaderHandle*)m_XCShaderSystem->GetShader(ShaderType_RenderTexture);
+    shaderHandle->SetResource("gTexture", *m_graphicsCommandList, m_renderTargets[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL]->GetRenderTargetResource());
+
+    shaderHandle->SetVertexBuffer(*m_graphicsCommandList, m_renderQuadVB);
+    shaderHandle->SetIndexBuffer(*m_graphicsCommandList, *m_renderQuadIB);
+
+    m_graphicsCommandList->DrawIndexedInstanced(m_renderQuadIB->m_indexData.size(), 1, 0, 0, 0);
+
+    SetResourceBarrier(m_graphicsCommandList, m_renderTargets[m_frameIndex]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
     ValidateResult(m_graphicsCommandList->Close());
 
     //Execute the cmd list
@@ -443,14 +509,9 @@ void XC_GraphicsDx12::EndScene()
     WaitForPreviousFrameCompletion();
 }
 
-void XC_GraphicsDx12::PresentRenderTarget(ID3D12GraphicsCommandList* cmdList)
+void XC_GraphicsDx12::ClearRTVAndDSV(ID3DDeviceContext* context, RenderTargetsType type)
 {
-    SetResourceBarrier(cmdList, m_renderTargets[m_frameIndex]->GetTexture2D(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
-}
-
-void XC_GraphicsDx12::ClearRTVAndDSV(ID3D12GraphicsCommandList* cmdList)
-{
-    m_renderTargets[m_frameIndex]->ClearRenderTarget(*cmdList, nullptr, m_clearColor);
+    m_renderTargets[type]->ClearRenderTarget(*context, nullptr, m_clearColor);
 }
 
 ID3DDepthStencilView* XC_GraphicsDx12::GetDepthStencilView(RenderTargetsType type)

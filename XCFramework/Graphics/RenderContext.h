@@ -20,7 +20,7 @@ class RenderContext
 public:
     RenderContext();
 
-    void                                Init(ID3DDevice* device, XC_ShaderContainer* shaderMgr, bool clearStateOnBegin, bool clearStateOnFinish);
+    void                                Init(ID3DDevice* device, XC_ShaderContainer* shaderMgr);
     void                                BeginRender(RenderTargetsType targetType);
     void                                FinishRender();
     void                                Destroy();
@@ -32,14 +32,14 @@ public:
 
     GlobalShaderData&                   GetGlobalShaderData();
 
-    void                                DrawNonIndexed(ID3DDeviceContext& context, u32 vertexCount);
-    void                                DrawIndexedInstanced(ID3DDeviceContext& context, u32 _indexCount, void* indexGpuAddr = nullptr, u32 instanceCount = 1);
+    void                                DrawNonIndexed(u32 vertexCount);
+    void                                DrawIndexedInstanced(u32 _indexCount, void* indexGpuAddr = nullptr, u32 instanceCount = 1);
 
 protected:
     void                                ReleaseCommandList();
 
 private:
-    XC_ShaderContainer*                   m_shaderContainer;
+    XC_ShaderContainer*                 m_shaderContainer;
     ID3DDeviceContext*                  m_deviceContext;
 
 #if defined(XCGRAPHICS_DX12)
@@ -50,7 +50,4 @@ private:
 
     XC_Graphics*                        m_graphicsSystem;
     XCVec4                              m_clearColor;
-
-    bool                                m_clearStateOnBegin;
-    bool                                m_clearStateOnFinish;
 };

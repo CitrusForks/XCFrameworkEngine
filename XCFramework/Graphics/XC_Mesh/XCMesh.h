@@ -111,13 +111,13 @@ protected:
     //This buffer is created based on the shader type
     struct InstanceBuffer
     {
-        D3DConstantBuffer*                  m_cbInstancedBufferGPU;
+        GPUResource*                        m_cbInstancedBufferGPU;
         cbInstancedBuffer                   m_cbInstancedBuffer;
     };
 
     struct BoneBuffer
     {
-        D3DConstantBuffer*                  m_cbBoneBufferGPU;
+        GPUResource*                        m_cbBoneBufferGPU;
         cbBoneBuffer                        m_cbBoneBuffer;
     };
 

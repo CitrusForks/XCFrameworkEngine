@@ -5,11 +5,12 @@ enum ShaderType : byte
 {
     Default = 0,
     SolidColor,
+    RenderTexture,
     LightTexture,
     TerrainMultiTexture,
     SimpleCubeMap,
     SkinnedCharacter,
-    VectorFont,    
+    VectorFont,
 
     Max
 }
@@ -19,6 +20,7 @@ enum VertexFormat : byte
     Position,
     PositionColor,
     PositionNormal,
+    PositionTexture,
     PositionNormalTexture,
     PositionNormalTextureBlendIndexBlendWeight,
     PositionColorInstanceIndex,

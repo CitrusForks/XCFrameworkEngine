@@ -12,6 +12,8 @@
 #include "Graphics/XC_Textures/RenderableTexture.h"
 #include "Graphics/RenderTargetTypes.h"
 
+class GPUResourceSystem;
+
 class XC_Graphics : public ISystem
 {
 public:
@@ -39,7 +41,7 @@ public:
     virtual void                    TurnOffZ();
     virtual void                    TurnOnZ();
     virtual void                    SetLessEqualDepthStencilView(ID3DDeviceContext& context, bool turnOn);
-    virtual void                    ClearRTVAndDSV(ID3D12GraphicsCommandList* cmdList) {}
+    virtual void                    ClearRTVAndDSV(ID3DDeviceContext* context, RenderTargetsType type) {}
 
     ID3DDevice*                     GetDevice() { return m_pD3DDevice; }
     XC_ShaderContainer&             GetShaderContainer() { return *m_XCShaderSystem; }
@@ -76,7 +78,7 @@ protected:
 
     RenderingPool*                  m_renderingPool;
     RenderableTexture*              m_renderTargets[RENDERTARGET_MAX];
-    
+
     D3D_VIEWPORT                    m_ScreenViewPort[RENDERTARGET_MAX];
     D3D_RECT                        m_scissorRect;
 

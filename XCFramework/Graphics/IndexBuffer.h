@@ -47,8 +47,9 @@ public:
         }
     }
 
-    void BuildIndexBuffer();
-    void RenderContextCallback(RenderContext& renderContext);
+    //If context is passed, then this buffer won't wait for render context callback from render pool.
+    void BuildIndexBuffer(ID3DDeviceContext* context = nullptr);
+    void RenderContextCallback(ID3DDeviceContext& renderContext);
 
 #if defined(XCGRAPHICS_DX12)
     D3D12_INDEX_BUFFER_VIEW& GetIndexBufferView() { return m_indexBufferView; }
@@ -72,7 +73,7 @@ public:
 
 
 template<class T>
-void IndexBuffer<T>::BuildIndexBuffer()
+void IndexBuffer<T>::BuildIndexBuffer(ID3DDeviceContext* context)
 {
     XC_Graphics& graphicsSystem = (XC_Graphics&)SystemLocator::GetInstance()->RequestSystem("GraphicsSystem");
 
@@ -96,9 +97,16 @@ void IndexBuffer<T>::BuildIndexBuffer()
         nullptr,
         IID_PPV_ARGS(&m_pIndexBufferUploadResource)));
 
-    RenderingPool& renderPool = graphicsSystem.GetRenderingPool();
-    renderPool.RequestResourceDeviceContext(this);
-    WaitResourceUpdate();
+    if (context != nullptr)
+    {
+        RenderContextCallback(*context);
+    }
+    else
+    {
+        RenderingPool& renderPool = graphicsSystem.GetRenderingPool();
+        renderPool.RequestResourceDeviceContext(this);
+        WaitResourceUpdate();
+    }
 
     //Initialize the vertex buffer view.
     m_indexBufferView.BufferLocation = m_pIndexBufferResource->GetGPUVirtualAddress();
@@ -123,10 +131,9 @@ void IndexBuffer<T>::BuildIndexBuffer()
 }
 
 template<class T>
-void IndexBuffer<T>::RenderContextCallback(RenderContext& renderContext)
+void IndexBuffer<T>::RenderContextCallback(ID3DDeviceContext& context)
 {
 #if defined(XCGRAPHICS_DX12)
-    ID3DDeviceContext& context = renderContext.GetDeviceContext();
     i32 ibSize = sizeof(u32) * m_indexData.size();
 
     D3D12_SUBRESOURCE_DATA indexData = {};
@@ -138,7 +145,7 @@ void IndexBuffer<T>::RenderContextCallback(RenderContext& renderContext)
     context.ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_pIndexBufferResource, D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_INDEX_BUFFER));
 #endif
 
-    IResource::RenderContextCallback(renderContext);
+    IResource::RenderContextCallback(context);
 
     m_resourceUpdated = true;
 }

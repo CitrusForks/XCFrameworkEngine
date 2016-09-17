@@ -8,6 +8,9 @@
 #include "MemorySystemWin32.h"
 
 MemorySystemWin32::MemorySystemWin32()
+    : m_freeSize(0)
+    , m_pChunkFront(nullptr)
+    , m_pChunkBack(nullptr)
 {
 }
 
@@ -39,10 +42,14 @@ void MemorySystemWin32::Update(f32 dt)
 
 void MemorySystemWin32::Destroy()
 {
+    m_threadLock.Enter();
+
     if (m_pChunkFront)
     {
         _aligned_free(m_pChunkFront);
     }
+
+    m_threadLock.Exit();
 
     //Null it here. The system container will destruct the instance of memory system.
     ms_pMemorySystem = nullptr;
@@ -57,8 +64,15 @@ bool MemorySystemWin32::IsInMyMemory(uintptr_t address)
 
 bool MemorySystemWin32::AllocateChunk()
 {
+    m_threadLock.Enter();
+
     m_pChunkFront = (c8*)_aligned_malloc(sizeof(c8) * m_chunkSize, AlignmentBoundary);
+
+    Logger("[Memory] aligned malloc returned : %d. Requested Memory: %d", errno, m_chunkSize);
+    
     m_pChunkBack = m_pChunkFront + m_chunkSize;
+
+    m_threadLock.Exit();
 
     return m_pChunkFront ? true : false;
 }

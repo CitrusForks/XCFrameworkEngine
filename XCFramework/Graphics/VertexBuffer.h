@@ -50,8 +50,11 @@ public:
     }
 
     void            UpdateState() override;
-    void            BuildVertexBuffer();
-    void            RenderContextCallback(RenderContext& renderContext);
+
+    //If context is passed, then this buffer won't wait for render context callback from render pool.
+    void            BuildVertexBuffer(ID3DDeviceContext* context = nullptr);
+    
+    void            RenderContextCallback(ID3DDeviceContext& renderContext);
     u32             GetVertexFormatStride() { return sizeof(T); }
     void            SetVertexBuffer(ID3DDeviceContext& context);
 
@@ -89,7 +92,7 @@ void VertexBuffer<T>::SetVertexBuffer(ID3DDeviceContext& context)
 }
 
 template<class T>
-void VertexBuffer<T>::BuildVertexBuffer()
+void VertexBuffer<T>::BuildVertexBuffer(ID3DDeviceContext* context)
 {
     XC_Graphics& graphicsSystem = (XC_Graphics&)SystemLocator::GetInstance()->RequestSystem("GraphicsSystem");
 
@@ -117,9 +120,16 @@ void VertexBuffer<T>::BuildVertexBuffer()
 
     XCASSERT(m_pVertexBufferUploadResource != nullptr);
 
-    RenderingPool& renderPool = graphicsSystem.GetRenderingPool();
-    renderPool.RequestResourceDeviceContext(this);
-    WaitResourceUpdate();
+    if (context != nullptr)
+    {
+        RenderContextCallback(*context);
+    }
+    else
+    {
+        RenderingPool& renderPool = graphicsSystem.GetRenderingPool();
+        renderPool.RequestResourceDeviceContext(this);
+        WaitResourceUpdate();
+    }
 
     //Initialize the vertex buffer view.
     m_vertexBufferView.BufferLocation = m_pVertexBufferResource->GetGPUVirtualAddress();
@@ -146,10 +156,9 @@ void VertexBuffer<T>::BuildVertexBuffer()
 }
 
 template<class T>
-void VertexBuffer<T>::RenderContextCallback(RenderContext& renderContext)
+void VertexBuffer<T>::RenderContextCallback(ID3DDeviceContext& context)
 {
 #if defined(XCGRAPHICS_DX12)
-    ID3DDeviceContext& context = renderContext.GetDeviceContext();
     i32 vbSize = sizeof(T) * m_vertexData.size();
 
     D3D12_SUBRESOURCE_DATA vertexData = {};
@@ -161,7 +170,7 @@ void VertexBuffer<T>::RenderContextCallback(RenderContext& renderContext)
     context.ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_pVertexBufferResource, D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER));
 #endif
 
-    IResource::RenderContextCallback(renderContext);
+    IResource::RenderContextCallback(context);
 
     m_resourceUpdated = true;
 }

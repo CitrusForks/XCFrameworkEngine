@@ -10,7 +10,6 @@
 enum RenderWorkerType
 {
     WorkerType_SkyBox,
-
     WorkerType_Misc,
     WorkerType_XCMesh,
     WorkerType_Terrain,

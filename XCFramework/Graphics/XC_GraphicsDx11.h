@@ -11,10 +11,10 @@
 #include "Engine/System/ISystem.h"
 
 #include "Graphics/XC_Graphics.h"
-#include "Graphics/XC_Shaders/XC_ShaderContainer.h"
-#include "Graphics/RenderingPool.h"
-#include "Graphics/XC_Textures/RenderableTexture.h"
 #include "Graphics/RenderTargetTypes.h"
+#include "Graphics/XC_Shaders/XC_VertexFormat.h"
+#include "Graphics/VertexBuffer.h"
+#include "Graphics/IndexBuffer.h"
 
 class SharedDescriptorHeap;
 
@@ -43,14 +43,17 @@ public:
     void                        TurnOnZ();
     void                        SetLessEqualDepthStencilView(ID3DDeviceContext& context, bool turnOn);
 
-    ID3DDepthStencilView*       GetDepthStencilView(RenderTargetsType type) { return type == RENDERTARGET_MAIN_0 ? m_pDepthStencilView : m_pDepthStencilViewLiveDrive; }
+    ID3DDepthStencilView*       GetDepthStencilView(RenderTargetsType type) { return type != RENDERTARGET_LIVEDRIVE ? m_pDepthStencilView : m_pDepthStencilViewLiveDrive; }
 
 protected:
     void                        CreateDescriptorHeaps();
+    void                        CreateGPUResourceSystem();
+
     void                        SetupPipeline();
     void                        SetupDevice();
     void                        SetupSwapChain();
     void                        SetupRenderTargets();
+    void                        SetupRenderQuad();
 
     void                        SetupDepthStencilBuffer();
     void                        SetupDepthStencilStates();
@@ -65,11 +68,14 @@ private:
     D3D_TEXTURE2D_DESC          m_depthBufferDescLiveDrive;
 
     ID3DDeviceContext*          m_pD3DDeviceContext;
-    ID3DRenderTargetView*       m_pRenderTargetView;
 
-    ID3DTexture2D*              m_pDepthStencilBuffer;
+    ID3DRenderTargetView*       m_pRenderTargetView;
+    VertexBuffer<VertexPosTex>* m_renderQuadVB;
+    IndexBuffer<u32>*           m_renderQuadIB;
+
+    ID3D11Texture2D*            m_pDepthStencilBuffer;
     ID3DDepthStencilView*       m_pDepthStencilView;
-    ID3DTexture2D*              m_pDepthStencilBufferLiveDrive;
+    ID3D11Texture2D*            m_pDepthStencilBufferLiveDrive;
     ID3DDepthStencilView*       m_pDepthStencilViewLiveDrive;
 
     ID3DDepthStencilState*      m_depthStencilState;
@@ -77,6 +83,8 @@ private:
     ID3DDepthStencilState*      m_depthStencilLessEqualState;
     
     D3D_FEATURE_LEVEL           m_featureLevel;
+
     SharedDescriptorHeap*       m_sharedDescriptorHeap;
+    GPUResourceSystem*          m_gpuResourceSystem;
 };
 #endif

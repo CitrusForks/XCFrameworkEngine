@@ -11,7 +11,7 @@
 #include "Assets/Packages/Schema/BasicTypes_generated.h"
 #include "Assets/Packages/Schema/GameplayActors_generated.h"
 
-#include "Graphics/D3DConstantBuffer.h"
+#include "Graphics/GPUResourceSystem.h"
 #include "Graphics/XC_Shaders/XC_VertexShaderLayout.h"
 #include "Graphics/XC_Shaders/XC_ShaderHandle.h"
 #include "Graphics/XC_Shaders/XC_ShaderBufferConstants.h"
@@ -50,8 +50,8 @@ void TexturedPlane::PreLoad(const void* fbBuffer)
     ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
     m_texture = &resMgr.AcquireResource(texPlaneBuff->ResourceName()->c_str());
 
-    SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
-    m_pCBPerObject = heap.CreateBufferView(D3DBufferDesc(BUFFERTYPE_CBV, sizeof(PerObjectBuffer)));
+    GPUResourceSystem& gpuSys = (GPUResourceSystem&)SystemLocator::GetInstance()->RequestSystem("GPUResourceSystem");
+    m_pCBPerObject = gpuSys.CreateConstantBufferResourceView(GPUResourceDesc(GPUResourceType_CBV, sizeof(PerObjectBuffer)));
 }
 
 void TexturedPlane::PreLoad(XCVec4& initialPosition, XCVec4& initialRotation, XCVec4& initialScaling, Material& material, std::string texture, RasterType rasterType)
@@ -115,7 +115,7 @@ void TexturedPlane::Draw(RenderContext& context)
     lightTexShader->SetConstantBuffer("PerObjectBuffer", context.GetDeviceContext(), *m_pCBPerObject);
     lightTexShader->SetResource("gDiffuseMap", context.GetDeviceContext(), m_texture);
 
-    context.DrawNonIndexed(context.GetDeviceContext(), 6);
+    context.DrawNonIndexed(6);
 }
 
 void TexturedPlane::Destroy()
@@ -123,6 +123,6 @@ void TexturedPlane::Destroy()
     ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
     resMgr.ReleaseResource(m_texture);
 
-    SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
-    heap.DestroyBuffer(m_pCBPerObject);
+    GPUResourceSystem& gpuSys = (GPUResourceSystem&)SystemLocator::GetInstance()->RequestSystem("GPUResourceSystem");
+    gpuSys.DestroyResource(m_pCBPerObject);
 }

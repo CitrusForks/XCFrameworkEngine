@@ -38,7 +38,7 @@ protected:
 
     ShaderType                        m_useShaderType;
     ResourceHandle*                   m_texture;
-    D3DConstantBuffer*                m_pCBPerObject;
+    GPUResource*                      m_pCBPerObject;
     VertexBuffer<VertexPosNormTex>    m_vertexBuffer;
-    Material                     m_material;
+    Material                          m_material;
 };

@@ -8,6 +8,8 @@
 
 #include "SharedDescriptorHeap.h"
 
+#include "Graphics/GPUResourceView.h"
+#include "Graphics/GPUResource.h"
 
 SharedDescriptorHeap::SharedDescriptorHeap()
 #if defined(XCGRAPHICS_DX12)
@@ -67,163 +69,81 @@ SharedDescriptorHeap::HeapDesc* SharedDescriptorHeap::CreateHeapDesc(D3D12_DESCR
 }
 #endif
 
-D3DConstantBuffer* SharedDescriptorHeap::CreateBufferView(D3DBufferDesc& desc)
+GPUResource* SharedDescriptorHeap::AllocateGPUResource(GPUResourceType type, u32 sizeOfBuffer)
 {
+    GPUResource* outRes = nullptr;
+
+    for each (GPUResource* res in m_gpuResources)
+    {
+        if (!res->IsInUse() && res->GetResourceType() == type && res->GetResourceSize() == sizeOfBuffer)
+        {
+            outRes = res;
+            outRes->Destroy();
+            break;
+        }
+    }
+
+    if (outRes == nullptr)
+    {
+        //Create new
+        outRes = XCNEW(GPUResource)(type, sizeOfBuffer);
+    }
+
+    outRes->SetInUse(true);
+    m_gpuResources.push_back(outRes);
+
+    return outRes;
+}
+
+GPUResourceView* SharedDescriptorHeap::AllocateGPUResourceView(GPUResourceType type)
+{
+    GPUResourceView* outView = nullptr;
+
     m_cs.Enter();
 
-    desc.m_bufferSize = (desc.m_bufferSize + 255) & ~255;     //Must be a multiple of 256
-
-    D3DConstantBuffer* constBuffer = FindFreeConstantBuffer(desc.m_bufferType, desc.m_bufferSize);
-
-    if (constBuffer != nullptr)
+    for each (GPUResourceView* view in m_gpuResourcesView)
     {
-        constBuffer->m_isInUse = true;
-    }
-    else
-    {
-        XCASSERT(desc.m_bufferSize);
-
-        constBuffer = XCNEW(D3DConstantBuffer)(BUFFERTYPE_CBV);
-
-        //Create the cbv
-        if (desc.m_bufferSize)
+        if (!view->IsInUse() && view->GetResourceType() == type)
         {
-            constBuffer->m_sizeOfBuffer = desc.m_bufferSize;
-            constBuffer->m_isInUse      = true;
-
-#if defined(XCGRAPHICS_DX12)
-
-            D3D12_HEAP_PROPERTIES heapDesc = {};
-            heapDesc.Type = D3D12_HEAP_TYPE_UPLOAD;
-            heapDesc.CreationNodeMask = 1;
-            heapDesc.VisibleNodeMask = 1;
-
-            ValidateResult(m_device->CreateCommittedResource(&heapDesc,
-                D3D12_HEAP_FLAG_NONE,
-                &CD3DX12_RESOURCE_DESC::Buffer(constBuffer->m_sizeOfBuffer),
-                D3D12_RESOURCE_STATE_GENERIC_READ,
-                nullptr,
-                IID_PPV_ARGS(&constBuffer->m_cbResource)));
-
-            //Map the above heap with the actual cb on CPU. Keep it mapped.
-            //TODO: Need to analyze whether the cpu mapped memory is released when cbResource is released. Check the dtor of D3DConstantBuffer.
-            ValidateResult(constBuffer->m_cbResource->Map(0, nullptr, reinterpret_cast<void**>(&constBuffer->m_cbDataBegin)));
-
-            D3D12_CONSTANT_BUFFER_VIEW_DESC cbDesc = {};
-            cbDesc.BufferLocation = constBuffer->m_cbResource->GetGPUVirtualAddress();
-            cbDesc.SizeInBytes = constBuffer->m_sizeOfBuffer;
-
-            m_device->CreateConstantBufferView(&cbDesc, m_heapDesc[D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV]->m_cbvCPUOffsetHandle);
-
-            HeapDesc& desc = *m_heapDesc[D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV];
-            constBuffer->m_cpuHandle = desc.m_cbvCPUOffsetHandle;
-            constBuffer->m_gpuHandle = desc.m_cbvGPUOffsetHandle;
-
-            //Inc the offsets
-            desc.m_cbvCPUOffsetHandle.Offset(m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
-            desc.m_cbvGPUOffsetHandle.Offset(m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
-
-#elif defined(XCGRAPHICS_DX11)
-            
-            D3D11_BUFFER_DESC bd;
-            ZeroMemory(&bd, sizeof(bd));
-            bd.Usage = D3D11_USAGE_DYNAMIC;
-            bd.ByteWidth = desc.m_bufferSize;
-            bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-            bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-
-            ValidateResult(m_device->CreateBuffer(&bd, nullptr, &constBuffer->m_gpuHandle));
-
-#endif
-            m_constantBuffers.push_back(constBuffer);
-        }
-        else
-        {
-            XCDELETE(constBuffer);
-            constBuffer = nullptr;
+            outView = view;
+            outView->Destroy();
+            break;
         }
     }
+
+    if (outView == nullptr)
+    {
+        //Create new
+        outView = XCNEW(GPUResourceView)(type);
+    }
+
+    outView->SetInUse(true);
+    m_gpuResourcesView.push_back(outView);
 
     m_cs.Exit();
 
-    return constBuffer;
+    return outView;
 }
 
-#if defined(XCGRAPHICS_DX12)
-D3DConstantBuffer* SharedDescriptorHeap::CreateShaderResourceView(CD3DX12_RESOURCE_DESC& textureDesc, D3D12_SHADER_RESOURCE_VIEW_DESC& viewDesc)
-#elif defined(XCGRAPHICS_DX11)
-D3DConstantBuffer* SharedDescriptorHeap::CreateShaderResourceView()
-#endif
+void SharedDescriptorHeap::DestroyGPUResource(GPUResource* resource)
 {
     m_cs.Enter();
 
-    D3DConstantBuffer* constBuffer = FindFreeConstantBuffer(BUFFERTYPE_SRV, 0);
+    resource->SetInUse(false);
 
-    if (constBuffer != nullptr)
-    {
-        constBuffer->m_isInUse = true;
-        return constBuffer;
-    }
-    else
-    {
-        constBuffer = XCNEW(D3DConstantBuffer)(BUFFERTYPE_SRV);
-        constBuffer->m_sizeOfBuffer = 0;
-        constBuffer->m_isInUse = true;
-
-#if defined(XCGRAPHICS_DX12)
-
-        //Create Desc heap for shader specific.
-        //Create descriptor heap for constant buffers
-        ValidateResult(m_device->CreateCommittedResource(
-            &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
-            D3D12_HEAP_FLAG_NONE,
-            &textureDesc,
-            D3D12_RESOURCE_STATE_COPY_DEST,
-            nullptr,
-            IID_PPV_ARGS(&constBuffer->m_cbResource)));
-
-        m_device->CreateShaderResourceView(constBuffer->m_cbResource, &viewDesc, m_heapDesc[D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV]->m_cbvCPUOffsetHandle);
-
-        HeapDesc& desc = *m_heapDesc[D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV];
-        constBuffer->m_cpuHandle = desc.m_cbvCPUOffsetHandle;
-        constBuffer->m_gpuHandle = desc.m_cbvGPUOffsetHandle;
-
-        //Inc the offsets
-        desc.m_cbvCPUOffsetHandle.Offset(m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
-        desc.m_cbvGPUOffsetHandle.Offset(m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
-
-#endif
-        m_constantBuffers.push_back(constBuffer);
-    }
-
-    m_cs.Exit();
-    return constBuffer;
-}
-
-D3DConstantBuffer* SharedDescriptorHeap::FindFreeConstantBuffer(BufferType type, u32 size)
-{
-    for each (D3DConstantBuffer* buffer in m_constantBuffers)
-    {
-        if (!buffer->m_isInUse && buffer->m_bufferType == type && (type == BUFFERTYPE_SRV || buffer->m_sizeOfBuffer == size))
-        {
-            return buffer;
-        }
-    }
-    return nullptr;
-}
-
-void SharedDescriptorHeap::DestroyBuffer(D3DConstantBuffer* buffer)
-{
-    m_cs.Enter();
-    buffer->m_isInUse = false;
     m_cs.Exit();
 }
 
 void SharedDescriptorHeap::Destroy()
 {
-    for each(D3DConstantBuffer* buffer in m_constantBuffers)
+    for each(GPUResource* res in m_gpuResources)
     {
-        XCDELETE(buffer);
+        XCDELETE(res);
+    }
+
+    for each(GPUResourceView* view in m_gpuResourcesView)
+    {
+        XCDELETE(view);
     }
 
 #if defined(XCGRAPHICS_DX12)
@@ -233,5 +153,5 @@ void SharedDescriptorHeap::Destroy()
     }
 #endif
 
-    m_constantBuffers.clear();
+    m_gpuResources.clear();
 }

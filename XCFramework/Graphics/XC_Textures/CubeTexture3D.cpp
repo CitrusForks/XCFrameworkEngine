@@ -8,7 +8,7 @@
 
 #include "Graphics/XC_Textures/CubeTexture3D.h"
 #include "Graphics/XC_Graphics.h"
-#include "Graphics/SharedDescriptorHeap.h"
+#include "Graphics/GPUResourceSystem.h"
 
 CubeTexture3D::CubeTexture3D()
 {
@@ -37,73 +37,7 @@ void CubeTexture3D::Load(const void* buffer)
 
 void CubeTexture3D::LoadTexture()
 {
-#if defined(XCGRAPHICS_DX12)
-    m_diffuseMapTextureSRVUpload = XCNEW(D3DConstantBuffer)(BUFFERTYPE_SRV);
-#endif
-
-    XC_Graphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XC_Graphics>("GraphicsSystem");
-
-#if defined(XCGRAPHICS_DX12)
-    size_t cSize = strlen(m_resourcePath.c_str()) + 1;
-    std::wstring wc(cSize, L'#');
-    mbstowcs(&wc[0], m_resourcePath.c_str(), cSize);
-    const WCHAR* str = wc.c_str();
-
-    ValidateResult(LoadFromDDSFile(str, 0, &m_texMetaData, m_scratchImage));
-    m_textureDesc = CD3DX12_RESOURCE_DESC
-        (
-            D3D12_RESOURCE_DIMENSION_TEXTURE2D,
-            0,
-            m_scratchImage.GetMetadata().width,
-            m_scratchImage.GetMetadata().height,
-            m_scratchImage.GetMetadata().arraySize,
-            static_cast<UINT16>(m_scratchImage.GetMetadata().mipLevels),
-            m_scratchImage.GetMetadata().format,
-            1,
-            0,
-            D3D12_TEXTURE_LAYOUT_UNKNOWN,
-            D3D12_RESOURCE_FLAG_NONE);
-
-    //Create srv view.
-    D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
-    desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-    desc.Format = m_scratchImage.GetMetadata().format;
-
-    if (m_scratchImage.GetMetadata().IsCubemap())
-    {
-        desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
-        desc.TextureCube.MipLevels = m_scratchImage.GetMetadata().mipLevels;
-        desc.TextureCube.MostDetailedMip = 0;
-        desc.TextureCube.ResourceMinLODClamp = 0.0f;
-    }
-    else
-    {
-        desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-        desc.Texture2D.MipLevels = m_scratchImage.GetMetadata().mipLevels;
-        desc.Texture2D.MostDetailedMip = 0;
-        desc.Texture2D.ResourceMinLODClamp = 0.0f;
-    }
-
-    SharedDescriptorHeap& heap = SystemLocator::GetInstance()->RequestSystem<SharedDescriptorHeap>("SharedDescriptorHeap");
-    m_diffuseMapTextureSRV = heap.CreateShaderResourceView(m_textureDesc, desc);
-
-    const u32 subResCount = m_textureDesc.DepthOrArraySize * m_textureDesc.MipLevels;
-    UINT64 intermediateUploadBufferSize = GetRequiredIntermediateSize(m_diffuseMapTextureSRV->m_cbResource, 0, subResCount);
-    ValidateResult(graphicsSystem.GetDevice()->CreateCommittedResource(
-        &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
-        D3D12_HEAP_FLAG_NONE,
-        &CD3DX12_RESOURCE_DESC::Buffer(intermediateUploadBufferSize),
-        D3D12_RESOURCE_STATE_GENERIC_READ,
-        nullptr,
-        IID_PPV_ARGS(&m_diffuseMapTextureSRVUpload->m_cbResource)));
-
-    //Copy the data to upload heap and then copy it to default heap
-    RenderingPool& renderPool = graphicsSystem.GetRenderingPool();
-    renderPool.RequestResourceDeviceContext(this);
-    WaitResourceUpdate();
-#elif defined(XCGRAPHICS_DX11)
     Texture2D::LoadTexture();
-#endif
 
     Logger("[TEXTURE 3D] Texture Loaded");
 }

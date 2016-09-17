@@ -9,11 +9,14 @@
 #include "SimpleTerrain.h"
 
 #include "Engine/Utils/EngineUtils.h"
+
 #include "Graphics/XC_Graphics.h"
 #include "Graphics/XC_Shaders/XC_ShaderBufferConstants.h"
 #include "Graphics/XC_Shaders/XC_ShaderHandle.h"
 #include "Graphics/VertexBuffer.h"
 #include "Graphics/IndexBuffer.h"
+#include "Graphics/GPUResourceSystem.h"
+
 #include "Gameplay/XC_Camera/XC_CameraManager.h"
 
 SimpleTerrain::SimpleTerrain(void)
@@ -36,8 +39,8 @@ void SimpleTerrain::PreLoad(XCVec3& _initialPosition, i32 _rows, i32 _column, f3
     m_rowSpacing = _rowSpacing;
     m_colSpacing = _colSpacing;
 
-    SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
-    m_pCBPerObject = heap.CreateBufferView(D3DBufferDesc(BUFFERTYPE_CBV, sizeof(PerObjectBuffer)));
+    GPUResourceSystem& gpuSys = (GPUResourceSystem&)SystemLocator::GetInstance()->RequestSystem("GPUResourceSystem");
+    m_pCBPerObject = gpuSys.CreateConstantBufferResourceView(GPUResourceDesc(GPUResourceType_CBV, sizeof(PerObjectBuffer)));
 }
 
 void SimpleTerrain::Load()
@@ -194,11 +197,11 @@ void SimpleTerrain::Draw(RenderContext& context)
     solidColorShader->SetConstantBuffer("cbWVP", context.GetDeviceContext(), *m_pCBPerObject);
 
 
-    context.DrawIndexedInstanced(context.GetDeviceContext(), m_indexBuffer.m_indexData.size());
+    context.DrawIndexedInstanced(m_indexBuffer.m_indexData.size());
 }
 
 void SimpleTerrain::Destroy()
 {
-    SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
-    heap.DestroyBuffer(m_pCBPerObject);
+    GPUResourceSystem& gpuSys = (GPUResourceSystem&)SystemLocator::GetInstance()->RequestSystem("GPUResourceSystem");
+    gpuSys.DestroyResource(m_pCBPerObject);
 }

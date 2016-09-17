@@ -111,7 +111,6 @@ void VectorFontMesh::CreateConstantBuffer()
     case ShaderType_VectorFont:
     {
         VectorFontInstanceBuffer buffer = {};
-        SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
         XC_Graphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XC_Graphics>("GraphicsSystem");
 
         for (u32 subMeshIndex = 0; subMeshIndex < m_subMeshes.size(); ++subMeshIndex)
@@ -154,8 +153,7 @@ void VectorFontMesh::DrawSubMesh(RenderContext & renderContext, u32 meshIndex, u
     m_shaderHandler->SetVertexBuffer(renderContext.GetDeviceContext(), m_subMeshes[meshIndex]->GetVertexBuffer());
     m_shaderHandler->SetIndexBuffer(renderContext.GetDeviceContext(), m_subMeshes[meshIndex]->GetIndexBuffer());
 
-    renderContext.DrawIndexedInstanced(renderContext.GetDeviceContext(),
-        m_subMeshes[meshIndex]->GetNoOfFaces() * 3,
+    renderContext.DrawIndexedInstanced(m_subMeshes[meshIndex]->GetNoOfFaces() * 3,
         m_subMeshes[meshIndex]->GetIndexBuffer().GetIndexBufferInGPUMem(),
         instanceCount);
 }
