@@ -17,7 +17,6 @@ XCFramework/Engine/Graphics/XC_Shaders/src/*
 XCFramework/bin/*
 XCFramework/obj/*
 XCFramework/.vs/*
-*.exe
 *.pdb
 *.filters
 *.vcxproj
