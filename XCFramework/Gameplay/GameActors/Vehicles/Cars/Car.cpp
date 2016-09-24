@@ -33,7 +33,6 @@ void Car::PreLoad(XCVec3& initialPosition, std::string pMesh)
     m_currentPosition = initialPosition;
     
     m_useShaderType = ShaderType_LightTexture;
-    m_useRenderWorkerType = WorkerType_XCMesh;
     m_collisionDetectionType = COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX;
 }
 

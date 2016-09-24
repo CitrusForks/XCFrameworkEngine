@@ -23,7 +23,6 @@ SimpleTerrain::SimpleTerrain(void)
 {
     m_useShaderType = ShaderType_SolidColor;
     m_collisionDetectionType = COLLISIONDETECTIONTYPE_TRIANGLE;
-    m_useRenderWorkerType = WorkerType_Terrain;
 }
 
 SimpleTerrain::~SimpleTerrain(void)

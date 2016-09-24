@@ -37,7 +37,6 @@ PistolBullet::PistolBullet(IActor* parentActor, XCVec3& initialPosition, std::st
     m_currentPosition = initialPosition;
 
     m_useShaderType = ShaderType_LightTexture;
-    m_useRenderWorkerType = WorkerType_XCMesh;
 
     m_secondaryLookAxis  = XCFloat4::XCFloat4ZeroVector;
     m_secondaryUpAxis    = XCFloat4::XCFloat4ZeroVector;

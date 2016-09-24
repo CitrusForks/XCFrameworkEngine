@@ -33,7 +33,6 @@ GPUResource* GPUResourceSystem::CreateConstantBufferResource(GPUResourceDesc& de
             resource->SetResourceSize(desc.m_bufferSize);
 
 #if defined(XCGRAPHICS_DX12)
-
             D3D12_HEAP_PROPERTIES heapDesc = {};
             heapDesc.Type = D3D12_HEAP_TYPE_UPLOAD;
             heapDesc.CreationNodeMask = 1;
@@ -133,23 +132,66 @@ GPUResource* GPUResourceSystem::CreateRenderTextureResource(ID3DSwapChain* swapC
 
 GPUResource* GPUResourceSystem::CreateTextureResource(D3D_TEXTURE2D_DESC& textureDesc, const D3D_SUBRESOURCE_DATA* subResourceData)
 {
+    GPUResourceType resourceType = GPUResourceType_SRV;
+
+    bool isRenderTarget = false;
+    bool isDepthStencil = false;
+
+#if defined(XCGRAPHICS_DX12)
+    isRenderTarget = textureDesc.Flags & D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+    isDepthStencil = textureDesc.Flags & D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+#else
+    isRenderTarget = textureDesc.BindFlags & D3D11_BIND_RENDER_TARGET;
+    isDepthStencil = textureDesc.BindFlags & D3D11_BIND_DEPTH_STENCIL;
+#endif
+
+    if (isRenderTarget)
+    {
+        resourceType = GPUResourceType_RTV;
+    }
+    else if (isDepthStencil)
+    {
+        resourceType = GPUResourceType_DSV;
+    }
+
     SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
-    GPUResource* resource = heap.AllocateGPUResource(GPUResourceType_SRV, 0);
+    GPUResource* resource = heap.AllocateGPUResource(resourceType, 0);
 
     if (resource != nullptr)
     {
 #if defined(XCGRAPHICS_DX12)
+        D3D12_HEAP_PROPERTIES heapProps = {};
+        heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
 
-        //Create Desc heap for shader specific.
-        //Create descriptor heap for constant buffers
-        bool isRenderTarget = textureDesc.Flags & D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+        D3D12_CLEAR_VALUE clearValue;
+        clearValue.Color[0] = 1.0f; clearValue.Color[1] = 1.0f; clearValue.Color[2] = 1.0f; clearValue.Color[3] = 1.0f;
+        clearValue.Format = textureDesc.Format;
+
+        D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COPY_DEST;
+
+        bool setClearValue  = isRenderTarget || isDepthStencil;
+
+        if (isRenderTarget)
+        {
+            state = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+        }
+        else if (isDepthStencil)
+        {
+            heapProps.CreationNodeMask = 1;
+            heapProps.VisibleNodeMask = 1;
+
+            clearValue.DepthStencil.Depth = 1.0f;
+            clearValue.DepthStencil.Stencil = 0;
+
+            state = D3D12_RESOURCE_STATE_DEPTH_WRITE;
+        }
 
         ValidateResult(m_device->CreateCommittedResource(
-            &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+            &heapProps,
             D3D12_HEAP_FLAG_NONE,
             &textureDesc,
-            isRenderTarget ? D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE : D3D12_RESOURCE_STATE_COPY_DEST,
-            nullptr,
+            state,
+            setClearValue ? &clearValue : nullptr,
             IID_PPV_ARGS(&resource->GetPointerToResource<ID3DResource*>())));
 
 #elif defined(XCGRAPHICS_DX11)
@@ -242,11 +284,10 @@ void GPUResourceSystem::CreateRenderTargetView(GPUResource* gpuResource)
     gpuResource->AddResourceView(resourceView);
 }
 
-#if defined(UNUSED)
-void GPUResourceSystem::CreateRenderTargetView(D3D_TEXTURE2D_DESC& desc, GPUResource* gpuResource)
+void GPUResourceSystem::CreateDepthStencilView(GPUResource* gpuResource)
 {
     SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
-    GPUResourceView* resourceView = heap.AllocateGPUResourceView(GPUResourceType_RTV);
+    GPUResourceView* resourceView = heap.AllocateGPUResourceView(GPUResourceType_DSV);
 
     if (resourceView != nullptr)
     {
@@ -254,75 +295,33 @@ void GPUResourceSystem::CreateRenderTargetView(D3D_TEXTURE2D_DESC& desc, GPUReso
 
         //Create Desc heap for shader specific.
         //Create descriptor heap for constant buffers
-        D3D12_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
-        ZeroMemory(&renderTargetViewDesc, sizeof(D3D12_RENDER_TARGET_VIEW_DESC));
+        SharedDescriptorHeap::HeapDesc& desc = heap.GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
-        renderTargetViewDesc.Format = desc.Format;
-        renderTargetViewDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
-        renderTargetViewDesc.Texture2D.MipSlice = 0;
+        m_device->CreateDepthStencilView(gpuResource->GetResource<ID3DResource*>(), nullptr, desc.m_cbvCPUOffsetHandle);
 
-        m_device->CreateRenderTargetView(gpuResource->GetResource<ID3D11Resource>(), &renderTargetViewDesc, m_heapDesc[D3D12_DESCRIPTOR_HEAP_TYPE_RTV]->m_cbvCPUOffsetHandle);
-
-        HeapDesc& desc = *m_heapDesc[D3D12_DESCRIPTOR_HEAP_TYPE_RTV];
-        resourceView->m_cpuHandle = desc.m_cbvCPUOffsetHandle;
-        resourceView->m_gpuHandle = desc.m_cbvGPUOffsetHandle;
+        resourceView->SetCPUResourceViewHandle(desc.m_cbvCPUOffsetHandle);
+        resourceView->SetGPUResourceViewHandle(desc.m_cbvGPUOffsetHandle);
 
         //Inc the offsets
-        desc.m_cbvCPUOffsetHandle.Offset(m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV));
-        desc.m_cbvGPUOffsetHandle.Offset(m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV));
+        desc.m_cbvCPUOffsetHandle.Offset(m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV));
+        desc.m_cbvGPUOffsetHandle.Offset(m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV));
 
 #elif defined(XCGRAPHICS_DX11)
+        // Set up the depth stencil view description.
+        D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
+        ZeroMemory(&depthStencilViewDesc, sizeof(depthStencilViewDesc));
 
-        // Create the render target texture.
-        // Setup the description of the render target view.
-        D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
+        depthStencilViewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+        depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMS;
+        depthStencilViewDesc.Texture2D.MipSlice = 0;
 
-        renderTargetViewDesc.Format = desc.Format;
-        renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;
-        renderTargetViewDesc.Texture2D.MipSlice = 0;
-
-        ValidateResult(m_device->CreateRenderTargetView(gpuResource->GetResource<ID3D11Resource>(), &renderTargetViewDesc, resourceView->GetResourceView<ID3D11RenderTargetView*>()));
+        // Create the depth stencil view.
+        ValidateResult(m_device->CreateDepthStencilView(gpuResource->GetResource<ID3DResource*>(), &depthStencilViewDesc, &resourceView->GetPointerToResourceView<ID3D11DepthStencilView*>()));
 #endif
     }
 
     gpuResource->AddResourceView(resourceView);
 }
-#endif
-
-#if defined(UNUSED)
-GPUResourceView* GPUResourceSystem::CreateRenderTargetView(ID3DSwapChain* swapChain, RenderTargetsType type)
-{
-    SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
-    GPUResourceView* resourceView = heap.AllocateGPUResourceView(GPUResourceType_RTV);
-
-    if (resourceView != nullptr)
-    {
-#if defined(XCGRAPHICS_DX12)
-
-        m_device->CreateRenderTargetView(resourceView->m_cbResource, nullptr, m_heapDesc[D3D12_DESCRIPTOR_HEAP_TYPE_RTV]->m_cbvCPUOffsetHandle);
-
-        HeapDesc& desc = *m_heapDesc[D3D12_DESCRIPTOR_HEAP_TYPE_RTV];
-        resourceView->m_cpuHandle = desc.m_cbvCPUOffsetHandle;
-
-        //Inc the offsets
-        desc.m_cbvCPUOffsetHandle.Offset(m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV));
-
-#elif defined(XCGRAPHICS_DX11)
-        ID3DResource* backBufferTexture;
-        swapChain->GetBuffer(type, __uuidof(ID3DResource), (void**)resourceView->GetResource<ID3D11RenderTargetView*>());
-
-        resourceView->m_cbResource = backBufferTexture;
-
-        ID3D11RenderTargetView* renderTargetView = static_cast<ID3D11RenderTargetView*>(resourceView->m_resourceView);
-        ValidateResult(m_device->CreateRenderTargetView(backBufferTexture, 0, &renderTargetView));
-
-        ReleaseCOM(backBufferTexture);
-#endif
-    }
-
-    return resourceView;
-}
-#endif
 
 void GPUResourceSystem::DestroyResource(GPUResource* resource)
 {

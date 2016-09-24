@@ -27,6 +27,9 @@ XCMesh::XCMesh()
     , m_lastPlayedAnimTime(1.0f)
     , m_instanceCount(0)
 {
+    m_workerType = WorkerType_PosDiffuseTex;
+    m_renderWorkerMask = WorkerMask_PosDiffuseTex_Pass1 | WorkerMask_Lighting_Pass2;
+
     m_resourceType = RESOURCETYPE_MESH;
 }
 
@@ -36,8 +39,6 @@ void XCMesh::Init(i32 resourceId, std::string userFriendlyName)
 
     m_computedBoundBox = std::make_unique<OrientedBoundingBox>();
     m_computedBoundBox->Init();
-
-    RegisterDrawable();
 }
 
 XCMesh::~XCMesh(void)
@@ -107,6 +108,7 @@ void XCMesh::UpdateState()
 {
     if (m_resourceUpdated && m_texture && m_texture->m_Resource->IsLoaded())
     {
+        RegisterDrawable();
         m_resourceState = IResource::ResourceState_Loaded;
     }
 
@@ -144,8 +146,6 @@ void XCMesh::InitDynamic(std::string resPath, ShaderType shaderUsage, std::strin
 
     m_computedBoundBox = std::make_unique<OrientedBoundingBox>();
     m_computedBoundBox->Init();
-
-    RegisterDrawable();
 
     m_shaderType = shaderUsage;
 
@@ -567,7 +567,6 @@ void XCMesh::Update(f32 dt)
     }
 }
 
-
 void XCMesh::RegisterDrawable()
 {
     //Register with the rendering pool that this is drawable
@@ -594,8 +593,6 @@ void XCMesh::Draw(RenderContext& context)
         m_shaderHandler->SetResource("gDiffuseMap", context.GetDeviceContext(), m_texture);
 
         DrawSubMeshes(context);
-
-        m_instanceCount = 0;
     }
 }
 
@@ -672,6 +669,11 @@ void XCMesh::DrawInstanced(PerObjectBuffer& objectBuffer)
     {
         m_instanceBuffers[0].m_cbInstancedBuffer.gPerObject[m_instanceCount++] = objectBuffer;
     }
+}
+
+void XCMesh::OnRenderComplete()
+{
+    m_instanceCount = 0;
 }
 
 void XCMesh::Destroy()

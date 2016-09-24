@@ -133,15 +133,18 @@ void VectorFontMesh::Draw(RenderContext& context)
 
     XCShaderHandle* shader = (XCShaderHandle*)context.GetShader(m_shaderType);
 
-    for (auto subMesh : m_subMeshesIdBuffer)
+    if (m_subMeshesIdBuffer.size())
     {
-        m_vectorFontInstanceBuffers[subMesh.submeshId].m_instanceBufferGPU->UploadDataOnGPU(
-            context.GetDeviceContext(), 
-            &m_vectorFontInstanceBuffers[subMesh.submeshId].m_instanceBuffer.gWVP[0], 
-            sizeof(XCMatrix4Unaligned) * subMesh.instanceCount);
+        for (auto subMesh : m_subMeshesIdBuffer)
+        {
+            m_vectorFontInstanceBuffers[subMesh.submeshId].m_instanceBufferGPU->UploadDataOnGPU(
+                context.GetDeviceContext(),
+                &m_vectorFontInstanceBuffers[subMesh.submeshId].m_instanceBuffer.gWVP[0],
+                sizeof(XCMatrix4Unaligned) * subMesh.instanceCount);
 
-        shader->SetConstantBuffer("cbPerObjectInstanced", context.GetDeviceContext(), *m_vectorFontInstanceBuffers[subMesh.submeshId].m_instanceBufferGPU);
-        DrawSubMesh(context, subMesh.submeshId, subMesh.instanceCount);
+            shader->SetConstantBuffer("cbPerObjectInstanced", context.GetDeviceContext(), *m_vectorFontInstanceBuffers[subMesh.submeshId].m_instanceBufferGPU);
+            DrawSubMesh(context, subMesh.submeshId, subMesh.instanceCount);
+        }
     }
 
     //Clear the existing buffer

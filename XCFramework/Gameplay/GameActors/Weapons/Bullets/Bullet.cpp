@@ -34,7 +34,6 @@ void Bullet::PreLoad(XCVec3& initialPosition, XCVec3& target, std::string pMeshN
     m_currentPosition = initialPosition;
 
     m_useShaderType = ShaderType_LightTexture;
-    m_useRenderWorkerType = WorkerType_XCMesh;
     m_collisionDetectionType = COLLISIONDETECTIONTYPE_BULLET;
 
     //Assign the look

@@ -13,6 +13,8 @@ XC_Graphics::XC_Graphics(void)
     : m_pD3DDevice(nullptr)
     , m_XCShaderSystem(nullptr)
     , m_renderingPool(nullptr)
+    , m_sharedDescriptorHeap(nullptr)
+    , m_gpuResourceSystem(nullptr)
     , m_secondaryDrawCall(false)
     , m_4xMsaaQuality(false)
     , m_Enable4xMsaa(false)
@@ -48,6 +50,11 @@ void XC_Graphics::Destroy()
         {
             m_renderTargets[rIndex]->Destroy();
             XCDELETE(m_renderTargets[rIndex]);
+        }
+
+        if (m_depthStencilResource[rIndex])
+        {
+            m_gpuResourceSystem->DestroyResource(m_depthStencilResource[rIndex]);
         }
     }
 
@@ -129,6 +136,14 @@ void XC_Graphics::SetupViewPort()
     m_ScreenViewPort[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL].Height = (f32)m_ClientHeight;
     m_ScreenViewPort[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL].MinDepth = 0.0f;
     m_ScreenViewPort[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL].MaxDepth = 1.0f;
+
+    //Set the Viewport
+    m_ScreenViewPort[RENDERTARGET_GBUFFER_LIGHTING].TopLeftX = 0.0f;
+    m_ScreenViewPort[RENDERTARGET_GBUFFER_LIGHTING].TopLeftY = 0.0f;
+    m_ScreenViewPort[RENDERTARGET_GBUFFER_LIGHTING].Width = (f32)m_ClientWidth;
+    m_ScreenViewPort[RENDERTARGET_GBUFFER_LIGHTING].Height = (f32)m_ClientHeight;
+    m_ScreenViewPort[RENDERTARGET_GBUFFER_LIGHTING].MinDepth = 0.0f;
+    m_ScreenViewPort[RENDERTARGET_GBUFFER_LIGHTING].MaxDepth = 1.0f;
 
     //Set the Viewport Live Drive
     m_ScreenViewPort[RENDERTARGET_LIVEDRIVE].TopLeftX = 0.0f;

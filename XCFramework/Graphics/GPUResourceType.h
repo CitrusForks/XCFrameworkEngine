@@ -9,6 +9,7 @@
 enum GPUResourceType
 {
     GPUResourceType_RTV,
+    GPUResourceType_DSV,
     GPUResourceType_SRV,
     GPUResourceType_CBV,
     GPUResourceType_UAV

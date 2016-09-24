@@ -14,18 +14,26 @@ class IRenderableObject
 {
 public:
     IRenderableObject()
+        : m_workerType(WorkerType_PosDiffuseTex)
+        , m_renderWorkerMask(WorkerMask_PosDiffuseTex_Pass1 | WorkerMask_Lighting_Pass2)
+        , m_isRenderable(false)
     {
-        m_useRenderWorkerType = WorkerType_Max;
         m_isRenderable = false;
     }
+
     virtual ~IRenderableObject() {}
 
     virtual void        Draw(RenderContext& context) = 0;
+    virtual void        RenderContextCallback(ID3DDeviceContext& renderContext) {}
+    virtual void        OnRenderComplete() {}
 
-    RenderWorkerType    GetRenderOnWorkerType() { return m_useRenderWorkerType; }
-    bool                IsRenderable()          { return m_isRenderable; }
+    RenderWorkerType    GetRenderWorkerType()     { return m_workerType; }
+    u32                 GetRenderWorkerMask()     { return m_renderWorkerMask; }
+    bool                IsRenderable()            { return m_isRenderable; }
+
 protected:
 
-    RenderWorkerType    m_useRenderWorkerType;
+    RenderWorkerType    m_workerType;
+    u32                 m_renderWorkerMask;
     bool                m_isRenderable;
 };

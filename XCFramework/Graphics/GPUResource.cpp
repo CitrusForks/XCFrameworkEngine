@@ -63,7 +63,9 @@ void GPUResource::UploadZeroMemoryDataOnGPU(ID3DDeviceContext& context, u32 size
     XCASSERT(m_sizeOfBuffer >= sizeOfBuffer);
 
 #if defined(XCGRAPHICS_DX12)
+
     memset(m_cpuMappedResource, 0, sizeOfBuffer);
+
 #elif defined(XCGRAPHICS_DX11)
     /*
     //TODO: Map, copy and unmap. This could be called from other threads which is asserted by d3d11. So disabled currently.
@@ -80,7 +82,9 @@ void GPUResource::UploadDataOnGPU(ID3DDeviceContext& context, void* buffer, u32 
     XCASSERT(m_sizeOfBuffer >= sizeOfBuffer);
 
 #if defined(XCGRAPHICS_DX12)
+
     memcpy(m_cpuMappedResource, buffer, sizeOfBuffer);
+
 #elif defined(XCGRAPHICS_DX11)
     //Map, copy and unmap
     D3D11_MAPPED_SUBRESOURCE mappedData;

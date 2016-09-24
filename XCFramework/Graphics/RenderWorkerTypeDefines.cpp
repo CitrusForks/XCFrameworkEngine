@@ -4,17 +4,6 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
-#pragma once
+#include "GraphicsPrecompiledHeader.h"
 
-enum RenderTargetsType
-{
-    RENDERTARGET_MAIN_0,
-    RENDERTARGET_MAIN_1,
-
-    RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL,
-    RENDERTARGET_GBUFFER_LIGHTING,
-    
-    RENDERTARGET_LIVEDRIVE,
-
-    RENDERTARGET_MAX
-};
+#include "RenderWorkerTypeDefines.h"

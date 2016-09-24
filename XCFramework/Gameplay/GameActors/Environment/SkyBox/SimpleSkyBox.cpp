@@ -17,7 +17,8 @@
 
 SimpleSkyBox::SimpleSkyBox(void)
 {
-    m_useRenderWorkerType = WorkerType_SkyBox;
+    m_workerType       = WorkerType_SkyBox;
+    m_renderWorkerMask = WorkerMask_None;
 }
 
 SimpleSkyBox::~SimpleSkyBox(void)

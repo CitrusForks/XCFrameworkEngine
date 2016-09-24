@@ -21,7 +21,6 @@ Door::Door(void)
     m_material.Specular = XCVec4(0.2f, 0.2f, 0.2f, 16.0f);
 
     m_useShaderType = ShaderType_LightTexture;
-    m_useRenderWorkerType = WorkerType_XCMesh;
     m_collisionDetectionType = COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX;
 }
 

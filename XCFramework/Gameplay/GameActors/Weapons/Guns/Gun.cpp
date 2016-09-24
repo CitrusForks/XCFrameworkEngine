@@ -42,7 +42,6 @@ void Gun::PreLoad(IActor* parentActor, XCVec3& initialPosition, std::string pMes
     m_currentPosition = initialPosition;
 
     m_useShaderType = ShaderType_LightTexture;
-    m_useRenderWorkerType = WorkerType_XCMesh;
 
     m_secondaryLookAxis  = XCVec4(0, 0, 0, 0);
     m_secondaryUpAxis    = XCVec4(0, 0, 0, 0);

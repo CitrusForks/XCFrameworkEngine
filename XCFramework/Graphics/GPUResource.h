@@ -37,8 +37,6 @@ public:
 
     void AddResourceView(GPUResourceView* view);
 
-
-
     template<class Typed>
     Typed           GetGPUResourceViewTyped(GPUResourceType type)
     {

@@ -29,10 +29,10 @@ using XCVec4    = XCMath::XCFloat4;
 using XCMatrix4 = XCMath::XCMatrix;
 
 //Unaligned versions for gpu structures which are 4byte aligned and not 16-byte aligned.
-typedef XCMath::XCFloat2Unaligned     XCVec2Unaligned;
-typedef XCMath::XCFloat3Unaligned     XCVec3Unaligned;
-typedef XCMath::XCFloat4Unaligned     XCVec4Unaligned;
-typedef XCMath::XCMatrixUnaligned     XCMatrix4Unaligned;
+using XCVec2Unaligned    = XCMath::XCFloat2Unaligned;
+using XCVec3Unaligned    = XCMath::XCFloat3Unaligned;
+using XCVec4Unaligned    = XCMath::XCFloat4Unaligned;
+using XCMatrix4Unaligned = XCMath::XCMatrixUnaligned;
 
 static const f32 XC_PI        = 3.141592654f;
 static const f32 XC_2PI       = 6.283185307f;

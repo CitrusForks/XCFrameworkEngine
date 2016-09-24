@@ -37,6 +37,9 @@ public:
     //void               CreateRenderTargetView(D3D_TEXTURE2D_DESC& desc, GPUResource* gpuResource);
     void                 CreateRenderTargetView(GPUResource* gpuResource);
 
+    //Depth Target Views
+    void                 CreateDepthStencilView(GPUResource* gpuResource);
+
     //ShaderResourceViews
     void                 CreateShaderResourceView(D3D_SHADER_RESOURCE_VIEW_DESC& viewDesc, GPUResource* gpuResource);
 

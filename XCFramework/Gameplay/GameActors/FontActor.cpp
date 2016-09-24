@@ -12,8 +12,6 @@
 
 FontActor::FontActor()
 {
-    m_useRenderWorkerType = WorkerType_Misc;
-    m_useRenderWorkerType = WorkerType_XCMesh;
 }
 
 FontActor::~FontActor(void)

@@ -21,6 +21,7 @@ public:
     RenderContext();
 
     void                                Init(ID3DDevice* device, XC_ShaderContainer* shaderMgr);
+    void                                Reset();
     void                                BeginRender(RenderTargetsType targetType);
     void                                FinishRender();
     void                                Destroy();
@@ -35,17 +36,12 @@ public:
     void                                DrawNonIndexed(u32 vertexCount);
     void                                DrawIndexedInstanced(u32 _indexCount, void* indexGpuAddr = nullptr, u32 instanceCount = 1);
 
-protected:
-    void                                ReleaseCommandList();
-
 private:
     XC_ShaderContainer*                 m_shaderContainer;
     ID3DDeviceContext*                  m_deviceContext;
 
 #if defined(XCGRAPHICS_DX12)
     ID3DCommandAllocator*               m_commandAllocator;
-#elif defined(XCGRAPHICS_DX11)
-    ID3DCommandList*                    m_commandList;
 #endif
 
     XC_Graphics*                        m_graphicsSystem;

@@ -15,8 +15,6 @@
 
 #include "Engine/Thread/CriticalSection.h"
 
-class SharedDescriptorHeap;
-
 class XC_GraphicsDx12 : public XC_Graphics
 {
 public:
@@ -47,8 +45,8 @@ public:
 
     u32                         GetCurrentRTVFrameIndex() { return m_frameIndex; }
     ID3DPipelineState*          GetPipelineState() { return m_pipelineState; }
-    ID3DDepthStencilView*       GetDepthStencilView(RenderTargetsType type);
 
+    void                        SetRenderableTargetsContiguous(ID3DDeviceContext& context, std::vector<RenderTargetsType>& types, ID3DDepthStencilView* depthView);
     void                        ClearRTVAndDSV(ID3DDeviceContext* context, RenderTargetsType type);
 
 protected:
@@ -77,9 +75,6 @@ private:
     ID3D12CommandQueue*         m_pCommandQueue;
     ID3D12GraphicsCommandList*  m_graphicsCommandList;
 
-    //DepthStencilResource
-    ID3D12Resource*             m_depthStencilResource;
-
     //Fencing
     HANDLE                      m_fenceEvent;
     ID3D12Fence*                m_pFence;
@@ -90,8 +85,7 @@ private:
 
     ID3D12RootSignature*        m_rootSignature;
     ID3DPipelineState*          m_pipelineState;
-    SharedDescriptorHeap*       m_sharedDescriptorHeap;
-    GPUResourceSystem*          m_gpuResourceSystem;
+
 
     VertexBuffer<VertexPosTex>* m_renderQuadVB;
     IndexBuffer<u32>*           m_renderQuadIB;

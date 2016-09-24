@@ -77,7 +77,7 @@ protected:
     virtual void                            Draw(RenderContext& context);
     virtual void                            DrawSubMesh(RenderContext& renderContext, u32 meshIndex);
     virtual void                            DrawSubMeshes(RenderContext& renderContext);
-
+    void                                    OnRenderComplete();
 
     //Member Variables--------------------------------------------------------------------------------------------------------------------------------------------------
     std::vector<MeshData*>                  m_subMeshes;

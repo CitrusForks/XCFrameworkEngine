@@ -13,6 +13,11 @@
 #include "Graphics/XC_GraphicsDx12.h"
 #endif
 
+const u32 RenderingPool::RenderWorkerTypeMaskMap[] = { WorkerMask_None,
+                                                       WorkerMask_None,
+                                                       WorkerMask_PosDiffuseTex_Pass1 | WorkerMask_Lighting_Pass2,
+                                                       WorkerMask_None };
+
 RenderingPool::RenderingPool()
 {
 }
@@ -60,80 +65,119 @@ void RenderingPool::Destroy()
 void RenderingPool::AddRenderableObject(IRenderableObject* obj, i32 baseObjId)
 {
     //Add from main thread only.
-    RenderWorkerType workerType = obj->GetRenderOnWorkerType();
-    workerType = workerType < WorkerType_Max ? workerType : WorkerType_Misc;
+    u32 workerMask = obj->GetRenderWorkerMask();
+    RenderWorkerType workerType = obj->GetRenderWorkerType();
 
-    m_renderWorkers[workerType].m_renderableObjectRefList[baseObjId] = obj;
+    for (u32 maskIndex = 0; maskIndex < WorkerType_Max; ++maskIndex)
+    {
+        if (maskIndex == workerType || (workerMask != WorkerMask_None && workerMask & RenderWorkerTypeMaskMap[maskIndex]))
+        {
+            m_renderWorkers[maskIndex].m_renderableObjectRefList[baseObjId] = obj;
+            Logger("[Rendering Pool] Added Renderable object on worker id : %d Base Obj id : %d", maskIndex, baseObjId);
+        }
+    }
 }
 
 void RenderingPool::RemoveRenderableObject(IRenderableObject* obj, i32 baseObjId)
 {
-    RenderWorkerType workerType = obj->GetRenderOnWorkerType();
-    workerType = workerType < WorkerType_Max ? workerType : WorkerType_Misc;
+    u32 workerMask = obj->GetRenderWorkerMask();
+    RenderWorkerType workerType = obj->GetRenderWorkerType();
 
-    auto objRef = m_renderWorkers[workerType].m_renderableObjectRefList.find(baseObjId);
-    if (objRef != m_renderWorkers[workerType].m_renderableObjectRefList.end())
+    for (u32 maskIndex = 0; maskIndex < WorkerType_Max; ++maskIndex)
     {
-        m_renderWorkers[workerType].m_renderableObjectRefList.erase(objRef);
-    }
-}
-
-void RenderingPool::AddResourceDrawable(IResource* obj)
-{
-    switch (obj->GetResourceType())
-    {
-    case RESOURCETYPE_MESH:
-        m_renderWorkers[WorkerType_XCMesh].m_resourceRefList.push_back(obj);
-        break;
-
-    default:
-        Logger("Unkown resource draw request");
-        XCASSERT(false);
-    }
-}
-
-void RenderingPool::RemoveResourceDrawable(IResource* obj)
-{
-    switch (obj->GetResourceType())
-    {
-    case RESOURCETYPE_MESH:
-    {
-        auto refList = m_renderWorkers[WorkerType_XCMesh].m_resourceRefList;
-        auto objRef = std::find_if(refList.begin(), refList.end(), [obj](IResource* resource) -> bool
+        if (maskIndex == workerType || (workerMask != WorkerMask_None && workerMask & RenderWorkerTypeMaskMap[maskIndex]))
         {
-            return obj == resource;
-        });
-
-        if (objRef != refList.end())
-        {
-            m_renderWorkers[WorkerType_XCMesh].m_resourceRefList.erase(objRef);
+            auto objRef = m_renderWorkers[maskIndex].m_renderableObjectRefList.find(baseObjId);
+            if (objRef != m_renderWorkers[maskIndex].m_renderableObjectRefList.end())
+            {
+                Logger("[Rendering Pool] Removing Renderable object on worker id : %d ", maskIndex);
+                m_renderWorkers[maskIndex].m_renderableObjectRefList.erase(objRef);
+            }
         }
-        break;
-    }
-
-    default:
-        Logger("Unkown resource draw request");
-        XCASSERT(false);
     }
 }
 
-void RenderingPool::RequestResourceDeviceContext(IResource* graphicsBuffer)
+void RenderingPool::AddResourceDrawable(IRenderableObject* obj)
+{
+    u32 workerMask = obj->GetRenderWorkerMask();
+    RenderWorkerType workerType = obj->GetRenderWorkerType();
+
+    for (u32 maskIndex = 0; maskIndex < WorkerType_Max; ++maskIndex)
+    {
+        if (maskIndex == workerType || (workerMask != WorkerMask_None && workerMask & RenderWorkerTypeMaskMap[maskIndex]))
+        {
+            m_renderWorkers[maskIndex].m_resourceRefList.push_back(obj);
+            Logger("[Rendering Pool] Added Resource Drawable on worker id : %d ", maskIndex);
+        }
+    }
+}
+
+void RenderingPool::RemoveResourceDrawable(IRenderableObject* obj)
+{
+    u32 workerMask = obj->GetRenderWorkerMask();
+    RenderWorkerType workerType = obj->GetRenderWorkerType();
+
+    for (u32 maskIndex = 0; maskIndex < WorkerType_Max; ++maskIndex)
+    {
+        if (maskIndex == workerType || (workerMask != WorkerMask_None && workerMask & RenderWorkerTypeMaskMap[maskIndex]))
+        {
+            auto refList = m_renderWorkers[maskIndex].m_resourceRefList;
+            auto objRef = std::find_if(refList.begin(), refList.end(), [obj](IRenderableObject* resource) -> bool
+            {
+                return obj == resource;
+            });
+
+            if (objRef != refList.end())
+            {
+                Logger("[Rendering Pool] Removing Resource Drawable on worker id : %d ", maskIndex);
+                m_renderWorkers[maskIndex].m_resourceRefList.erase(objRef);
+            }
+        }
+    }
+}
+
+void RenderingPool::RequestResourceDeviceContext(IRenderableObject* graphicsBuffer)
 {
     m_renderWorkers[WorkerType_ResourceLoader].m_resourceRefList.push_back(graphicsBuffer);
 }
 
-void RenderingPool::Begin(RenderTargetsType targetType)
+void RenderingPool::Begin()
+{
+    BeginInternal(RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL);
+}
+
+void RenderingPool::BeginInternal(RenderTargetsType targetType)
 {
 #if defined(XCGRAPHICS_DX12)
+    m_FrameCommandList[0].Reset();
+
     //Clear the rtv and dsv
-    m_FrameCommandList[0].BeginRender(targetType);
-    m_graphicsSystem->ClearRTVAndDSV(&m_FrameCommandList[0].GetDeviceContext(), targetType);
+    m_FrameCommandList[0].BeginRender(RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL);
+    m_graphicsSystem->ClearRTVAndDSV(&m_FrameCommandList[0].GetDeviceContext(), RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL);
+
+    //Clear the second rendertarget
+    //Clear the rtv and dsv
+    m_FrameCommandList[0].BeginRender(RENDERTARGET_GBUFFER_LIGHTING);
+    m_graphicsSystem->ClearRTVAndDSV(&m_FrameCommandList[0].GetDeviceContext(), RENDERTARGET_GBUFFER_LIGHTING);
 #endif
 
     for (auto& workers : m_renderWorkers)
     {
-        workers.m_renderContext.BeginRender(targetType);
+        workers.m_renderContext.Reset();
+
+        if (workers.m_workerId == WorkerType_Lighting)
+        {
+            workers.m_renderContext.BeginRender(RENDERTARGET_GBUFFER_LIGHTING);
+        }
+        else
+        {
+            workers.m_renderContext.BeginRender(RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL);
+        }
     }
+}
+
+void RenderingPool::EndInternal()
+{
 }
 
 void RenderingPool::Render()
@@ -181,10 +225,27 @@ void RenderingPool::End()
 #endif
 
     //Now execute all cmd list
-    for (auto& workers : m_renderWorkers)
+    for (auto& worker : m_renderWorkers)
     {
         //Finish cmdlist
-        workers.m_renderContext.FinishRender();
+        worker.m_renderContext.FinishRender();
+
+        //Call render complete on all the objects
+        for (auto& obj : worker.m_renderableObjectRefList)
+        {
+            if (obj.second->IsRenderable())
+            {
+                obj.second->OnRenderComplete();
+            }
+        }
+
+        for (auto& obj : worker.m_resourceRefList)
+        {
+            if (obj->IsRenderable())
+            {
+                obj->OnRenderComplete();
+            }
+        }
     }
 }
 
@@ -210,54 +271,43 @@ i32 RenderingPool::RenderWorker::WorkerThreadFunc(void* param)
         //Wait for signal from main thread
         worker->m_beginRender.WaitEvent(1);
 
-        if (worker->m_workerId != WorkerType_ResourceLoader)
+        //if (worker->m_workerId != WorkerType_Lighting)
         {
-            //Call Render
-            for (auto& obj : worker->m_renderableObjectRefList)
+            if (worker->m_workerId != WorkerType_ResourceLoader)
             {
-                if (obj.second->IsRenderable())
+                //Call Render
+                for (auto& obj : worker->m_renderableObjectRefList)
                 {
-                    obj.second->Draw(worker->m_renderContext);
+                    if (obj.second->IsRenderable())
+                    {
+                        obj.second->Draw(worker->m_renderContext);
+                    }
                 }
-            }
-        }
 
-        //In the case of instancing mesh rendering. The WorkerType_XCMesh renders all actors first which will accumulate all instance 
-        //data and then we render the actual mesh resource.
-        if (worker->m_workerId == WorkerType_XCMesh)
-        {
-            for (auto& obj : worker->m_resourceRefList)
-            {
-                if (obj->IsLoaded())
+                //In the case of instancing mesh rendering. The WorkerType_XCMesh renders all actors first which will accumulate all instance 
+                //data and then we render the actual mesh resource.
+                for (auto& obj : worker->m_resourceRefList)
                 {
-                    obj->Draw(worker->m_renderContext);
+                    if (obj->IsRenderable())
+                    {
+                        obj->Draw(worker->m_renderContext);
+                    }
                 }
             }
-        }
-        else if (worker->m_workerId == WorkerType_ResourceLoader)
-        {
-            IResource* res = nullptr;
-            while (worker->m_resourceRefList.size() > 0)
+
+            if (worker->m_workerId == WorkerType_ResourceLoader)
             {
-                res = worker->m_resourceRefList.back();
-                switch (res->GetResourceType())
+                IRenderableObject* res = nullptr;
+
+                while (worker->m_resourceRefList.size() > 0)
                 {
-                case RESOURCETYPE_VERTEXBUFFER:
-                case RESOURCETYPE_INDEXBUFFER:
-                case RESOURCETYPE_TEXTURE2D:
-                case RESOURCETYPE_CUBETEXTURE3D:
+                    res = worker->m_resourceRefList.back();
                     res->RenderContextCallback(worker->m_renderContext.GetDeviceContext());
-                    break;
 
-                default:
-                    XCASSERT(false);
-                    break;
+                    worker->m_resourceRefList.pop_back();
                 }
-
-                worker->m_resourceRefList.pop_back();
             }
         }
-
         //Increase the semaphore to indicate that this worker has done the work.
         worker->m_finishRender.SignalEvent(1);
     }

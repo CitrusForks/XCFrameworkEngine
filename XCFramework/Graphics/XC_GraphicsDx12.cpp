@@ -26,13 +26,11 @@ XC_GraphicsDx12::XC_GraphicsDx12(void)
     , m_pCommandAllocator(nullptr)
     , m_pCommandQueue(nullptr)
     , m_graphicsCommandList(nullptr)
-    , m_depthStencilResource(nullptr)
     , m_pFence(nullptr)
     , m_frameIndex(0)
     , m_rootSignature(nullptr)
     , m_pipelineState(nullptr)
-    , m_sharedDescriptorHeap(nullptr)
-    , m_gpuResourceSystem(nullptr)
+
     , m_renderQuadVB(nullptr)
     , m_renderQuadIB(nullptr)
 {
@@ -197,7 +195,6 @@ void XC_GraphicsDx12::Destroy()
     ReleaseCOM(m_pCommandAllocator);
     ReleaseCOM(m_pCommandQueue);
     ReleaseCOM(m_graphicsCommandList);
-    ReleaseCOM(m_depthStencilResource);
     ReleaseCOM(m_rootSignature);
     ReleaseCOM(m_pipelineState);
 
@@ -326,10 +323,51 @@ void XC_GraphicsDx12::SetupRenderTargets()
     m_renderTargets[RENDERTARGET_MAIN_1]->PreLoad(m_pSwapChain);
 
     m_renderTargets[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL] = XCNEW(RenderableTexture)(RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL, *m_pD3DDevice, *m_graphicsCommandList);
-    m_renderTargets[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL]->PreLoad(false, m_ClientWidth, m_ClientHeight);
+    m_renderTargets[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL]->PreLoad(m_Enable4xMsaa & m_4xMsaaQuality, m_ClientWidth, m_ClientHeight);
+
+    m_renderTargets[RENDERTARGET_GBUFFER_LIGHTING] = XCNEW(RenderableTexture)(RENDERTARGET_GBUFFER_LIGHTING, *m_pD3DDevice, *m_graphicsCommandList);
+    m_renderTargets[RENDERTARGET_GBUFFER_LIGHTING]->PreLoad(m_Enable4xMsaa & m_4xMsaaQuality, m_ClientWidth, m_ClientHeight);
 
     m_renderTargets[RENDERTARGET_LIVEDRIVE] = XCNEW(RenderableTexture)(RENDERTARGET_LIVEDRIVE, *m_pD3DDevice, *m_graphicsCommandList);
-    m_renderTargets[RENDERTARGET_LIVEDRIVE]->PreLoad(m_4xMsaaQuality, 256, 256);
+    m_renderTargets[RENDERTARGET_LIVEDRIVE]->PreLoad(m_Enable4xMsaa & m_4xMsaaQuality, 256, 256);
+}
+
+void XC_GraphicsDx12::SetupDepthView()
+{
+    D3D12_RESOURCE_DESC depthViewResDesc = {};
+    depthViewResDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+    depthViewResDesc.Alignment = 0;
+    depthViewResDesc.MipLevels = 1;
+    depthViewResDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    depthViewResDesc.SampleDesc = { 1, 0 };
+    depthViewResDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+    depthViewResDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL | D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE;
+    depthViewResDesc.DepthOrArraySize = 1;
+
+    depthViewResDesc.Width = (UINT64)m_ScreenViewPort[RENDERTARGET_MAIN_0].Width;
+    depthViewResDesc.Height = (UINT64)m_ScreenViewPort[RENDERTARGET_MAIN_0].Height;
+    m_depthStencilResource[RENDERTARGET_MAIN_0] = m_gpuResourceSystem->CreateTextureResource(depthViewResDesc, nullptr);
+    m_gpuResourceSystem->CreateDepthStencilView(m_depthStencilResource[RENDERTARGET_MAIN_0]);
+
+    depthViewResDesc.Width = (UINT64)m_ScreenViewPort[RENDERTARGET_MAIN_1].Width;
+    depthViewResDesc.Height = (UINT64)m_ScreenViewPort[RENDERTARGET_MAIN_1].Height;
+    m_depthStencilResource[RENDERTARGET_MAIN_1] = m_gpuResourceSystem->CreateTextureResource(depthViewResDesc, nullptr);
+    m_gpuResourceSystem->CreateDepthStencilView(m_depthStencilResource[RENDERTARGET_MAIN_1]);
+
+    depthViewResDesc.Width = (UINT64)m_ScreenViewPort[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL].Width;
+    depthViewResDesc.Height = (UINT64)m_ScreenViewPort[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL].Height;
+    m_depthStencilResource[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL] = m_gpuResourceSystem->CreateTextureResource(depthViewResDesc, nullptr);
+    m_gpuResourceSystem->CreateDepthStencilView(m_depthStencilResource[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL]);
+
+    depthViewResDesc.Width = (UINT64)m_ScreenViewPort[RENDERTARGET_GBUFFER_LIGHTING].Width;
+    depthViewResDesc.Height = (UINT64)m_ScreenViewPort[RENDERTARGET_GBUFFER_LIGHTING].Height;
+    m_depthStencilResource[RENDERTARGET_GBUFFER_LIGHTING] = m_gpuResourceSystem->CreateTextureResource(depthViewResDesc, nullptr);
+    m_gpuResourceSystem->CreateDepthStencilView(m_depthStencilResource[RENDERTARGET_GBUFFER_LIGHTING]);
+
+    depthViewResDesc.Width = (UINT64)m_ScreenViewPort[RENDERTARGET_LIVEDRIVE].Width;
+    depthViewResDesc.Height = (UINT64)m_ScreenViewPort[RENDERTARGET_LIVEDRIVE].Height;
+    m_depthStencilResource[RENDERTARGET_LIVEDRIVE] = m_gpuResourceSystem->CreateTextureResource(depthViewResDesc, nullptr);
+    m_gpuResourceSystem->CreateDepthStencilView(m_depthStencilResource[RENDERTARGET_LIVEDRIVE]);
 }
 
 void XC_GraphicsDx12::CreateDescriptorHeaps()
@@ -340,8 +378,8 @@ void XC_GraphicsDx12::CreateDescriptorHeaps()
     m_sharedDescriptorHeap = (SharedDescriptorHeap*)&container.CreateNewSystem("SharedDescriptorHeap");
 
     m_sharedDescriptorHeap->Init(*m_pD3DDevice
-        , RENDERTARGET_MAX //No of RTV's
-        , 1 //No of DSV's
+        , RENDERTARGET_MAX + 1 //No of RTV's
+        , RENDERTARGET_MAX + 1 //No of DSV's
         , 1 //No of Samplers
 #if defined(LOAD_SHADERS_FROM_DATA)
         , 100 //No of CBV, UAV combined
@@ -364,44 +402,6 @@ void XC_GraphicsDx12::CreateGPUResourceSystem()
     container.RegisterSystem<GPUResourceSystem>("GPUResourceSystem");
     m_gpuResourceSystem = (GPUResourceSystem*)&container.CreateNewSystem("GPUResourceSystem");
     m_gpuResourceSystem->Init(*m_pD3DDevice);
-}
-
-void XC_GraphicsDx12::SetupDepthView()
-{
-    D3D12_RESOURCE_DESC depthViewResDesc = {};
-    depthViewResDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-    depthViewResDesc.Alignment = 0;
-    depthViewResDesc.Width = (UINT64)m_ScreenViewPort[RENDERTARGET_MAIN_0].Width;
-    depthViewResDesc.Height= (UINT64)m_ScreenViewPort[RENDERTARGET_MAIN_0].Height;
-    depthViewResDesc.MipLevels = 1;
-    depthViewResDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-    depthViewResDesc.SampleDesc = {1, 0};
-    depthViewResDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-    depthViewResDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL | D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE;
-    depthViewResDesc.DepthOrArraySize = 1;
-
-    D3D12_CLEAR_VALUE clearValue;
-    clearValue.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-    clearValue.DepthStencil.Depth = 1.0f;
-    clearValue.DepthStencil.Stencil = 0;
-
-    D3D12_HEAP_PROPERTIES heapProps = {};
-    heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
-    heapProps.CreationNodeMask = 1;
-    heapProps.VisibleNodeMask = 1;
-
-    ValidateResult(m_pD3DDevice->CreateCommittedResource(
-        &heapProps,
-        D3D12_HEAP_FLAG_NONE,
-        &depthViewResDesc,
-        D3D12_RESOURCE_STATE_DEPTH_WRITE,
-        &clearValue,
-        IID_PPV_ARGS(&m_depthStencilResource)));
-
-    D3D12_CPU_DESCRIPTOR_HANDLE& dsvCPUHandle = m_sharedDescriptorHeap->GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV).m_cbvCPUOffsetHandle;
-    m_pD3DDevice->CreateDepthStencilView(m_depthStencilResource, nullptr, dsvCPUHandle);
-
-    //SetResourceBarrier(m_graphicsCommandList, m_depthStencilResource, D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_READ);
 }
 
 void XC_GraphicsDx12::SetupRenderQuad()
@@ -449,18 +449,19 @@ void XC_GraphicsDx12::BeginScene()
     ValidateResult(m_graphicsCommandList->Reset(m_pCommandAllocator, m_pipelineState));
 
     m_graphicsCommandList->SetGraphicsRootSignature(m_rootSignature);
-    m_graphicsCommandList->RSSetViewports(1, &m_ScreenViewPort[RENDERTARGET_MAIN_0]);
+    m_graphicsCommandList->RSSetViewports(1, &m_ScreenViewPort[m_frameIndex]);
     m_graphicsCommandList->RSSetScissorRects(1, &m_scissorRect);
 
     SetResourceBarrier(m_graphicsCommandList, m_renderTargets[m_frameIndex]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
     SetResourceBarrier(m_graphicsCommandList, m_renderTargets[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
+    SetResourceBarrier(m_graphicsCommandList, m_renderTargets[RENDERTARGET_GBUFFER_LIGHTING]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
-    m_renderTargets[m_frameIndex]->SetRenderableTarget(*m_graphicsCommandList, nullptr);
-    m_renderTargets[m_frameIndex]->ClearRenderTarget(*m_graphicsCommandList, m_depthStencilResource, XCVec4(1.0f, 0.0f, 0.0f, 1.0f));
+    m_renderTargets[m_frameIndex]->SetRenderableTarget(*m_graphicsCommandList, m_depthStencilResource[m_frameIndex]);
+    m_renderTargets[m_frameIndex]->ClearRenderTarget(*m_graphicsCommandList, m_depthStencilResource[m_frameIndex], XCVec4(1.0f, 1.0f, 1.0f, 1.0f));
 
     //Set descriptor heaps
-    ID3D12DescriptorHeap* ppHeaps[] = { m_sharedDescriptorHeap->GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV).m_heapDesc, 
-        m_sharedDescriptorHeap->GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER).m_heapDesc};
+    ID3D12DescriptorHeap* ppHeaps[] = { m_sharedDescriptorHeap->GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV).m_heapDesc,
+    m_sharedDescriptorHeap->GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER).m_heapDesc};
     m_graphicsCommandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 
 #if defined(DEBUG_GRAPHICS_PIPELINE)
@@ -470,7 +471,7 @@ void XC_GraphicsDx12::BeginScene()
     m_graphicsCommandList->DrawInstanced(3, 1, 0, 0);
 #endif
 
-    m_renderingPool->Begin(RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL);
+    m_renderingPool->Begin();
 }
 
 void XC_GraphicsDx12::EndScene()
@@ -484,6 +485,7 @@ void XC_GraphicsDx12::EndScene()
 
     //Draw post processed render target
     SetResourceBarrier(m_graphicsCommandList, m_renderTargets[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+    SetResourceBarrier(m_graphicsCommandList, m_renderTargets[RENDERTARGET_GBUFFER_LIGHTING]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
     m_XCShaderSystem->ApplyShader(*m_graphicsCommandList, ShaderType_RenderTexture);
 
@@ -511,13 +513,24 @@ void XC_GraphicsDx12::EndScene()
 
 void XC_GraphicsDx12::ClearRTVAndDSV(ID3DDeviceContext* context, RenderTargetsType type)
 {
-    m_renderTargets[type]->ClearRenderTarget(*context, nullptr, m_clearColor);
+    m_renderTargets[type]->ClearRenderTarget(*context, m_depthStencilResource[type], m_clearColor);
 }
 
-ID3DDepthStencilView* XC_GraphicsDx12::GetDepthStencilView(RenderTargetsType type)
+void XC_GraphicsDx12::SetRenderableTargetsContiguous(ID3DDeviceContext& context, std::vector<RenderTargetsType>& types, ID3DDepthStencilView* depthView)
 {
-    XCASSERT(false);
-    return nullptr;
+#if defined(XCGRAPHICS_DX11)
+    context.OMSetRenderTargets(1, &m_pRenderTargetResource->GetPointerToGPUResourceViewTyped<ID3D11RenderTargetView*>(GPUResourceType_RTV), depthView);
+#elif defined(XCGRAPHICS_DX12)
+    
+    SharedDescriptorHeap& descHeap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
+    context.OMSetRenderTargets(types.size(), &m_renderTargets[types.front()]->GetRenderTargetResource()->GetResourceView(GPUResourceType_RTV)->GetCPUResourceViewHandle()
+        , false  //this states that the handles to render targets are adjacent to each other.
+        , &descHeap.GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV).m_heapDesc->GetCPUDescriptorHandleForHeapStart());
+
+#elif defined(XCGRAPHICS_GNM)
+    context.setRenderTarget(0, m_pRenderTargetView);
+    context.setDepthRenderTarget(&m_gnmDepthTarget);
+#endif
 }
 
 void XC_GraphicsDx12::WaitForPreviousFrameCompletion()

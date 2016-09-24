@@ -13,6 +13,7 @@
 #include "Graphics/RenderTargetTypes.h"
 
 class GPUResourceSystem;
+class SharedDescriptorHeap;
 
 class XC_Graphics : public ISystem
 {
@@ -30,7 +31,7 @@ public:
 
     virtual u32                     GetCurrentRTVFrameIndex() = 0;
     virtual ID3DDeviceContext*      GetDeviceContext() = 0;
-    virtual ID3DDepthStencilView*   GetDepthStencilView(RenderTargetsType type) = 0;
+    virtual GPUResource*            GetDepthStencilView(RenderTargetsType type) { return m_depthStencilResource[type]; };
     virtual ID3DPipelineState*      GetPipelineState() { return nullptr; }
 
     virtual void                    GoFullscreen(bool go);
@@ -77,7 +78,11 @@ protected:
     XC_ShaderContainer*             m_XCShaderSystem;
 
     RenderingPool*                  m_renderingPool;
+    SharedDescriptorHeap*           m_sharedDescriptorHeap;
+    GPUResourceSystem*              m_gpuResourceSystem;
+
     RenderableTexture*              m_renderTargets[RENDERTARGET_MAX];
+    GPUResource*                    m_depthStencilResource[RENDERTARGET_MAX];
 
     D3D_VIEWPORT                    m_ScreenViewPort[RENDERTARGET_MAX];
     D3D_RECT                        m_scissorRect;

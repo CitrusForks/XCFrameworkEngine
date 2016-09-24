@@ -7,11 +7,13 @@
 #pragma once
 
 #include "Engine/Resource/ResourceTypes.h"
+#include "Graphics/IRenderableObject.h"
+
 #include "Assets/Packages/PackageConsts.h"
 
 class RenderContext;
 
-class IResource : public IBase
+class IResource : public IBase, public IRenderableObject
 {
 public:
     
@@ -38,7 +40,6 @@ public:
 
     virtual void            UpdateState();
     virtual void            Update(f32 dt) {}
-    virtual void            Draw() {}
     virtual void            Draw(RenderContext& context) {}
 
     virtual void            RenderContextCallback(ID3DDeviceContext& renderContext);

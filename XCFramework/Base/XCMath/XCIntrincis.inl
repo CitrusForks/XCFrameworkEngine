@@ -92,13 +92,13 @@ namespace XCMath
         PackedVector4 outVector;
 
         //Find the length of the vector.
-        float length = 1.0f / VectorLength<Components>(vec);
+        float inverseLength = 1.0f / VectorLength<Components>(vec);
 
-        if (length > 0)
+        if (inverseLength > 0)
         {
             for (unsigned int componentIndex = 0; componentIndex < Components; ++componentIndex)
             {
-                outVector[componentIndex] = vec[componentIndex] * length;
+                outVector[componentIndex] = vec[componentIndex] * inverseLength;
             }
         }
         else

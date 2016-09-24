@@ -16,8 +16,6 @@
 #include "Graphics/VertexBuffer.h"
 #include "Graphics/IndexBuffer.h"
 
-class SharedDescriptorHeap;
-
 class XC_GraphicsDx11 : public XC_Graphics
 {
 public:
@@ -43,8 +41,6 @@ public:
     void                        TurnOnZ();
     void                        SetLessEqualDepthStencilView(ID3DDeviceContext& context, bool turnOn);
 
-    ID3DDepthStencilView*       GetDepthStencilView(RenderTargetsType type) { return type != RENDERTARGET_LIVEDRIVE ? m_pDepthStencilView : m_pDepthStencilViewLiveDrive; }
-
 protected:
     void                        CreateDescriptorHeaps();
     void                        CreateGPUResourceSystem();
@@ -55,7 +51,6 @@ protected:
     void                        SetupRenderTargets();
     void                        SetupRenderQuad();
 
-    void                        SetupDepthStencilBuffer();
     void                        SetupDepthStencilStates();
     void                        SetupDepthView();
     void                        SetupViewPort();
@@ -64,8 +59,6 @@ private:
     ID3DSwapChain*              m_pSwapChain;
     DXGI_SWAP_CHAIN_DESC        m_SwapChainDesc;
     IDXGIFactory*               m_pdxgiFactory;
-    D3D_TEXTURE2D_DESC          m_depthBufferDesc;
-    D3D_TEXTURE2D_DESC          m_depthBufferDescLiveDrive;
 
     ID3DDeviceContext*          m_pD3DDeviceContext;
 
@@ -73,18 +66,10 @@ private:
     VertexBuffer<VertexPosTex>* m_renderQuadVB;
     IndexBuffer<u32>*           m_renderQuadIB;
 
-    ID3D11Texture2D*            m_pDepthStencilBuffer;
-    ID3DDepthStencilView*       m_pDepthStencilView;
-    ID3D11Texture2D*            m_pDepthStencilBufferLiveDrive;
-    ID3DDepthStencilView*       m_pDepthStencilViewLiveDrive;
-
     ID3DDepthStencilState*      m_depthStencilState;
     ID3DDepthStencilState*      m_depthDisabledStencilState;
     ID3DDepthStencilState*      m_depthStencilLessEqualState;
     
     D3D_FEATURE_LEVEL           m_featureLevel;
-
-    SharedDescriptorHeap*       m_sharedDescriptorHeap;
-    GPUResourceSystem*          m_gpuResourceSystem;
 };
 #endif

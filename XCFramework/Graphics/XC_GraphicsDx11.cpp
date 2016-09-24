@@ -12,10 +12,10 @@
 
 #include "Graphics/RenderingPool.h"
 #include "Graphics/XC_Shaders/XC_VertexShaderLayout.h"
-#include "Graphics/SharedDescriptorHeap.h"
 #include "Graphics/XC_Textures/RenderableTexture.h"
 #include "Graphics/XC_Shaders/XC_ShaderHandle.h"
 #include "Graphics/GPUResourceSystem.h"
+#include "Graphics/SharedDescriptorHeap.h"
 
 XC_GraphicsDx11::XC_GraphicsDx11(void)
     : m_pSwapChain(nullptr)
@@ -24,15 +24,9 @@ XC_GraphicsDx11::XC_GraphicsDx11(void)
     , m_pRenderTargetView(nullptr)
     , m_renderQuadVB(nullptr)
     , m_renderQuadIB(nullptr)
-    , m_pDepthStencilBuffer(nullptr)
-    , m_pDepthStencilView(nullptr)
-    , m_pDepthStencilBufferLiveDrive(nullptr)
-    , m_pDepthStencilViewLiveDrive(nullptr)
     , m_depthStencilState(nullptr)
     , m_depthDisabledStencilState(nullptr)
     , m_depthStencilLessEqualState(nullptr)
-    , m_sharedDescriptorHeap(nullptr)
-    , m_gpuResourceSystem(nullptr)
 {
 }
 
@@ -56,8 +50,6 @@ void XC_GraphicsDx11::Destroy()
     ReleaseCOM(m_pdxgiFactory);
     ReleaseCOM(m_pSwapChain);
     ReleaseCOM(m_pRenderTargetView);
-    ReleaseCOM(m_pDepthStencilBuffer);
-    ReleaseCOM(m_pDepthStencilView);
     ReleaseCOM(m_depthDisabledStencilState);
 }
 
@@ -77,11 +69,10 @@ void XC_GraphicsDx11::SetupPipeline()
     CreateDescriptorHeaps();
     CreateGPUResourceSystem();
 
-    SetupRenderTargets();
-    SetupDepthStencilBuffer();
-    SetupDepthStencilStates();
-    SetupDepthView();
     SetupViewPort();
+    SetupRenderTargets();
+    SetupDepthView();
+    SetupDepthStencilStates();
 
     SetupShadersAndRenderPool();
 
@@ -96,8 +87,8 @@ void XC_GraphicsDx11::CreateDescriptorHeaps()
     m_sharedDescriptorHeap = (SharedDescriptorHeap*)&container.CreateNewSystem("SharedDescriptorHeap");
 
     m_sharedDescriptorHeap->Init(*m_pD3DDevice
-        , 2 //No of RTV's
-        , 1 //No of DSV's
+        , RENDERTARGET_MAX + 1 //No of RTV's
+        , RENDERTARGET_MAX + 1 //No of DSV's
         , 1 //No of Samplers
         , 100 //No of CBV, UAV combined
     );
@@ -191,6 +182,9 @@ void XC_GraphicsDx11::SetupRenderTargets()
     m_renderTargets[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL] = XCNEW(RenderableTexture)(RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL, *m_pD3DDevice, *m_pD3DDeviceContext);
     m_renderTargets[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL]->PreLoad(m_Enable4xMsaa && m_4xMsaaQuality, m_ClientWidth, m_ClientHeight);
 
+    m_renderTargets[RENDERTARGET_GBUFFER_LIGHTING] = XCNEW(RenderableTexture)(RENDERTARGET_GBUFFER_LIGHTING, *m_pD3DDevice, *m_pD3DDeviceContext);
+    m_renderTargets[RENDERTARGET_GBUFFER_LIGHTING]->PreLoad(m_Enable4xMsaa && m_4xMsaaQuality, m_ClientWidth, m_ClientHeight);
+
     m_renderTargets[RENDERTARGET_LIVEDRIVE] = XCNEW(RenderableTexture)(RENDERTARGET_LIVEDRIVE, *m_pD3DDevice, *m_pD3DDeviceContext);
     m_renderTargets[RENDERTARGET_LIVEDRIVE]->PreLoad(m_Enable4xMsaa && m_4xMsaaQuality, 256, 256);
 }
@@ -215,59 +209,6 @@ void XC_GraphicsDx11::SetupRenderQuad()
     });
 
     m_renderQuadIB->BuildIndexBuffer(m_pD3DDeviceContext);
-}
-
-void XC_GraphicsDx11::SetupDepthStencilBuffer()
-{
-    //Create Depth Buffer & view
-    m_depthBufferDesc.Width = m_ClientWidth;
-    m_depthBufferDesc.Height = m_ClientHeight;
-    m_depthBufferDesc.MipLevels = 1;
-    m_depthBufferDesc.ArraySize = 1;
-    m_depthBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-
-    if (m_Enable4xMsaa)
-    {
-        m_depthBufferDesc.SampleDesc.Count = 4;
-        m_depthBufferDesc.SampleDesc.Quality = m_4xMsaaQuality - 1;
-    }
-    else
-    {
-        m_depthBufferDesc.SampleDesc.Count = 1;
-        m_depthBufferDesc.SampleDesc.Quality = 0;
-    }
-
-    m_depthBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-    m_depthBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-    m_depthBufferDesc.CPUAccessFlags = 0;
-    m_depthBufferDesc.MiscFlags = 0;
-
-    ValidateResult(m_pD3DDevice->CreateTexture2D(&m_depthBufferDesc, 0, &m_pDepthStencilBuffer));
-
-    //Create Depth buffer & view for live drive
-    m_depthBufferDescLiveDrive.Width = 256;
-    m_depthBufferDescLiveDrive.Height = 256;
-    m_depthBufferDescLiveDrive.MipLevels = 1;
-    m_depthBufferDescLiveDrive.ArraySize = 1;
-    m_depthBufferDescLiveDrive.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-
-    if (m_Enable4xMsaa)
-    {
-        m_depthBufferDescLiveDrive.SampleDesc.Count = 4;
-        m_depthBufferDescLiveDrive.SampleDesc.Quality = m_4xMsaaQuality - 1;
-    }
-    else
-    {
-        m_depthBufferDescLiveDrive.SampleDesc.Count = 1;
-        m_depthBufferDescLiveDrive.SampleDesc.Quality = 0;
-    }
-
-    m_depthBufferDescLiveDrive.Usage = D3D11_USAGE_DEFAULT;
-    m_depthBufferDescLiveDrive.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-    m_depthBufferDescLiveDrive.CPUAccessFlags = 0;
-    m_depthBufferDescLiveDrive.MiscFlags = 0;
-
-    ValidateResult(m_pD3DDevice->CreateTexture2D(&m_depthBufferDescLiveDrive, 0, &m_pDepthStencilBufferLiveDrive));
 }
 
 void XC_GraphicsDx11::SetupDepthStencilStates()
@@ -329,25 +270,47 @@ void XC_GraphicsDx11::SetupDepthStencilStates()
 
 void XC_GraphicsDx11::SetupDepthView()
 {
-    // Set up the depth stencil view description.
-    D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
-    ZeroMemory(&depthStencilViewDesc, sizeof(depthStencilViewDesc));
+    //Create Depth Buffer & view
+    D3D_TEXTURE2D_DESC depthBufferDesc = {};
+    depthBufferDesc.MipLevels = 1;
+    depthBufferDesc.ArraySize = 1;
+    depthBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
-    depthStencilViewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-    depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMS;
-    depthStencilViewDesc.Texture2D.MipSlice = 0;
+    if (m_Enable4xMsaa)
+    {
+        depthBufferDesc.SampleDesc.Count = 4;
+        depthBufferDesc.SampleDesc.Quality = m_4xMsaaQuality - 1;
+    }
+    else
+    {
+        depthBufferDesc.SampleDesc.Count = 1;
+        depthBufferDesc.SampleDesc.Quality = 0;
+    }
 
-    // Create the depth stencil view.
-    ValidateResult(m_pD3DDevice->CreateDepthStencilView(m_pDepthStencilBuffer, &depthStencilViewDesc, &m_pDepthStencilView));
+    depthBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+    depthBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+    depthBufferDesc.CPUAccessFlags = 0;
+    depthBufferDesc.MiscFlags = 0;
 
-    //Binding the view to the output merger stage
-    m_renderTargets[RENDERTARGET_MAIN_0]->SetRenderableTarget(*m_pD3DDeviceContext, m_pDepthStencilView);
+    depthBufferDesc.Width = (UINT64)m_ScreenViewPort[RENDERTARGET_MAIN_0].Width;
+    depthBufferDesc.Height = (UINT64)m_ScreenViewPort[RENDERTARGET_MAIN_0].Height;
+    m_depthStencilResource[RENDERTARGET_MAIN_0] = m_gpuResourceSystem->CreateTextureResource(depthBufferDesc, nullptr);
+    m_gpuResourceSystem->CreateDepthStencilView(m_depthStencilResource[RENDERTARGET_MAIN_0]);
 
-    // Create the depth stencil view.
-    ValidateResult(m_pD3DDevice->CreateDepthStencilView(m_pDepthStencilBufferLiveDrive, &depthStencilViewDesc, &m_pDepthStencilViewLiveDrive));
+    depthBufferDesc.Width = (UINT64)m_ScreenViewPort[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL].Width;
+    depthBufferDesc.Height = (UINT64)m_ScreenViewPort[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL].Height;
+    m_depthStencilResource[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL] = m_gpuResourceSystem->CreateTextureResource(depthBufferDesc, nullptr);
+    m_gpuResourceSystem->CreateDepthStencilView(m_depthStencilResource[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL]);
 
-    //Binding the view to the output merger stage for Live Drive
-    m_renderTargets[RENDERTARGET_LIVEDRIVE]->SetRenderableTarget(*m_pD3DDeviceContext, m_pDepthStencilViewLiveDrive);
+    depthBufferDesc.Width = (UINT64)m_ScreenViewPort[RENDERTARGET_GBUFFER_LIGHTING].Width;
+    depthBufferDesc.Height = (UINT64)m_ScreenViewPort[RENDERTARGET_GBUFFER_LIGHTING].Height;
+    m_depthStencilResource[RENDERTARGET_GBUFFER_LIGHTING] = m_gpuResourceSystem->CreateTextureResource(depthBufferDesc, nullptr);
+    m_gpuResourceSystem->CreateDepthStencilView(m_depthStencilResource[RENDERTARGET_GBUFFER_LIGHTING]);
+
+    depthBufferDesc.Width = (UINT64)m_ScreenViewPort[RENDERTARGET_LIVEDRIVE].Width;
+    depthBufferDesc.Height = (UINT64)m_ScreenViewPort[RENDERTARGET_LIVEDRIVE].Height;
+    m_depthStencilResource[RENDERTARGET_LIVEDRIVE] = m_gpuResourceSystem->CreateTextureResource(depthBufferDesc, nullptr);
+    m_gpuResourceSystem->CreateDepthStencilView(m_depthStencilResource[RENDERTARGET_LIVEDRIVE]);
 }
 
 void XC_GraphicsDx11::SetupViewPort()
@@ -364,10 +327,10 @@ void XC_GraphicsDx11::BeginScene()
 {
     m_pD3DDeviceContext->RSSetViewports(1, &m_ScreenViewPort[RENDERTARGET_MAIN_0]);
 
-    m_renderTargets[RENDERTARGET_MAIN_0]->SetRenderableTarget(*m_pD3DDeviceContext, m_pDepthStencilView);
-    m_renderTargets[RENDERTARGET_MAIN_0]->ClearRenderTarget(*m_pD3DDeviceContext, m_pDepthStencilView, m_clearColor);
+    m_renderTargets[RENDERTARGET_MAIN_0]->SetRenderableTarget(*m_pD3DDeviceContext, m_depthStencilResource[RENDERTARGET_MAIN_0]);
+    m_renderTargets[RENDERTARGET_MAIN_0]->ClearRenderTarget(*m_pD3DDeviceContext, m_depthStencilResource[RENDERTARGET_MAIN_0], m_clearColor);
 
-    m_renderingPool->Begin(RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL);
+    m_renderingPool->Begin();
 }
 
 void XC_GraphicsDx11::BeginSecondaryScene()
@@ -375,7 +338,7 @@ void XC_GraphicsDx11::BeginSecondaryScene()
     SetSecondaryDrawCall(true);
     
     //TurnOffZ();
-    m_renderingPool->Begin(RENDERTARGET_LIVEDRIVE);
+    m_renderingPool->Begin();
 }
 
 void XC_GraphicsDx11::EndSecondaryScene()
@@ -389,11 +352,6 @@ void XC_GraphicsDx11::EndScene()
     m_renderingPool->End();
 
     //Draw post processed render target
-    m_pD3DDeviceContext->RSSetViewports(1, &m_ScreenViewPort[RENDERTARGET_MAIN_0]);
-
-    m_renderTargets[RENDERTARGET_MAIN_0]->SetRenderableTarget(*m_pD3DDeviceContext, m_pDepthStencilView);
-    m_renderTargets[RENDERTARGET_MAIN_0]->ClearRenderTarget(*m_pD3DDeviceContext, m_pDepthStencilView, m_clearColor);
-
     m_XCShaderSystem->ApplyShader(*m_pD3DDeviceContext, ShaderType_RenderTexture);
 
     XCShaderHandle* shaderHandle = (XCShaderHandle*)m_XCShaderSystem->GetShader(ShaderType_RenderTexture);
@@ -437,27 +395,38 @@ void XC_GraphicsDx11::OnResize(i32 _width, i32 _height)
         m_ClientWidth = _width;
         m_ClientHeight = _height;
 
-        m_pDepthStencilBuffer->Release();
         m_renderTargets[RENDERTARGET_MAIN_0]->OnResize();
-        m_pDepthStencilView->Release();
 
         m_pSwapChain->ResizeBuffers(1, m_ClientWidth, m_ClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
+
+        //Reset the Screen ViewPort
+        SetupViewPort();
 
         //Create RenderTargetView
         m_renderTargets[RENDERTARGET_MAIN_0]->PreLoad(m_pSwapChain);
 
-        //Reset the Backbuffer and depth buffer
-        m_depthBufferDesc.Width = m_ClientWidth;
-        m_depthBufferDesc.Height = m_ClientHeight;
+        //Reset the depth stencil
+        D3D_TEXTURE2D_DESC depthDesc = {};
+        m_depthStencilResource[RENDERTARGET_MAIN_0]->GetResource<ID3D11Texture2D*>()->GetDesc(&depthDesc);
+        m_gpuResourceSystem->DestroyResource(m_depthStencilResource[RENDERTARGET_MAIN_0]);
+        depthDesc.Width = m_ClientWidth;
+        depthDesc.Height = m_ClientHeight;
+        m_depthStencilResource[RENDERTARGET_MAIN_0] = m_gpuResourceSystem->CreateTextureResource(depthDesc, nullptr);
+        m_gpuResourceSystem->CreateDepthStencilView(m_depthStencilResource[RENDERTARGET_MAIN_0]);
 
-        ValidateResult(m_pD3DDevice->CreateTexture2D(&m_depthBufferDesc, 0, &m_pDepthStencilBuffer));
-        ValidateResult(m_pD3DDevice->CreateDepthStencilView(m_pDepthStencilBuffer, 0, &m_pDepthStencilView));
+        m_depthStencilResource[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL]->GetResource<ID3D11Texture2D*>()->GetDesc(&depthDesc);
+        m_gpuResourceSystem->DestroyResource(m_depthStencilResource[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL]);
+        depthDesc.Width = m_ClientWidth;
+        depthDesc.Height = m_ClientHeight;
+        m_depthStencilResource[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL] = m_gpuResourceSystem->CreateTextureResource(depthDesc, nullptr);
+        m_gpuResourceSystem->CreateDepthStencilView(m_depthStencilResource[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL]);
 
-        //Binding the view to the output merger stage
-        m_renderTargets[RENDERTARGET_MAIN_0]->SetRenderableTarget(*m_pD3DDeviceContext, m_pDepthStencilView);
-
-        //Reset the Screen ViewPort
-        SetupViewPort();
+        m_depthStencilResource[RENDERTARGET_GBUFFER_LIGHTING]->GetResource<ID3D11Texture2D*>()->GetDesc(&depthDesc);
+        m_gpuResourceSystem->DestroyResource(m_depthStencilResource[RENDERTARGET_GBUFFER_LIGHTING]);
+        depthDesc.Width = m_ClientWidth;
+        depthDesc.Height = m_ClientHeight;
+        m_depthStencilResource[RENDERTARGET_GBUFFER_LIGHTING] = m_gpuResourceSystem->CreateTextureResource(depthDesc, nullptr);
+        m_gpuResourceSystem->CreateDepthStencilView(m_depthStencilResource[RENDERTARGET_GBUFFER_LIGHTING]);
     }
 }
 #endif

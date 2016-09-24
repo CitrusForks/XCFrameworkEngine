@@ -51,16 +51,23 @@ void RenderContext::Destroy()
 #endif
 }
 
+void RenderContext::Reset()
+{
+#if defined(XCGRAPHICS_DX12)
+
+    ValidateResult(m_commandAllocator->Reset());
+    ValidateResult(m_deviceContext->Reset(m_commandAllocator, m_graphicsSystem->GetPipelineState()));
+#elif defined(XCGRAPHICS_DX11)
+    m_deviceContext->ClearState();
+#endif
+}
+
 void RenderContext::BeginRender(RenderTargetsType targetType)
 {
 #if defined(USE_IMMEDIATE_CONTEXT)
 
 #else
     #if defined(XCGRAPHICS_DX12)
-
-        ValidateResult(m_commandAllocator->Reset());
-        ValidateResult(m_deviceContext->Reset(m_commandAllocator, m_graphicsSystem->GetPipelineState()));
-    
         m_deviceContext->RSSetViewports(1, &m_graphicsSystem->GetViewPort(targetType));
         m_deviceContext->RSSetScissorRects(1, &m_graphicsSystem->GetScissorRect());
     
@@ -69,8 +76,8 @@ void RenderContext::BeginRender(RenderTargetsType targetType)
         m_deviceContext->OMSetRenderTargets(1,
             &m_graphicsSystem->GetRenderTexture(targetType).GetRenderTargetResource()->GetResourceView(GPUResourceType_RTV)->GetCPUResourceViewHandle(),
             false,
-            &heap.GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV).m_cbvCPUOffsetHandle);
-    
+            &m_graphicsSystem->GetDepthStencilView(targetType)->GetResourceView(GPUResourceType_DSV)->GetCPUResourceViewHandle());
+
         //Set descriptor heaps
         ID3D12DescriptorHeap* ppHeaps[] = { heap.GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV).m_heapDesc, 
             heap.GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER).m_heapDesc };
@@ -79,10 +86,9 @@ void RenderContext::BeginRender(RenderTargetsType targetType)
     
     #elif defined(XCGRAPHICS_DX11)
     
-        m_deviceContext->ClearState();
         m_deviceContext->RSSetViewports(1, &m_graphicsSystem->GetViewPort(targetType));
 
-        m_graphicsSystem->GetRenderTexture(targetType).SetRenderableTarget(*m_deviceContext, m_graphicsSystem->GetDepthStencilView(targetType));
+        m_graphicsSystem->GetRenderTexture(targetType).SetRenderableTarget(*m_deviceContext, m_graphicsSystem->GetDepthStencilView(RENDERTARGET_MAIN_0));
     
     #elif defined(XCGRAPHICS_GNM)
         m_graphicsSystem->GetRenderTexture(targetType).SetRenderableTarget(m_deviceContext, nullptr);
@@ -99,21 +105,15 @@ void RenderContext::FinishRender()
         //Cmdlist Close can happen here when in multiple render context.
         ValidateResult(m_deviceContext->Close());
     #elif defined(XCGRAPHICS_DX11)
-        m_deviceContext->FinishCommandList(false, &m_commandList);
+        ID3DCommandList* commandList;
+        m_deviceContext->FinishCommandList(false, &commandList);
 
         //Execute on main device context
-        m_graphicsSystem->GetDeviceContext()->ExecuteCommandList(m_commandList, false);
+        m_graphicsSystem->GetDeviceContext()->ExecuteCommandList(commandList, true);
+        ReleaseCOM(commandList);
+
         m_shaderContainer->ClearShaderAndRenderStates(*m_deviceContext);
-
-        ReleaseCommandList();
     #endif
-#endif
-}
-
-void RenderContext::ReleaseCommandList()
-{
-#if defined(XCGRAPHICS_DX11)
-    ReleaseCOM(m_commandList);
 #endif
 }
 

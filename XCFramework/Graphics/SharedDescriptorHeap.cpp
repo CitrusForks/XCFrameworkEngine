@@ -35,7 +35,7 @@ void SharedDescriptorHeap::Init(ID3DDevice& device, u32 nbOfRTVDesc, u32 nbOfDSV
     //Create descriptor heap for Depth Shader View
     //Allocate on heap
     D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc = {};
-    dsvHeapDesc.NumDescriptors = 1;
+    dsvHeapDesc.NumDescriptors = nbOfDSVDesc;
     dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
     dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
     m_heapDesc[D3D12_DESCRIPTOR_HEAP_TYPE_DSV] = CreateHeapDesc(dsvHeapDesc);
