@@ -50,13 +50,14 @@ void RenderableTexture::Destroy()
     {
         GPUResourceSystem& gpuSys = (GPUResourceSystem&) SystemLocator::GetInstance()->RequestSystem("GPUResourceSystem");
         gpuSys.DestroyResource(m_pRenderTargetResource);
+        m_pRenderTargetResource = nullptr;
     }
 }
 
 void RenderableTexture::OnResize()
 {
 #if defined(XCGRAPHICS_DX11) || defined(XCGRAPHICS_DX12)
-    m_pRenderTargetResource->GetResource<ID3D11Resource*>()->Release();
+    m_pRenderTargetResource->GetResource<ID3DResource*>()->Release();
 #endif
 }
 

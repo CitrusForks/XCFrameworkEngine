@@ -79,6 +79,7 @@ GPUResource* SharedDescriptorHeap::AllocateGPUResource(GPUResourceType type, u32
         {
             outRes = res;
             outRes->Destroy();
+            outRes->SetInUse(true);
             break;
         }
     }
@@ -87,10 +88,10 @@ GPUResource* SharedDescriptorHeap::AllocateGPUResource(GPUResourceType type, u32
     {
         //Create new
         outRes = XCNEW(GPUResource)(type, sizeOfBuffer);
-    }
+        outRes->SetInUse(true);
 
-    outRes->SetInUse(true);
-    m_gpuResources.push_back(outRes);
+        m_gpuResources.push_back(outRes);
+    }
 
     return outRes;
 }
@@ -107,6 +108,7 @@ GPUResourceView* SharedDescriptorHeap::AllocateGPUResourceView(GPUResourceType t
         {
             outView = view;
             outView->Destroy();
+            outView->SetInUse(true);
             break;
         }
     }
@@ -115,10 +117,11 @@ GPUResourceView* SharedDescriptorHeap::AllocateGPUResourceView(GPUResourceType t
     {
         //Create new
         outView = XCNEW(GPUResourceView)(type);
+        outView->SetInUse(true);
+
+        m_gpuResourcesView.push_back(outView);
     }
 
-    outView->SetInUse(true);
-    m_gpuResourcesView.push_back(outView);
 
     m_cs.Exit();
 

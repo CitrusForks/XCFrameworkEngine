@@ -70,6 +70,11 @@ public:
         return (u32*&)m_cpuMappedResource;
     }
 
+    bool IsValid()
+    {
+        return m_gpuResource != nullptr;
+    }
+
 private:
     ID3DResource*                 m_gpuResource;
     u32*                          m_cpuMappedResource;

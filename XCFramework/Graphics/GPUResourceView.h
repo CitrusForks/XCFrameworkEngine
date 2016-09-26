@@ -45,6 +45,15 @@ public:
         return (T&)m_resourceView;
     }
 
+    bool IsValid()
+    {
+#if defined(XCGRAPHICS_DX12)
+        return m_cpuHandle.ptr != 0;
+#elif defined(XC_GRAPHICSDX11)
+        return m_resourceView != nullptr;
+#endif
+    }
+
 private:
     GPU_DESCRIPTOR_HANDLE        m_gpuHandle;
     CPU_DESCRIPTOR_HANDLE        m_cpuHandle;

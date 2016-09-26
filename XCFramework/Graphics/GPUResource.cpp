@@ -20,6 +20,8 @@ void GPUResource::Destroy()
         view->Destroy();
     }
 
+    m_resourceViews.clear();
+
     //Destroy the views
     if (m_cpuMappedResource != nullptr)
     {

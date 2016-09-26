@@ -25,6 +25,8 @@ GPUResourceView::~GPUResourceView()
 
 void GPUResourceView::Destroy()
 {
+    m_isInUse = false;
+
 #if defined(XCGRAPHICS_DX11)
     ReleaseCOM(m_cpuHandle);
     ReleaseCOM(m_gpuHandle);

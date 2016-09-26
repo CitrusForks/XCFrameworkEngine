@@ -23,7 +23,7 @@ GPUResource* GPUResourceSystem::CreateConstantBufferResource(GPUResourceDesc& de
     SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
     GPUResource* resource = heap.AllocateGPUResource(desc.m_bufferType, desc.m_bufferSize);
 
-    if (resource != nullptr)
+    if (resource != nullptr && !resource->IsValid())
     {
         XCASSERT(desc.m_bufferSize);
 
@@ -71,7 +71,7 @@ void GPUResourceSystem::CreateConstantBufferView(GPUResource* res)
     SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
     GPUResourceView* resourceView = heap.AllocateGPUResourceView(GPUResourceType_CBV);
 
-    if (resourceView != nullptr)
+    if (resourceView != nullptr && !resourceView->IsValid())
     {
         XCASSERT(res->GetResourceSize());
 
@@ -115,7 +115,7 @@ GPUResource* GPUResourceSystem::CreateRenderTextureResource(ID3DSwapChain* swapC
     SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
     GPUResource* resource = heap.AllocateGPUResource(GPUResourceType_RTV, 0);
 
-    if (resource != nullptr)
+    if (resource != nullptr && !resource->IsValid())
     {
 #if defined(XCGRAPHICS_DX12)
         //Create Desc heap for shader specific.
@@ -157,7 +157,7 @@ GPUResource* GPUResourceSystem::CreateTextureResource(D3D_TEXTURE2D_DESC& textur
     SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
     GPUResource* resource = heap.AllocateGPUResource(resourceType, 0);
 
-    if (resource != nullptr)
+    if (resource != nullptr && !resource->IsValid())
     {
 #if defined(XCGRAPHICS_DX12)
         D3D12_HEAP_PROPERTIES heapProps = {};
@@ -207,12 +207,12 @@ void GPUResourceSystem::CreateShaderResourceView(D3D_SHADER_RESOURCE_VIEW_DESC& 
     SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
     GPUResourceView* resourceView = heap.AllocateGPUResourceView(GPUResourceType_SRV);
 
-    if (resourceView != nullptr)
+    if (resourceView != nullptr && !resourceView->IsValid())
     {
 #if defined(XCGRAPHICS_DX12)
         SharedDescriptorHeap::HeapDesc& desc = heap.GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-        m_device->CreateShaderResourceView(gpuResource->GetResource<ID3D12Resource*>(), &viewDesc, desc.m_cbvCPUOffsetHandle);
+        m_device->CreateShaderResourceView(gpuResource->GetResource<ID3DResource*>(), &viewDesc, desc.m_cbvCPUOffsetHandle);
 
         resourceView->SetCPUResourceViewHandle(desc.m_cbvCPUOffsetHandle);
         resourceView->SetGPUResourceViewHandle(desc.m_cbvGPUOffsetHandle);
@@ -223,7 +223,7 @@ void GPUResourceSystem::CreateShaderResourceView(D3D_SHADER_RESOURCE_VIEW_DESC& 
 
 #elif defined(XCGRAPHICS_DX11)
         // Create srv
-        m_device->CreateShaderResourceView(gpuResource->GetResource<ID3D11Resource*>(), &viewDesc, &resourceView->GetPointerToResourceView<ID3D11ShaderResourceView*>());
+        m_device->CreateShaderResourceView(gpuResource->GetResource<ID3DResource*>(), &viewDesc, &resourceView->GetPointerToResourceView<ID3D11ShaderResourceView*>());
 #endif
     }
     else
@@ -239,7 +239,7 @@ void GPUResourceSystem::CreateRenderTargetView(GPUResource* gpuResource)
     SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
     GPUResourceView* resourceView = heap.AllocateGPUResourceView(GPUResourceType_RTV);
 
-    if (resourceView != nullptr)
+    if (resourceView != nullptr && !resourceView->IsValid())
     {
 #if defined(XCGRAPHICS_DX12)
 
@@ -289,7 +289,7 @@ void GPUResourceSystem::CreateDepthStencilView(GPUResource* gpuResource)
     SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
     GPUResourceView* resourceView = heap.AllocateGPUResourceView(GPUResourceType_DSV);
 
-    if (resourceView != nullptr)
+    if (resourceView != nullptr && !resourceView->IsValid())
     {
 #if defined(XCGRAPHICS_DX12)
 

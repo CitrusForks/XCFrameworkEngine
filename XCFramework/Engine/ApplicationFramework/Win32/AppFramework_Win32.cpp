@@ -200,6 +200,8 @@ LRESULT AppFramework_Win32::MsgProc(HWND hwnd, u32 msg,WPARAM wParam,LPARAM lPar
                     m_clientWidth = clientRect.right;
                     m_clientHeight = clientRect.bottom;
                     m_AppPaused = false;
+                    
+                    //TODO : WIP. Crashes on dx12
                     //OnResize();
                     
                     return 0;

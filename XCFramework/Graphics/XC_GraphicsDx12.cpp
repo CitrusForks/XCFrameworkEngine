@@ -27,7 +27,6 @@ XC_GraphicsDx12::XC_GraphicsDx12(void)
     , m_pCommandQueue(nullptr)
     , m_graphicsCommandList(nullptr)
     , m_pFence(nullptr)
-    , m_frameIndex(0)
     , m_rootSignature(nullptr)
     , m_pipelineState(nullptr)
 
@@ -573,11 +572,46 @@ void XC_GraphicsDx12::OnResize(i32 _width, i32 _height)
         m_ClientWidth = _width;
         m_ClientHeight = _height;
 
-        m_pSwapChain->ResizeBuffers(1, m_ClientWidth, m_ClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
+        m_renderTargets[RENDERTARGET_MAIN_0]->OnResize();
+        m_renderTargets[RENDERTARGET_MAIN_1]->OnResize();
+
+        m_renderTargets[RENDERTARGET_MAIN_0]->Destroy();
+        m_renderTargets[RENDERTARGET_MAIN_1]->Destroy();
+        m_renderTargets[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL]->Destroy();
+        m_renderTargets[RENDERTARGET_GBUFFER_LIGHTING]->Destroy();
+
+        m_pSwapChain->ResizeBuffers(0, m_ClientWidth, m_ClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
         
         SetupViewPort();
 
-        //TODO resize the RTV & depth buffers.
+        //Create RenderTargetView
+        m_renderTargets[RENDERTARGET_MAIN_0]->PreLoad(m_pSwapChain);
+        m_renderTargets[RENDERTARGET_MAIN_1]->PreLoad(m_pSwapChain);
+        m_renderTargets[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL]->PreLoad(m_Enable4xMsaa & m_4xMsaaQuality, m_ClientWidth, m_ClientHeight);
+        m_renderTargets[RENDERTARGET_GBUFFER_LIGHTING]->PreLoad(m_Enable4xMsaa & m_4xMsaaQuality, m_ClientWidth, m_ClientHeight);
+
+        //Reset the depth stencil
+        D3D_TEXTURE2D_DESC depthDesc = m_depthStencilResource[RENDERTARGET_MAIN_0]->GetResource<ID3D12Resource*>()->GetDesc();
+        m_gpuResourceSystem->DestroyResource(m_depthStencilResource[RENDERTARGET_MAIN_0]);
+        depthDesc.Width = m_ClientWidth;
+        depthDesc.Height = m_ClientHeight;
+        m_depthStencilResource[RENDERTARGET_MAIN_0] = m_gpuResourceSystem->CreateTextureResource(depthDesc, nullptr);
+        m_gpuResourceSystem->CreateDepthStencilView(m_depthStencilResource[RENDERTARGET_MAIN_0]);
+
+        depthDesc = m_depthStencilResource[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL]->GetResource<ID3D12Resource*>()->GetDesc();
+        m_gpuResourceSystem->DestroyResource(m_depthStencilResource[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL]);
+        depthDesc.Width = m_ClientWidth;
+        depthDesc.Height = m_ClientHeight;
+        m_depthStencilResource[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL] = m_gpuResourceSystem->CreateTextureResource(depthDesc, nullptr);
+        m_gpuResourceSystem->CreateDepthStencilView(m_depthStencilResource[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL]);
+
+        depthDesc = m_depthStencilResource[RENDERTARGET_GBUFFER_LIGHTING]->GetResource<ID3D12Resource*>()->GetDesc();
+        m_gpuResourceSystem->DestroyResource(m_depthStencilResource[RENDERTARGET_GBUFFER_LIGHTING]);
+        depthDesc.Width = m_ClientWidth;
+        depthDesc.Height = m_ClientHeight;
+        m_depthStencilResource[RENDERTARGET_GBUFFER_LIGHTING] = m_gpuResourceSystem->CreateTextureResource(depthDesc, nullptr);
+        m_gpuResourceSystem->CreateDepthStencilView(m_depthStencilResource[RENDERTARGET_GBUFFER_LIGHTING]);
+
     }
 }
 
