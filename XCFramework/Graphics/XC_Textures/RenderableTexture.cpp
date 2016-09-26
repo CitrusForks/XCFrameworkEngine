@@ -210,39 +210,6 @@ void RenderableTexture::Update()
 #endif
 }
 
-void RenderableTexture::SetRenderableTarget(ID3DDeviceContext& context, GPUResource* depthView)
-{
-#if defined(XCGRAPHICS_DX11)
-    context.OMSetRenderTargets(1, &m_pRenderTargetResource->GetPointerToGPUResourceViewTyped<ID3D11RenderTargetView*>(GPUResourceType_RTV), depthView->GetGPUResourceViewTyped<ID3DDepthStencilView*>(GPUResourceType_DSV));
-#elif defined(XCGRAPHICS_DX12)
-    SharedDescriptorHeap& descHeap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
-    context.OMSetRenderTargets(1, &m_pRenderTargetResource->GetResourceView(GPUResourceType_RTV)->GetCPUResourceViewHandle()
-        , false
-        , &depthView->GetResourceView(GPUResourceType_DSV)->GetCPUResourceViewHandle());
-#elif defined(XCGRAPHICS_GNM)
-    context.setRenderTarget(0, m_pRenderTargetView);
-    context.setDepthRenderTarget(&m_gnmDepthTarget);
-#endif
-}
-
-void RenderableTexture::ClearRenderTarget(ID3DDeviceContext& context, GPUResource* depthView, const XCVec4& xmColor)
-{
-    const f32 color[] = { xmColor.Get<X>(), xmColor.Get<Y>(), xmColor.Get<Z>(), xmColor.Get<W>() };
-
-#if defined(XCGRAPHICS_DX11)
-    context.ClearRenderTargetView(m_pRenderTargetResource->GetGPUResourceViewTyped<ID3D11RenderTargetView*>(GPUResourceType_RTV), color);
-    context.ClearDepthStencilView(depthView->GetGPUResourceViewTyped<ID3DDepthStencilView*>(GPUResourceType_DSV), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-#elif defined(XCGRAPHICS_DX12)
-    SharedDescriptorHeap& descHeap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
-
-    context.ClearRenderTargetView(m_pRenderTargetResource->GetResourceView(GPUResourceType_RTV)->GetCPUResourceViewHandle()
-        , color
-        , 0
-        , nullptr);
-    context.ClearDepthStencilView(depthView->GetResourceView(GPUResourceType_DSV)->GetCPUResourceViewHandle(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
-#endif
-}
-
 #pragma region LiveDriveSpecifics
 void RenderableTexture::DumpTextureToFile()
 {

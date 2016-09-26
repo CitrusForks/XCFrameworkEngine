@@ -291,8 +291,8 @@ void XCShaderHandle::GenerateRootSignature()
 
     ValidateResult(D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signature, &errors));
     
-    m_pso->CreateRootSignature(m_device, signature->GetBufferPointer(), signature->GetBufferSize(), PSOType_RASTER_FILL_SOLID);
-    m_pso->CreateRootSignature(m_device, signature->GetBufferPointer(), signature->GetBufferSize(), PSOType_RASTER_FILL_WIREFRAME);
+    m_pso->CreateRootSignature(m_device, signature->GetBufferPointer(), signature->GetBufferSize(), RasterType_FillSolid);
+    m_pso->CreateRootSignature(m_device, signature->GetBufferPointer(), signature->GetBufferSize(), RasterType_FillWireframe);
 
     ReleaseCOM(signature);
     ReleaseCOM(errors);
@@ -302,35 +302,39 @@ void XCShaderHandle::GenerateRootSignature()
 void XCShaderHandle::GeneratePSO()
 {
 #if defined(XCGRAPHICS_DX12)
-    //Generate PSO
-    PSO_Dx12::GenerateDefaultPSO(m_pso, PSOType_RASTER_FILL_SOLID);
-    PSO_Dx12::GenerateDefaultPSO(m_pso, PSOType_RASTER_FILL_WIREFRAME);
+    //Fetch the output parameters of the pixel shader for MRT mapping.
+    D3D_SHADER_DESC desc = {};
+    m_psShaderReflection->GetDesc(&desc);
 
-    m_pso->m_psos[PSOType_RASTER_FILL_SOLID].m_psoDesc.InputLayout     = m_inputLayoutDesc;
-    m_pso->m_psos[PSOType_RASTER_FILL_WIREFRAME].m_psoDesc.InputLayout = m_inputLayoutDesc;
+    //Generate PSO
+    PSO_Dx12::GenerateDefaultPSO(m_pso, PSODesc(RasterType_FillSolid, desc.OutputParameters));
+    PSO_Dx12::GenerateDefaultPSO(m_pso, PSODesc(RasterType_FillWireframe, desc.OutputParameters));
+
+    m_pso->m_psos[RasterType_FillSolid].m_psoDesc.InputLayout     = m_inputLayoutDesc;
+    m_pso->m_psos[RasterType_FillWireframe].m_psoDesc.InputLayout = m_inputLayoutDesc;
 
 #if defined(USE_D3D_COMPILER)
-    m_pso->m_psos[PSOType_RASTER_FILL_SOLID].m_psoDesc.VS = { reinterpret_cast<UINT8*>(m_pVS->GetBufferPointer()), m_pVS->GetBufferSize() };
-    m_pso->m_psos[PSOType_RASTER_FILL_SOLID].m_psoDesc.PS = { reinterpret_cast<UINT8*>(m_pPS->GetBufferPointer()), m_pPS->GetBufferSize() };
+    m_pso->m_psos[RasterType_FillSolid].m_psoDesc.VS = { reinterpret_cast<UINT8*>(m_pVS->GetBufferPointer()), m_pVS->GetBufferSize() };
+    m_pso->m_psos[RasterType_FillSolid].m_psoDesc.PS = { reinterpret_cast<UINT8*>(m_pPS->GetBufferPointer()), m_pPS->GetBufferSize() };
 #else
-    m_pso->m_psos[PSOType_RASTER_FILL_SOLID].m_psoDesc.VS = { m_pVS, m_vsSize };
-    m_pso->m_psos[PSOType_RASTER_FILL_SOLID].m_psoDesc.PS = { m_pPS, m_psSize };
+    m_pso->m_psos[RasterType_FillSolid].m_psoDesc.VS = { m_pVS, m_vsSize };
+    m_pso->m_psos[RasterType_FillSolid].m_psoDesc.PS = { m_pPS, m_psSize };
 #endif
 
 #if defined(USE_D3D_COMPILER)
-    m_pso->m_psos[PSOType_RASTER_FILL_WIREFRAME].m_psoDesc.VS = { reinterpret_cast<UINT8*>(m_pVS->GetBufferPointer()), m_pVS->GetBufferSize() };
-    m_pso->m_psos[PSOType_RASTER_FILL_WIREFRAME].m_psoDesc.PS = { reinterpret_cast<UINT8*>(m_pPS->GetBufferPointer()), m_pPS->GetBufferSize() };
+    m_pso->m_psos[RasterType_FillWireframe].m_psoDesc.VS = { reinterpret_cast<UINT8*>(m_pVS->GetBufferPointer()), m_pVS->GetBufferSize() };
+    m_pso->m_psos[RasterType_FillWireframe].m_psoDesc.PS = { reinterpret_cast<UINT8*>(m_pPS->GetBufferPointer()), m_pPS->GetBufferSize() };
 #else
-    m_pso->m_psos[PSOType_RASTER_FILL_WIREFRAME].m_psoDesc.VS = { m_pVS, m_vsSize };
-    m_pso->m_psos[PSOType_RASTER_FILL_WIREFRAME].m_psoDesc.PS = { m_pPS, m_psSize };
+    m_pso->m_psos[RasterType_FillWireframe].m_psoDesc.VS = { m_pVS, m_vsSize };
+    m_pso->m_psos[RasterType_FillWireframe].m_psoDesc.PS = { m_pPS, m_psSize };
 #endif
 
     //Check the depth enable.
-    m_pso->m_psos[PSOType_RASTER_FILL_SOLID].m_psoDesc.DepthStencilState.DepthEnable     = m_enableDepth;
-    m_pso->m_psos[PSOType_RASTER_FILL_WIREFRAME].m_psoDesc.DepthStencilState.DepthEnable = m_enableDepth;
+    m_pso->m_psos[RasterType_FillSolid].m_psoDesc.DepthStencilState.DepthEnable     = m_enableDepth;
+    m_pso->m_psos[RasterType_FillWireframe].m_psoDesc.DepthStencilState.DepthEnable = m_enableDepth;
 
-    m_pso->CreateGraphicPSO(m_device, PSOType_RASTER_FILL_SOLID);
-    m_pso->CreateGraphicPSO(m_device, PSOType_RASTER_FILL_WIREFRAME);
+    m_pso->CreateGraphicPSO(m_device, RasterType_FillSolid);
+    m_pso->CreateGraphicPSO(m_device, RasterType_FillWireframe);
 
 #elif defined(XCGRAPHICS_DX11)
     ValidateResult(m_device.CreateInputLayout(m_inputLayoutDesc.pInputElementDescs, m_inputLayoutDesc.NumElements, m_pVS, m_vsSize, &m_inputLayout));

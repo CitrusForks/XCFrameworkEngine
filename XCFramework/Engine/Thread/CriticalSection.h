@@ -21,7 +21,6 @@ public:
     ~CriticalSection(void);
 
     void                        Create(bool isOwner = false, std::string mutexName = "Mutex");
-
     void                        Enter(i32 timeOut = INFINITE);
     void                        Exit();
     CS&                         GetRawMutex() { return m_mutex; }

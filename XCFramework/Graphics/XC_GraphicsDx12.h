@@ -41,13 +41,11 @@ public:
     ID3DDeviceContext*          GetDeviceContext()              { return m_graphicsCommandList; }
 
     void                        OnResize(i32 _width, i32 _height);
-    void                        SetClearColor(XCVec4& color)    { m_clearColor = color; }
 
-    u32                         GetCurrentRTVFrameIndex() { return m_frameIndex; }
     ID3DPipelineState*          GetPipelineState() { return m_pipelineState; }
 
-    void                        SetRenderableTargetsContiguous(ID3DDeviceContext& context, std::vector<RenderTargetsType>& types, ID3DDepthStencilView* depthView);
-    void                        ClearRTVAndDSV(ID3DDeviceContext* context, RenderTargetsType type);
+    void                        SetRenderableTargets(ID3DDeviceContext& context, const std::vector<RenderTargetsType>& types) override;
+    void                        ClearRTVAndDSVs(ID3DDeviceContext& context, std::vector<RenderTargetsType>& type, XCVec4& clearColor) override;
 
 protected:
     
@@ -80,12 +78,8 @@ private:
     ID3D12Fence*                m_pFence;
     UINT64                      m_fenceValue;
 
-    //FrameIndex
-    u32                         m_frameIndex;
-
     ID3D12RootSignature*        m_rootSignature;
     ID3DPipelineState*          m_pipelineState;
-
 
     VertexBuffer<VertexPosTex>* m_renderQuadVB;
     IndexBuffer<u32>*           m_renderQuadIB;

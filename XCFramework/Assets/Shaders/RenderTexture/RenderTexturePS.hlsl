@@ -19,9 +19,17 @@ struct VSOutput
     float2 Tex      : TEXCOORD;
 };
 
+struct PixelOut
+{
+    float4 RenderTarget0 : SV_Target0;
+};
+
 float4 PSMain(VSOutput input) : SV_TARGET
 {
     float4 finalColor = gTexture.Sample(samLinear, input.Tex);
+
+    PixelOut outColors;
+    outColors.RenderTarget0 = finalColor;
 
     return finalColor;
 }

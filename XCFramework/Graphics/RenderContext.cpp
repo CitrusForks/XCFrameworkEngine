@@ -34,7 +34,7 @@ void RenderContext::Init(ID3DDevice* device, XC_ShaderContainer* shaderMgr)
             0,
             D3D12_COMMAND_LIST_TYPE_DIRECT,
             m_commandAllocator,
-            m_shaderContainer->GetShader(ShaderType_SolidColor)->GetPso().m_psos[PSOType_RASTER_FILL_SOLID].m_pPso,
+            m_shaderContainer->GetShader(ShaderType_SolidColor)->GetPso().m_psos[RasterType_FillSolid].m_pPso,
             IID_PPV_ARGS(&m_deviceContext)));
     
         ValidateResult(m_deviceContext->Close());
@@ -62,33 +62,33 @@ void RenderContext::Reset()
 #endif
 }
 
-void RenderContext::BeginRender(RenderTargetsType targetType)
+void RenderContext::BeginRender(std::vector<RenderTargetsType>& targetType)
 {
+    D3D_VIEWPORT& viewPort = m_graphicsSystem->GetViewPort(targetType.front());
+    XCASSERT(viewPort.Width > 0 && viewPort.Height > 0);
+
 #if defined(USE_IMMEDIATE_CONTEXT)
 
 #else
     #if defined(XCGRAPHICS_DX12)
-        m_deviceContext->RSSetViewports(1, &m_graphicsSystem->GetViewPort(targetType));
-        m_deviceContext->RSSetScissorRects(1, &m_graphicsSystem->GetScissorRect());
-    
-        SharedDescriptorHeap& heap = SystemLocator::GetInstance()->RequestSystem<SharedDescriptorHeap>("SharedDescriptorHeap");
 
-        m_deviceContext->OMSetRenderTargets(1,
-            &m_graphicsSystem->GetRenderTexture(targetType).GetRenderTargetResource()->GetResourceView(GPUResourceType_RTV)->GetCPUResourceViewHandle(),
-            false,
-            &m_graphicsSystem->GetDepthStencilView(targetType)->GetResourceView(GPUResourceType_DSV)->GetCPUResourceViewHandle());
+        m_deviceContext->RSSetViewports(1, &viewPort);
+        m_deviceContext->RSSetScissorRects(1, &m_graphicsSystem->GetScissorRect());
+
+        m_graphicsSystem->SetRenderableTargets(*m_deviceContext, targetType);
 
         //Set descriptor heaps
+        SharedDescriptorHeap& heap = SystemLocator::GetInstance()->RequestSystem<SharedDescriptorHeap>("SharedDescriptorHeap");
         ID3D12DescriptorHeap* ppHeaps[] = { heap.GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV).m_heapDesc, 
             heap.GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER).m_heapDesc };
 
         m_deviceContext->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
-    
+
     #elif defined(XCGRAPHICS_DX11)
     
-        m_deviceContext->RSSetViewports(1, &m_graphicsSystem->GetViewPort(targetType));
+        m_deviceContext->RSSetViewports(1, &m_graphicsSystem->GetViewPort(targetType.front()));
 
-        m_graphicsSystem->GetRenderTexture(targetType).SetRenderableTarget(*m_deviceContext, m_graphicsSystem->GetDepthStencilView(RENDERTARGET_MAIN_0));
+        m_graphicsSystem->SetRenderableTargets(*m_deviceContext, targetType);
     
     #elif defined(XCGRAPHICS_GNM)
         m_graphicsSystem->GetRenderTexture(targetType).SetRenderableTarget(m_deviceContext, nullptr);

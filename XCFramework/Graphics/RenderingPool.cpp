@@ -15,7 +15,6 @@
 
 const u32 RenderingPool::RenderWorkerTypeMaskMap[] = { WorkerMask_None,
                                                        WorkerMask_None,
-                                                       WorkerMask_PosDiffuseTex_Pass1 | WorkerMask_Lighting_Pass2,
                                                        WorkerMask_None };
 
 RenderingPool::RenderingPool()
@@ -141,43 +140,19 @@ void RenderingPool::RequestResourceDeviceContext(IRenderableObject* graphicsBuff
     m_renderWorkers[WorkerType_ResourceLoader].m_resourceRefList.push_back(graphicsBuffer);
 }
 
-void RenderingPool::Begin()
+void RenderingPool::Begin(std::vector<RenderTargetsType>& targetTypes)
 {
-    BeginInternal(RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL);
-}
-
-void RenderingPool::BeginInternal(RenderTargetsType targetType)
-{
-#if defined(XCGRAPHICS_DX12)
     m_FrameCommandList[0].Reset();
 
     //Clear the rtv and dsv
-    m_FrameCommandList[0].BeginRender(RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL);
-    m_graphicsSystem->ClearRTVAndDSV(&m_FrameCommandList[0].GetDeviceContext(), RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL);
-
-    //Clear the second rendertarget
-    //Clear the rtv and dsv
-    m_FrameCommandList[0].BeginRender(RENDERTARGET_GBUFFER_LIGHTING);
-    m_graphicsSystem->ClearRTVAndDSV(&m_FrameCommandList[0].GetDeviceContext(), RENDERTARGET_GBUFFER_LIGHTING);
-#endif
+    m_FrameCommandList[0].BeginRender(targetTypes);
+    m_graphicsSystem->ClearRTVAndDSVs(m_FrameCommandList[0].GetDeviceContext(), targetTypes, XCVec4(1.0f, 1.0f, 1.0f, 1.0f));
 
     for (auto& workers : m_renderWorkers)
     {
         workers.m_renderContext.Reset();
-
-        if (workers.m_workerId == WorkerType_Lighting)
-        {
-            workers.m_renderContext.BeginRender(RENDERTARGET_GBUFFER_LIGHTING);
-        }
-        else
-        {
-            workers.m_renderContext.BeginRender(RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL);
-        }
+        workers.m_renderContext.BeginRender(targetTypes);
     }
-}
-
-void RenderingPool::EndInternal()
-{
 }
 
 void RenderingPool::Render()
@@ -220,9 +195,7 @@ void RenderingPool::Render()
 
 void RenderingPool::End()
 {
-#if defined(XCGRAPHICS_DX12)
     m_FrameCommandList[0].FinishRender();
-#endif
 
     //Now execute all cmd list
     for (auto& worker : m_renderWorkers)
@@ -317,6 +290,9 @@ i32 RenderingPool::RenderWorker::WorkerThreadFunc(void* param)
 
 void RenderingPool::RenderWorker::Destroy()
 {
+    m_resourceRefList.clear();
+    m_renderableObjectRefList.clear();
+
     m_renderContext.Destroy();
     m_workerThread.Join();
 

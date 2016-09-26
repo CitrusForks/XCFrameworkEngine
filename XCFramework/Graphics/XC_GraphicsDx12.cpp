@@ -456,8 +456,11 @@ void XC_GraphicsDx12::BeginScene()
     SetResourceBarrier(m_graphicsCommandList, m_renderTargets[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
     SetResourceBarrier(m_graphicsCommandList, m_renderTargets[RENDERTARGET_GBUFFER_LIGHTING]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
-    m_renderTargets[m_frameIndex]->SetRenderableTarget(*m_graphicsCommandList, m_depthStencilResource[m_frameIndex]);
-    m_renderTargets[m_frameIndex]->ClearRenderTarget(*m_graphicsCommandList, m_depthStencilResource[m_frameIndex], XCVec4(1.0f, 1.0f, 1.0f, 1.0f));
+    //On immediate context, we only want to work on current frame render target, so set and clear
+    std::vector<RenderTargetsType> rtvs = { (RenderTargetsType) m_frameIndex };
+
+    SetRenderableTargets(*m_graphicsCommandList, rtvs);
+    ClearRTVAndDSVs(*m_graphicsCommandList, rtvs, XCVec4(1.0f, 1.0f, 1.0f, 1.0f));
 
     //Set descriptor heaps
     ID3D12DescriptorHeap* ppHeaps[] = { m_sharedDescriptorHeap->GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV).m_heapDesc,
@@ -471,7 +474,11 @@ void XC_GraphicsDx12::BeginScene()
     m_graphicsCommandList->DrawInstanced(3, 1, 0, 0);
 #endif
 
-    m_renderingPool->Begin();
+    //On deferred context, we work on multiple render targets for deferred lighting. So work on them.
+    rtvs.push_back(RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL); 
+    rtvs.push_back(RENDERTARGET_GBUFFER_LIGHTING );
+
+    m_renderingPool->Begin(rtvs);
 }
 
 void XC_GraphicsDx12::EndScene()
@@ -490,13 +497,14 @@ void XC_GraphicsDx12::EndScene()
     m_XCShaderSystem->ApplyShader(*m_graphicsCommandList, ShaderType_RenderTexture);
 
     XCShaderHandle* shaderHandle = (XCShaderHandle*)m_XCShaderSystem->GetShader(ShaderType_RenderTexture);
-    shaderHandle->SetResource("gTexture", *m_graphicsCommandList, m_renderTargets[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL]->GetRenderTargetResource());
+    shaderHandle->SetResource("gTexture", *m_graphicsCommandList, m_renderTargets[RENDERTARGET_GBUFFER_LIGHTING]->GetRenderTargetResource());
 
     shaderHandle->SetVertexBuffer(*m_graphicsCommandList, m_renderQuadVB);
     shaderHandle->SetIndexBuffer(*m_graphicsCommandList, *m_renderQuadIB);
 
     m_graphicsCommandList->DrawIndexedInstanced(m_renderQuadIB->m_indexData.size(), 1, 0, 0, 0);
 
+    //Present
     SetResourceBarrier(m_graphicsCommandList, m_renderTargets[m_frameIndex]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
     ValidateResult(m_graphicsCommandList->Close());
 
@@ -511,26 +519,36 @@ void XC_GraphicsDx12::EndScene()
     WaitForPreviousFrameCompletion();
 }
 
-void XC_GraphicsDx12::ClearRTVAndDSV(ID3DDeviceContext* context, RenderTargetsType type)
+void XC_GraphicsDx12::ClearRTVAndDSVs(ID3DDeviceContext& context, std::vector<RenderTargetsType>& type, XCVec4& clearColor)
 {
-    m_renderTargets[type]->ClearRenderTarget(*context, m_depthStencilResource[type], m_clearColor);
+    const f32 color[] = { clearColor.Get<X>(), clearColor.Get<Y>(), clearColor.Get<Z>(), clearColor.Get<W>() };
+
+    for (u32 rIndex = 0; rIndex < type.size(); ++rIndex)
+    {
+        context.ClearRenderTargetView(m_renderTargets[type[rIndex]]->GetRenderTargetResource()->GetResourceView(GPUResourceType_RTV)->GetCPUResourceViewHandle()
+            , color
+            , 0
+            , nullptr);
+
+        context.ClearDepthStencilView(m_depthStencilResource[type[rIndex]]->GetResourceView(GPUResourceType_DSV)->GetCPUResourceViewHandle(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+    }
 }
 
-void XC_GraphicsDx12::SetRenderableTargetsContiguous(ID3DDeviceContext& context, std::vector<RenderTargetsType>& types, ID3DDepthStencilView* depthView)
+void XC_GraphicsDx12::SetRenderableTargets(ID3DDeviceContext& context, const std::vector<RenderTargetsType>& types)
 {
-#if defined(XCGRAPHICS_DX11)
-    context.OMSetRenderTargets(1, &m_pRenderTargetResource->GetPointerToGPUResourceViewTyped<ID3D11RenderTargetView*>(GPUResourceType_RTV), depthView);
-#elif defined(XCGRAPHICS_DX12)
-    
-    SharedDescriptorHeap& descHeap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
-    context.OMSetRenderTargets(types.size(), &m_renderTargets[types.front()]->GetRenderTargetResource()->GetResourceView(GPUResourceType_RTV)->GetCPUResourceViewHandle()
-        , false  //this states that the handles to render targets are adjacent to each other.
-        , &descHeap.GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV).m_heapDesc->GetCPUDescriptorHandleForHeapStart());
+    //Create a list of all the rtv's & dsv's that are going to be used
+    D3D12_CPU_DESCRIPTOR_HANDLE rtvDescHandle[RENDERTARGET_MAX];
+    D3D12_CPU_DESCRIPTOR_HANDLE depthDescHandle[RENDERTARGET_MAX];
 
-#elif defined(XCGRAPHICS_GNM)
-    context.setRenderTarget(0, m_pRenderTargetView);
-    context.setDepthRenderTarget(&m_gnmDepthTarget);
-#endif
+    for (u32 rIndex = 0; rIndex < types.size(); ++rIndex)
+    {
+        rtvDescHandle[rIndex]   = m_renderTargets[types[rIndex]]->GetRenderTargetResource()->GetResourceView(GPUResourceType_RTV)->GetCPUResourceViewHandle();
+        depthDescHandle[rIndex] = m_depthStencilResource[types[rIndex]]->GetResourceView(GPUResourceType_DSV)->GetCPUResourceViewHandle();
+    }
+
+    context.OMSetRenderTargets(types.size(), &rtvDescHandle[0]
+        , false  //this states that the input cpu handle is a array of handles pointing to rtvs
+        , depthDescHandle);
 }
 
 void XC_GraphicsDx12::WaitForPreviousFrameCompletion()
@@ -558,6 +576,8 @@ void XC_GraphicsDx12::OnResize(i32 _width, i32 _height)
         m_pSwapChain->ResizeBuffers(1, m_ClientWidth, m_ClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
         
         SetupViewPort();
+
+        //TODO resize the RTV & depth buffers.
     }
 }
 

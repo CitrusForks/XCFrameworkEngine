@@ -29,7 +29,6 @@ public:
     virtual void                    Update(f32 dt);
     virtual void                    Destroy();
 
-    virtual u32                     GetCurrentRTVFrameIndex() = 0;
     virtual ID3DDeviceContext*      GetDeviceContext() = 0;
     virtual GPUResource*            GetDepthStencilView(RenderTargetsType type) { return m_depthStencilResource[type]; };
     virtual ID3DPipelineState*      GetPipelineState() { return nullptr; }
@@ -37,13 +36,13 @@ public:
     virtual void                    GoFullscreen(bool go);
     virtual void                    OnResize(i32 _width, i32 _height);
 
-    virtual void                    SetClearColor(const XCVec4& color) { m_clearColor = color; }
-
     virtual void                    TurnOffZ();
     virtual void                    TurnOnZ();
     virtual void                    SetLessEqualDepthStencilView(ID3DDeviceContext& context, bool turnOn);
-    virtual void                    ClearRTVAndDSV(ID3DDeviceContext* context, RenderTargetsType type) {}
+    virtual void                    SetRenderableTargets(ID3DDeviceContext& context, const std::vector<RenderTargetsType>& types) = 0;
+    virtual void                    ClearRTVAndDSVs(ID3DDeviceContext& context, std::vector<RenderTargetsType>& type, XCVec4& clearColor) = 0;
 
+    u32                             GetCurrentRTVFrameIndex() const { return m_frameIndex; }
     ID3DDevice*                     GetDevice() { return m_pD3DDevice; }
     XC_ShaderContainer&             GetShaderContainer() { return *m_XCShaderSystem; }
     RenderingPool&                  GetRenderingPool() { return *m_renderingPool; }
@@ -87,8 +86,10 @@ protected:
     D3D_VIEWPORT                    m_ScreenViewPort[RENDERTARGET_MAX];
     D3D_RECT                        m_scissorRect;
 
-    XCVec4                          m_clearColor;
     bool                            m_secondaryDrawCall;
+
+    //FrameIndex
+    u32                             m_frameIndex;
 
     u32                             m_4xMsaaQuality;
     bool                            m_Enable4xMsaa;

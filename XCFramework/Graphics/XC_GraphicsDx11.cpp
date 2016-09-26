@@ -28,6 +28,7 @@ XC_GraphicsDx11::XC_GraphicsDx11(void)
     , m_depthDisabledStencilState(nullptr)
     , m_depthStencilLessEqualState(nullptr)
 {
+    m_frameIndex = RENDERTARGET_MAIN_0;
 }
 
 XC_GraphicsDx11::~XC_GraphicsDx11(void)
@@ -327,18 +328,28 @@ void XC_GraphicsDx11::BeginScene()
 {
     m_pD3DDeviceContext->RSSetViewports(1, &m_ScreenViewPort[RENDERTARGET_MAIN_0]);
 
-    m_renderTargets[RENDERTARGET_MAIN_0]->SetRenderableTarget(*m_pD3DDeviceContext, m_depthStencilResource[RENDERTARGET_MAIN_0]);
-    m_renderTargets[RENDERTARGET_MAIN_0]->ClearRenderTarget(*m_pD3DDeviceContext, m_depthStencilResource[RENDERTARGET_MAIN_0], m_clearColor);
+    //On immediate context, we only want to work on current frame render target, so set and clear
+    std::vector<RenderTargetsType> rtvs = { (RenderTargetsType)m_frameIndex };
 
-    m_renderingPool->Begin();
+    SetRenderableTargets(*m_pD3DDeviceContext, rtvs);
+    ClearRTVAndDSVs(*m_pD3DDeviceContext, rtvs, XCVec4(1.0f, 1.0f, 1.0f, 1.0f));
+
+    //On deferred context, we work on multiple render targets for deferred lighting. So work on them.
+    rtvs.push_back(RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL);
+    rtvs.push_back(RENDERTARGET_GBUFFER_LIGHTING);
+
+    m_renderingPool->Begin(rtvs);
 }
 
+#pragma region LiveDriveRendering
 void XC_GraphicsDx11::BeginSecondaryScene()
 {
     SetSecondaryDrawCall(true);
     
+    std::vector<RenderTargetsType> rtvs = { (RenderTargetsType)m_frameIndex };
+
     //TurnOffZ();
-    m_renderingPool->Begin();
+    m_renderingPool->Begin(rtvs);
 }
 
 void XC_GraphicsDx11::EndSecondaryScene()
@@ -346,6 +357,7 @@ void XC_GraphicsDx11::EndSecondaryScene()
     //TurnOnZ();
     SetSecondaryDrawCall(false);
 }
+#pragma endregion
 
 void XC_GraphicsDx11::EndScene()
 {
@@ -355,14 +367,41 @@ void XC_GraphicsDx11::EndScene()
     m_XCShaderSystem->ApplyShader(*m_pD3DDeviceContext, ShaderType_RenderTexture);
 
     XCShaderHandle* shaderHandle = (XCShaderHandle*)m_XCShaderSystem->GetShader(ShaderType_RenderTexture);
-    shaderHandle->SetResource("gTexture", *m_pD3DDeviceContext, m_renderTargets[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL]->GetRenderTargetResource());
+    shaderHandle->SetResource("gTexture", *m_pD3DDeviceContext, m_renderTargets[RENDERTARGET_GBUFFER_LIGHTING]->GetRenderTargetResource());
 
     shaderHandle->SetVertexBuffer(*m_pD3DDeviceContext, m_renderQuadVB);
     shaderHandle->SetIndexBuffer(*m_pD3DDeviceContext, *m_renderQuadIB);
 
     m_pD3DDeviceContext->DrawIndexedInstanced(m_renderQuadIB->m_indexData.size(), 1, 0, 0, 0);
 
+    //Present
     ValidateResult(m_pSwapChain->Present(1, 0));
+}
+
+void XC_GraphicsDx11::SetRenderableTargets(ID3DDeviceContext& context, const std::vector<RenderTargetsType>& types)
+{
+    //Create a list of all the rtv's & dsv's that are going to be used
+    ID3D11RenderTargetView*     rtvDescHandle[RENDERTARGET_MAX];
+    ID3D11DepthStencilView*     depthDescHandle[RENDERTARGET_MAX];
+
+    for (u32 rIndex = 0; rIndex < types.size(); ++rIndex)
+    {
+        rtvDescHandle[rIndex] = m_renderTargets[types[rIndex]]->GetRenderTargetResource()->GetPointerToGPUResourceViewTyped<ID3D11RenderTargetView*>(GPUResourceType_RTV);
+        depthDescHandle[rIndex] = m_depthStencilResource[types[rIndex]]->GetPointerToGPUResourceViewTyped<ID3D11DepthStencilView*>(GPUResourceType_DSV);
+    }
+
+    context.OMSetRenderTargets(types.size(), &rtvDescHandle[0], depthDescHandle[0]);
+}
+
+void XC_GraphicsDx11::ClearRTVAndDSVs(ID3DDeviceContext& context, std::vector<RenderTargetsType>& type, XCVec4& clearColor)
+{
+    const f32 color[] = { clearColor.Get<X>(), clearColor.Get<Y>(), clearColor.Get<Z>(), clearColor.Get<W>() };
+
+    for (u32 rIndex = 0; rIndex < type.size(); ++rIndex)
+    {
+        context.ClearRenderTargetView(m_renderTargets[type[rIndex]]->GetRenderTargetResource()->GetGPUResourceViewTyped<ID3D11RenderTargetView*>(GPUResourceType_RTV), color);
+        context.ClearDepthStencilView(m_depthStencilResource[type[rIndex]]->GetGPUResourceViewTyped<ID3DDepthStencilView*>(GPUResourceType_DSV), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+    }
 }
 
 void XC_GraphicsDx11::TurnOnZ()

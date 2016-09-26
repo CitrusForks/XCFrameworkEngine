@@ -16,13 +16,13 @@ XC_Graphics::XC_Graphics(void)
     , m_sharedDescriptorHeap(nullptr)
     , m_gpuResourceSystem(nullptr)
     , m_secondaryDrawCall(false)
+    , m_frameIndex(0)
     , m_4xMsaaQuality(false)
     , m_Enable4xMsaa(false)
     , m_ClientWidth(1024)
     , m_ClientHeight(768)
     , m_initDone(false)
 {
-    m_clearColor = XCVec4(1.0f, 1.0f, 1.0f, 1.0f);
     ZeroMemory(&m_ScreenViewPort, sizeof(D3D_VIEWPORT));
 }
 
@@ -122,36 +122,18 @@ void XC_Graphics::SetupViewPort()
     m_ScreenViewPort[RENDERTARGET_MAIN_0].MaxDepth = 1.0f;
 
     //Set the Viewport
-    m_ScreenViewPort[RENDERTARGET_MAIN_1].TopLeftX = 0.0f;
-    m_ScreenViewPort[RENDERTARGET_MAIN_1].TopLeftY = 0.0f;
-    m_ScreenViewPort[RENDERTARGET_MAIN_1].Width = (f32)m_ClientWidth;
-    m_ScreenViewPort[RENDERTARGET_MAIN_1].Height = (f32)m_ClientHeight;
-    m_ScreenViewPort[RENDERTARGET_MAIN_1].MinDepth = 0.0f;
-    m_ScreenViewPort[RENDERTARGET_MAIN_1].MaxDepth = 1.0f;
+    m_ScreenViewPort[RENDERTARGET_MAIN_1] = m_ScreenViewPort[RENDERTARGET_MAIN_0];
 
     //Set the Viewport
-    m_ScreenViewPort[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL].TopLeftX = 0.0f;
-    m_ScreenViewPort[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL].TopLeftY = 0.0f;
-    m_ScreenViewPort[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL].Width = (f32)m_ClientWidth;
-    m_ScreenViewPort[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL].Height = (f32)m_ClientHeight;
-    m_ScreenViewPort[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL].MinDepth = 0.0f;
-    m_ScreenViewPort[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL].MaxDepth = 1.0f;
+    m_ScreenViewPort[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL]= m_ScreenViewPort[RENDERTARGET_MAIN_0];
 
     //Set the Viewport
-    m_ScreenViewPort[RENDERTARGET_GBUFFER_LIGHTING].TopLeftX = 0.0f;
-    m_ScreenViewPort[RENDERTARGET_GBUFFER_LIGHTING].TopLeftY = 0.0f;
-    m_ScreenViewPort[RENDERTARGET_GBUFFER_LIGHTING].Width = (f32)m_ClientWidth;
-    m_ScreenViewPort[RENDERTARGET_GBUFFER_LIGHTING].Height = (f32)m_ClientHeight;
-    m_ScreenViewPort[RENDERTARGET_GBUFFER_LIGHTING].MinDepth = 0.0f;
-    m_ScreenViewPort[RENDERTARGET_GBUFFER_LIGHTING].MaxDepth = 1.0f;
+    m_ScreenViewPort[RENDERTARGET_GBUFFER_LIGHTING]= m_ScreenViewPort[RENDERTARGET_MAIN_0];
 
     //Set the Viewport Live Drive
-    m_ScreenViewPort[RENDERTARGET_LIVEDRIVE].TopLeftX = 0.0f;
-    m_ScreenViewPort[RENDERTARGET_LIVEDRIVE].TopLeftY = 0.0f;
+    m_ScreenViewPort[RENDERTARGET_LIVEDRIVE] = m_ScreenViewPort[RENDERTARGET_MAIN_0];
     m_ScreenViewPort[RENDERTARGET_LIVEDRIVE].Width = (f32)256;
     m_ScreenViewPort[RENDERTARGET_LIVEDRIVE].Height = (f32)256;
-    m_ScreenViewPort[RENDERTARGET_LIVEDRIVE].MinDepth = 0.0f;
-    m_ScreenViewPort[RENDERTARGET_LIVEDRIVE].MaxDepth = 1.0f;
 
     //And its scissor
     m_scissorRect.right = static_cast<LONG>(m_ClientWidth);

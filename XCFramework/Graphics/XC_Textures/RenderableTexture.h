@@ -35,11 +35,7 @@ public:
     void                             Destroy();
     void                             OnResize();
 
-    void                             SetRenderableTarget(ID3DDeviceContext& context, GPUResource* depthView);
-    void                             ClearRenderTarget(ID3DDeviceContext& context, GPUResource* depthView, const XCVec4& color);
-                                     
     GPUResource*                     GetRenderTargetResource() { return m_pRenderTargetResource; }
-
     RenderedTextureInfo*             GetRenderToTexture();
 
 protected:

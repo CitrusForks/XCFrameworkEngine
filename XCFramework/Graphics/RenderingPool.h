@@ -59,7 +59,7 @@ public:
     void                RequestResourceDeviceContext(IRenderableObject* graphicsBuffer);
 
     void                Update(f32 dt);                                               //Use it to push and pop renderable objects, since in update we remove the actors.
-    void                Begin();                                                      //Signal the workers to draw
+    void                Begin(std::vector<RenderTargetsType>& targetTypes);           //Signal the workers to draw
     void                Render();
     void                End();                                                        //Signal end and call execute command list on main thread
     void                Execute(ID3DCommandQueue* cmdQueue);
@@ -68,9 +68,6 @@ public:
     RenderWorker*       GetRenderWorkers() { return m_renderWorkers; }
 
 private:
-    void                BeginInternal(RenderTargetsType type);
-    void                EndInternal();
-
     RenderWorker        m_renderWorkers[NbRenderWorkerThreads];
     RenderContext       m_FrameCommandList[NbFrameCommandList];
 

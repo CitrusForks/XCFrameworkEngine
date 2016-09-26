@@ -33,13 +33,14 @@ public:
     void                        Destroy();
 
     ID3DDeviceContext*          GetDeviceContext() { return m_pD3DDeviceContext; }
-    u32                         GetCurrentRTVFrameIndex() { return RENDERTARGET_MAIN_0; }
-
     void                        GoFullscreen(bool go);
     void                        OnResize(i32 _width, i32 _height);
     void                        TurnOffZ();
     void                        TurnOnZ();
     void                        SetLessEqualDepthStencilView(ID3DDeviceContext& context, bool turnOn);
+
+    void                        SetRenderableTargets(ID3DDeviceContext& context, const std::vector<RenderTargetsType>& types) override;
+    void                        ClearRTVAndDSVs(ID3DDeviceContext& context, std::vector<RenderTargetsType>& type, XCVec4& clearColor) override;
 
 protected:
     void                        CreateDescriptorHeaps();

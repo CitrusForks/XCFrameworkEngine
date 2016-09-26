@@ -22,7 +22,7 @@ public:
 
     void                                Init(ID3DDevice* device, XC_ShaderContainer* shaderMgr);
     void                                Reset();
-    void                                BeginRender(RenderTargetsType targetType);
+    void                                BeginRender(std::vector<RenderTargetsType>& targetType);
     void                                FinishRender();
     void                                Destroy();
 

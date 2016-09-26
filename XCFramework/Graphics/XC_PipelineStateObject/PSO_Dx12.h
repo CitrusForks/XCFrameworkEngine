@@ -9,12 +9,15 @@
 
 #include "Graphics/XC_Shaders/XC_RasterizerTypes.h"
 
-enum PSOType
+struct PSODesc
 {
-    PSOType_RASTER_FILL_SOLID,
-    PSOType_RASTER_FILL_WIREFRAME,
+    PSODesc(RasterType type, u32 nbOfRTv)
+        : m_rasterType(type)
+        , m_nbOfRTV(nbOfRTv)
+    {}
 
-    PSOType_Max
+    u32         m_nbOfRTV;
+    RasterType  m_rasterType;
 };
 
 #if defined(XCGRAPHICS_DX12)
@@ -43,15 +46,15 @@ public:
         }
 
         D3D12_GRAPHICS_PIPELINE_STATE_DESC  m_psoDesc;
-        ID3DPipelineState*                m_pPso;
+        ID3DPipelineState*                  m_pPso;
         ID3D12RootSignature*                m_rootSignature;
     };
 
-    bool                                    CreateRootSignature(ID3DDevice& device, void* bufferPtr, u32 bufferSize, PSOType type);
-    void                                    CreateGraphicPSO(ID3DDevice& context, PSOType type);
+    bool                                    CreateRootSignature(ID3DDevice& device, void* bufferPtr, u32 bufferSize, RasterType type);
+    void                                    CreateGraphicPSO(ID3DDevice& context, RasterType type);
 
-    ID3D12RootSignature&                    GetRootSignature(PSOType type);
-    static void                             GenerateDefaultPSO(PSO_Dx12* inPso, PSOType type);
+    ID3D12RootSignature&                    GetRootSignature(RasterType type);
+    static void                             GenerateDefaultPSO(PSO_Dx12* inPso, PSODesc& type);
 
     void                                    SetGraphicsPipelineState(ID3DDeviceContext& context, RasterType type = RasterType_FillSolid);
 

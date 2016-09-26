@@ -26,12 +26,26 @@ struct VertexOut
     float3 PosW     : POSITION;
 };
 
+struct PixelOut
+{
+    float4 RenderTarget0 : SV_Target0;
+    float4 RenderTarget1 : SV_Target1;
+    float4 RenderTarget2 : SV_Target2;
+};
+
 DepthStencilState LessEqualDSS
 {
     DepthFunc = LESS_EQUAL;
 };
 
-float4 PSMain(VertexOut pin) : SV_TARGET
+PixelOut PSMain(VertexOut pin) : SV_TARGET
 {
-    return gCubeMap.Sample(samLinear, pin.PosW);
+    float4 finalColor = gCubeMap.Sample(samLinear, pin.PosW);
+    
+    PixelOut outColors;
+    outColors.RenderTarget0 = finalColor;
+    outColors.RenderTarget1 = finalColor;
+    outColors.RenderTarget2 = finalColor;
+
+    return outColors;
 }

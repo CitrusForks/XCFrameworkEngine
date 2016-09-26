@@ -40,7 +40,6 @@ struct VertexIn
     float2 Tex      : TEXCOORD;
 };
 
-
 struct VertexOut
 {
     float4 PosH     : SV_POSITION;
@@ -49,8 +48,14 @@ struct VertexOut
     float2 Tex      : TEXCOORD;
 };
 
+struct PixelOut
+{
+    float4 RenderTarget0 : SV_Target0;
+    float4 RenderTarget1 : SV_Target1;
+    float4 RenderTarget2 : SV_Target2;
+};
 
-float4 PSMain(VertexOut pin) : SV_Target
+PixelOut PSMain(VertexOut pin) : SV_Target
 {
     //Interpolating normal can unmormalize it, so normalize it
     pin.NormalW = normalize(pin.NormalW);
@@ -90,5 +95,10 @@ float4 PSMain(VertexOut pin) : SV_Target
 
     finalColor.a = gMaterial.Diffuse.a * texColor.a;
 
-    return finalColor;
+    PixelOut outColors;
+    outColors.RenderTarget0 = finalColor;
+    outColors.RenderTarget1 = finalColor;
+    outColors.RenderTarget2 = lightImpact;
+
+    return outColors;
 }
