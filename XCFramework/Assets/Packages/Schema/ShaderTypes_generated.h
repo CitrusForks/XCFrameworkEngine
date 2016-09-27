@@ -14,17 +14,18 @@ enum ShaderType {
   ShaderType_SolidColor = 1,
   ShaderType_RenderTexture = 2,
   ShaderType_LightTexture = 3,
-  ShaderType_TerrainMultiTexture = 4,
-  ShaderType_SimpleCubeMap = 5,
-  ShaderType_SkinnedCharacter = 6,
-  ShaderType_VectorFont = 7,
-  ShaderType_Max = 8,
+  ShaderType_DeferredLighting = 4,
+  ShaderType_TerrainMultiTexture = 5,
+  ShaderType_SimpleCubeMap = 6,
+  ShaderType_SkinnedCharacter = 7,
+  ShaderType_VectorFont = 8,
+  ShaderType_Max = 9,
   ShaderType_MIN = ShaderType_Default,
   ShaderType_MAX = ShaderType_Max
 };
 
 inline const char **EnumNamesShaderType() {
-  static const char *names[] = { "Default", "SolidColor", "RenderTexture", "LightTexture", "TerrainMultiTexture", "SimpleCubeMap", "SkinnedCharacter", "VectorFont", "Max", nullptr };
+  static const char *names[] = { "Default", "SolidColor", "RenderTexture", "LightTexture", "DeferredLighting", "TerrainMultiTexture", "SimpleCubeMap", "SkinnedCharacter", "VectorFont", "Max", nullptr };
   return names;
 }
 

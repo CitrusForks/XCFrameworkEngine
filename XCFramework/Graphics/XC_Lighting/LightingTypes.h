@@ -29,6 +29,7 @@ enum ELightType
 
 struct ILight
 {
+    //virtual ~ILight() {}
 };
 
 struct LightSource : public ILight

@@ -31,7 +31,6 @@ namespace GameState
         i32                     m_currentMainPlayableActor;
         bool                    m_bMainPlayerSet;
 
-        XC_LightManager*        m_lightManagerSystem;
         XC_CameraManager*       m_cameraSystem;
         DirectInput*            m_directInput;
         World*                  m_worldSystem;

@@ -588,8 +588,11 @@ void XCMesh::Draw(RenderContext& context)
     {
         context.ApplyShader(m_shaderType, m_rasterType);
 
+#if defined(FORWARD_LIGHTING)
         XC_LightManager* lightMgr = (XC_LightManager*)&SystemLocator::GetInstance()->RequestSystem("LightsManager");
         m_shaderHandler->SetConstantBuffer("cbLightsPerFrame", context.GetDeviceContext(), lightMgr->GetLightConstantBuffer());
+#endif
+
         m_shaderHandler->SetResource("gDiffuseMap", context.GetDeviceContext(), m_texture);
 
         DrawSubMeshes(context);

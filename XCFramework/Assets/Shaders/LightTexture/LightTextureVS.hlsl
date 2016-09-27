@@ -4,6 +4,9 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
+#ifndef _LIGHTTEXTUREVS_H_
+#define _LIGHTTEXTUREVS_H_
+
 #include "..\LightingShaders\LightSource.hlsl"
 
 struct PerObjectBuffer 
@@ -15,7 +18,13 @@ struct PerObjectBuffer
     Material    gMaterial;
 };
 
-cbuffer cbLightsPerFrame : register(b0)
+cbuffer cbInstancedBuffer : register(b0)
+{
+    PerObjectBuffer gPerObject[100];
+};
+
+#if defined(FORWARD_LIGHTING)
+cbuffer cbLightsPerFrame : register(b1)
 {
     LightSource      gLightSource[10];
     float4           gNoOfLights;
@@ -23,11 +32,7 @@ cbuffer cbLightsPerFrame : register(b0)
     float4           padding2;
     float4           padding3;
 };
-
-cbuffer cbInstancedBuffer : register(b1)
-{
-    PerObjectBuffer gPerObject[100];
-};
+#endif
 
 Texture2D       gDiffuseMap : register(t0);    //Mapped with ShaderResource Variable
 SamplerState    samLinear : register(s0);
@@ -60,3 +65,5 @@ VertexOut VSMain(VertexIn vin)
     
     return vout;
 }
+
+#endif

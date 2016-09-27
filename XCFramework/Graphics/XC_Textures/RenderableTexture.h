@@ -24,7 +24,7 @@ public:
         u32     m_texSize;
     };
 
-    RenderableTexture(RenderTargetsType type, ID3DDevice& device, ID3DDeviceContext& context);
+    RenderableTexture(RenderTargetsType type, DXGI_FORMAT format, ID3DDevice& device, ID3DDeviceContext& context);
     virtual ~RenderableTexture();
 
     bool                             PreLoad(i32 msaaQuality, i32 texWidth, i32 texHeight);
@@ -37,7 +37,7 @@ public:
 
     GPUResource*                     GetRenderTargetResource() { return m_pRenderTargetResource; }
     RenderedTextureInfo*             GetRenderToTexture();
-
+    DXGI_FORMAT                      GetRTVFormat() { return m_format; }
 protected:
 #if defined(XCGRAPHICS_DX11)
     void                             CreateStagingTextures(D3D_TEXTURE2D_DESC texDesc);
@@ -57,4 +57,5 @@ private:
     ID3DDevice&                      m_device;
     ID3DDeviceContext&               m_deviceContext;
     RenderTargetsType                m_renderTargetType;
+    DXGI_FORMAT                      m_format;
 };

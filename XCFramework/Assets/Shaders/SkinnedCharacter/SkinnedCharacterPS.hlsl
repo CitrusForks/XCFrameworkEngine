@@ -4,6 +4,9 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
+#ifndef _SKINNEDCHARACTERPS_H_
+#define _SKINNEDCHARACTERPS_H_
+
 #include "..\LightingShaders\LightSource.hlsl"
 
 struct PerObjectBuffer
@@ -15,7 +18,18 @@ struct PerObjectBuffer
     Material    gMaterial;
 };
 
-cbuffer cbLightsPerFrame : register(b0)
+cbuffer cbInstancedBuffer : register(b0)
+{
+    PerObjectBuffer gPerObject[100];
+};
+
+cbuffer cbBoneBuffer : register(b1)
+{
+    float4x4    gBoneMatrix[60];
+};
+
+#if defined(FORWARD_LIGHTING)
+cbuffer cbLightsPerFrame : register(b1)
 {
     LightSource      gLightSource[10];
     float4           gNoOfLights;
@@ -23,16 +37,7 @@ cbuffer cbLightsPerFrame : register(b0)
     float4           padding2;
     float4           padding3;
 };
-
-cbuffer cbInstancedBuffer : register(b1)
-{
-    PerObjectBuffer gPerObject[100];
-};
-
-cbuffer cbBoneBuffer : register(b2)
-{
-    float4x4    gBoneMatrix[60];
-};
+#endif
 
 Texture2D       gDiffuseMap : register(t0);    //Mapped with ShaderResource Variable
 SamplerState    samLinear : register(s0);
@@ -55,8 +60,16 @@ struct VertexOut
     float2 Tex           : TEXCOORD;
 };
 
+struct PixelOut
+{
+    float4 RTMain        : SV_Target0;
+    float4 RTDiffuse     : SV_Target1;
+    float4 RTPosition    : SV_Target2;
+    float4 RTNormal      : SV_Target3;
+};
 
-float4 PSMain(VertexOut pin) : SV_Target
+
+PixelOut PSMain(VertexOut pin) : SV_Target
 {
     //Interpolating normal can unmormalize it, so normalize it
     pin.NormalW = normalize(pin.NormalW);
@@ -67,6 +80,7 @@ float4 PSMain(VertexOut pin) : SV_Target
     
     float4 finalColor = texColor;
 
+#if defined(FORWARD_LIGHTING)
     float4 lightImpact = float4(0, 0, 0, 0);
 
     for (unsigned int index = 0; index < gNoOfLights.x; ++index)
@@ -83,6 +97,15 @@ float4 PSMain(VertexOut pin) : SV_Target
 
     //Common to take alpha from diffuse material
     finalColor.a = gPerObject[0].gMaterial.Diffuse.a * texColor.a;
-    
-    return finalColor;
+#endif
+
+    PixelOut outColors;
+    outColors.RTMain = finalColor;
+    outColors.RTDiffuse = finalColor;
+    outColors.RTPosition = float4(pin.PosW, 0.0);
+    outColors.RTNormal = float4(pin.NormalW, 0.0);
+
+    return outColors;
 }
+
+#endif

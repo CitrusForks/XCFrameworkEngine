@@ -4,6 +4,9 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
+#ifndef _SOLIDCOLORPS_H
+#define _SOLIDCOLORPS_H
+
 struct VertexOut
 {
     float4 PosH  : SV_POSITION;
@@ -14,3 +17,5 @@ float4 PSMain(VertexOut pin) : SV_Target
 {
     return pin.Color;
 }
+
+#endif

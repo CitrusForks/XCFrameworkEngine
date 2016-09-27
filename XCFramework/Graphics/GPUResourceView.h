@@ -49,7 +49,7 @@ public:
     {
 #if defined(XCGRAPHICS_DX12)
         return m_cpuHandle.ptr != 0;
-#elif defined(XC_GRAPHICSDX11)
+#elif defined(XCGRAPHICS_DX11)
         return m_resourceView != nullptr;
 #endif
     }

@@ -8,8 +8,9 @@
 
 #include "Gameplay/GameStates/LoadingWorldState.h"
 #include "Gameplay/GameStates/GameStateTypes.h"
-#include "Graphics/XC_GraphicsDx11.h"
+
 #include "Engine/TaskManager/TaskManager.h"
+
 #include "Assets/Packages/PackageConsts.h"
 
 using namespace GameState;

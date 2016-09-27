@@ -30,3 +30,7 @@ print("Project Generation done...")
 print("Building C++ UniTest Project XCUnitTest")
 include "UnitTests"
 print("Project Generation done...")
+
+print("Building C Shader Solution ")
+include "Assets/Shaders/"
+print("Solution Generation done...")

@@ -4,6 +4,9 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
+#ifndef _VECTORFONTPS_H_
+#define _VECTORFONTPS_H_
+
 cbuffer cbPerObjectInstanced : register(b0)
 {
     float4x4 gWVP[100];
@@ -36,3 +39,5 @@ VertexOut VSMain(VertexIn vin)
 
     return vout;
 }
+
+#endif

@@ -18,6 +18,7 @@ class XC_Graphics;
 class DirectInput;
 class ResourceManager;
 class XC_CameraManager;
+class XC_LightManager;
 class GameFiniteStateMachine;
 class NetworkManager;
 class INetPeer;
@@ -50,6 +51,7 @@ private:
     DirectInput*                 m_directInputSystem;
     ResourceManager*             m_resourceManagingSystem;
     XC_CameraManager*            m_cameraManagingSystem;
+    XC_LightManager*             m_lightsSystem;
     GameFiniteStateMachine*      m_gameFSM;
     NetworkManager*              m_networkManagingSystem;
     INetPeer*                    m_liveDriveClient;

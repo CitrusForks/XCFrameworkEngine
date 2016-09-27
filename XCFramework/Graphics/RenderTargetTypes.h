@@ -8,13 +8,32 @@
 
 enum RenderTargetsType
 {
-    RENDERTARGET_MAIN_0,
-    RENDERTARGET_MAIN_1,
+    RenderTargetType_Main_0,
+    RenderTargetType_Main_1,
 
-    RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL,
-    RENDERTARGET_GBUFFER_LIGHTING,
-    
-    RENDERTARGET_LIVEDRIVE,
+    //Deferred Lighting
+    RenderTargetType_GBuffer_Diffuse,
+    RenderTargetType_GBuffer_Position,
+    RenderTargetType_GBuffer_Normal,
 
-    RENDERTARGET_MAX
+    //Debug RT
+    RenderTargetType_Debug,
+
+    //Live Drive RT
+    RenderTargetType_LiveDrive,
+
+    RenderTargetType_Max
+};
+
+static const std::vector<DXGI_FORMAT> gs_RenderTargetFormats = { 
+   DXGI_FORMAT_R8G8B8A8_UNORM,      //RenderTargetType_Main_0
+   DXGI_FORMAT_R8G8B8A8_UNORM,      //RenderTargetType_Main_1
+
+   DXGI_FORMAT_R8G8B8A8_UNORM,      //RenderTargetType_GBuffer_Diffuse
+   DXGI_FORMAT_R32G32B32A32_FLOAT,  //RenderTargetType_GBuffer_Position
+   DXGI_FORMAT_R8G8B8A8_UNORM,      //RenderTargetType_GBuffer_Normal
+
+   DXGI_FORMAT_R8G8B8A8_UNORM,      //RenderTargetType_Debug
+
+   DXGI_FORMAT_R8G8B8A8_UNORM       //RenderTargetType_LiveDrive
 };

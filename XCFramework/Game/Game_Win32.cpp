@@ -29,6 +29,7 @@
 #elif defined(XCGRAPHICS_GL)
 #include "Graphics/XC_GraphicsGL.h"
 #endif
+#include "Graphics/XC_Lighting/XC_LightManager.h"
 
 #include "Gameplay/XC_Camera/XC_CameraManager.h"
 #include "Gameplay/GameFiniteStateMachine.h"
@@ -49,6 +50,7 @@ Game_Win32::Game_Win32(HINSTANCE hInstance, std::string winCaption, bool enable4
     , m_directInputSystem(nullptr)
     , m_resourceManagingSystem(nullptr)
     , m_cameraManagingSystem(nullptr)
+    , m_lightsSystem(nullptr)
     , m_gameFSM(nullptr)
     , m_networkManagingSystem(nullptr)
     , m_liveDriveClient(nullptr)
@@ -101,6 +103,10 @@ i32 Game_Win32::Init()
     m_cameraManagingSystem->Init(*m_graphicsSystem, m_clientWidth, m_clientHeight);
     m_cameraManagingSystem->SetCameraType(CAMERATYPE_BASIC);
 
+    //Initialize lights
+    m_lightsSystem = (XC_LightManager*) &m_systemContainer->CreateNewSystem("LightsManager");
+    m_lightsSystem->InitializeLights();
+
     //Gameplay state machine
     m_gameFSM = (GameFiniteStateMachine*) &m_systemContainer->CreateNewSystem("GameFSM");
     m_gameFSM->Init();
@@ -146,6 +152,7 @@ void Game_Win32::RegisterSystems()
     m_systemContainer->RegisterSystem<FlatBuffersSystem>("FlatBuffersSystem");
     m_systemContainer->RegisterSystem<ResourceManager>("ResourceManager");
     m_systemContainer->RegisterSystem<XC_CameraManager>("CameraManager");
+    m_systemContainer->RegisterSystem<XC_LightManager>("LightsManager");
     m_systemContainer->RegisterSystem<GameFiniteStateMachine>("GameFSM");
     m_systemContainer->RegisterSystem<NetworkManager>("NetworkManager");
 }
@@ -167,6 +174,8 @@ void Game_Win32::Update(f32 dt)
     m_resourceManagingSystem->Update();
 
     m_cameraManagingSystem->Update(dt);
+
+    m_lightsSystem->Update(dt);
 
     m_gameFSM->Update(dt);
 
@@ -192,7 +201,7 @@ void Game_Win32::Draw()
 
     //draw every other object
     m_graphicsSystem->BeginScene();
-
+    m_lightsSystem->Draw(*m_graphicsSystem);
     m_cameraManagingSystem->Draw();
     m_gameFSM->Draw(*m_graphicsSystem);
     m_graphicsSystem->GetRenderingPool().Render();
@@ -215,6 +224,7 @@ void Game_Win32::Destroy()
 
     m_gameFSM->Destroy();
     m_cameraManagingSystem->Destroy();
+    m_lightsSystem->Destroy();
     m_directInputSystem->Destroy();
     m_graphicsSystem->Destroy();
     m_resourceManagingSystem->Destroy();

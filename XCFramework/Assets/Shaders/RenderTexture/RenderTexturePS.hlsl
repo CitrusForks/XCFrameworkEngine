@@ -4,6 +4,9 @@
 * This program is complaint with GNU General Public License, version 3.
 * For complete license, read License.txt in source root directory. */
 
+#ifndef _RENDERTEXTUREPS_H_
+#define _RENDERTEXTUREPS_H_
+
 Texture2D gTexture : register(t0);
 SamplerState samLinear : register(s0);
 
@@ -33,3 +36,5 @@ float4 PSMain(VSOutput input) : SV_TARGET
 
     return finalColor;
 }
+
+#endif

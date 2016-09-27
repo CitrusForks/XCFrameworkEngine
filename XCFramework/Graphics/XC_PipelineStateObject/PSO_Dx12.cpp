@@ -8,6 +8,7 @@
 
 #if defined(XCGRAPHICS_DX12)
 #include "Graphics/XC_PipelineStateObject/PSO_Dx12.h"
+#include "Graphics/RenderTargetTypes.h"
 
 #include "Libs/Dx12Helpers/d3dx12.h"
 
@@ -84,8 +85,14 @@ void PSO_Dx12::GenerateDefaultPSO(PSO_Dx12* inPso, PSODesc& desc)
     inPso->m_psos[desc.m_rasterType].m_psoDesc.SampleMask = UINT_MAX;
     inPso->m_psos[desc.m_rasterType].m_psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
     inPso->m_psos[desc.m_rasterType].m_psoDesc.NumRenderTargets = desc.m_nbOfRTV;
-    for(u32 rIndex = 0; rIndex < desc.m_nbOfRTV; ++rIndex)
-        inPso->m_psos[desc.m_rasterType].m_psoDesc.RTVFormats[rIndex] = DXGI_FORMAT_R8G8B8A8_UNORM;
+
+    inPso->m_psos[desc.m_rasterType].m_psoDesc.RTVFormats[0] = gs_RenderTargetFormats[RenderTargetType_Main_0];
+
+    for (u32 rIndex = RenderTargetType_Main_1 + 1; rIndex < desc.m_nbOfRTV + 1; ++rIndex)
+    {
+        inPso->m_psos[desc.m_rasterType].m_psoDesc.RTVFormats[rIndex - 1] = gs_RenderTargetFormats[(RenderTargetsType)rIndex];
+    }
+
     inPso->m_psos[desc.m_rasterType].m_psoDesc.SampleDesc.Count = 1;
     inPso->m_psos[desc.m_rasterType].m_psoDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 }

@@ -390,8 +390,10 @@ void Terrain::Draw(RenderContext& context)
         shaderHandle->SetResource("gBlendMap",    context.GetDeviceContext(), m_textures[3]);
     }
 
+#if defined(FORWARD_LIGHTING)
     XC_LightManager* lightMgr = (XC_LightManager*)&SystemLocator::GetInstance()->RequestSystem("LightsManager");
     shaderHandle->SetConstantBuffer("cbLightsPerFrame", context.GetDeviceContext(), lightMgr->GetLightConstantBuffer());
+#endif
 
     shaderHandle->SetVertexBuffer(context.GetDeviceContext(), &m_vertexPosNormTexBuffer);
     shaderHandle->SetIndexBuffer(context.GetDeviceContext(), m_indexBuffer);

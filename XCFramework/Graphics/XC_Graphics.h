@@ -80,10 +80,10 @@ protected:
     SharedDescriptorHeap*           m_sharedDescriptorHeap;
     GPUResourceSystem*              m_gpuResourceSystem;
 
-    RenderableTexture*              m_renderTargets[RENDERTARGET_MAX];
-    GPUResource*                    m_depthStencilResource[RENDERTARGET_MAX];
+    RenderableTexture*              m_renderTargets[RenderTargetType_Max];
+    GPUResource*                    m_depthStencilResource[RenderTargetType_Max];
 
-    D3D_VIEWPORT                    m_ScreenViewPort[RENDERTARGET_MAX];
+    D3D_VIEWPORT                    m_ScreenViewPort[RenderTargetType_Max];
     D3D_RECT                        m_scissorRect;
 
     bool                            m_secondaryDrawCall;

@@ -4,6 +4,9 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
+#ifndef _SOLIDCOLORVS_H
+#define _SOLIDCOLORVS_H
+
 cbuffer cbWVP : register(b0)
 {
     float4x4 gWVP;
@@ -33,3 +36,5 @@ VertexOut VSMain(VertexIn vin)
 
     return vout;
 }
+
+#endif

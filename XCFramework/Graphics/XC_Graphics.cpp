@@ -44,7 +44,7 @@ void XC_Graphics::Destroy()
         XCDELETE(m_renderingPool);
     }
 
-    for (u32 rIndex = 0; rIndex < RENDERTARGET_MAX; ++rIndex)
+    for (u32 rIndex = 0; rIndex < RenderTargetType_Max; ++rIndex)
     {
         if (m_renderTargets[rIndex])
         {
@@ -114,26 +114,27 @@ void XC_Graphics::SetupViewPort()
 {
 #if defined(WIN32)
     //Set the Viewport
-    m_ScreenViewPort[RENDERTARGET_MAIN_0].TopLeftX = 0.0f;
-    m_ScreenViewPort[RENDERTARGET_MAIN_0].TopLeftY = 0.0f;
-    m_ScreenViewPort[RENDERTARGET_MAIN_0].Width = (f32)m_ClientWidth;
-    m_ScreenViewPort[RENDERTARGET_MAIN_0].Height = (f32)m_ClientHeight;
-    m_ScreenViewPort[RENDERTARGET_MAIN_0].MinDepth = 0.0f;
-    m_ScreenViewPort[RENDERTARGET_MAIN_0].MaxDepth = 1.0f;
+    m_ScreenViewPort[RenderTargetType_Main_0].TopLeftX  = 0.0f;
+    m_ScreenViewPort[RenderTargetType_Main_0].TopLeftY  = 0.0f;
+    m_ScreenViewPort[RenderTargetType_Main_0].Width     = (f32)m_ClientWidth;
+    m_ScreenViewPort[RenderTargetType_Main_0].Height    = (f32)m_ClientHeight;
+    m_ScreenViewPort[RenderTargetType_Main_0].MinDepth  = 0.0f;
+    m_ScreenViewPort[RenderTargetType_Main_0].MaxDepth  = 1.0f;
 
-    //Set the Viewport
-    m_ScreenViewPort[RENDERTARGET_MAIN_1] = m_ScreenViewPort[RENDERTARGET_MAIN_0];
+    m_ScreenViewPort[RenderTargetType_Main_1]           = m_ScreenViewPort[RenderTargetType_Main_0];
 
-    //Set the Viewport
-    m_ScreenViewPort[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL]= m_ScreenViewPort[RENDERTARGET_MAIN_0];
+    m_ScreenViewPort[RenderTargetType_GBuffer_Diffuse]  = m_ScreenViewPort[RenderTargetType_Main_0];
 
-    //Set the Viewport
-    m_ScreenViewPort[RENDERTARGET_GBUFFER_LIGHTING]= m_ScreenViewPort[RENDERTARGET_MAIN_0];
+    m_ScreenViewPort[RenderTargetType_GBuffer_Position] = m_ScreenViewPort[RenderTargetType_Main_0];
+
+    m_ScreenViewPort[RenderTargetType_GBuffer_Normal]   = m_ScreenViewPort[RenderTargetType_Main_0];
+
+    m_ScreenViewPort[RenderTargetType_Debug]            = m_ScreenViewPort[RenderTargetType_Main_0];
 
     //Set the Viewport Live Drive
-    m_ScreenViewPort[RENDERTARGET_LIVEDRIVE] = m_ScreenViewPort[RENDERTARGET_MAIN_0];
-    m_ScreenViewPort[RENDERTARGET_LIVEDRIVE].Width = (f32)256;
-    m_ScreenViewPort[RENDERTARGET_LIVEDRIVE].Height = (f32)256;
+    m_ScreenViewPort[RenderTargetType_LiveDrive]        = m_ScreenViewPort[RenderTargetType_Main_0];
+    m_ScreenViewPort[RenderTargetType_LiveDrive].Width  = (f32)256;
+    m_ScreenViewPort[RenderTargetType_LiveDrive].Height = (f32)256;
 
     //And its scissor
     m_scissorRect.right = static_cast<LONG>(m_ClientWidth);

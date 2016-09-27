@@ -17,13 +17,14 @@
 #include "Libs/DirectXTex/DirectXTex.h"
 #endif
 
-RenderableTexture::RenderableTexture(RenderTargetsType type, ID3DDevice& device, ID3DDeviceContext& context)
+RenderableTexture::RenderableTexture(RenderTargetsType type, DXGI_FORMAT format, ID3DDevice& device, ID3DDeviceContext& context)
     : m_pRenderTargetResource(nullptr)
     , m_pRenderTargetTextureStaged(nullptr)
     , m_pSingleSampledTex(nullptr)
     , m_device(device)
     , m_deviceContext(context)
     , m_renderTargetType(type)
+    , m_format(format)
 {
     m_renderableTexture = XCNEW(RenderedTextureInfo)();
 
@@ -80,7 +81,7 @@ bool RenderableTexture::PreLoad(i32 msaaQuality, i32 texWidth, i32 texHeight)
         texHeight,
         1,
         1,
-        DXGI_FORMAT_R8G8B8A8_UNORM,
+        m_format,
         1,
         0,
         D3D12_TEXTURE_LAYOUT_UNKNOWN,
@@ -94,7 +95,7 @@ bool RenderableTexture::PreLoad(i32 msaaQuality, i32 texWidth, i32 texHeight)
 
     desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
     desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-    desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    desc.Format = m_format;
     desc.Texture2D.MipLevels = 1;
     desc.Texture2D.MostDetailedMip = 0;
     desc.Texture2D.ResourceMinLODClamp = 0.0f;
@@ -112,7 +113,7 @@ bool RenderableTexture::PreLoad(i32 msaaQuality, i32 texWidth, i32 texHeight)
     textureDesc.Height = texHeight;
     textureDesc.MipLevels = 1;
     textureDesc.ArraySize = 1;
-    textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    textureDesc.Format = m_format;
     if (msaaQuality)
     {
         textureDesc.SampleDesc.Count = 4;
@@ -135,7 +136,7 @@ bool RenderableTexture::PreLoad(i32 msaaQuality, i32 texWidth, i32 texHeight)
     ZeroMemory(&desc, sizeof(D3D11_SHADER_RESOURCE_VIEW_DESC));
 
     desc.ViewDimension = msaaQuality ? D3D11_SRV_DIMENSION_TEXTURE2DMS : D3D11_SRV_DIMENSION_TEXTURE2D;
-    desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    desc.Format = m_format;
     desc.Texture2D.MipLevels = 1;
     desc.Texture2D.MostDetailedMip = 0;
 
@@ -207,7 +208,7 @@ void RenderableTexture::Update()
         DumpTextureToFile();
     }
 
-    m_deviceContext.ResolveSubresource(m_pRenderTargetTextureStaged->GetResource<ID3D11Texture2D*>(), 0, m_pRenderTargetResource->GetResource<ID3D11Texture2D*>(), 0, DXGI_FORMAT_R8G8B8A8_UNORM);
+    m_deviceContext.ResolveSubresource(m_pRenderTargetTextureStaged->GetResource<ID3D11Texture2D*>(), 0, m_pRenderTargetResource->GetResource<ID3D11Texture2D*>(), 0, m_format);
 #endif
 }
 
@@ -215,7 +216,7 @@ void RenderableTexture::Update()
 void RenderableTexture::DumpTextureToFile()
 {
 #if defined(XCGRAPHICS_DX11)
-    m_deviceContext.ResolveSubresource(m_pRenderTargetTextureStaged->GetResource<ID3D11Texture2D*>(), 0, m_pRenderTargetResource->GetResource<ID3D11Texture2D*>(), 0, DXGI_FORMAT_R8G8B8A8_UNORM);
+    m_deviceContext.ResolveSubresource(m_pRenderTargetTextureStaged->GetResource<ID3D11Texture2D*>(), 0, m_pRenderTargetResource->GetResource<ID3D11Texture2D*>(), 0, m_format);
 
     D3D11_MAPPED_SUBRESOURCE subResource = { 0 };
 
@@ -229,7 +230,7 @@ void RenderableTexture::DumpTextureToFile()
     u8* pData = (u8*)subResource.pData;
 
     DirectX::Image image;
-    image.format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    image.format = m_format;
     image.height = texDesc.Height;
     image.width = texDesc.Width;
     image.pixels = pData;
@@ -249,7 +250,7 @@ void RenderableTexture::DumpTextureToFile()
 RenderableTexture::RenderedTextureInfo* RenderableTexture::GetRenderToTexture()
 {
 #if defined(XCGRAPHICS_DX11)
-    m_deviceContext.ResolveSubresource(m_pRenderTargetTextureStaged->GetResource<ID3D11Texture2D*>(), 0, m_pRenderTargetResource->GetResource<ID3D11Texture2D*>(), 0, DXGI_FORMAT_R8G8B8A8_UNORM);
+    m_deviceContext.ResolveSubresource(m_pRenderTargetTextureStaged->GetResource<ID3D11Texture2D*>(), 0, m_pRenderTargetResource->GetResource<ID3D11Texture2D*>(), 0, m_format);
 
     D3D11_MAPPED_SUBRESOURCE subResource = { 0 };
 

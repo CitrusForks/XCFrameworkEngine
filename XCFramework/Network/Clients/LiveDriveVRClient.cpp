@@ -53,7 +53,7 @@ void LiveDriveVRClient::sendTexture()
     if (m_sendData)
     {
 #if defined(XCGRAPHICS_DX11)
-        RenderableTexture& texture = m_graphicsSystem->GetRenderTexture(RENDERTARGET_LIVEDRIVE);
+        RenderableTexture& texture = m_graphicsSystem->GetRenderTexture(RenderTargetType_LiveDrive);
         m_texInfo = texture.GetRenderToTexture();
         if (m_texInfo)
         {

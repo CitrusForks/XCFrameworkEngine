@@ -17,6 +17,9 @@
 #include "Graphics/GPUResourceSystem.h"
 #include "Graphics/XC_Shaders/XC_ShaderHandle.h"
 
+//TODO : Remove this dependency of light over here.
+#include "Graphics/XC_Lighting/XC_LightManager.h"
+
 #include "Assets/Packages/PackageConsts.h"
 #include "Libs/Dx12Helpers/d3dx12.h"
 
@@ -29,7 +32,6 @@ XC_GraphicsDx12::XC_GraphicsDx12(void)
     , m_pFence(nullptr)
     , m_rootSignature(nullptr)
     , m_pipelineState(nullptr)
-
     , m_renderQuadVB(nullptr)
     , m_renderQuadIB(nullptr)
 {
@@ -315,20 +317,28 @@ void XC_GraphicsDx12::DebugTestGraphicsPipeline()
 void XC_GraphicsDx12::SetupRenderTargets()
 {
     //Initiate RenderableTextures
-    m_renderTargets[RENDERTARGET_MAIN_0] = XCNEW(RenderableTexture)(RENDERTARGET_MAIN_0, *m_pD3DDevice, *m_graphicsCommandList);
-    m_renderTargets[RENDERTARGET_MAIN_0]->PreLoad(m_pSwapChain);
+    m_renderTargets[RenderTargetType_Main_0] = XCNEW(RenderableTexture)(RenderTargetType_Main_0, DXGI_FORMAT_R8G8B8A8_UNORM, *m_pD3DDevice, *m_graphicsCommandList);
+    m_renderTargets[RenderTargetType_Main_0]->PreLoad(m_pSwapChain);
 
-    m_renderTargets[RENDERTARGET_MAIN_1] = XCNEW(RenderableTexture)(RENDERTARGET_MAIN_1, *m_pD3DDevice, *m_graphicsCommandList);
-    m_renderTargets[RENDERTARGET_MAIN_1]->PreLoad(m_pSwapChain);
+    m_renderTargets[RenderTargetType_Main_1] = XCNEW(RenderableTexture)(RenderTargetType_Main_1, DXGI_FORMAT_R8G8B8A8_UNORM, *m_pD3DDevice, *m_graphicsCommandList);
+    m_renderTargets[RenderTargetType_Main_1]->PreLoad(m_pSwapChain);
 
-    m_renderTargets[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL] = XCNEW(RenderableTexture)(RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL, *m_pD3DDevice, *m_graphicsCommandList);
-    m_renderTargets[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL]->PreLoad(m_Enable4xMsaa & m_4xMsaaQuality, m_ClientWidth, m_ClientHeight);
+    m_renderTargets[RenderTargetType_GBuffer_Diffuse] = XCNEW(RenderableTexture)(RenderTargetType_GBuffer_Diffuse, DXGI_FORMAT_R8G8B8A8_UNORM, *m_pD3DDevice, *m_graphicsCommandList);
+    m_renderTargets[RenderTargetType_GBuffer_Diffuse]->PreLoad(m_Enable4xMsaa & m_4xMsaaQuality, m_ClientWidth, m_ClientHeight);
 
-    m_renderTargets[RENDERTARGET_GBUFFER_LIGHTING] = XCNEW(RenderableTexture)(RENDERTARGET_GBUFFER_LIGHTING, *m_pD3DDevice, *m_graphicsCommandList);
-    m_renderTargets[RENDERTARGET_GBUFFER_LIGHTING]->PreLoad(m_Enable4xMsaa & m_4xMsaaQuality, m_ClientWidth, m_ClientHeight);
+    m_renderTargets[RenderTargetType_GBuffer_Position] = XCNEW(RenderableTexture)(RenderTargetType_GBuffer_Position, DXGI_FORMAT_R32G32B32A32_FLOAT, *m_pD3DDevice, *m_graphicsCommandList);
+    m_renderTargets[RenderTargetType_GBuffer_Position]->PreLoad(m_Enable4xMsaa & m_4xMsaaQuality, m_ClientWidth, m_ClientHeight);
 
-    m_renderTargets[RENDERTARGET_LIVEDRIVE] = XCNEW(RenderableTexture)(RENDERTARGET_LIVEDRIVE, *m_pD3DDevice, *m_graphicsCommandList);
-    m_renderTargets[RENDERTARGET_LIVEDRIVE]->PreLoad(m_Enable4xMsaa & m_4xMsaaQuality, 256, 256);
+    m_renderTargets[RenderTargetType_GBuffer_Normal] = XCNEW(RenderableTexture)(RenderTargetType_GBuffer_Normal, DXGI_FORMAT_R8G8B8A8_UNORM, *m_pD3DDevice, *m_graphicsCommandList);
+    m_renderTargets[RenderTargetType_GBuffer_Normal]->PreLoad(m_Enable4xMsaa & m_4xMsaaQuality, m_ClientWidth, m_ClientHeight);
+
+#if defined(DEBUG_DEFERRED_LIGHTING)
+    m_renderTargets[RenderTargetType_Debug] = XCNEW(RenderableTexture)(RenderTargetType_Debug, DXGI_FORMAT_R8G8B8A8_UNORM, *m_pD3DDevice, *m_graphicsCommandList);
+    m_renderTargets[RenderTargetType_Debug]->PreLoad(m_Enable4xMsaa & m_4xMsaaQuality, m_ClientWidth, m_ClientHeight);
+#endif
+
+    m_renderTargets[RenderTargetType_LiveDrive] = XCNEW(RenderableTexture)(RenderTargetType_LiveDrive, DXGI_FORMAT_R8G8B8A8_UNORM, *m_pD3DDevice, *m_graphicsCommandList);
+    m_renderTargets[RenderTargetType_LiveDrive]->PreLoad(m_Enable4xMsaa & m_4xMsaaQuality, 256, 256);
 }
 
 void XC_GraphicsDx12::SetupDepthView()
@@ -343,30 +353,42 @@ void XC_GraphicsDx12::SetupDepthView()
     depthViewResDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL | D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE;
     depthViewResDesc.DepthOrArraySize = 1;
 
-    depthViewResDesc.Width = (UINT64)m_ScreenViewPort[RENDERTARGET_MAIN_0].Width;
-    depthViewResDesc.Height = (UINT64)m_ScreenViewPort[RENDERTARGET_MAIN_0].Height;
-    m_depthStencilResource[RENDERTARGET_MAIN_0] = m_gpuResourceSystem->CreateTextureResource(depthViewResDesc, nullptr);
-    m_gpuResourceSystem->CreateDepthStencilView(m_depthStencilResource[RENDERTARGET_MAIN_0]);
+    depthViewResDesc.Width = (UINT64)m_ScreenViewPort[RenderTargetType_Main_0].Width;
+    depthViewResDesc.Height = (UINT64)m_ScreenViewPort[RenderTargetType_Main_0].Height;
+    m_depthStencilResource[RenderTargetType_Main_0] = m_gpuResourceSystem->CreateTextureResource(depthViewResDesc, nullptr);
+    m_gpuResourceSystem->CreateDepthStencilView(m_depthStencilResource[RenderTargetType_Main_0]);
 
-    depthViewResDesc.Width = (UINT64)m_ScreenViewPort[RENDERTARGET_MAIN_1].Width;
-    depthViewResDesc.Height = (UINT64)m_ScreenViewPort[RENDERTARGET_MAIN_1].Height;
-    m_depthStencilResource[RENDERTARGET_MAIN_1] = m_gpuResourceSystem->CreateTextureResource(depthViewResDesc, nullptr);
-    m_gpuResourceSystem->CreateDepthStencilView(m_depthStencilResource[RENDERTARGET_MAIN_1]);
+    depthViewResDesc.Width = (UINT64)m_ScreenViewPort[RenderTargetType_Main_1].Width;
+    depthViewResDesc.Height = (UINT64)m_ScreenViewPort[RenderTargetType_Main_1].Height;
+    m_depthStencilResource[RenderTargetType_Main_1] = m_gpuResourceSystem->CreateTextureResource(depthViewResDesc, nullptr);
+    m_gpuResourceSystem->CreateDepthStencilView(m_depthStencilResource[RenderTargetType_Main_1]);
 
-    depthViewResDesc.Width = (UINT64)m_ScreenViewPort[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL].Width;
-    depthViewResDesc.Height = (UINT64)m_ScreenViewPort[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL].Height;
-    m_depthStencilResource[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL] = m_gpuResourceSystem->CreateTextureResource(depthViewResDesc, nullptr);
-    m_gpuResourceSystem->CreateDepthStencilView(m_depthStencilResource[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL]);
+    depthViewResDesc.Width = (UINT64)m_ScreenViewPort[RenderTargetType_GBuffer_Diffuse].Width;
+    depthViewResDesc.Height = (UINT64)m_ScreenViewPort[RenderTargetType_GBuffer_Diffuse].Height;
+    m_depthStencilResource[RenderTargetType_GBuffer_Diffuse] = m_gpuResourceSystem->CreateTextureResource(depthViewResDesc, nullptr);
+    m_gpuResourceSystem->CreateDepthStencilView(m_depthStencilResource[RenderTargetType_GBuffer_Diffuse]);
 
-    depthViewResDesc.Width = (UINT64)m_ScreenViewPort[RENDERTARGET_GBUFFER_LIGHTING].Width;
-    depthViewResDesc.Height = (UINT64)m_ScreenViewPort[RENDERTARGET_GBUFFER_LIGHTING].Height;
-    m_depthStencilResource[RENDERTARGET_GBUFFER_LIGHTING] = m_gpuResourceSystem->CreateTextureResource(depthViewResDesc, nullptr);
-    m_gpuResourceSystem->CreateDepthStencilView(m_depthStencilResource[RENDERTARGET_GBUFFER_LIGHTING]);
+    depthViewResDesc.Width = (UINT64)m_ScreenViewPort[RenderTargetType_GBuffer_Position].Width;
+    depthViewResDesc.Height = (UINT64)m_ScreenViewPort[RenderTargetType_GBuffer_Position].Height;
+    m_depthStencilResource[RenderTargetType_GBuffer_Position] = m_gpuResourceSystem->CreateTextureResource(depthViewResDesc, nullptr);
+    m_gpuResourceSystem->CreateDepthStencilView(m_depthStencilResource[RenderTargetType_GBuffer_Position]);
 
-    depthViewResDesc.Width = (UINT64)m_ScreenViewPort[RENDERTARGET_LIVEDRIVE].Width;
-    depthViewResDesc.Height = (UINT64)m_ScreenViewPort[RENDERTARGET_LIVEDRIVE].Height;
-    m_depthStencilResource[RENDERTARGET_LIVEDRIVE] = m_gpuResourceSystem->CreateTextureResource(depthViewResDesc, nullptr);
-    m_gpuResourceSystem->CreateDepthStencilView(m_depthStencilResource[RENDERTARGET_LIVEDRIVE]);
+    depthViewResDesc.Width = (UINT64)m_ScreenViewPort[RenderTargetType_GBuffer_Normal].Width;
+    depthViewResDesc.Height = (UINT64)m_ScreenViewPort[RenderTargetType_GBuffer_Normal].Height;
+    m_depthStencilResource[RenderTargetType_GBuffer_Normal] = m_gpuResourceSystem->CreateTextureResource(depthViewResDesc, nullptr);
+    m_gpuResourceSystem->CreateDepthStencilView(m_depthStencilResource[RenderTargetType_GBuffer_Normal]);
+
+#if defined(DEBUG_DEFERRED_LIGHTING)
+    depthViewResDesc.Width = (UINT64)m_ScreenViewPort[RenderTargetType_Debug].Width;
+    depthViewResDesc.Height = (UINT64)m_ScreenViewPort[RenderTargetType_Debug].Height;
+    m_depthStencilResource[RenderTargetType_Debug] = m_gpuResourceSystem->CreateTextureResource(depthViewResDesc, nullptr);
+    m_gpuResourceSystem->CreateDepthStencilView(m_depthStencilResource[RenderTargetType_Debug]);
+#endif
+
+    depthViewResDesc.Width = (UINT64)m_ScreenViewPort[RenderTargetType_LiveDrive].Width;
+    depthViewResDesc.Height = (UINT64)m_ScreenViewPort[RenderTargetType_LiveDrive].Height;
+    m_depthStencilResource[RenderTargetType_LiveDrive] = m_gpuResourceSystem->CreateTextureResource(depthViewResDesc, nullptr);
+    m_gpuResourceSystem->CreateDepthStencilView(m_depthStencilResource[RenderTargetType_LiveDrive]);
 }
 
 void XC_GraphicsDx12::CreateDescriptorHeaps()
@@ -377,8 +399,8 @@ void XC_GraphicsDx12::CreateDescriptorHeaps()
     m_sharedDescriptorHeap = (SharedDescriptorHeap*)&container.CreateNewSystem("SharedDescriptorHeap");
 
     m_sharedDescriptorHeap->Init(*m_pD3DDevice
-        , RENDERTARGET_MAX + 1 //No of RTV's
-        , RENDERTARGET_MAX + 1 //No of DSV's
+        , RenderTargetType_Max + 1 //No of RTV's
+        , RenderTargetType_Max + 1 //No of DSV's
         , 1 //No of Samplers
 #if defined(LOAD_SHADERS_FROM_DATA)
         , 100 //No of CBV, UAV combined
@@ -452,8 +474,13 @@ void XC_GraphicsDx12::BeginScene()
     m_graphicsCommandList->RSSetScissorRects(1, &m_scissorRect);
 
     SetResourceBarrier(m_graphicsCommandList, m_renderTargets[m_frameIndex]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
-    SetResourceBarrier(m_graphicsCommandList, m_renderTargets[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
-    SetResourceBarrier(m_graphicsCommandList, m_renderTargets[RENDERTARGET_GBUFFER_LIGHTING]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
+    SetResourceBarrier(m_graphicsCommandList, m_renderTargets[RenderTargetType_GBuffer_Diffuse]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
+    SetResourceBarrier(m_graphicsCommandList, m_renderTargets[RenderTargetType_GBuffer_Position]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
+    SetResourceBarrier(m_graphicsCommandList, m_renderTargets[RenderTargetType_GBuffer_Normal]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
+
+#if defined(DEBUG_DEFERRED_LIGHTING)
+    SetResourceBarrier(m_graphicsCommandList, m_renderTargets[RenderTargetType_Debug]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
+#endif
 
     //On immediate context, we only want to work on current frame render target, so set and clear
     std::vector<RenderTargetsType> rtvs = { (RenderTargetsType) m_frameIndex };
@@ -474,8 +501,9 @@ void XC_GraphicsDx12::BeginScene()
 #endif
 
     //On deferred context, we work on multiple render targets for deferred lighting. So work on them.
-    rtvs.push_back(RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL); 
-    rtvs.push_back(RENDERTARGET_GBUFFER_LIGHTING );
+    rtvs.push_back(RenderTargetType_GBuffer_Diffuse);
+    rtvs.push_back(RenderTargetType_GBuffer_Position);
+    rtvs.push_back(RenderTargetType_GBuffer_Normal);
 
     m_renderingPool->Begin(rtvs);
 }
@@ -490,18 +518,28 @@ void XC_GraphicsDx12::EndScene()
     m_renderingPool->Execute(m_pCommandQueue);
 
     //Draw post processed render target
-    SetResourceBarrier(m_graphicsCommandList, m_renderTargets[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-    SetResourceBarrier(m_graphicsCommandList, m_renderTargets[RENDERTARGET_GBUFFER_LIGHTING]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+    SetResourceBarrier(m_graphicsCommandList, m_renderTargets[RenderTargetType_GBuffer_Diffuse]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+    SetResourceBarrier(m_graphicsCommandList, m_renderTargets[RenderTargetType_GBuffer_Position]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+    SetResourceBarrier(m_graphicsCommandList, m_renderTargets[RenderTargetType_GBuffer_Normal]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
-    m_XCShaderSystem->ApplyShader(*m_graphicsCommandList, ShaderType_RenderTexture);
+#if defined(DEBUG_DEFERRED_LIGHTING)
+    SetResourceBarrier(m_graphicsCommandList, m_renderTargets[RenderTargetType_Debug]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+#endif
 
-    XCShaderHandle* shaderHandle = (XCShaderHandle*)m_XCShaderSystem->GetShader(ShaderType_RenderTexture);
-    shaderHandle->SetResource("gTexture", *m_graphicsCommandList, m_renderTargets[RENDERTARGET_GBUFFER_LIGHTING]->GetRenderTargetResource());
+    m_XCShaderSystem->ApplyShader(*m_graphicsCommandList, ShaderType_DeferredLighting);
+
+    XCShaderHandle* shaderHandle = (XCShaderHandle*)m_XCShaderSystem->GetShader(ShaderType_DeferredLighting);
+    shaderHandle->SetResource("gGBufferDiffuse", *m_graphicsCommandList, m_renderTargets[RenderTargetType_GBuffer_Diffuse]->GetRenderTargetResource());
+    shaderHandle->SetResource("gGBufferPosition", *m_graphicsCommandList, m_renderTargets[RenderTargetType_GBuffer_Position]->GetRenderTargetResource());
+    shaderHandle->SetResource("gGBufferNormal", *m_graphicsCommandList, m_renderTargets[RenderTargetType_GBuffer_Normal]->GetRenderTargetResource());
 
     shaderHandle->SetVertexBuffer(*m_graphicsCommandList, m_renderQuadVB);
     shaderHandle->SetIndexBuffer(*m_graphicsCommandList, *m_renderQuadIB);
 
-    m_graphicsCommandList->DrawIndexedInstanced(m_renderQuadIB->m_indexData.size(), 1, 0, 0, 0);
+    XC_LightManager* lightMgr = (XC_LightManager*)&SystemLocator::GetInstance()->RequestSystem("LightsManager");
+    shaderHandle->SetConstantBuffer("cbLightsPerFrame", *m_graphicsCommandList, lightMgr->GetLightConstantBuffer());
+
+    m_graphicsCommandList->DrawIndexedInstanced(m_renderQuadIB->m_indexData.size(), 1, 0, 0, 0);;
 
     //Present
     SetResourceBarrier(m_graphicsCommandList, m_renderTargets[m_frameIndex]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
@@ -536,8 +574,8 @@ void XC_GraphicsDx12::ClearRTVAndDSVs(ID3DDeviceContext& context, std::vector<Re
 void XC_GraphicsDx12::SetRenderableTargets(ID3DDeviceContext& context, const std::vector<RenderTargetsType>& types)
 {
     //Create a list of all the rtv's & dsv's that are going to be used
-    D3D12_CPU_DESCRIPTOR_HANDLE rtvDescHandle[RENDERTARGET_MAX];
-    D3D12_CPU_DESCRIPTOR_HANDLE depthDescHandle[RENDERTARGET_MAX];
+    D3D12_CPU_DESCRIPTOR_HANDLE rtvDescHandle[RenderTargetType_Max];
+    D3D12_CPU_DESCRIPTOR_HANDLE depthDescHandle[RenderTargetType_Max];
 
     for (u32 rIndex = 0; rIndex < types.size(); ++rIndex)
     {
@@ -572,46 +610,54 @@ void XC_GraphicsDx12::OnResize(i32 _width, i32 _height)
         m_ClientWidth = _width;
         m_ClientHeight = _height;
 
-        m_renderTargets[RENDERTARGET_MAIN_0]->OnResize();
-        m_renderTargets[RENDERTARGET_MAIN_1]->OnResize();
+        m_renderTargets[RenderTargetType_Main_0]->OnResize();
+        m_renderTargets[RenderTargetType_Main_1]->OnResize();
 
-        m_renderTargets[RENDERTARGET_MAIN_0]->Destroy();
-        m_renderTargets[RENDERTARGET_MAIN_1]->Destroy();
-        m_renderTargets[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL]->Destroy();
-        m_renderTargets[RENDERTARGET_GBUFFER_LIGHTING]->Destroy();
+        m_renderTargets[RenderTargetType_Main_0]->Destroy();
+        m_renderTargets[RenderTargetType_Main_1]->Destroy();
+        m_renderTargets[RenderTargetType_GBuffer_Diffuse]->Destroy();
+        m_renderTargets[RenderTargetType_GBuffer_Position]->Destroy();
+        m_renderTargets[RenderTargetType_GBuffer_Normal]->Destroy();
 
         m_pSwapChain->ResizeBuffers(0, m_ClientWidth, m_ClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
         
         SetupViewPort();
 
         //Create RenderTargetView
-        m_renderTargets[RENDERTARGET_MAIN_0]->PreLoad(m_pSwapChain);
-        m_renderTargets[RENDERTARGET_MAIN_1]->PreLoad(m_pSwapChain);
-        m_renderTargets[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL]->PreLoad(m_Enable4xMsaa & m_4xMsaaQuality, m_ClientWidth, m_ClientHeight);
-        m_renderTargets[RENDERTARGET_GBUFFER_LIGHTING]->PreLoad(m_Enable4xMsaa & m_4xMsaaQuality, m_ClientWidth, m_ClientHeight);
+        m_renderTargets[RenderTargetType_Main_0]->PreLoad(m_pSwapChain);
+        m_renderTargets[RenderTargetType_Main_1]->PreLoad(m_pSwapChain);
+        m_renderTargets[RenderTargetType_GBuffer_Diffuse]->PreLoad(m_Enable4xMsaa & m_4xMsaaQuality, m_ClientWidth, m_ClientHeight);
+        m_renderTargets[RenderTargetType_GBuffer_Position]->PreLoad(m_Enable4xMsaa & m_4xMsaaQuality, m_ClientWidth, m_ClientHeight);
+        m_renderTargets[RenderTargetType_GBuffer_Normal]->PreLoad(m_Enable4xMsaa & m_4xMsaaQuality, m_ClientWidth, m_ClientHeight);
 
         //Reset the depth stencil
-        D3D_TEXTURE2D_DESC depthDesc = m_depthStencilResource[RENDERTARGET_MAIN_0]->GetResource<ID3D12Resource*>()->GetDesc();
-        m_gpuResourceSystem->DestroyResource(m_depthStencilResource[RENDERTARGET_MAIN_0]);
+        D3D_TEXTURE2D_DESC depthDesc = m_depthStencilResource[RenderTargetType_Main_0]->GetResource<ID3D12Resource*>()->GetDesc();
+        m_gpuResourceSystem->DestroyResource(m_depthStencilResource[RenderTargetType_Main_0]);
         depthDesc.Width = m_ClientWidth;
         depthDesc.Height = m_ClientHeight;
-        m_depthStencilResource[RENDERTARGET_MAIN_0] = m_gpuResourceSystem->CreateTextureResource(depthDesc, nullptr);
-        m_gpuResourceSystem->CreateDepthStencilView(m_depthStencilResource[RENDERTARGET_MAIN_0]);
+        m_depthStencilResource[RenderTargetType_Main_0] = m_gpuResourceSystem->CreateTextureResource(depthDesc, nullptr);
+        m_gpuResourceSystem->CreateDepthStencilView(m_depthStencilResource[RenderTargetType_Main_0]);
 
-        depthDesc = m_depthStencilResource[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL]->GetResource<ID3D12Resource*>()->GetDesc();
-        m_gpuResourceSystem->DestroyResource(m_depthStencilResource[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL]);
+        depthDesc = m_depthStencilResource[RenderTargetType_GBuffer_Diffuse]->GetResource<ID3D12Resource*>()->GetDesc();
+        m_gpuResourceSystem->DestroyResource(m_depthStencilResource[RenderTargetType_GBuffer_Diffuse]);
         depthDesc.Width = m_ClientWidth;
         depthDesc.Height = m_ClientHeight;
-        m_depthStencilResource[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL] = m_gpuResourceSystem->CreateTextureResource(depthDesc, nullptr);
-        m_gpuResourceSystem->CreateDepthStencilView(m_depthStencilResource[RENDERTARGET_GBUFFER_POS_DIFFUSE_NORMAL]);
+        m_depthStencilResource[RenderTargetType_GBuffer_Diffuse] = m_gpuResourceSystem->CreateTextureResource(depthDesc, nullptr);
+        m_gpuResourceSystem->CreateDepthStencilView(m_depthStencilResource[RenderTargetType_GBuffer_Diffuse]);
 
-        depthDesc = m_depthStencilResource[RENDERTARGET_GBUFFER_LIGHTING]->GetResource<ID3D12Resource*>()->GetDesc();
-        m_gpuResourceSystem->DestroyResource(m_depthStencilResource[RENDERTARGET_GBUFFER_LIGHTING]);
+        depthDesc = m_depthStencilResource[RenderTargetType_GBuffer_Position]->GetResource<ID3D12Resource*>()->GetDesc();
+        m_gpuResourceSystem->DestroyResource(m_depthStencilResource[RenderTargetType_GBuffer_Position]);
         depthDesc.Width = m_ClientWidth;
         depthDesc.Height = m_ClientHeight;
-        m_depthStencilResource[RENDERTARGET_GBUFFER_LIGHTING] = m_gpuResourceSystem->CreateTextureResource(depthDesc, nullptr);
-        m_gpuResourceSystem->CreateDepthStencilView(m_depthStencilResource[RENDERTARGET_GBUFFER_LIGHTING]);
+        m_depthStencilResource[RenderTargetType_GBuffer_Position] = m_gpuResourceSystem->CreateTextureResource(depthDesc, nullptr);
+        m_gpuResourceSystem->CreateDepthStencilView(m_depthStencilResource[RenderTargetType_GBuffer_Position]);
 
+        depthDesc = m_depthStencilResource[RenderTargetType_GBuffer_Normal]->GetResource<ID3D12Resource*>()->GetDesc();
+        m_gpuResourceSystem->DestroyResource(m_depthStencilResource[RenderTargetType_GBuffer_Normal]);
+        depthDesc.Width = m_ClientWidth;
+        depthDesc.Height = m_ClientHeight;
+        m_depthStencilResource[RenderTargetType_GBuffer_Normal] = m_gpuResourceSystem->CreateTextureResource(depthDesc, nullptr);
+        m_gpuResourceSystem->CreateDepthStencilView(m_depthStencilResource[RenderTargetType_GBuffer_Normal]);
     }
 }
 

@@ -4,7 +4,8 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
-#pragma once
+#ifndef _MATERIAL_H_
+#define _MATERIAL_H_
 
 struct Material
 {
@@ -13,3 +14,5 @@ struct Material
     float4  Specular;
     float4  Padding;
 };
+
+#endif

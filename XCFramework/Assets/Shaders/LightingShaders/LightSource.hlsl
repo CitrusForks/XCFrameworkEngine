@@ -4,7 +4,8 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
-#pragma once
+#ifndef _LIGHTSOURCE_H_
+#define _LIGHTSOURCE_H_
 
 #include "..\Materials\Material.hlsl"
 
@@ -43,3 +44,5 @@ float4 CalculateLightImpact(LightSource lightSource, float4 vertexPos, float4 su
 
     return surfaceColor;
 }
+
+#endif

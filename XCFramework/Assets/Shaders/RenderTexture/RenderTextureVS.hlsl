@@ -4,6 +4,9 @@
 * This program is complaint with GNU General Public License, version 3.
 * For complete license, read License.txt in source root directory. */
 
+#ifndef _RENDERTEXTUREVS_H_
+#define _RENDERTEXTUREVS_H_
+
 Texture2D gTexture : register(t0);
 SamplerState samLinear : register(s0);
 
@@ -28,3 +31,5 @@ VSOutput VSMain(VSInput input)
 
     return result;
 }
+
+#endif

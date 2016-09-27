@@ -41,7 +41,7 @@ void LiveDriveTexturePlane::PreLoad(const void* fbBuffer)
     m_material.Specular = XCVec4(texPlaneBuff->Material()->Specular()->x(), texPlaneBuff->Material()->Specular()->y(), texPlaneBuff->Material()->Specular()->z(), texPlaneBuff->Material()->Specular()->w());
 
     XC_Graphics& graphicsSystem = (XC_Graphics&)SystemLocator::GetInstance()->RequestSystem("GraphicsSystem");
-    m_liveDriveTexture = XCNEW(Texture2D)(graphicsSystem.GetRenderTexture(RENDERTARGET_LIVEDRIVE).GetRenderTargetResource());
+    m_liveDriveTexture = XCNEW(Texture2D)(graphicsSystem.GetRenderTexture(RenderTargetType_LiveDrive).GetRenderTargetResource());
     m_texture->m_Resource = m_liveDriveTexture;
 }
 

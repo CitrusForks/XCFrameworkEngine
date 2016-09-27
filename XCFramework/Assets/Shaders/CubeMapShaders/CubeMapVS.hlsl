@@ -4,7 +4,8 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
-#pragma once
+#ifndef _CUBEMAPVS_H_
+#define _CUBEMAPVS_H_
 
 cbuffer cbWVP : register(b0)
 {
@@ -36,3 +37,5 @@ VertexOut VSMain(VertexIn vin)
 
     return vout;
 }
+
+#endif

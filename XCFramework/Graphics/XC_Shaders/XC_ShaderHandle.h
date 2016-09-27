@@ -24,6 +24,11 @@ static const std::vector<std::string> gs_slotPriority =
     "cbWVP",
     "cbBoneBuffer",
 
+    //RTV treated as SRV
+    "gGBufferDiffuse",
+    "gGBufferPosition",
+    "gGBufferNormal",
+
     //Texture slots
     "gDiffuseMap",
     "gDiffuseMap1",

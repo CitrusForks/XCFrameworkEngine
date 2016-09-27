@@ -4,20 +4,12 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
-#pragma once
+#ifndef _TERRAINMULTITEXPS_H_
+#define _TERRAINMULTITEXPS_H_
 
 #include "..\LightingShaders\LightSource.hlsl"
 
-cbuffer cbLightsPerFrame : register(b0)
-{
-    LightSource      gLightSource[10];
-    float4           gNoOfLights;
-    float4           padding1;
-    float4           padding2;
-    float4           padding3;
-};
-
-cbuffer PerObjectBuffer : register(b1)
+cbuffer PerObjectBuffer : register(b0)
 {
     float4x4    gWorld;
     float4x4    gWVP;
@@ -25,6 +17,17 @@ cbuffer PerObjectBuffer : register(b1)
     float4x4    gTexTransform;
     Material    gMaterial;
 };
+
+#if defined(FORWARD_LIGHTING)
+cbuffer cbLightsPerFrame : register(b1)
+{
+    LightSource      gLightSource[10];
+    float4           gNoOfLights;
+    float4           padding1;
+    float4           padding2;
+    float4           padding3;
+};
+#endif
 
 Texture2D       gDiffuseMap : register(t0);    //Mapped with ShaderResource Variable
 Texture2D       gDiffuseMap1 : register(t1);    //Mapped with ShaderResource Variable
@@ -50,9 +53,10 @@ struct VertexOut
 
 struct PixelOut
 {
-    float4 RenderTarget0 : SV_Target0;
-    float4 RenderTarget1 : SV_Target1;
-    float4 RenderTarget2 : SV_Target2;
+    float4 RTMain        : SV_Target0;
+    float4 RTDiffuse     : SV_Target1;
+    float4 RTPosition    : SV_Target2;
+    float4 RTNormal      : SV_Target3;
 };
 
 PixelOut PSMain(VertexOut pin) : SV_Target
@@ -79,6 +83,7 @@ PixelOut PSMain(VertexOut pin) : SV_Target
     
     float4 finalColor = texColor + texColor1 + texColor2;
 
+#if defined(FORWARD_LIGHTING)
     float4 lightImpact = float4(0, 0, 0, 0);
 
     for (unsigned int index = 0; index < gNoOfLights.x; ++index)
@@ -94,11 +99,15 @@ PixelOut PSMain(VertexOut pin) : SV_Target
     finalColor += gMaterial.Ambient;
 
     finalColor.a = gMaterial.Diffuse.a * texColor.a;
+#endif
 
     PixelOut outColors;
-    outColors.RenderTarget0 = finalColor;
-    outColors.RenderTarget1 = finalColor;
-    outColors.RenderTarget2 = lightImpact;
+    outColors.RTMain     = finalColor;
+    outColors.RTDiffuse  = finalColor;
+    outColors.RTPosition = float4(pin.PosW, 0.0);
+    outColors.RTNormal   = float4(pin.NormalW, 0.0);
 
     return outColors;
 }
+
+#endif

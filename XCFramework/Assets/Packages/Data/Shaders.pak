@@ -5,6 +5,7 @@
 		{ ShaderUsage:SolidColor, 				VsPath:"Assets\\Shaders\\SolidColor\\SolidColorVS.cso", 				PsPath:"Assets\\Shaders\\SolidColor\\SolidColorPS.cso",				 EnableDepth:1 },
 		{ ShaderUsage:RenderTexture, 			VsPath:"Assets\\Shaders\\RenderTexture\\RenderTextureVS.cso", 			PsPath:"Assets\\Shaders\\RenderTexture\\RenderTexturePS.cso",		 EnableDepth:1 },
 		{ ShaderUsage:LightTexture, 			VsPath:"Assets\\Shaders\\LightTexture\\LightTextureVS.cso", 			PsPath:"Assets\\Shaders\\LightTexture\\LightTexturePS.cso",			 EnableDepth:1 },
+		{ ShaderUsage:DeferredLighting, 		VsPath:"Assets\\Shaders\\LightTexture\\DeferredLightingVS.cso", 		PsPath:"Assets\\Shaders\\LightTexture\\DeferredLightingPS.cso",		 EnableDepth:1 },
 		{ ShaderUsage:TerrainMultiTexture, 		VsPath:"Assets\\Shaders\\TerrainMultiTex\\TerrainMultiTexVS.cso", 		PsPath:"Assets\\Shaders\\TerrainMultiTex\\TerrainMultiTexPS.cso",	 EnableDepth:1 },
 		{ ShaderUsage:SkinnedCharacter, 		VsPath:"Assets\\Shaders\\SkinnedCharacter\\SkinnedCharacterVS.cso", 	PsPath:"Assets\\Shaders\\SkinnedCharacter\\SkinnedCharacterPS.cso",  EnableDepth:1 },
 		{ ShaderUsage:VectorFont, 				VsPath:"Assets\\Shaders\\VectorFontShader\\VectorFontVS.cso", 			PsPath:"Assets\\Shaders\\VectorFontShader\\VectorFontPS.cso",  		 EnableDepth:1 },

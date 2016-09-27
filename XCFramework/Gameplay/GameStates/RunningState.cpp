@@ -38,13 +38,6 @@ void RunningState::Init()
     ResourceManager& resMgr         = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
     XC_Graphics& graphicsSystem     = SystemLocator::GetInstance()->RequestSystem<XC_Graphics>("GraphicsSystem");
 
-    //Initialize the lights
-    SystemContainer& container = (SystemContainer&)SystemLocator::GetInstance()->GetSystemContainer();
-    container.RegisterSystem<XC_LightManager>("LightsManager");
-
-    m_lightManagerSystem = (XC_LightManager*)&container.CreateNewSystem("LightsManager");
-    m_lightManagerSystem->InitializeLights();
-
     //Set the camera to FPS mode
     m_cameraSystem->SetCameraType(CAMERATYPE_FPS);
 
@@ -62,7 +55,7 @@ void RunningState::Init()
     m_worldSystem->RequestAddActor(std::move(pSkyBox));
 
     std::unique_ptr<TexturedPlane> pTexturedPlane = (std::unique_ptr<TexturedPlane>)(TexturedPlane*)actorFactory.CreateActor("TexturedPlane");
-    pTexturedPlane->PreLoad(toXMVECTOR(0.0f, 5.0f, 10.0f, 1.0f), toXMVECTOR(0.0f, 0.0f, 0.0f, 1.0f), toXMVECTOR(5.0f, 5.0f, 0.0f, 1.0f), Material(), graphicsSystem.GetRenderTexture(RENDERTARGET_LIVEDRIVE), RasterType_FillSolid);
+    pTexturedPlane->PreLoad(toXMVECTOR(0.0f, 5.0f, 10.0f, 1.0f), toXMVECTOR(0.0f, 0.0f, 0.0f, 1.0f), toXMVECTOR(5.0f, 5.0f, 0.0f, 1.0f), Material(), graphicsSystem.GetRenderTexture(RenderTargetType_LiveDrive), RasterType_FillSolid);
     m_worldSystem->RequestAddActor(std::move(pTexturedPlane));
 
     std::unique_ptr<Waves> pWave = (std::unique_ptr<Waves>)(Waves*)actorFactory.CreateActor("Waves");
@@ -200,7 +193,6 @@ void RunningState::Update(f32 dt)
             m_worldSystem->EnablePhysics(false);
         }
 
-        m_lightManagerSystem->Update(dt);
         m_worldSystem->Update(dt);
     }
 
@@ -218,18 +210,12 @@ void RunningState::Draw(XC_Graphics& graphicsSystem)
 {
     if (m_worldSystem->IsWorldReady())
     {
-        m_lightManagerSystem->Draw(graphicsSystem);
         m_worldSystem->Draw(graphicsSystem);
     }
 }
 
 void RunningState::Destroy()
 {
-    m_lightManagerSystem->Destroy();
-
-    SystemContainer& container = SystemLocator::GetInstance()->GetSystemContainer();
-    container.RemoveSystem("LightsManager");
-
     m_worldSystem->SetWorldReady(false);
     m_worldSystem->Destroy();
 }

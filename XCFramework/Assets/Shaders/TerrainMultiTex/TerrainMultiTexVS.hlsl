@@ -4,20 +4,13 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
-#pragma once
+#ifndef _TERRAINMULTITEXVS_H_
+#define _TERRAINMULTITEXVS_H_
 
 #include "..\LightingShaders\LightSource.hlsl"
 
-cbuffer cbLightsPerFrame : register(b0)
-{
-    LightSource      gLightSource[10];
-    float4           gNoOfLights;
-    float4           padding1;
-    float4           padding2;
-    float4           padding3;
-};
 
-cbuffer PerObjectBuffer : register(b1)
+cbuffer PerObjectBuffer : register(b0)
 {
     float4x4    gWorld;
     float4x4    gWVP;
@@ -25,6 +18,17 @@ cbuffer PerObjectBuffer : register(b1)
     float4x4    gTexTransform;
     Material    gMaterial;
 };
+
+#if defined(FORWARD_LIGHTING)
+cbuffer cbLightsPerFrame : register(b1)
+{
+    LightSource      gLightSource[10];
+    float4           gNoOfLights;
+    float4           padding1;
+    float4           padding2;
+    float4           padding3;
+};
+#endif
 
 Texture2D       gDiffuseMap : register(t0);    //Mapped with ShaderResource Variable
 Texture2D       gDiffuseMap1 : register(t1);    //Mapped with ShaderResource Variable
@@ -70,3 +74,5 @@ VertexOut VSMain(VertexIn vin)
     
     return vout;
 }
+
+#endif

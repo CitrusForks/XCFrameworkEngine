@@ -4,6 +4,9 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
+#ifndef _VECTORFONTPS_H_
+#define _VECTORFONTPS_H_
+
 cbuffer cbPerObjectInstanced : register(b0)
 {
     float4x4 gWVP[100];
@@ -15,7 +18,7 @@ struct VertexIn
     float4          Color : COLOR;
 
     //Instance data
-    float4          SamplePad : BLENDWEIGHT;
+    float4          SamplePad     : BLENDWEIGHT;
     uint            InstanceIndex : SV_InstanceID;
 };
 
@@ -29,3 +32,5 @@ float4 PSMain(VertexOut pin) : SV_Target
 {
     return pin.Color;
 }
+
+#endif

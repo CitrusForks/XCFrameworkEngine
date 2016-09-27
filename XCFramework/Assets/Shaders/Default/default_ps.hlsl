@@ -4,6 +4,9 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
+#ifndef _DEFAULTPS_H_
+#define _DEFAULTPS_H_
+
 struct PSInput
 {
     float4 position : SV_POSITION;
@@ -14,3 +17,5 @@ float4 PSMain(PSInput input) : SV_TARGET
 {
     return input.color;
 }
+
+#endif
