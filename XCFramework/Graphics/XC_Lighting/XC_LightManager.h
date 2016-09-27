@@ -29,9 +29,10 @@ public:
 
 protected:
     static const u32                NoOfLights = 5;
+
 private:
 
-    std::vector<ILight*>            m_Lights;
+    std::vector<LightSource*>       m_Lights;
     XCVec4                          m_eyePos;
 
     GPUResource*                    m_pCBLightsPerFrame;

@@ -35,7 +35,7 @@ void XC_LightManager::InitializeLights()
         lightSource->Direction   = XCVec4Unaligned(0.0f, 1.0f, 0.0f, 0.0f);
         lightSource->Position    = XCVec4Unaligned(0.0f, 10.0f, index * 50.0f, 1.0f);
 
-        m_Lights.push_back((ILight*)lightSource);
+        m_Lights.push_back(lightSource);
     }
 
     m_eyePos = XCVec4(0, 0, 0, 0);
@@ -62,7 +62,7 @@ void XC_LightManager::Draw(XC_Graphics& graphicsSystem)
 
     for (u32 index = 0; index < NoOfLights; ++index)
     {
-        lightsPerFrame.gLightSource[index] = *(LightSource*)m_Lights[index];
+        lightsPerFrame.gLightSource[index] = *m_Lights[index];
     }
     lightsPerFrame.gNoOfLights = XCVec4Unaligned(NoOfLights, NoOfLights, NoOfLights, 1.0f);
 
