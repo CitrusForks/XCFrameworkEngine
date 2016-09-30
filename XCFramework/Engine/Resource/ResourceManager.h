@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "Engine/System/ISystem.h"
+#include "Base/System/ISystem.h"
 #include "Engine/TaskManager/TaskManager.h"
 #include "Engine/Resource/IResource.h"
 #include "Engine/Resource/ResourceFactory.h"

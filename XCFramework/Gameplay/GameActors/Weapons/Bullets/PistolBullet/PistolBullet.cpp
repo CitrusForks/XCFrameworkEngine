@@ -10,10 +10,10 @@
 
 #include "Engine/Resource/ResourceManager.h"
 
-#include "Graphics/XC_Shaders/XC_ShaderBufferConstants.h"
-#include "Graphics/XC_Shaders/XC_ShaderHandle.h"
+#include "Graphics/XCShaders/XCShaderBufferConstants.h"
+#include "Graphics/XCShaders/XCShaderHandle.h"
 
-#include "Gameplay/XC_Camera/XC_CameraManager.h"
+#include "Gameplay/XCCamera/XCCameraManager.h"
 
 PistolBullet::PistolBullet(void)
 {

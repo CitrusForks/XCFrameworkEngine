@@ -20,7 +20,7 @@ namespace GameState
 
         void                Init()                              override;
         void                Update(f32 dt)                    override;
-        void                Draw(XC_Graphics& graphicsSystem)   override;
+        void                Draw(XCGraphics& graphicsSystem)   override;
         void                Destroy()                           override;
     };
 }

@@ -9,11 +9,11 @@
 #include "LiveDriveVRClient.h"
 
 #if defined(XCGRAPHICS_DX11)
-#include "Graphics/XC_Graphics.h"
-#include "Graphics/XC_Textures/RenderableTexture.h"
+#include "Graphics/XCGraphics.h"
+#include "Graphics/XCTextures/RenderableTexture.h"
 #endif
 
-#include "Engine/Input/Directinput.h"
+#include "Engine/Input/XCInput.h"
 
 LiveDriveVRClient::LiveDriveVRClient()
 {
@@ -28,10 +28,10 @@ LiveDriveVRClient::~LiveDriveVRClient()
 void LiveDriveVRClient::Init(const char *ip, i32 port)
 {
     Client::Init(ip, port);
-    m_directInput = (DirectInput*) &SystemLocator::GetInstance()->RequestSystem("InputSystem");
+    m_directInput = (XCInput*) &SystemLocator::GetInstance()->RequestSystem("InputSystem");
 
 #if defined(XCGRAPHICS_DX11)
-    m_graphicsSystem = (XC_Graphics*) &SystemLocator::GetInstance()->RequestSystem("GraphicsSystem");
+    m_graphicsSystem = (XCGraphics*) &SystemLocator::GetInstance()->RequestSystem("GraphicsSystem");
 #endif
 }
 

@@ -7,7 +7,7 @@
 #include "GameplayPrecompiledHeader.h"
 
 #include "Waves.h"
-#include "Graphics/XC_GraphicsDx11.h"
+#include "Graphics/XCGraphicsDx11.h"
 
 Waves::Waves(void)
 {
@@ -43,7 +43,7 @@ void Waves::Update(f32 dt)
 {
     SimpleTerrain::Update(dt);
  
-    XC_Graphics& graphicsSystem = (XC_Graphics&)SystemLocator::GetInstance()->RequestSystem("GraphicsSystem");
+    XCGraphics& graphicsSystem = (XCGraphics&)SystemLocator::GetInstance()->RequestSystem("GraphicsSystem");
 
 #if defined(TODO)
     //Create moving terrain using Dynamic Vertex Buffer

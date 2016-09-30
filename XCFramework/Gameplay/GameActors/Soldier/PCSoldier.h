@@ -8,7 +8,7 @@
 
 #include "Gameplay/GameActors/Soldier/Soldier.h"
 #include "Gameplay/GameActors/PlayableCharacterActor.h"
-#include "Engine/Input/Directinput.h"
+#include "Engine/Input/XCInput.h"
 
 class PCSoldier : public Soldier, public PlayableCharacterActor
 {
@@ -22,5 +22,5 @@ public:
     virtual void                        Update(f32 dt);
 
 protected:
-    DirectInput*                        m_directInput;
+    XCInput*                        m_directInput;
 };

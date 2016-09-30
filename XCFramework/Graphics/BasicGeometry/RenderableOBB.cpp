@@ -8,8 +8,8 @@
 
 #include "RenderableOBB.h"
 #include "Graphics/RenderContext.h"
-#include "Graphics/XC_Mesh/XCMesh.h"
-#include "Graphics/XC_Shaders/XC_ShaderBufferConstants.h"
+#include "Graphics/XCMesh/XCMesh.h"
+#include "Graphics/XCShaders/XCShaderBufferConstants.h"
 
 #include "Engine/Resource/ResourceManager.h"
 

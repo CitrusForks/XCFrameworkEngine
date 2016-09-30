@@ -31,12 +31,12 @@ void RunningState::Init()
 {
     IGameState::Init();
 
-    m_cameraSystem = &SystemLocator::GetInstance()->RequestSystem<XC_CameraManager>("CameraManager");
-    m_directInput = &SystemLocator::GetInstance()->RequestSystem<DirectInput>("InputSystem");
+    m_cameraSystem = &SystemLocator::GetInstance()->RequestSystem<XCCameraManager>("CameraManager");
+    m_directInput = &SystemLocator::GetInstance()->RequestSystem<XCInput>("InputSystem");
     m_worldSystem = &SystemLocator::GetInstance()->RequestSystem<World>("World");
 
     ResourceManager& resMgr         = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
-    XC_Graphics& graphicsSystem     = SystemLocator::GetInstance()->RequestSystem<XC_Graphics>("GraphicsSystem");
+    XCGraphics& graphicsSystem     = SystemLocator::GetInstance()->RequestSystem<XCGraphics>("GraphicsSystem");
 
     //Set the camera to FPS mode
     m_cameraSystem->SetCameraType(CAMERATYPE_FPS);
@@ -206,7 +206,7 @@ void RunningState::Update(f32 dt)
 }
 
 
-void RunningState::Draw(XC_Graphics& graphicsSystem)
+void RunningState::Draw(XCGraphics& graphicsSystem)
 {
     if (m_worldSystem->IsWorldReady())
     {

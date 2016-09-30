@@ -45,7 +45,7 @@ void LoadingWorldState::Update(f32 dt)
     }
 }
 
-void GameState::LoadingWorldState::Draw(XC_Graphics& graphicsSystem)
+void GameState::LoadingWorldState::Draw(XCGraphics& graphicsSystem)
 {
     IGameState::Draw(graphicsSystem);
 }

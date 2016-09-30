@@ -6,13 +6,4 @@
 
 #pragma once
 
-#if defined(WIN_32)
-#include "ApplicationFramework/Win32/pch_win32.h"
-#elif defined(DURANGO)
-#include "ApplicationFramework/Durango/pch_durango.h"
-#elif defined(XC_ORBIS)
-#include "ApplicationFramework/Orbis/pch_orbis.h"
-#endif
-
 #include "Engine/Utils/EngineUtils.h"
-#include "Engine/System/SystemLocator.h"

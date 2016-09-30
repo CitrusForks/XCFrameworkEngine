@@ -9,7 +9,6 @@
 #include "Base/BaseCommonIncludes.h"
 
 //Engine Includes
-#include "Engine/System/SystemLocator.h"
 #include "Engine/Utils/EngineUtils.h"
 
 #include "GraphicsCommonIncludes.h"

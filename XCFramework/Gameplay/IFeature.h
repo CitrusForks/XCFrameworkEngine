@@ -6,7 +6,7 @@
 
 #pragma once
 
-class XC_Graphics;
+class XCGraphics;
 
 //IFeature is a interface that every Atom can have as many as can.
 class IFeature
@@ -17,7 +17,7 @@ public:
 
     virtual void            Init() {}
     virtual void            Update(f32 dt) {}
-    virtual void            Draw(XC_Graphics& graphics) {}
+    virtual void            Draw(XCGraphics& graphics) {}
     virtual void            Destroy() {}
 
 private:

@@ -24,7 +24,7 @@ void IGameState::Init()
 {
 }
 
-void IGameState::Draw(XC_Graphics& graphicsSystem)
+void IGameState::Draw(XCGraphics& graphicsSystem)
 {
 }
 

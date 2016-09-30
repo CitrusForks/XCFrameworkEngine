@@ -11,7 +11,7 @@
 #include "Gameplay/AI/INavigator.h"
 #include "Gameplay/XCPhysics/XPhysics.h"
 
-#include "Graphics/XC_Mesh/XCMesh.h"
+#include "Graphics/XCMesh/XCMesh.h"
 #include "Graphics/BasicGeometry/RenderableOBB.h"
 
 

@@ -8,7 +8,7 @@
 
 #include "IFeature.h"
 
-class XC_Graphics;
+class XCGraphics;
 
 //Atom is the basic building block for matter and consists the structural properties of an object placed in Matter
 //Combinations of them can work together to provide different working mechanism
@@ -20,7 +20,7 @@ public:
 
     virtual void            Init() {}
     virtual void            Update(f32 dt) {}
-    virtual void            Draw(XC_Graphics& graphics) {}
+    virtual void            Draw(XCGraphics& graphics) {}
     virtual void            Destroy() {}
 
 private:

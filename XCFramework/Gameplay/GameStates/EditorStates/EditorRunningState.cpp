@@ -3,7 +3,7 @@
 #include "Gameplay/GameStates/EditorStates/EditorRunningState.h"
 #include "Gameplay/WorldEditor.h"
 
-#include "Engine/Graphics/XC_Camera/XC_CameraManager.h"
+#include "Engine/Graphics/XCCamera/XCCameraManager.h"
 
 using namespace GameState;
 
@@ -20,7 +20,7 @@ void EditorRunningState::Init(GameFiniteStateMachine& gameFSM)
 {
     TaskManager& taskManger = (TaskManager&)SystemLocator::GetInstance()->RequestSystem("TaskManager");
     SystemContainer& sysContainer = (SystemContainer&)SystemLocator::GetInstance()->GetSystemContainer();
-    XC_CameraManager& cameraMgr = (XC_CameraManager&)SystemLocator::GetInstance()->RequestSystem("CameraSystem");
+    XCCameraManager& cameraMgr = (XCCameraManager&)SystemLocator::GetInstance()->RequestSystem("CameraSystem");
 
     sysContainer.RegisterSystem<WorldEditor>("WorldEditor");
     m_worldEditor = (WorldEditor*) &sysContainer.CreateNewSystem("WorldEditor");

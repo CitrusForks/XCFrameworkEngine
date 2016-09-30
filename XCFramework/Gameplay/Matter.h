@@ -8,7 +8,7 @@
 
 #include "Atom.h"
 
-class XC_Graphics;
+class XCGraphics;
 
 //Matter is the collection of other child matter and contains interactive Atoms that have some features and provide behavior to matter
 class Matter
@@ -19,7 +19,7 @@ public:
 
     virtual void            Init() {}
     virtual void            Update(f32 dt) {}
-    virtual void            Draw(XC_Graphics& graphics) {}
+    virtual void            Draw(XCGraphics& graphics) {}
     virtual void            Destroy() {}
 
 private:

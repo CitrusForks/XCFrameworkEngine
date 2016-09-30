@@ -22,7 +22,7 @@ namespace GameState
 
         void                    Init();
         void                    Update(f32 dt);
-        void                    Draw(XC_Graphics& graphicsSystem);
+        void                    Draw(XCGraphics& graphicsSystem);
         void                    Destroy();
 
     private:                    

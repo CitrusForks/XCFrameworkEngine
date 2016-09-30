@@ -8,7 +8,7 @@
 
 #include "Engine/Resource/IResource.h"
 
-#include "Graphics/XC_Graphics.h"
+#include "Graphics/XCGraphics.h"
 #include "Graphics/Utils/GraphicUtils.h"
 
 template<class T>
@@ -94,7 +94,7 @@ void VertexBuffer<T>::SetVertexBuffer(ID3DDeviceContext& context)
 template<class T>
 void VertexBuffer<T>::BuildVertexBuffer(ID3DDeviceContext* context)
 {
-    XC_Graphics& graphicsSystem = (XC_Graphics&)SystemLocator::GetInstance()->RequestSystem("GraphicsSystem");
+    XCGraphics& graphicsSystem = (XCGraphics&)SystemLocator::GetInstance()->RequestSystem("GraphicsSystem");
 
 #if defined(XCGRAPHICS_DX12)
     //Create VB

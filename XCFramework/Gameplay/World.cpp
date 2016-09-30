@@ -14,7 +14,7 @@
 #include "Gameplay/GameActors/NonPlayableCharacterActor.h"
 #include "Gameplay/WorldEventTypes.h"
 
-#include "Graphics/XC_Graphics.h"
+#include "Graphics/XCGraphics.h"
 #include "Engine/Event/EventBroadcaster.h"
 
 World::World()
@@ -234,7 +234,7 @@ void World::Update(f32 dt)
     }
 }
 
-void World::Draw(XC_Graphics& graphicsSystem)
+void World::Draw(XCGraphics& graphicsSystem)
 {
     //Nothing here. Drawing of actors done in RenderingPool.
 }
@@ -288,7 +288,7 @@ void World::AddActor(IActor* actor)
     m_GameObjects[actorId] = actor;
 
     //Register with renderpool
-    XC_Graphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XC_Graphics>("GraphicsSystem");
+    XCGraphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XCGraphics>("GraphicsSystem");
     graphicsSystem.GetRenderingPool().AddRenderableObject((IRenderableObject*)m_GameObjects[actorId], actorId);
 
     //m_GameObjects[actorId]->SetWorldReady(true);
@@ -310,7 +310,7 @@ void World::RemoveActor(i32 _key)
         Logger("[WORLD] Removing actor id : %d", _key);
 
         //Unregister from rendering pool 
-        XC_Graphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XC_Graphics>("GraphicsSystem");
+        XCGraphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XCGraphics>("GraphicsSystem");
         graphicsSystem.GetRenderingPool().RemoveRenderableObject((IRenderableObject*)it->second, it->second->GetBaseObjectId());
 
         //Remove from the filtering vectors

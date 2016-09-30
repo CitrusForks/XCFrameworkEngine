@@ -8,9 +8,9 @@
 
 #include "Gameplay/GameActors/Environment/SkyBox/SimpleSkyBox.h"
 
-#include "Graphics/XC_Graphics.h"
-#include "Graphics/XC_Shaders/XC_ShaderBufferConstants.h"
-#include "Graphics/XC_Shaders/XC_ShaderHandle.h"
+#include "Graphics/XCGraphics.h"
+#include "Graphics/XCShaders/XCShaderBufferConstants.h"
+#include "Graphics/XCShaders/XCShaderHandle.h"
 #include "Graphics/GPUResourceSystem.h"
 
 #include "Engine/Resource/ResourceManager.h"
@@ -83,7 +83,7 @@ void SimpleSkyBox::UpdateState()
 
 void SimpleSkyBox::BuildBuffers()
 {
-    XC_Graphics& graphicsSystem = (XC_Graphics&) SystemLocator::GetInstance()->RequestSystem("GraphicsSystem");
+    XCGraphics& graphicsSystem = (XCGraphics&) SystemLocator::GetInstance()->RequestSystem("GraphicsSystem");
     
     //Set up vertices
     m_vertexBuffer.m_vertexData.push_back(VertexPos(XCVec3Unaligned(-1.0f, -1.0f, -1.0f)));
@@ -136,7 +136,7 @@ void SimpleSkyBox::Draw(RenderContext& context)
     
     context.ApplyShader(m_useShaderType);
 
-    XC_Graphics& graphicsSystem = (XC_Graphics&)SystemLocator::GetInstance()->RequestSystem("GraphicsSystem");
+    XCGraphics& graphicsSystem = (XCGraphics&)SystemLocator::GetInstance()->RequestSystem("GraphicsSystem");
     graphicsSystem.SetLessEqualDepthStencilView(context.GetDeviceContext(), true);
 
     // Set constants

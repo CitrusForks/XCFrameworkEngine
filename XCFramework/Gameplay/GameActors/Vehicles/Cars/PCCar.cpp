@@ -22,7 +22,7 @@ void PCCar::Init(i32 actorId)
 {
     Car::Init(actorId);
 
-    m_directInput = (DirectInput*)&SystemLocator::GetInstance()->RequestSystem("InputSystem");
+    m_directInput = (XCInput*)&SystemLocator::GetInstance()->RequestSystem("InputSystem");
 }
 
 void PCCar::PreLoad(const void* fbBuffer)

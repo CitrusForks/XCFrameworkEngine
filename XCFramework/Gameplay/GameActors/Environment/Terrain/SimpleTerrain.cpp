@@ -10,14 +10,14 @@
 
 #include "Engine/Utils/EngineUtils.h"
 
-#include "Graphics/XC_Graphics.h"
-#include "Graphics/XC_Shaders/XC_ShaderBufferConstants.h"
-#include "Graphics/XC_Shaders/XC_ShaderHandle.h"
+#include "Graphics/XCGraphics.h"
+#include "Graphics/XCShaders/XCShaderBufferConstants.h"
+#include "Graphics/XCShaders/XCShaderHandle.h"
 #include "Graphics/VertexBuffer.h"
 #include "Graphics/IndexBuffer.h"
 #include "Graphics/GPUResourceSystem.h"
 
-#include "Gameplay/XC_Camera/XC_CameraManager.h"
+#include "Gameplay/XCCamera/XCCameraManager.h"
 
 SimpleTerrain::SimpleTerrain(void)
 {
@@ -152,7 +152,7 @@ void SimpleTerrain::GenerateIndicesWithTextureMapping()
 
 void SimpleTerrain::BuildGeometryBuffer()
 {
-    XC_Graphics& graphicsSystem = (XC_Graphics&)SystemLocator::GetInstance()->RequestSystem("GraphicsSystem");
+    XCGraphics& graphicsSystem = (XCGraphics&)SystemLocator::GetInstance()->RequestSystem("GraphicsSystem");
 
     //Allocate resource for vb and ib
     if (m_useShaderType == ShaderType_SolidColor)

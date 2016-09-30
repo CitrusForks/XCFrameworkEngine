@@ -12,7 +12,7 @@
 
 #include "Graphics/GPUResourceType.h"
 #include "Graphics/RenderTargetTypes.h"
-#include "Engine/Thread/CriticalSection.h"
+#include "Base/Thread/CriticalSection.h"
 
 class GPUResource;
 class GPUResourceView;

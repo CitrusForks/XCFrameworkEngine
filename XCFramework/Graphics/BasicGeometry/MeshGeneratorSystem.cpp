@@ -7,8 +7,8 @@
 #include "GraphicsPrecompiledHeader.h"
 
 #include "MeshGeneratorSystem.h"
-#include "Graphics/XC_Mesh/XCMesh.h"
-#include "Graphics/XC_Graphics.h"
+#include "Graphics/XCMesh/XCMesh.h"
+#include "Graphics/XCGraphics.h"
 #include "Engine/Resource/ResourceManager.h"
 
 MeshGeneratorSystem::MeshGeneratorSystem(void)

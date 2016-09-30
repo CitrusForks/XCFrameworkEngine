@@ -12,7 +12,7 @@
 
 #include "Gameplay/GameStates/GameStateTypes.h"
 
-class XC_Graphics;
+class XCGraphics;
 
 namespace GameState
 {
@@ -24,7 +24,7 @@ namespace GameState
 
         virtual void            Init();
         virtual void            Update(f32 dt) = 0;
-        virtual void            Draw(XC_Graphics& graphicsSystem);
+        virtual void            Draw(XCGraphics& graphicsSystem);
         virtual void            Destroy();
 
         bool                    GetPauseState() { return m_isPaused; }

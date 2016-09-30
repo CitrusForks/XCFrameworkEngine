@@ -10,9 +10,9 @@
 
 #include "Engine/ObjectBase/IObjectDimensions.h"
 
-#include "Graphics/XC_Shaders/XC_VertexFormat.h"
-#include "Graphics/XC_Shaders/XC_ShaderTypes.h"
-#include "Graphics/XC_Materials/MaterialTypes.h"
+#include "Graphics/XCShaders/XCVertexFormat.h"
+#include "Graphics/XCShaders/XCShaderTypes.h"
+#include "Graphics/XCMaterials/MaterialTypes.h"
 #include "Graphics/VertexBuffer.h"
 
 class ResourceHandle;

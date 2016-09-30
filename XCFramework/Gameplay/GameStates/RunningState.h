@@ -7,9 +7,9 @@
 #pragma once
 
 #include "Gameplay/GameStates/IGameState.h"
-#include "Engine/Input/Directinput.h"
-#include "Gameplay/XC_Camera/XC_CameraManager.h"
-#include "Graphics/XC_Lighting/XC_LightManager.h"
+#include "Engine/Input/XCInput.h"
+#include "Gameplay/XCCamera/XCCameraManager.h"
+#include "Graphics/XCLighting/XCLightManager.h"
 #include "Gameplay/World.h"
 
 namespace GameState
@@ -24,15 +24,15 @@ namespace GameState
 
         void                    Init();
         void                    Update(f32 dt);
-        void                    Draw(XC_Graphics& graphicsSystem);
+        void                    Draw(XCGraphics& graphicsSystem);
         void                    Destroy();
 
     private:
         i32                     m_currentMainPlayableActor;
         bool                    m_bMainPlayerSet;
 
-        XC_CameraManager*       m_cameraSystem;
-        DirectInput*            m_directInput;
+        XCCameraManager*       m_cameraSystem;
+        XCInput*            m_directInput;
         World*                  m_worldSystem;
     };
 }

@@ -7,12 +7,12 @@
 #include "EnginePrecompiledHeader.h"
 
 #include "Engine/Resource/ResourceFactory.h"
-#include "Graphics/XC_Textures/Texture2D.h"
-#include "Graphics/XC_Textures/CubeTexture3D.h"
-#include "Graphics/XC_Mesh/XCMesh.h"
-#include "Graphics/XC_Mesh/XCMeshAssimp.h"
-#include "Graphics/XC_Mesh/XCMeshFBX.h"
-#include "Graphics/XC_Mesh/VectorFontMesh.h"
+#include "Graphics/XCTextures/Texture2D.h"
+#include "Graphics/XCTextures/CubeTexture3D.h"
+#include "Graphics/XCMesh/XCMesh.h"
+#include "Graphics/XCMesh/XCMeshAssimp.h"
+#include "Graphics/XCMesh/XCMeshFBX.h"
+#include "Graphics/XCMesh/VectorFontMesh.h"
 
 ResourceFactory::ResourceFactory()
 {

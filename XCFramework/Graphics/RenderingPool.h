@@ -12,10 +12,10 @@
 #include "Graphics/RenderTargetTypes.h"
 
 #include "Engine/Resource/IResource.h"
-#include "Engine/Thread/Thread.h"
-#include "Engine/Thread/XCSyncEvent.h"
+#include "Base/Thread/Thread.h"
+#include "Base/Thread/XCSyncEvent.h"
 
-class XC_Graphics;
+class XCGraphics;
 
 class RenderingPool
 {
@@ -71,7 +71,7 @@ private:
     RenderWorker        m_renderWorkers[NbRenderWorkerThreads];
     RenderContext       m_FrameCommandList[NbFrameCommandList];
 
-    XC_Graphics*        m_graphicsSystem;
+    XCGraphics*        m_graphicsSystem;
 
 #if defined(XCGRAPHICS_DX12)
     ID3D12CommandList*  m_ppCmdList[NbRenderWorkerThreads + 1];

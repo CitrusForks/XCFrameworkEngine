@@ -7,10 +7,10 @@
 #include "GraphicsPrecompiledHeader.h"
 
 #include "Graphics/RenderingPool.h"
-#include "Graphics/XC_Graphics.h"
+#include "Graphics/XCGraphics.h"
 
 #if defined(XCGRAPHICS_DX12)
-#include "Graphics/XC_GraphicsDx12.h"
+#include "Graphics/XCGraphicsDx12.h"
 #endif
 
 const u32 RenderingPool::RenderWorkerTypeMaskMap[] = { WorkerMask_None,
@@ -23,7 +23,7 @@ RenderingPool::RenderingPool()
 
 void RenderingPool::Init()
 {
-    m_graphicsSystem = &SystemLocator::GetInstance()->RequestSystem<XC_Graphics>("GraphicsSystem");
+    m_graphicsSystem = &SystemLocator::GetInstance()->RequestSystem<XCGraphics>("GraphicsSystem");
 
     //Initialize the staged render contexts
     //These staging render context are used per frame states which are common and not be deferred. Such as clear rtv, execute deferred contexts...

@@ -8,9 +8,9 @@
 
 #include "Soldier.h"
 
-#include "Gameplay/XC_Camera/XC_CameraManager.h"
-#include "Graphics/XC_Shaders/XC_ShaderBufferConstants.h"
-#include "Graphics/XC_Shaders/XC_ShaderHandle.h"
+#include "Gameplay/XCCamera/XCCameraManager.h"
+#include "Graphics/XCShaders/XCShaderBufferConstants.h"
+#include "Graphics/XCShaders/XCShaderHandle.h"
 #include "Engine/Resource/ResourceManager.h"
 
 #include "Gameplay/GameActors/GameActorsFactory.h"
@@ -39,7 +39,6 @@ void Soldier::PreLoad(const void* fbBuffer)
     m_material.Diffuse  = XCVec4(0.5f, 0.8f, 0.0f, 1.0f);
     m_material.Specular = XCVec4(0.2f, 0.2f, 0.2f, 16.0f);
 
-    m_useShaderType = m_pMesh->GetResource<XCMesh>()->IsSkinnedMesh()? ShaderType_SkinnedCharacter : ShaderType_LightTexture;
     m_collisionDetectionType = COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX;
 
     m_secondaryLookAxis  = XCVec4();
@@ -86,6 +85,11 @@ void Soldier::SetInitialPhysicsProperties()
 
 void Soldier::UpdateState()
 {
+    if (m_pMesh && m_pMesh->GetResource<XCMesh>()->IsLoaded())
+    {
+        m_useShaderType = m_pMesh->GetResource<XCMesh>()->IsSkinnedMesh() ? ShaderType_SkinnedCharacter : ShaderType_LightTexture;
+    }
+
     PhysicsActor::UpdateState();
 }
 
@@ -205,11 +209,11 @@ void Soldier::Draw(RenderContext& context)
     }
     else if(m_useShaderType == ShaderType_SkinnedCharacter)
     {
-        static XCMatrix4 scaling  = MatrixScale(1.0f, 1.0f, 1.0f);
-        static XCMatrix4 rotation = MatrixRotationX(XC_PI);
+        static const XCMatrix4 scaling  = MatrixScale(1.0f, 1.0f, 1.0f);
+        static const XCMatrix4 rotation = MatrixRotationX(XC_PI);
 
         XCMatrix4 transform(m_pMesh->GetResource<XCMesh>()->GetRootTransform());
-        transform = scaling * transform;
+        transform = m_World * scaling * transform;
 
         perObject = {
             MatrixTranspose(transform).GetUnaligned(),

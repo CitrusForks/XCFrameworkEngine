@@ -13,7 +13,7 @@
 #include "Engine/ObjectBase/IObjectDimensions.h"
 #include "Engine/Resource/ResourceHandle.h"
 #include "Graphics/BasicGeometry/OrientedBoundingBox.h"
-#include "Graphics/XC_Materials/MaterialTypes.h"
+#include "Graphics/XCMaterials/MaterialTypes.h"
 
 class RenderableOBB : public IObjectDimensions, public OrientedBoundingBox
 {

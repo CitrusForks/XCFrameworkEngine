@@ -10,9 +10,9 @@
 #include "Gameplay/GameActors/SimpleMeshActor.h"
 #include "Gameplay/GameActors/SubActor.h"
 
-#include "Graphics/XC_Shaders/XC_VertexFormat.h"
-#include "Graphics/XC_Materials/MaterialTypes.h"
-#include "Graphics/XC_Mesh/XCMesh.h"
+#include "Graphics/XCShaders/XCVertexFormat.h"
+#include "Graphics/XCMaterials/MaterialTypes.h"
+#include "Graphics/XCMesh/XCMesh.h"
 
 class PistolBullet : public SimpleMeshActor, public SubActor
 {

@@ -12,7 +12,7 @@
 #include "Engine/Resource/IResource.h"
 #include "Engine/Resource/ResourceHandle.h"
 
-#include "Engine/Thread/CriticalSection.h"
+#include "Base/Thread/CriticalSection.h"
 
 class ResourceLoaderTask : public AsyncTask
 {

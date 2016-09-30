@@ -12,10 +12,10 @@
 #include "Assets/Packages/Schema/GameplayActors_generated.h"
 
 #include "Graphics/GPUResourceSystem.h"
-#include "Graphics/XC_Shaders/XC_VertexShaderLayout.h"
-#include "Graphics/XC_Shaders/XC_ShaderHandle.h"
-#include "Graphics/XC_Shaders/XC_ShaderBufferConstants.h"
-#include "Graphics/XC_Textures/RenderableTexture.h"
+#include "Graphics/XCShaders/XCVertexShaderLayout.h"
+#include "Graphics/XCShaders/XCShaderHandle.h"
+#include "Graphics/XCShaders/XCShaderBufferConstants.h"
+#include "Graphics/XCTextures/RenderableTexture.h"
 
 #include "Engine/Resource/ResourceManager.h"
 #include "Engine/Resource/ResourceHandle.h"
@@ -77,7 +77,7 @@ void TexturedPlane::Load()
 
 void TexturedPlane::BuildGeometryBuffers()
 {
-    XC_Graphics& graphicsSystem = (XC_Graphics&)SystemLocator::GetInstance()->RequestSystem("GraphicsSystem");
+    XCGraphics& graphicsSystem = (XCGraphics&)SystemLocator::GetInstance()->RequestSystem("GraphicsSystem");
 
     m_vertexBuffer.m_vertexData.push_back(VertexPosNormTex(XCVec3Unaligned(-1.0f, 1.0f, 0.0f),  XCVec3Unaligned(0.33f, 0.33f, 0.34f), XCVec2Unaligned(0.0f, 0.0f)));   //TL
     m_vertexBuffer.m_vertexData.push_back(VertexPosNormTex(XCVec3Unaligned(1.0f, -1.0f, 0.0f),  XCVec3Unaligned(0.33f, 0.33f, 0.34f), XCVec2Unaligned(1.0f, 1.0f)));   //BR

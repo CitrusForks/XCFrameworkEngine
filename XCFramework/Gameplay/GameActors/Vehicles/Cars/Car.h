@@ -6,9 +6,9 @@
 
 #pragma once
 
-#include "Graphics/XC_Shaders/XC_VertexFormat.h"
+#include "Graphics/XCShaders/XCVertexFormat.h"
 #include "Gameplay/GameActors/PhysicsActor.h"
-#include "Graphics/XC_Materials/MaterialTypes.h"
+#include "Graphics/XCMaterials/MaterialTypes.h"
 
 
 class Car : public PhysicsActor

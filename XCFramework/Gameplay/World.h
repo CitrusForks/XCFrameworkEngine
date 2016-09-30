@@ -6,9 +6,10 @@
 
 #pragma once
 
+#include "Base/Thread/CriticalSection.h"
+
 #include "Engine/TaskManager/Task/AsyncTask.h"
 #include "Engine/TaskManager/TaskManager.h"
-#include "Engine/Thread/CriticalSection.h"
 #include "Engine/Event/IEventListener.h"
 
 #include "Gameplay/XCPhysics/ParticleContact.h"
@@ -109,7 +110,7 @@ public:
     
     virtual void                                Init(TaskManager& taskMgr);
     virtual void                                Update(f32 dt);
-    virtual void                                Draw(XC_Graphics& graphicsSystem);
+    virtual void                                Draw(XCGraphics& graphicsSystem);
     virtual void                                Destroy();
     
     void                                        RequestAddActor(IActor* actor);

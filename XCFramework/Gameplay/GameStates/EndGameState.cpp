@@ -28,7 +28,7 @@ void EndGameState::Update(f32 dt)
 {
 }
 
-void EndGameState::Draw(XC_Graphics& graphicsSystem)
+void EndGameState::Draw(XCGraphics& graphicsSystem)
 {
     IGameState::Draw(graphicsSystem);
 }

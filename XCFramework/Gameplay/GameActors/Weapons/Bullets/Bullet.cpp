@@ -9,9 +9,9 @@
 #include "Bullet.h"
 
 #include "Engine/Resource/ResourceManager.h"
-#include "Graphics/XC_Shaders/XC_ShaderBufferConstants.h"
-#include "Graphics/XC_Shaders/XC_ShaderHandle.h"
-#include "Graphics/XC_Mesh/XCMesh.h"
+#include "Graphics/XCShaders/XCShaderBufferConstants.h"
+#include "Graphics/XCShaders/XCShaderHandle.h"
+#include "Graphics/XCMesh/XCMesh.h"
 
 Bullet::Bullet(void)
 {

@@ -7,7 +7,7 @@
 #pragma once
 
 #include "Base/Serializer/ObjectFactory.h"
-#include "Engine/System/ISystem.h"
+#include "Base/System/ISystem.h"
 #include "Gameplay/GameActors/GameActorDefines.h"
 
 struct GameActorsInfo

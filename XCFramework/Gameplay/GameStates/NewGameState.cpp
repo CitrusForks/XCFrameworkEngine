@@ -32,7 +32,7 @@ void NewGameState::Update(f32 dt)
     broadcaster.BroadcastEvent(&event);
 }
 
-void NewGameState::Draw(XC_Graphics& graphicsSystem)
+void NewGameState::Draw(XCGraphics& graphicsSystem)
 {
     IGameState::Draw(graphicsSystem);
 }

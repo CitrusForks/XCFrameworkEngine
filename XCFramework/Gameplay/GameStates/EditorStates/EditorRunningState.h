@@ -3,7 +3,7 @@
 #include "Gameplay/GameStates/IGameState.h"
 #include "Gameplay/GameActors/GameActorsFactory.h"
 
-#include "Graphics/XC_Lighting/XC_LightManager.h"
+#include "Graphics/XCLighting/XCLightManager.h"
 
 class WorldEditor;
 
@@ -20,11 +20,11 @@ namespace GameState
 
         void                        Init();
         void                        Update(float dt);
-        void                        Draw(XC_Graphics& graphicsSystem);
+        void                        Draw(XCGraphics& graphicsSystem);
         void                        Destroy();
 
     private:
-        XC_LightManager*            m_lightManagerSystem;
+        XCLightManager*             m_lightManagerSystem;
         GameActorsFactory*          m_gameActorFactory;
         WorldEditor*                m_worldEditor;
     };

@@ -31,7 +31,7 @@ void MainMenuState::Update(f32 dt)
     broadcaster.BroadcastEvent(&event);
 }
 
-void GameState::MainMenuState::Draw(XC_Graphics& graphicsSystem)
+void GameState::MainMenuState::Draw(XCGraphics& graphicsSystem)
 {
     IGameState::Draw(graphicsSystem);
 }

@@ -11,8 +11,8 @@
 #include "Gameplay/GameActors/SimpleMeshActor.h"
 #include "Gameplay/GameActors/PhysicsActor.h"
 
-#include "Graphics/XC_Materials/MaterialTypes.h"
-#include "Graphics/XC_Shaders/XC_VertexFormat.h"
+#include "Graphics/XCMaterials/MaterialTypes.h"
+#include "Graphics/XCShaders/XCVertexFormat.h"
 
 class Bullet : public PhysicsActor
 {

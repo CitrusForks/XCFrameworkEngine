@@ -6,11 +6,11 @@
 
 #pragma once
 
-#include "Engine/Input/Directinput.h"
+#include "Engine/Input/XCInput.h"
 
-#include "Graphics/XC_Shaders/XC_VertexFormat.h"
-#include "Graphics/XC_GraphicsDx11.h"
-#include "Graphics/XC_Materials/MaterialTypes.h"
+#include "Graphics/XCShaders/XCVertexFormat.h"
+#include "Graphics/XCGraphicsDx11.h"
+#include "Graphics/XCMaterials/MaterialTypes.h"
 
 #include "Gameplay/GameActors/SimpleMeshActor.h"
 #include "Gameplay/GameActors/SubActor.h"
@@ -53,5 +53,5 @@ protected:
     f32                m_recoilMaxTime;
     bool               m_canShootBullet;
 
-    DirectInput*       m_directInput;
+    XCInput*       m_directInput;
 };

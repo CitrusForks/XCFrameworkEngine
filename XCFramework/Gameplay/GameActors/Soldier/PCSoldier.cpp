@@ -20,7 +20,7 @@ void PCSoldier::Init(i32 actorId)
 {
     Soldier::Init(actorId);
 
-    m_directInput = (DirectInput*) &SystemLocator::GetInstance()->RequestSystem("InputSystem");
+    m_directInput = (XCInput*) &SystemLocator::GetInstance()->RequestSystem("InputSystem");
 
     XCVec4 distance(1.5f, 5.0f, 10.0f, 0.0f);
     TPCChaseableActor::SetDistanceFromTarget(distance);

@@ -7,8 +7,8 @@
 #pragma once
 
 #include "Gameplay/GameActors/PhysicsActor.h"
-#include "Graphics/XC_Shaders/XC_VertexFormat.h"
-#include "Graphics/XC_Shaders/XC_ShaderTypes.h"
+#include "Graphics/XCShaders/XCVertexFormat.h"
+#include "Graphics/XCShaders/XCShaderTypes.h"
 
 class SimpleTerrain : public PhysicsActor
 {

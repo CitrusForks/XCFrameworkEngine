@@ -14,7 +14,7 @@
 #include "Engine/Resource/ResourceManager.h"
 #include "Engine/Resource/LoadPackageFileFBTask.h"
 
-#include "Graphics/XC_Graphics.h"
+#include "Graphics/XCGraphics.h"
 #include "Graphics/BasicGeometry/MeshGeneratorSystem.h"
 
 #include "Assets/Packages/PackageConsts.h"
@@ -66,7 +66,7 @@ void LoadingState::Update(f32 dt)
     }
 }
 
-void GameState::LoadingState::Draw(XC_Graphics& graphicsSystem)
+void GameState::LoadingState::Draw(XCGraphics& graphicsSystem)
 {
     IGameState::Draw(graphicsSystem);
 

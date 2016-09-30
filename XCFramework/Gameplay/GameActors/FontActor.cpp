@@ -8,7 +8,7 @@
 
 #include "Gameplay/GameActors/FontActor.h"
 #include "Engine/Resource/ResourceManager.h"
-#include "Graphics/XC_Mesh/VectorFontMesh.h"
+#include "Graphics/XCMesh/VectorFontMesh.h"
 
 FontActor::FontActor()
 {

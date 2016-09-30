@@ -8,7 +8,7 @@
 
 #include "Matter.h"
 
-class XC_Graphics;
+class XCGraphics;
 
 //SpaceGraph is a collection of Matter that consumes some physical space.
 class SpaceGraph
@@ -19,7 +19,7 @@ public:
 
     virtual void            Init() {}
     virtual void            Update(f32 dt) {}
-    virtual void            Draw(XC_Graphics& graphics) {}
+    virtual void            Draw(XCGraphics& graphics) {}
     virtual void            Destroy() {}
 
 private:

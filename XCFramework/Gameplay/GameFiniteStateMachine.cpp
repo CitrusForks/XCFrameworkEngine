@@ -7,7 +7,6 @@
 #include "GameplayPrecompiledHeader.h"
 
 #include "Gameplay/GameFiniteStateMachine.h"
-#include "Engine/System/SystemLocator.h"
 #include "Engine/Event/IEventListener.h"
 
 GameFiniteStateMachine::GameFiniteStateMachine()
@@ -51,7 +50,7 @@ void GameFiniteStateMachine::Update(f32 dt)
     m_StateStack.back()->Update(dt);
 }
 
-void GameFiniteStateMachine::Draw(XC_Graphics& graphicsSystem)
+void GameFiniteStateMachine::Draw(XCGraphics& graphicsSystem)
 {
     m_StateStack.back()->Draw(graphicsSystem);
 }

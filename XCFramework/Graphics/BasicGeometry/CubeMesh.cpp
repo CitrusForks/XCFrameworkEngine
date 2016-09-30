@@ -10,7 +10,7 @@
 
 #include "Engine/Graphics/BasicGeometry/CubeMesh.h"
 #include "Engine/Graphics/XC_Graphics.h"
-#include "Engine/Graphics/XC_Shaders/XC_VertexShaderLayout.h"
+#include "Engine/Graphics/XCShaders/XCVertexShaderLayout.h"
 
 #include "Engine/Resource/ResourceManager.h"
 
@@ -62,7 +62,7 @@ void CubeMesh::BuildBuffers()
 #if defined(DEBUG_OBB)
     if (!m_isBufferBuild)
     {
-        XC_Graphics& graphicsSystem = (XC_Graphics&)SystemLocator::GetInstance()->RequestSystem("GraphicsSystem");
+        XCGraphics& graphicsSystem = (XCGraphics&)SystemLocator::GetInstance()->RequestSystem("GraphicsSystem");
 
         //Set up vertices
         m_vertexBuffer.m_vertexData.push_back(VertexPosNormTex(XCVec3(-1.0f, -1.0f, -1.0f), XCVec3(-0.33f, -0.33f, -0.33f), XCVec2(0.0f, 1.0f)));

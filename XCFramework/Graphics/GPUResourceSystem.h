@@ -10,8 +10,8 @@
 #include "Graphics/RenderTargetTypes.h"
 #include "GPUResourceType.h"
 
-#include "Engine/System/ISystem.h"
-#include "Engine/Thread/CriticalSection.h"
+#include "Base/System/ISystem.h"
+#include "Base/Thread/CriticalSection.h"
 
 class GPUResource;
 class GPUResourceView;

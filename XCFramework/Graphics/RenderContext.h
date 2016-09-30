@@ -9,10 +9,10 @@
 #include "Assets/Packages/PackageConsts.h"
 
 #include "Graphics/RenderTargetTypes.h"
-#include "Graphics/XC_Shaders/GlobalShaderData.h"
+#include "Graphics/XCShaders/GlobalShaderData.h"
 
-class XC_Graphics;
-class XC_ShaderContainer;
+class XCGraphics;
+class XCShaderContainer;
 class IShader;
 
 class RenderContext
@@ -20,7 +20,7 @@ class RenderContext
 public:
     RenderContext();
 
-    void                                Init(ID3DDevice* device, XC_ShaderContainer* shaderMgr);
+    void                                Init(ID3DDevice* device, XCShaderContainer* shaderMgr);
     void                                Reset();
     void                                BeginRender(std::vector<RenderTargetsType>& targetType);
     void                                FinishRender();
@@ -37,13 +37,13 @@ public:
     void                                DrawIndexedInstanced(u32 _indexCount, void* indexGpuAddr = nullptr, u32 instanceCount = 1);
 
 private:
-    XC_ShaderContainer*                 m_shaderContainer;
+    XCShaderContainer*                 m_shaderContainer;
     ID3DDeviceContext*                  m_deviceContext;
 
 #if defined(XCGRAPHICS_DX12)
     ID3DCommandAllocator*               m_commandAllocator;
 #endif
 
-    XC_Graphics*                        m_graphicsSystem;
+    XCGraphics*                        m_graphicsSystem;
     XCVec4                              m_clearColor;
 };

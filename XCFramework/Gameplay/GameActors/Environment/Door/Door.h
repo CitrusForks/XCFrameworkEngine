@@ -8,9 +8,9 @@
 
 #include "Gameplay/GameActors/PhysicsActor.h"
 
-#include "Graphics/XC_Materials/MaterialTypes.h"
-#include "Graphics/XC_Shaders/XC_ShaderTypes.h"
-#include "Engine/Input/Directinput.h"
+#include "Graphics/XCMaterials/MaterialTypes.h"
+#include "Graphics/XCShaders/XCShaderTypes.h"
+#include "Engine/Input/XCInput.h"
 
 class Door : public PhysicsActor
 {
@@ -34,5 +34,5 @@ protected:
     ShaderType                          m_useShaderType;
 
     Material                       m_material;
-    DirectInput*                        m_directInput;
+    XCInput*                        m_directInput;
 };

@@ -9,11 +9,11 @@
 #if UNUSED 
 
 #include "Engine/ObjectBase/IObjectDimensions.h"
-#include "Engine/Graphics/XC_Shaders/XC_ShaderTypes.h"
-#include "Engine/Graphics/XC_Shaders/XC_VertexFormat.h"
-#include "Engine/Graphics/XC_Shaders/XC_RasterizerTypes.h"
-#include "Engine/Graphics/XC_Materials/MaterialTypes.h"
-#include "Engine/Graphics/XC_Textures/Texture2D.h"
+#include "Engine/Graphics/XCShaders/XCShaderTypes.h"
+#include "Engine/Graphics/XCShaders/XCVertexFormat.h"
+#include "Engine/Graphics/XCShaders/XCRasterizerTypes.h"
+#include "Engine/Graphics/XCMaterials/MaterialTypes.h"
+#include "Engine/Graphics/XCTextures/Texture2D.h"
 #include "Engine/Graphics/VertexBuffer.h"
 #include "Engine/Graphics/IndexBuffer.h"
 

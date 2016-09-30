@@ -30,7 +30,7 @@ void PauseState::Update(f32 dt)
 {
 }
 
-void GameState::PauseState::Draw(XC_Graphics& graphicsSystem)
+void GameState::PauseState::Draw(XCGraphics& graphicsSystem)
 {
     IGameState::Draw(graphicsSystem);
 }

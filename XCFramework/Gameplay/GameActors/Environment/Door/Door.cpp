@@ -8,13 +8,13 @@
 
 #include "Door.h"
 #include "Engine/Resource/ResourceManager.h"
-#include "Graphics/XC_Shaders/XC_ShaderHandle.h"
-#include "Gameplay/XC_Camera/XC_CameraManager.h"
-#include "Graphics/XC_Mesh/XCMesh.h"
+#include "Graphics/XCShaders/XCShaderHandle.h"
+#include "Gameplay/XCCamera/XCCameraManager.h"
+#include "Graphics/XCMesh/XCMesh.h"
 
 Door::Door(void)
 {
-    m_directInput = (DirectInput*) &SystemLocator::GetInstance()->RequestSystem("InputSystem");
+    m_directInput = (XCInput*) &SystemLocator::GetInstance()->RequestSystem("InputSystem");
 
     m_material.Ambient = XCVec4(1.0f, 1.0f, 1.0f, 1.0f);
     m_material.Diffuse = XCVec4(0.5f, 0.8f, 0.0f, 1.0f);

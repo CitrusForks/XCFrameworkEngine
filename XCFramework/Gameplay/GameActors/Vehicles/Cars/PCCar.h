@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "Engine/Input/Directinput.h"
+#include "Engine/Input/XCInput.h"
 #include "Gameplay/GameActors/Vehicles/Cars/Car.h"
 #include "Gameplay/GameActors/PlayableCharacterActor.h"
 
@@ -25,5 +25,5 @@ public:
     virtual void                        Destroy();
 
 private:
-    DirectInput*                        m_directInput;
+    XCInput*                        m_directInput;
 };

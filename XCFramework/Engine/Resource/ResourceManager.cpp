@@ -7,7 +7,6 @@
 #include "EnginePrecompiledHeader.h"
 
 #include "ResourceManager.h"
-#include "Engine/System/SystemLocator.h"
 #include "Engine/Utils/FileIO.h"
 
 #if defined(LEGACY_LOADING)

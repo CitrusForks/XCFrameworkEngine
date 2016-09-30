@@ -35,9 +35,8 @@
 
 #include "Base/ErrorHandling/ErrorHandler.h"
 
-//Engine Memory includes. To remove this
-#include "Engine/Memory/MemoryOverrides.h"
+#include "Base/Memory/MemoryOverrides.h"
 
-//Base Includes
+#include "Base/System/SystemLocator.h"
 #include "Base/Serializer/IBase.h"
 #include "Base/XCMath/XCMathIncludes.h"

@@ -13,12 +13,12 @@
 #include "Terrain.h"
 
 #include "Gameplay/WorldEventTypes.h"
-#include "Gameplay/XC_Camera/XC_CameraManager.h"
+#include "Gameplay/XCCamera/XCCameraManager.h"
 
-#include "Graphics/XC_Graphics.h"
-#include "Graphics/XC_Shaders/XC_ShaderBufferConstants.h"
-#include "Graphics/XC_Shaders/XC_ShaderHandle.h"
-#include "Graphics/XC_Lighting/XC_LightManager.h"
+#include "Graphics/XCGraphics.h"
+#include "Graphics/XCShaders/XCShaderBufferConstants.h"
+#include "Graphics/XCShaders/XCShaderHandle.h"
+#include "Graphics/XCLighting/XCLightManager.h"
 #include "Graphics/GPUResourceSystem.h"
 
 #include "Engine/Resource/ResourceManager.h"
@@ -391,7 +391,7 @@ void Terrain::Draw(RenderContext& context)
     }
 
 #if defined(FORWARD_LIGHTING)
-    XC_LightManager* lightMgr = (XC_LightManager*)&SystemLocator::GetInstance()->RequestSystem("LightsManager");
+    XCLightManager* lightMgr = (XCLightManager*)&SystemLocator::GetInstance()->RequestSystem("LightsManager");
     shaderHandle->SetConstantBuffer("cbLightsPerFrame", context.GetDeviceContext(), lightMgr->GetLightConstantBuffer());
 #endif
 

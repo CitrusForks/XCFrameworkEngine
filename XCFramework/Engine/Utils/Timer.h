@@ -8,7 +8,7 @@
 
 #if defined(UNUSED)
 
-#include "Engine/System/ISystem.h"
+#include "Base/System/ISystem.h"
 #include "Engine/Graphics/XC_Graphics.h"
 
 class Timer : ISystem
@@ -79,7 +79,7 @@ public:
             char fpsStr[256];
             sprintf_s(fpsStr, "\t FPS : %d", m_fps);
 
-            XC_Graphics& graphics = SystemLocator::GetInstance()->RequestSystem<XC_Graphics>("GraphicsSystem");
+            XCGraphics& graphics = SystemLocator::GetInstance()->RequestSystem<XCGraphics>("GraphicsSystem");
             graphics.SetWindowTitle(graphics.GetDefaultWindowTitle() + fpsStr);
 
             m_fps = 0;

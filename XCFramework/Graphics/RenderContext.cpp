@@ -7,22 +7,22 @@
 #include "GraphicsPrecompiledHeader.h"
 
 #include "Graphics/RenderContext.h"
-#include "Graphics/XC_Graphics.h"
-#include "Graphics/XC_Shaders/XC_ShaderContainer.h"
-#include "Graphics/XC_Shaders/IShader.h"
+#include "Graphics/XCGraphics.h"
+#include "Graphics/XCShaders/XCShaderContainer.h"
+#include "Graphics/XCShaders/IShader.h"
 #include "Graphics/SharedDescriptorHeap.h"
 
 RenderContext::RenderContext()
 {
 }
 
-void RenderContext::Init(ID3DDevice* device, XC_ShaderContainer* shaderMgr)
+void RenderContext::Init(ID3DDevice* device, XCShaderContainer* shaderMgr)
 {
     m_clearColor = XCVec4(1.0f, 1.0f, 1.0f, 1.0f);
 
     m_shaderContainer = shaderMgr;
 
-    m_graphicsSystem = &SystemLocator::GetInstance()->RequestSystem<XC_Graphics>("GraphicsSystem");
+    m_graphicsSystem = &SystemLocator::GetInstance()->RequestSystem<XCGraphics>("GraphicsSystem");
 
 #if defined(USE_IMMEDIATE_CONTEXT)
     m_deviceContext = m_graphicsSystem->GetDeviceContext();

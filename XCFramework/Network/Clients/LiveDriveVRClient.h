@@ -9,11 +9,11 @@
 #include "Network/Client.h"
 
 #if defined(XCGRAPHICS_DX11)
-#include "Graphics/XC_Textures/RenderableTexture.h"
+#include "Graphics/XCTextures/RenderableTexture.h"
 #endif
 
-class XC_Graphics;
-class DirectInput;
+class XCGraphics;
+class XCInput;
 
 static const char* IP_ADDRESS = "192.168.1.101";
 static const i32   DEFAULT_PORT = 38300;
@@ -49,9 +49,9 @@ private:
 
 #if defined(XCGRAPHICS_DX11)
     RenderableTexture::RenderedTextureInfo* m_texInfo;
-    XC_Graphics*                            m_graphicsSystem;
+    XCGraphics*                            m_graphicsSystem;
 #endif
 
     bool                                    m_sendData;
-    DirectInput*                            m_directInput;
+    XCInput*                            m_directInput;
 };

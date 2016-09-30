@@ -9,7 +9,7 @@
 #include "Gameplay/GameActors/SimpleActor.h"
 
 #include "Graphics/BasicGeometry/TexturedPlane.h"
-#include "Graphics/XC_Textures/Texture2D.h"
+#include "Graphics/XCTextures/Texture2D.h"
 
 class LiveDriveTexturePlane : public TexturedPlane
 {

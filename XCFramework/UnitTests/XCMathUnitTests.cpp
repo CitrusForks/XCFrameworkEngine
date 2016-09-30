@@ -1,7 +1,7 @@
 #include "UnitTestPrecompiledHeader.h"
 
-#include "Engine/Memory/MemorySystem.h"
-#include "Engine/Memory/MemorySystemWin32.h"
+#include "Base/Memory/MemorySystem.h"
+#include "Base/Memory/MemorySystemWin32.h"
 
 #include "Gameplay/GameActors/IActor.h"
 #include "Gameplay/GameActors/Soldier/Soldier.h"

@@ -11,7 +11,7 @@
 #include "Assets/Packages/Schema/BasicTypes_generated.h"
 #include "Assets/Packages/Schema/GameplayActors_generated.h"
 
-#include "Graphics/XC_Graphics.h"
+#include "Graphics/XCGraphics.h"
 
 #include "Engine/Resource/ResourceHandle.h"
 
@@ -40,7 +40,7 @@ void LiveDriveTexturePlane::PreLoad(const void* fbBuffer)
     m_material.Diffuse  = XCVec4(texPlaneBuff->Material()->Diffuse()->x(), texPlaneBuff->Material()->Diffuse()->y(), texPlaneBuff->Material()->Diffuse()->z(), texPlaneBuff->Material()->Diffuse()->w());
     m_material.Specular = XCVec4(texPlaneBuff->Material()->Specular()->x(), texPlaneBuff->Material()->Specular()->y(), texPlaneBuff->Material()->Specular()->z(), texPlaneBuff->Material()->Specular()->w());
 
-    XC_Graphics& graphicsSystem = (XC_Graphics&)SystemLocator::GetInstance()->RequestSystem("GraphicsSystem");
+    XCGraphics& graphicsSystem = (XCGraphics&)SystemLocator::GetInstance()->RequestSystem("GraphicsSystem");
     m_liveDriveTexture = XCNEW(Texture2D)(graphicsSystem.GetRenderTexture(RenderTargetType_LiveDrive).GetRenderTargetResource());
     m_texture->m_Resource = m_liveDriveTexture;
 }
@@ -51,7 +51,7 @@ void LiveDriveTexturePlane::Update(f32 dt)
 
 void LiveDriveTexturePlane::Draw(RenderContext& renderContext)
 {
-    XC_Graphics& graphicsSystem = (XC_Graphics&)SystemLocator::GetInstance()->RequestSystem("GraphicsSystem");
+    XCGraphics& graphicsSystem = (XCGraphics&)SystemLocator::GetInstance()->RequestSystem("GraphicsSystem");
     if (!graphicsSystem.IsSecondaryDrawCall())
     {
         TexturedPlane::Draw(renderContext);

@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "Engine/System/ISystem.h"
+#include "Base/System/ISystem.h"
 
 #include "Gameplay/GameStates/IGameState.h"
 #include "GameStates/GameStateTypes.h"
@@ -27,7 +27,7 @@ public:
 
     void                        Init();
     void                        Update(f32 dt);
-    void                        Draw(XC_Graphics& graphicsSystem);
+    void                        Draw(XCGraphics& graphicsSystem);
     void                        Destroy();
 
     void                        SetState(std::string stateName, EWhatToDoWithPreviousState what = STATE_NONE);

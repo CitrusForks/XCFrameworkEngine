@@ -6,7 +6,7 @@
 
     FBPCSoldiers:
     [
-        { Position:{ x:10, y:2, z:10}, XCMeshResourceName:"Soldier" },
+        { Position:{ x:10, y:2, z:10}, XCMeshResourceName:"ArmyPilot" },
     ],
 
     FBNPCSoldiers:

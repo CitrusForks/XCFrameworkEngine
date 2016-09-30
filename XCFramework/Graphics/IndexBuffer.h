@@ -75,7 +75,7 @@ public:
 template<class T>
 void IndexBuffer<T>::BuildIndexBuffer(ID3DDeviceContext* context)
 {
-    XC_Graphics& graphicsSystem = (XC_Graphics&)SystemLocator::GetInstance()->RequestSystem("GraphicsSystem");
+    XCGraphics& graphicsSystem = (XCGraphics&)SystemLocator::GetInstance()->RequestSystem("GraphicsSystem");
 
 #if defined(XCGRAPHICS_DX12)
     //Create IB
