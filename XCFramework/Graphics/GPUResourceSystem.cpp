@@ -11,6 +11,7 @@
 #include "GPUResourceView.h"
 #include "SharedDescriptorHeap.h"
 
+
 void GPUResourceSystem::Init(ID3DDevice& device)
 {
     m_device = &device;
@@ -18,7 +19,7 @@ void GPUResourceSystem::Init(ID3DDevice& device)
 
 GPUResource* GPUResourceSystem::CreateConstantBufferResource(GPUResourceDesc& desc)
 {
-    desc.m_bufferSize = (desc.m_bufferSize + 255) & ~255;     //Must be a multiple of 256
+    desc.m_bufferSize = (desc.m_bufferSize + ConstantBufferAlignment) & ~ConstantBufferAlignment;
 
     SharedDescriptorHeap& heap = (SharedDescriptorHeap&)SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
     GPUResource* resource = heap.AllocateGPUResource(desc.m_bufferType, desc.m_bufferSize);

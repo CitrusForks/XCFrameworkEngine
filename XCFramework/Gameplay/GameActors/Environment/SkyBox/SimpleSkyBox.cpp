@@ -29,9 +29,9 @@ void SimpleSkyBox::Init(i32 actorId)
 {
     SimpleActor::Init(actorId);
 
-    m_material.Ambient = XCVec4(1.0f, 1.0f, 1.0f, 1.0f);
-    m_material.Diffuse = XCVec4(0.5f, 0.8f, 0.0f, 1.0f);
-    m_material.Specular = XCVec4(0.2f, 0.2f, 0.2f, 16.0f);
+    m_material.Ambient = XCVec4Unaligned(1.0f, 1.0f, 1.0f, 1.0f);
+    m_material.Diffuse = XCVec4Unaligned(0.5f, 0.8f, 0.0f, 1.0f);
+    m_material.Specular = XCVec4Unaligned(0.2f, 0.2f, 0.2f, 16.0f);
 
     m_useShaderType = ShaderType_SimpleCubeMap;
 
@@ -45,9 +45,9 @@ void SimpleSkyBox::PreLoad(const void* fbBuffer)
     m_initialRotation.SetValues(skyBoxBuff->Rotation()->x(), skyBoxBuff->Rotation()->y(), skyBoxBuff->Rotation()->z(), skyBoxBuff->Rotation()->w());
     m_initialScaling.SetValues(skyBoxBuff->Scaling()->x(),  skyBoxBuff->Scaling()->y(),  skyBoxBuff->Scaling()->z(),  skyBoxBuff->Scaling()->w());
 
-    m_material.Ambient = XCVec4(skyBoxBuff->Material()->Ambient()->x(), skyBoxBuff->Material()->Ambient()->y(), skyBoxBuff->Material()->Ambient()->z(), skyBoxBuff->Material()->Ambient()->w());
-    m_material.Diffuse = XCVec4(skyBoxBuff->Material()->Diffuse()->x(), skyBoxBuff->Material()->Diffuse()->y(), skyBoxBuff->Material()->Diffuse()->z(), skyBoxBuff->Material()->Diffuse()->w());
-    m_material.Specular = XCVec4(skyBoxBuff->Material()->Specular()->x(), skyBoxBuff->Material()->Specular()->y(), skyBoxBuff->Material()->Specular()->z(), skyBoxBuff->Material()->Specular()->w());
+    m_material.Ambient = XCVec4Unaligned(skyBoxBuff->Material()->Ambient()->x(), skyBoxBuff->Material()->Ambient()->y(), skyBoxBuff->Material()->Ambient()->z(), skyBoxBuff->Material()->Ambient()->w());
+    m_material.Diffuse = XCVec4Unaligned(skyBoxBuff->Material()->Diffuse()->x(), skyBoxBuff->Material()->Diffuse()->y(), skyBoxBuff->Material()->Diffuse()->z(), skyBoxBuff->Material()->Diffuse()->w());
+    m_material.Specular = XCVec4Unaligned(skyBoxBuff->Material()->Specular()->x(), skyBoxBuff->Material()->Specular()->y(), skyBoxBuff->Material()->Specular()->z(), skyBoxBuff->Material()->Specular()->w());
 
     ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
     m_cubeMapTexture = &resMgr.AcquireResource(skyBoxBuff->CubeTexture3DResourceName()->c_str());

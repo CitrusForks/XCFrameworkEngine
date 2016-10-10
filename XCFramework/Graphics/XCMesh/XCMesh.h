@@ -51,6 +51,7 @@ public:
     MeshData*                               CreateAndGetSubMesh();
     void                                    DrawInstanced(PerObjectBuffer& objectBuffer);
 
+    //This returns the initial transform state from data multiplied by the root transform of the mesh
     XCMatrix4Unaligned                      GetRootTransform();
     OrientedBoundingBox*                    GetAABB() { return m_computedBoundBox.get(); }
 

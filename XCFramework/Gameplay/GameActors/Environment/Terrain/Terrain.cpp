@@ -26,9 +26,9 @@
 
 Terrain::Terrain()
 {
-    m_material.Ambient = XCVec4(0.1f, 0.1f, 0.1f, 1.0f);
-    m_material.Diffuse = XCVec4(0.48f, 0.77f, 0.46f, 1.0f);
-    m_material.Specular = XCVec4(0.2f, 0.2f, 0.2f, 16.0f);
+    m_material.Ambient = XCVec4Unaligned(0.1f, 0.1f, 0.1f, 1.0f);
+    m_material.Diffuse = XCVec4Unaligned(0.48f, 0.77f, 0.46f, 1.0f);
+    m_material.Specular = XCVec4Unaligned(0.2f, 0.2f, 0.2f, 16.0f);
 
     m_useShaderType = ShaderType_TerrainMultiTexture;
     m_collisionDetectionType = COLLISIONDETECTIONTYPE_TERRAIN;

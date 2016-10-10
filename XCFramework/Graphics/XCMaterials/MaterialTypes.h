@@ -8,10 +8,10 @@
 
 struct Material
 {
-    XCVec4        Ambient;
-    XCVec4        Diffuse;
-    XCVec4        Specular;
-    XCVec4        Padding;
+    XCVec4Unaligned        Ambient;
+    XCVec4Unaligned        Diffuse;
+    XCVec4Unaligned        Specular;
+    XCVec4Unaligned        Padding;
 
     Material() :
         Ambient(0, 0, 0, 0),
@@ -20,7 +20,7 @@ struct Material
         Padding(0, 0, 0, 0)
     { }
 
-    Material(const XCVec4& ambient, const XCVec4& diffuse, const XCVec4& specular) :
+    Material(const XCVec4Unaligned& ambient, const XCVec4Unaligned& diffuse, const XCVec4Unaligned& specular) :
         Ambient(ambient),
         Diffuse(diffuse),
         Specular(specular),

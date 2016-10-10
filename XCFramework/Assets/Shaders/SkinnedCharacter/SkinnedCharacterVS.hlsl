@@ -25,7 +25,7 @@ cbuffer cbInstancedBuffer : register(b0)
 
 cbuffer cbBoneBuffer : register(b1)
 {
-    float4x4    gBoneMatrix[60];
+    float4x3    gBoneMatrix[100];
 };
 
 #if defined(FORWARD_LIGHTING)
@@ -70,14 +70,15 @@ VertexOut VSMain(VertexIn vin)
     weight.w = 1.0f - dot(weight.xyz, float3(1, 1, 1));
     
     float4 localPos = float4(vin.PosL, 1.0f);
-    float3 objPos    = mul(localPos, gBoneMatrix[vin.BlendIndices.x]) * weight.x;
-    objPos          += mul(localPos, gBoneMatrix[vin.BlendIndices.y]) * weight.y;
-    objPos          += mul(localPos, gBoneMatrix[vin.BlendIndices.z]) * weight.z;
-    objPos          += mul(localPos, gBoneMatrix[vin.BlendIndices.w]) * weight.w;
+    float3 objPos = mul(localPos, gBoneMatrix[vin.BlendIndices.x]).xyz * weight.x;
+    objPos       += mul(localPos, gBoneMatrix[vin.BlendIndices.y]).xyz * weight.y;
+    objPos       += mul(localPos, gBoneMatrix[vin.BlendIndices.z]).xyz * weight.z;
+    objPos       += mul(localPos, gBoneMatrix[vin.BlendIndices.w]).xyz * weight.w;
 
     // Transform to world space.
     vout.PosW = mul(float4(objPos, 1.0), gPerObject[vin.InstanceIndex].gWorld).xyz;
     vout.PosH = mul(float4(objPos, 1.0), gPerObject[vin.InstanceIndex].gWVP);
+
     vout.NormalW = normalize(mul(float4(vin.NormalL, 0.0f), gPerObject[vin.InstanceIndex].gWorldInvTranspose)).xyz;
     vout.Tex = mul(float4(vin.Tex, 0.0f, 1.0f), gPerObject[vin.InstanceIndex].gTexTransform).xy;
     

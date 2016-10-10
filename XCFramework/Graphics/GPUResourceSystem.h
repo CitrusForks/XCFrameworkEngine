@@ -21,6 +21,13 @@ class GPUResourceSystem : public ISystem
 public:
     DECLARE_OBJECT_CREATION(GPUResourceSystem)
 
+    static const u32     ConstantBufferAlignment
+#if defined(XCGRAPHICS_DX12)
+        = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT - 1;
+#else
+        = 255;
+#endif
+
     void                 Init(ID3DDevice& device);
     void                 Destroy();
 

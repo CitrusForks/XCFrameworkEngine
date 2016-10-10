@@ -177,7 +177,12 @@ void XCMesh::LoadDynamic()
 
 XCMatrix4Unaligned XCMesh::GetRootTransform()
 {
-    return aiMatrixToMatrix4Unaligned(m_sceneAnimator->GetGlobalTransform(m_scene->mRootNode));
+    XCMatrix out = MatrixScale(m_globalScaling.x, m_globalScaling.y, m_globalScaling.z)
+        * MatrixRotationXYZ(m_globalRotation.x, m_globalRotation.y, m_globalRotation.z)
+        * MatrixTranslate(m_globalTranslation.x, m_globalTranslation.y, m_globalTranslation.z)
+        * aiMatrixToMatrix4(m_sceneAnimator->GetGlobalTransform(m_scene->mRootNode));
+
+    return out.GetUnaligned();
 }
 
 bool XCMesh::LoadMesh()
@@ -210,19 +215,26 @@ void XCMesh::CreateBuffers()
     {
         MeshData* submesh = m_subMeshes[objIndex];
 
-        //Calculate the global translation matrix * this sub mesh trnaslation matrix
-        const XCVec3Unaligned& localTrans = submesh->GetGeometryTranslation();
-        const XCMatrix4 globalTranslationMat = MatrixTranslate(localTrans.x, localTrans.y, localTrans.z);
+        XCMatrix4 transformMatrix;
 
-        //Calculate the global rotation matrix * this sub mesh rotation matrix
-        const XCVec3Unaligned& localRot = submesh->GetGeometryRotation();
-        const XCMatrix4 globalRotationMat = MatrixRotationX(m_globalRotation.x + localRot.x) * MatrixRotationY(m_globalRotation.y + localRot.y) * MatrixRotationZ(m_globalRotation.z + localRot.z);
+        //The transforms specified in data will me multiplied while you call the GetRootTransform, since we do not want to modify the skinned mesh in local space,
+        //due to its bone transforms where made according to the original local space.
+        if (!IsSkinnedMesh())
+        {
+            //Calculate the global translation matrix * this sub mesh trnaslation matrix
+            const XCVec3Unaligned& localTrans = submesh->GetGeometryTranslation();
+            const XCMatrix4 globalTranslationMat = MatrixTranslate(localTrans.x, localTrans.y, localTrans.z);
 
-        //Calculate the global scaling matrix * this sub mesh scaling matrix
-        const XCVec3Unaligned& localScale = submesh->GetGeometryScaling();
-        const XCMatrix4 globalScalingMat = MatrixScale(m_globalScaling.x, m_globalScaling.y, m_globalScaling.z) * MatrixScale(localScale.x, localScale.y, localScale.z);
+            //Calculate the global rotation matrix * this sub mesh rotation matrix
+            const XCVec3Unaligned& localRot = submesh->GetGeometryRotation();
+            const XCMatrix4 globalRotationMat = MatrixRotationX(m_globalRotation.x + localRot.x) * MatrixRotationY(m_globalRotation.y + localRot.y) * MatrixRotationZ(m_globalRotation.z + localRot.z);
 
-        XCMatrix4 transformMatrix = globalScalingMat * globalRotationMat * globalTranslationMat;
+            //Calculate the global scaling matrix * this sub mesh scaling matrix
+            const XCVec3Unaligned& localScale = submesh->GetGeometryScaling();
+            const XCMatrix4 globalScalingMat = MatrixScale(m_globalScaling.x, m_globalScaling.y, m_globalScaling.z) * MatrixScale(localScale.x, localScale.y, localScale.z);
+
+            transformMatrix = globalScalingMat * globalRotationMat * globalTranslationMat;
+        }
 
         XCVec4 transformedVertex;
         //XCVec3Unaligned vertexPos = { 0.0f, 0.0f, 0.0f };
@@ -323,7 +335,9 @@ void XCMesh::CreateBuffers()
             
             if (IsSkinnedMesh())
             {
-                fp = fopen("xcmesh_log.txt", "w+");
+                char fileName[32];
+                sprintf(fileName, "xcmesh_log%d.txt", objIndex);
+                fp = fopen(fileName, "w+");
                 if (m_scene)
                     mesh = m_scene->mMeshes;
 
@@ -363,7 +377,7 @@ void XCMesh::CreateBuffers()
                     for (u32 weightIndex = 0; weightIndex < weightsPerVertex[vertIndex].size(); ++weightIndex)
                     {
                         boneIndex[weightIndex] = (f32)weightsPerVertex[vertIndex][weightIndex].mVertexId;
-                        boneWeight[weightIndex] = (f32)(weightsPerVertex[vertIndex][weightIndex].mWeight /** 255.0f*/);
+                        boneWeight[weightIndex] = (f32)(weightsPerVertex[vertIndex][weightIndex].mWeight * 1.0f);
                     }
 
                     blendIndices = XCVec4Unaligned(boneIndex[0], boneIndex[1], boneIndex[2], boneIndex[3]);
@@ -469,6 +483,15 @@ void XCMesh::CreateBuffers()
     }
 
     //Got the min max, compute the centre and extends
+    if (IsSkinnedMesh())
+    {
+        XCMatrix transform = MatrixScale(m_globalScaling.x, m_globalScaling.y, m_globalScaling.z)
+            * MatrixTranslate(m_globalTranslation.x, m_globalTranslation.y, m_globalTranslation.z);
+
+        vMin = VectorTransformMatrix(vMin, transform);
+        vMax = VectorTransformMatrix(vMax, transform);
+    }
+
     m_computedBoundBox->m_boxCenter  = 0.5f * (vMin + vMax);
     m_computedBoundBox->m_boxExtends = 0.5f * (vMax - vMin);
     m_computedBoundBox->CreateBoundBox();
@@ -531,6 +554,8 @@ void XCMesh::FilterSubMeshes()
     }
 }
 
+static f64 g_dCurrent = 0.0f;
+
 void XCMesh::Update(f32 dt)
 {
     //Need not update. Update the clone of this of every actor
@@ -541,7 +566,6 @@ void XCMesh::Update(f32 dt)
         {
             aiAnimation* anim = m_sceneAnimator->CurrentAnim();
 
-            static f64 g_dCurrent = 0.0f;
             g_dCurrent += clock() / f64(CLOCKS_PER_SEC) - m_lastPlayedAnimTime;
 
             f64 time = g_dCurrent;
@@ -618,25 +642,24 @@ void XCMesh::DrawSubMesh(RenderContext& renderContext, u32 meshIndex)
 
         std::vector<aiMatrix4x4> boneMatrix = m_sceneAnimator->GetBoneMatrices(m_scene->mRootNode, meshIndex);
 
-        for (u32 index = 0; index < 60; ++index)
+        XCMatrixUnaligned mat = XCMatrix::XCMatrixIdentity.GetUnaligned();
+
+        for (u32 index = 0; index < boneMatrix.size(); ++index)
         {
-            m_boneBuffers[meshIndex].m_cbBoneBuffer.gBoneMatrix[index] = aiMatrixToMatrix4Unaligned(boneMatrix[index]);
+            //First transpose normally in 4x4 space
+             mat = aiMatrixToMatrix4(boneMatrix[index]).GetUnaligned();
+             mat = MatrixTranspose(mat).GetUnaligned();
+
+             //Fit the transposed matrix into 4 vector 3 component matrix aka 4x3
+             XCMatrixUnaligned43 mat43 = XCMatrixUnaligned43(mat.r1, mat.r2, mat.r3, mat.r4);
+
+             //Transpose to column matrix with 3x4
+             XCMatrixUnaligned34 mat34 = mat43.Transpose();
+
+             m_boneBuffers[meshIndex].m_cbBoneBuffer.gBoneMatrix[index] = mat34;
         }
 
-        static f32 matrices[4 * 4 * 60];
-        f32* tempmat = matrices;
-
-        for (u32 matIndex = 0; matIndex < boneMatrix.size(); ++matIndex)
-        {
-            aiMatrix4x4& mat = boneMatrix[matIndex];
-            mat.Transpose();
-            *tempmat++ = mat.a1; *tempmat++ = mat.a2; *tempmat++ = mat.a3; *tempmat++ = mat.a4;
-            *tempmat++ = mat.b1; *tempmat++ = mat.b2; *tempmat++ = mat.b3; *tempmat++ = mat.b4;
-            *tempmat++ = mat.c1; *tempmat++ = mat.c2; *tempmat++ = mat.c3; *tempmat++ = mat.c4;
-            *tempmat++ = mat.d1; *tempmat++ = mat.d2; *tempmat++ = mat.d3; *tempmat++ = mat.d4;
-        }
-
-        m_boneBuffers[meshIndex].m_cbBoneBufferGPU->UploadDataOnGPU(renderContext.GetDeviceContext(), &matrices, sizeof(cbBoneBuffer));
+        m_boneBuffers[meshIndex].m_cbBoneBufferGPU->UploadDataOnGPU(renderContext.GetDeviceContext(), &m_boneBuffers[meshIndex].m_cbBoneBuffer, sizeof(cbBoneBuffer));
         m_shaderHandler->SetConstantBuffer("cbBoneBuffer", renderContext.GetDeviceContext(), *m_boneBuffers[meshIndex].m_cbBoneBufferGPU);
         break;
     }

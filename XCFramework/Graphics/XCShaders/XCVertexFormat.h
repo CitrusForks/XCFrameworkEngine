@@ -256,11 +256,6 @@ struct VertexPosNormTexBIndexBWeight
 
 struct VertexPosColorInstanceIndex
 {
-    /*struct InstanceBuffer
-    {
-        XCVec4Unaligned SamplePad;
-    };*/
-
     XCVec4Unaligned Pos;
     XCVec4Unaligned Color;
 

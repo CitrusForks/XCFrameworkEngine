@@ -35,7 +35,7 @@ float4 CalculateLightImpact(LightSource lightSource, float4 vertexPos, float4 su
     float intensityOfLight = 1 / (gSoftenerA + (gSoftenerB * dist) + (gSoftenerC * dist * dist));
 
     //Multiply the intensity of light 
-    intensityOfLight = intensityOfLight * lightSource.Intensity;
+    intensityOfLight = (float) intensityOfLight * lightSource.Intensity;
 
     //Dot can return negative value, which shouldn't be lit at all. So take the max.
     float angleOfIncidence = intensityOfLight * max(dot(surfaceNormal.xyz, incidentLight.xyz), 0.0);

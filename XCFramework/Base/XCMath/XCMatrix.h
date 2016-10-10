@@ -29,7 +29,95 @@ namespace XCMath
             r3 = row3.GetUnaligned4();
             r4 = row4.GetUnaligned4();
         }
+
+        void Print()
+        {
+            Logger("Matrix Print");
+            Logger("Row 1 : %f %f %f %f", r1.x, r1.y, r1.z, r1.w);
+            Logger("Row 2 : %f %f %f %f", r2.x, r2.y, r2.z, r2.w);
+            Logger("Row 3 : %f %f %f %f", r3.x, r3.y, r3.z, r3.w);
+            Logger("Row 4 : %f %f %f %f", r4.x, r4.y, r4.z, r4.w);
+        }
     };
+
+    //On CPU end, this is a 3 vector with 4 components, but when transferred to GPU end, it turns into 4 vector 3 component for
+    //Constant buffers float4x3 matrix.
+    struct XCMatrixUnaligned34
+    {
+        XCFloat4Unaligned r1;
+        XCFloat4Unaligned r2;
+        XCFloat4Unaligned r3;
+
+        XCMatrixUnaligned34() {}
+        XCMatrixUnaligned34(const XCFloat4Unaligned& row1, const XCFloat4Unaligned& row2, const XCFloat4Unaligned& row3)
+        {
+            r1 = row1;
+            r2 = row2;
+            r3 = row3;
+        }
+
+        XCMatrixUnaligned34(const XCFloat4& row1, const XCFloat4& row2, const XCFloat4& row3)
+        {
+            r1 = row1.GetUnaligned4();
+            r2 = row2.GetUnaligned4();
+            r3 = row3.GetUnaligned4();
+        }
+
+        /*
+        XCMatrixUnaligned43 Transpose()
+        {
+        return XCMatrixUnaligned43(
+        XCFloat3Unaligned(r1.x, r2.x, r3.x)
+        , XCFloat3Unaligned(r1.y, r2.y, r3.y)
+        , XCFloat3Unaligned(r1.z, r2.z, r3.z)
+        , XCFloat3Unaligned(r1.w, r2.w, r3.w)
+        );
+        }
+        */
+
+        void Print()
+        {
+            Logger("Matrix34 Print");
+            Logger("Row 1 : %f %f %f %f", r1.x, r1.y, r1.z, r1.w);
+            Logger("Row 2 : %f %f %f %f", r2.x, r2.y, r2.z, r2.w);
+            Logger("Row 3 : %f %f %f %f", r3.x, r3.y, r3.z, r3.w);
+        }
+    };
+
+    struct XCMatrixUnaligned43
+    {
+        XCFloat3Unaligned r1;
+        XCFloat3Unaligned r2;
+        XCFloat3Unaligned r3;
+        XCFloat3Unaligned r4;
+
+        XCMatrixUnaligned43() {}
+        XCMatrixUnaligned43(const XCFloat3Unaligned& row1, const XCFloat3Unaligned& row2, const XCFloat3Unaligned& row3, const XCFloat3Unaligned& row4)
+        {
+            r1 = row1;
+            r2 = row2;
+            r3 = row3;
+            r4 = row4;
+        }
+
+        XCMatrixUnaligned34 Transpose()
+        {
+        return XCMatrixUnaligned34(
+            XCFloat4Unaligned(r1.x, r2.x, r3.x, r4.x),
+            XCFloat4Unaligned(r1.y, r2.y, r3.y, r4.y),
+            XCFloat4Unaligned(r1.z, r2.z, r3.z, r4.z));
+        }
+
+        void Print()
+        {
+            Logger("Matrix43 Print");
+            Logger("Row 1 : %f %f %f", r1.x, r1.y, r1.z);
+            Logger("Row 2 : %f %f %f", r2.x, r2.y, r2.z);
+            Logger("Row 3 : %f %f %f", r3.x, r3.y, r3.z);
+            Logger("Row 4 : %f %f %f", r4.x, r4.y, r4.z);
+        }
+    };
+
 
     class XCMatrix
     {
@@ -304,6 +392,11 @@ namespace XCMath
     inline XCMatrix MatrixRotationZ(f32 angle)
     {
         return XCMatrix(DirectX::XMMatrixRotationZ(angle));
+    }
+
+    inline XCMatrix MatrixRotationXYZ(f32 angleX, f32 angleY, f32 angleZ)
+    {
+        return MatrixRotationX(angleX) * MatrixRotationY(angleY) * MatrixRotationZ(angleZ);
     }
 
     inline XCMatrix MatrixRotationAxis(const XCFloat4& axis, f32 angle)

@@ -26,9 +26,9 @@ void Bullet::PreLoad(XCVec3& initialPosition, XCVec3& target, std::string pMeshN
     ResourceManager& resMgr = (ResourceManager&)SystemLocator::GetInstance()->RequestSystem("ResourceManager");
     m_pMesh     = &resMgr.AcquireResource(pMeshName.c_str());
 
-    m_material.Ambient = XCVec4(1.0f, 1.0f, 1.0f, 1.0f);
-    m_material.Diffuse = XCVec4(0.5f, 0.8f, 0.0f, 1.0f);
-    m_material.Specular = XCVec4(0.2f, 0.2f, 0.2f, 16.0f);
+    m_material.Ambient = XCVec4Unaligned(1.0f, 1.0f, 1.0f, 1.0f);
+    m_material.Diffuse = XCVec4Unaligned(0.5f, 0.8f, 0.0f, 1.0f);
+    m_material.Specular = XCVec4Unaligned(0.2f, 0.2f, 0.2f, 16.0f);
 
     //Get initial position
     m_currentPosition = initialPosition;

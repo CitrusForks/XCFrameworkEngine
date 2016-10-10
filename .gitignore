@@ -30,3 +30,8 @@ XCFramework/.vs/*
 /XCFramworkEditor/obj/Debug
 /XCFramworkEditor/bin/Debug
 /XCFramework/.settings
+/XCFramework/Assets/Shaders/obj/Debug
+/XCFramework/xcmesh_log2.txt
+/XCFramework/xcmesh_log1.txt
+/XCFramework/xcmesh_log0.txt
+/XCFramework/bonelogs.txt

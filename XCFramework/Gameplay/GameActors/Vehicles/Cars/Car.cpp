@@ -25,9 +25,9 @@ void Car::PreLoad(XCVec3& initialPosition, std::string pMesh)
     ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
     m_pMesh = &resMgr.AcquireResource(pMesh.c_str());
     
-    m_material.Ambient = XCVec4(0.1f, 0.1f, 0.1f, 1.0f);
-    m_material.Diffuse = XCVec4(0.5f, 0.8f, 0.0f, 1.0f);
-    m_material.Specular = XCVec4(0.2f, 0.2f, 0.2f, 16.0f);
+    m_material.Ambient = XCVec4Unaligned(0.1f, 0.1f, 0.1f, 1.0f);
+    m_material.Diffuse = XCVec4Unaligned(0.5f, 0.8f, 0.0f, 1.0f);
+    m_material.Specular = XCVec4Unaligned(0.2f, 0.2f, 0.2f, 16.0f);
     
     //Get initial position
     m_currentPosition = initialPosition;

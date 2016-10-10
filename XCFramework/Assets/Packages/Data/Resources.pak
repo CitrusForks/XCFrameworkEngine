@@ -32,7 +32,7 @@
 
     FBMeshCustoms:
     [
-        { ResourceName:"ArmyPilot", ResourcePath:"Assets\\Meshes\\Soldiers\\ArmyPilot\\ArmyPilot.ms3d", TextureRes:"armypilot_body_mesh_tex", InitialScaling:{x:0.05, y:0.05, z:0.05}, InitialRotation:{x:0.0, y:0.0, z:0.0}, ShaderUsage:SkinnedCharacter }
+        { ResourceName:"ArmyPilot", ResourcePath:"Assets\\Meshes\\Soldiers\\ArmyPilot\\ArmyPilot.ms3d", TextureRes:"armypilot_body_mesh_tex", InitialScaling:{x:0.03, y:0.03, z:0.03}, InitialRotation:{x:0.0, y:3.14, z:0.0}, ShaderUsage:SkinnedCharacter }
     ],
 
     FBVectorFontMesh:

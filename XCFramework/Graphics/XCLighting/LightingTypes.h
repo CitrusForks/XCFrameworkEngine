@@ -32,7 +32,7 @@ struct ILight
     //virtual ~ILight() {}
 };
 
-struct LightSource : public ILight
+struct LightSource
 {
     XCVec4Unaligned            LightColor;  //Color of the light that emits
     XCVec4Unaligned            Direction;   //Direction the light is pointing at

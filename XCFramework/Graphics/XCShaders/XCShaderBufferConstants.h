@@ -37,11 +37,11 @@ struct cbInvTransposeWorld
 
 struct cbLightsPerFrame
 {
-    LightSource      gLightSource[10];
-    XCVec4Unaligned  gNoOfLights;
-    XCVec4Unaligned  padding1;
-    XCVec4Unaligned  padding2;
-    XCVec4Unaligned  padding3;
+    LightSource         gLightSource[10];
+    XCVec4Unaligned     gNoOfLights;
+    XCVec4Unaligned     padding1;
+    XCVec4Unaligned     padding2;
+    XCVec4Unaligned     padding3;
 };
 
 struct cbMatTexPerObject
@@ -66,7 +66,7 @@ struct cbInstancedBuffer
 
 struct cbBoneBuffer
 {
-    XCMatrix4Unaligned    gBoneMatrix[60];
+    XCMatrixUnaligned34   gBoneMatrix[100];
 };
 
 struct cbVectorFontInstanced
