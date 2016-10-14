@@ -47,5 +47,5 @@ protected:
     //MultiTex
     std::vector<ResourceHandle*>        m_textures;
 
-    TerrainOBBHierarchy*                       m_OBBHierarchy;
+    TerrainOBBHierarchy*                m_OBBHierarchy;
 };

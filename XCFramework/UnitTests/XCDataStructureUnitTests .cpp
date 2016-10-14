@@ -30,8 +30,8 @@ namespace XCFrameworkUnitTest
         {
             Data* data = XCNEW(Data)(10);
             
-            XCTree<Data*>* tree = XCNEW(XCTree<Data*>)(data);
-            
+            XCNTreeDFS<Data*>* tree = XCNEW((XCNTreeDFS<Data*>)) (data);
+
             XCTreeNode<Data*>* lastNode;
 
             //Add 4 nodes to root node

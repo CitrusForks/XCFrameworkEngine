@@ -10,18 +10,18 @@
 
 #include "XCTreeNode.h"
 
-template<class T>
+template<class T, class TreeType>
 class XCTree
 {
 public:
     explicit XCTree(const T& data)
     {
-        m_rootNode = XCNEW(XCTreeNode<T>)(data);
+        m_rootNode = XCNEW(TreeType)(data);
     }
 
     ~XCTree()
     {
-        XCDELETE(m_rootNode);
+        XCDELETE(static_cast<TreeType*>(m_rootNode));
     }
 
     //Node Addition
@@ -48,50 +48,56 @@ private:
     XCTreeNode<T>*    m_rootNode;
 };
 
-template<class T>
-XCTreeNode<T>& XCTree<T>::AddNode(const T& data)
+template<class T, class TreeType>
+XCTreeNode<T>& XCTree<T, TreeType>::AddNode(const T& data)
 {
     return AddNode(*m_rootNode, data);
 }
 
-template<class T>
-XCTreeNode<T>& XCTree<T>::AddNode(XCTreeNode<T>& parentNode, const T& data)
+template<class T, class TreeType>
+XCTreeNode<T>& XCTree<T, TreeType>::AddNode(XCTreeNode<T>& parentNode, const T& data)
 {
-    return parentNode.AddNode(data);
+    return static_cast<TreeType&>(parentNode).AddNode(data);
 }
 
-template<class T>
-void XCTree<T>::RemoveNode(XCTreeNode<T>& node)
+template<class T, class TreeType>
+void XCTree<T, TreeType>::RemoveNode(XCTreeNode<T>& node)
 {
     //Find the parent node containing this node
     XCTreeNode<T>* parentNode = GetParentNode(node);
     XCASSERT(parentNode != nullptr);
 
-    parentNode->RemoveNode(node);
+    static_cast<TreeType*>(parentNode)->RemoveNode(node);
 }
 
-template<class T>
-void XCTree<T>::RemoveNode(const T& dataPattern)
+template<class T, class TreeType>
+void XCTree<T, TreeType>::RemoveNode(const T& dataPattern)
 {
     XCASSERT(false);
 }
 
-template<class T>
-XCTreeNode<T>* XCTree<T>::GetParentNode(const XCTreeNode<T>& childNode)
+template<class T, class TreeType>
+XCTreeNode<T>* XCTree<T, TreeType>::GetParentNode(const XCTreeNode<T>& childNode)
 {
     XCTreeNode<T>* outNode = m_rootNode;
 
     //Traverse from root node
     if (*outNode != childNode)
     {
-        outNode = m_rootNode->GetParentNode(childNode);
+        outNode = static_cast<TreeType*>(m_rootNode)->GetParentNode(childNode);
     }
 
     return outNode;
 }
 
-template<class T>
-void XCTree<T>::PrintAll()
+template<class T, class TreeType>
+void XCTree<T, TreeType>::PrintAll()
 {
     m_rootNode->Print();
 }
+
+template<class T>
+using XCNTreeBFS = XCTree<T, NTree<T, BreathFirstSearch>>;
+
+template<class T>
+using XCNTreeDFS = XCTree<T, NTree<T, DepthFirstSearch>>;

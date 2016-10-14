@@ -61,33 +61,33 @@ struct TerrainQuad
 class TerrainOBBHierarchy
 {
 public:
-    static const i32     NO_OF_QUADS_EACH_LEVEL = 4;
+    static const i32            NO_OF_QUADS_EACH_LEVEL = 4;
 
     TerrainOBBHierarchy();
     ~TerrainOBBHierarchy();
 
-    void                    CreateTerrainOBBHierarchy(i32 rowStart, i32 totalRows, i32 colStart, i32 totalColumns, i32 totalWidth);
-    void                    CreateTerrainOBBHierarchy(i32 levels, i32 rowStart, i32 totalRows, i32 colStart, i32 totalColumns, i32 totalWidth);
-    void                    ComputeQuad(i32 row, i32 col, XCVec4& pos);
-    void                    ComputeOBBForAllQuads();
-    void                    Transform(XCMatrix4& translateMat, XCMatrix4& rotateMatrix);
+    void                        CreateTerrainOBBHierarchy(i32 rowStart, i32 totalRows, i32 colStart, i32 totalColumns, i32 totalWidth);
+    void                        CreateTerrainOBBHierarchy(i32 levels, i32 rowStart, i32 totalRows, i32 colStart, i32 totalColumns, i32 totalWidth);
+    void                        ComputeQuad(i32 row, i32 col, XCVec4& pos);
+    void                        ComputeOBBForAllQuads();
+    void                        Transform(XCMatrix4& translateMat, XCMatrix4& rotateMatrix);
 
-    void                    Update(f32 dt);
-    void                    Draw(RenderContext& context);
+    void                        Update(f32 dt);
+    void                        Draw(RenderContext& context);
 
-    TerrainQuad*            GetQuadCollidingWithOBB(OrientedBoundingBox* bbox);
+    TerrainQuad*                GetQuadCollidingWithOBB(OrientedBoundingBox* bbox);
 
 protected:
     //Recursive calls to traverse the tree
-    void                    ComputeQuad(XCTreeNode<TerrainQuad*>& node, i32 row, i32 col, XCVec4& pos);
-    void                    ComputeOBBForAllQuads(XCTreeNode<TerrainQuad*>& node);
-    TerrainQuad*            GetQuadCollidingWithOBB(XCTreeNode<TerrainQuad*>& node, OrientedBoundingBox* bbox);
+    void                        ComputeQuad(XCTreeNode<TerrainQuad*>& node, i32 row, i32 col, XCVec4& pos);
+    void                        ComputeOBBForAllQuads(XCTreeNode<TerrainQuad*>& node);
+    TerrainQuad*                GetQuadCollidingWithOBB(XCTreeNode<TerrainQuad*>& node, OrientedBoundingBox* bbox);
 
-    void                    Update(XCTreeNode<TerrainQuad*>& node, f32 dt);
-    void                    Draw(XCTreeNode<TerrainQuad*>& node, RenderContext& context);
+    void                        Update(XCTreeNode<TerrainQuad*>& node, f32 dt);
+    void                        Draw(XCTreeNode<TerrainQuad*>& node, RenderContext& context);
 
-    void                    Transform(XCTreeNode<TerrainQuad*>& node, XCMatrix4& translateMat, XCMatrix4& rotateMatrix);
+    void                        Transform(XCTreeNode<TerrainQuad*>& node, XCMatrix4& translateMat, XCMatrix4& rotateMatrix);
 
 private:
-    XCTree<TerrainQuad*>*   m_terrainQuadTree;
+    XCNTreeBFS<TerrainQuad*>*   m_terrainQuadTree;
 };

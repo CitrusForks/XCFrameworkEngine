@@ -94,7 +94,7 @@ void TerrainOBBHierarchy::CreateTerrainOBBHierarchy(i32 rowStart, i32 totalRows,
     //Setup of quadruples, which divides the terrain into smaller quads. Conduct object test on the quads and moving towards the most inner quad within the OBBHierarchy
     //First create root bound box
     TerrainQuad* rootQuad = XCNEW(TerrainQuad)(rowStart, totalRows, colStart, totalColumns, totalColumns, vMin, vMax);
-    m_terrainQuadTree = XCNEW(XCTree<TerrainQuad*>)(rootQuad);
+    m_terrainQuadTree = XCNEW(XCNTreeBFS<TerrainQuad*>)(rootQuad);
 
     //1st degree Child nodes
     TerrainQuad* quad1 = XCNEW(TerrainQuad)(0, totalRows / (noOfQuads / 2), 0, totalColumns / (noOfQuads / 2), totalColumns, vMin, vMax);
