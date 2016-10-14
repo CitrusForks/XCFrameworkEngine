@@ -79,12 +79,12 @@ protected:
 
 private:
 
-    u32                    m_currentAnimationIndex;
-    const MeshNode*                 m_rootNode;
-    AnimNode*                       m_currentNodeStructure;
+    u32                                   m_currentAnimationIndex;
+    const MeshNode*                       m_rootNode;
+    AnimNode*                             m_currentNodeStructure;
     std::map<const MeshNode*, AnimNode*>  m_mappedMeshNodeAnimNodes;
-    std::vector<XCMatrix4Unaligned> m_boneTransforms;
-    u32                    m_nbOfAnimations;
+    std::vector<XCMatrix4Unaligned>       m_boneTransforms;
+    u32                                   m_nbOfAnimations;
 
     //TODO : For now using aiScene for aiAnimation.
     const aiScene*                  m_scene;

@@ -9,6 +9,7 @@
 #include "XCMeshAssimp.h"
 #include "Engine/FlatBuffersInterface/FlatBuffersSystem.h"
 
+
 // default pp steps
 static const u32 ppsteps = aiProcess_CalcTangentSpace | // calculate tangents and bitangents if possible
                                     aiProcess_JoinIdenticalVertices | // join identical vertices/ optimize indexing

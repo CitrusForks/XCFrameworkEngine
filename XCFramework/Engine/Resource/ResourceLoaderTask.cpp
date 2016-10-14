@@ -57,7 +57,7 @@ void ResourceLoaderTask::Run()
 
         case ResourceRequestType_Unload:
 
-            XCASSERT(resRequest.m_resourceHandle.m_Resource->IsLoaded());
+            XCASSERT(resRequest.m_resourceHandle.m_Resource->GetResourceState() != IResource::ResourceState_UnLoaded);
 
             if (resRequest.m_resourceHandle.m_Resource)
             {

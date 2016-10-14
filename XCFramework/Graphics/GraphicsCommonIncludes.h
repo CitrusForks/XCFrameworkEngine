@@ -35,3 +35,5 @@
 
 #include "Graphics/GraphicsSpecificDefines.h"
 #include "Graphics/Utils/GraphicUtils.h"
+
+//#define CUSTOM_ANIMATION 1

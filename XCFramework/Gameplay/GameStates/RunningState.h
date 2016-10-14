@@ -32,7 +32,7 @@ namespace GameState
         bool                    m_bMainPlayerSet;
 
         XCCameraManager*       m_cameraSystem;
-        XCInput*            m_directInput;
-        World*                  m_worldSystem;
+        XCInput*               m_directInput;
+        World*                 m_worldSystem;
     };
 }

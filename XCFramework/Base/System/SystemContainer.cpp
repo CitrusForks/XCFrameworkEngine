@@ -22,9 +22,10 @@ SystemContainer::~SystemContainer(void)
 void SystemContainer::Init(SystemFactory& sysFactory)
 {
     m_systemFactory = &sysFactory;
-    m_systemFactory->RegisterSystem<INullSystem>("INullSystem");
+    m_systemFactory->RegisterSystem<INullSystem>("NullSystem");
     
-    NULLSYSTEM = (INullSystem*) m_systemFactory->CreateSystem("INullSystem");
+    m_systemContainer["NullSystem"] = m_systemFactory->CreateSystem("NullSystem");
+    NULLSYSTEM = (INullSystem*)m_systemContainer["INullSystem"];
 }
 
 ISystem& SystemContainer::CreateNewSystem(std::string sysName)

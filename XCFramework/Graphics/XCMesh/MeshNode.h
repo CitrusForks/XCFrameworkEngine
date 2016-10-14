@@ -22,7 +22,6 @@ public:
         }
 
         m_transformation = aiMatrixToMatrix4(node->mTransformation);
-        
 
         if (tranverse)
         {

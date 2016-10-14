@@ -34,7 +34,7 @@ public:
     : m_vertexId(vertexId), m_weight(weight)
     {}
 
-    u32 m_vertexId;
+    u32        m_vertexId;
     f32        m_weight;
 };
 

@@ -11,6 +11,7 @@
 #endif
 
 #include "Terrain.h"
+#include "TerrainOBBHierarchy.h"
 
 #include "Gameplay/WorldEventTypes.h"
 #include "Gameplay/XCCamera/XCCameraManager.h"
@@ -145,48 +146,9 @@ void Terrain::GenerateVertices()
     i32 verticesIndex = 0;
     i32 bitmapRGBIndex = 0;
 
-    XCVec4 vMin(Infinity, Infinity, Infinity, 1);
-    XCVec4 vMax(-Infinity, -Infinity, -Infinity, 1);
-    
-    i32 noOfQuads = 4;
-    
-    //Setup of quadruples, which divides the terrain into smaller quads. Conduct object test on the quads and moving towards the most inner quad within the OBBHierarchy
-    //First create root bound box
-    m_OBBHierarchy = std::make_unique<OBBHierarchy>();
-    std::unique_ptr<TerrainQuad> rootQuad = std::make_unique<TerrainQuad>(0, m_rows, 0, m_cols, m_cols, vMin, vMax);
-    //m_OBBHierarchy->createTerrainOBBHierarchy(2, 0, m_rows, 0, m_cols, m_cols);
-    
-    
-    //1st degree Child nodes
-    std::unique_ptr<OBBHierarchy> childNode = std::make_unique<OBBHierarchy>();
-    std::unique_ptr<TerrainQuad> quad1 = std::make_unique<TerrainQuad>(0, m_rows / (noOfQuads / 2), 0, m_cols / (noOfQuads / 2), m_cols, vMin, vMax);
-    std::unique_ptr<TerrainQuad> quad2 = std::make_unique<TerrainQuad>(0, m_rows / (noOfQuads / 2), m_cols / (noOfQuads / 2), m_cols, m_cols, vMin, vMax);
-    std::unique_ptr<TerrainQuad> quad3 = std::make_unique<TerrainQuad>(m_rows / (noOfQuads / 2), m_rows, 0, m_cols / (noOfQuads / 2), m_cols, vMin, vMax);
-    std::unique_ptr<TerrainQuad> quad4 = std::make_unique<TerrainQuad>(m_rows / (noOfQuads / 2), m_rows, m_cols / (noOfQuads / 2), m_cols, m_cols, vMin, vMax);
-    
-    
-    //This sub division will be a node to quad1
-    std::unique_ptr<OBBHierarchy> childNode1 = std::make_unique<OBBHierarchy>();
-    std::unique_ptr<TerrainQuad> quad11 = std::make_unique<TerrainQuad>(0, (m_rows / (noOfQuads / 2)) / 2, 0, (m_cols / (noOfQuads / 2)) / 2, m_cols, vMin, vMax);
-    std::unique_ptr<TerrainQuad> quad22 = std::make_unique<TerrainQuad>(0, (m_rows / (noOfQuads / 2)) / 2, (m_cols / (noOfQuads / 2)) / 2, m_cols / (noOfQuads / 2), m_cols, vMin, vMax);
-    std::unique_ptr<TerrainQuad> quad33 = std::make_unique<TerrainQuad>(m_rows / (noOfQuads / 2) / 2, m_rows / (noOfQuads / 2), 0, (m_cols / (noOfQuads / 2)) / 2, m_cols, vMin, vMax);
-    std::unique_ptr<TerrainQuad> quad44 = std::make_unique<TerrainQuad>(m_rows / (noOfQuads / 2) / 2, m_rows / (noOfQuads / 2), m_cols / (noOfQuads / 2) / 2, m_cols / (noOfQuads / 2), m_cols, vMin, vMax);
-    
-    childNode1->AddQuad(std::move(quad11));
-    childNode1->AddQuad(std::move(quad22));
-    childNode1->AddQuad(std::move(quad33));
-    childNode1->AddQuad(std::move(quad44));
-    
-    quad1->SetChildNodeOBB(std::move(childNode1));
-    
-    childNode->AddQuad(std::move(quad1));
-    childNode->AddQuad(std::move(quad2));
-    childNode->AddQuad(std::move(quad3));
-    childNode->AddQuad(std::move(quad4));
-    
-    rootQuad->SetChildNodeOBB(std::move(childNode));
-    m_OBBHierarchy->AddQuad(std::move(rootQuad));
-
+    //Generate the obb tree to optimize terrain - actor collisions.
+    m_OBBHierarchy = XCNEW(TerrainOBBHierarchy)();
+    m_OBBHierarchy->CreateTerrainOBBHierarchy(0, m_rows, 0, m_cols, m_cols);
 
     for (i32 rowIndex = 0; rowIndex < m_rows; rowIndex++)
     {
@@ -416,6 +378,8 @@ void Terrain::Destroy()
     
     GPUResourceSystem& gpuSys = (GPUResourceSystem&)SystemLocator::GetInstance()->RequestSystem("GPUResourceSystem");
     gpuSys.DestroyResource(m_pCBPerObject);
+
+    XCDELETE(m_OBBHierarchy);
 }
 
 XCVec3 Terrain::GetTerrainNormal(f32 x, f32 z) const

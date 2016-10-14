@@ -7,8 +7,9 @@
 #pragma once
 
 #include "Gameplay/GameActors/Environment/Terrain/SimpleTerrain.h"
-#include "Gameplay/XCPhysics/OBBHierarchy.h"
 #include "Graphics/XCMaterials/MaterialTypes.h"
+
+class TerrainOBBHierarchy;
 
 class Terrain : public SimpleTerrain
 {
@@ -46,5 +47,5 @@ protected:
     //MultiTex
     std::vector<ResourceHandle*>        m_textures;
 
-    std::unique_ptr<OBBHierarchy>       m_OBBHierarchy;
+    TerrainOBBHierarchy*                       m_OBBHierarchy;
 };
