@@ -18,12 +18,12 @@ public:
     PCCar(void);
     virtual ~PCCar(void);
 
-    virtual void                        Init(i32 actorId);
-    virtual void                        PreLoad(const void* fbBuffer);
-    virtual void                        Load();
-    virtual void                        Update(f32 dt);
-    virtual void                        Destroy();
+    void                        Init(i32 actorId) override;
+    void                        PreLoad(const void* fbBuffer) override;
+    void                        Load() override;
+    void                        Update(f32 dt) override;
+    void                        Destroy() override;
 
 private:
-    XCInput*                        m_directInput;
+    XCInput*                    m_directInput;
 };

@@ -20,10 +20,10 @@ public:
     LiveDriveTexturePlane(XCVec4& p1, XCVec4& p2, XCVec4& p3);
     virtual ~LiveDriveTexturePlane();
 
-    virtual void                     PreLoad(const void* fbBuffer);
-    virtual void                     Update(f32 dt);
-    virtual void                     Draw(RenderContext& renderContext);
-    virtual void                     Destroy();
+    virtual void                     PreLoad(const void* fbBuffer) override;
+    virtual void                     Update(f32 dt) override;
+    virtual void                     Draw(RenderContext& renderContext) override;
+    virtual void                     Destroy() override;
 
 private:
     Texture2D*                       m_liveDriveTexture;

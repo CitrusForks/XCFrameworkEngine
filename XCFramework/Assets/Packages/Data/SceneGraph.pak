@@ -1,0 +1,259 @@
+{
+	"Root":
+	{
+		"FPSCamera":1
+	},
+	
+	"SceneNodes":
+	[
+		{
+			"NodeInstance_type":"FBFont",
+			"NodeInstance":
+			{
+				"Base":
+				{
+					"Position":{ "x":10, "y":2, "z":10, "w":0 },
+					"Rotation":{ "x":0, "y":0, "z":0, "w":0 },
+					"Scaling":{ "x":1, "y":1, "z":1, "w":0 },
+					"Material":{ "Ambient":{"x":1, "y":1, "z":1, "w":1}, "Diffuse":{"x":0.5, "y":0.8, "z":0, "w":1}, "Specular":{"x":0.5, "y":0.5, "z":0.5, "w":20} },
+					"RasterizerType":"FillSolid"
+				},
+				"FontResourceName":"VectorFontFBX"
+			}
+		},
+		
+		{
+			"NodeInstance_type":"FBPCSoldier",
+			"NodeInstance":
+			{
+				"Base":
+				{
+					"Base":
+					{
+						"Position":{ "x":10, "y":2, "z":10, "w":0 },
+						"Rotation":{ "x":0, "y":0, "z":0, "w":0 },
+						"Scaling":{ "x":1, "y":1, "z":1, "w":0 },
+						"Material":{ "Ambient":{"x":1, "y":1, "z":1, "w":1}, "Diffuse":{"x":0.5, "y":0.8, "z":0, "w":1}, "Specular":{"x":0.5, "y":0.5, "z":0.5, "w":20} },
+						"RasterizerType":"FillSolid"
+					},
+					"XCMeshResourceName":"ArmyPilot"
+				}
+			}
+		},
+		
+		{
+			"NodeInstance_type":"FBNPCSoldier",
+			"NodeInstance":
+			{
+				"Base":
+				{
+					"Base":
+					{
+						"Position":{ "x":-30, "y":2, "z":50, "w":0 },
+						"Rotation":{ "x":0, "y":0, "z":0, "w":0 },
+						"Scaling":{ "x":1, "y":1, "z":1, "w":0 },
+						"Material":{ "Ambient":{"x":1, "y":1, "z":1, "w":1}, "Diffuse":{"x":0.5, "y":0.8, "z":0, "w":1}, "Specular":{"x":0.5, "y":0.5, "z":0.5, "w":20} },
+						"RasterizerType":"FillSolid"
+					},
+					"XCMeshResourceName":"Soldier"
+				}
+			}
+		},
+		{
+			"NodeInstance_type":"FBNPCSoldier",
+			"NodeInstance":
+			{
+				"Base":
+				{
+					"Base":
+					{
+						"Position":{ "x":-30, "y":2, "z":60, "w":0 },
+						"Rotation":{ "x":0, "y":0, "z":0, "w":0 },
+						"Scaling":{ "x":1, "y":1, "z":1, "w":0 },
+						"Material":{ "Ambient":{"x":1, "y":1, "z":1, "w":1}, "Diffuse":{"x":0.5, "y":0.8, "z":0, "w":1}, "Specular":{"x":0.5, "y":0.5, "z":0.5, "w":20} },
+						"RasterizerType":"FillSolid"
+					},
+					"XCMeshResourceName":"Soldier"
+				}
+			}
+		},
+		{
+			"NodeInstance_type":"FBNPCSoldier",
+			"NodeInstance":
+			{
+				"Base":
+				{
+					"Base":
+					{
+						"Position":{ "x":-30, "y":2, "z":70, "w":0 },
+						"Rotation":{ "x":0, "y":0, "z":0, "w":0 },
+						"Scaling":{ "x":1, "y":1, "z":1, "w":0 },
+						"Material":{ "Ambient":{"x":1, "y":1, "z":1, "w":1}, "Diffuse":{"x":0.5, "y":0.8, "z":0, "w":1}, "Specular":{"x":0.5, "y":0.5, "z":0.5, "w":20} },
+						"RasterizerType":"FillSolid"
+					},
+					"XCMeshResourceName":"Soldier"
+				}
+			}
+		},
+		{
+			"NodeInstance_type":"FBNPCSoldier",
+			"NodeInstance":
+			{
+				"Base":
+				{
+					"Base":
+					{
+						"Position":{ "x":-30, "y":2, "z":80, "w":0 },
+						"Rotation":{ "x":0, "y":0, "z":0, "w":0 },
+						"Scaling":{ "x":1, "y":1, "z":1, "w":0 },
+						"Material":{ "Ambient":{"x":1, "y":1, "z":1, "w":1}, "Diffuse":{"x":0.5, "y":0.8, "z":0, "w":1}, "Specular":{"x":0.5, "y":0.5, "z":0.5, "w":20} },
+						"RasterizerType":"FillSolid"
+					},
+					"XCMeshResourceName":"Soldier"
+				}
+			}
+		},
+		{
+			"NodeInstance_type":"FBNPCSoldier",
+			"NodeInstance":
+			{
+				"Base":
+				{
+					"Base":
+					{
+						"Position":{ "x":-30, "y":2, "z":90, "w":0 },
+						"Rotation":{ "x":0, "y":0, "z":0, "w":0 },
+						"Scaling":{ "x":1, "y":1, "z":1, "w":0 },
+						"Material":{ "Ambient":{"x":1, "y":1, "z":1, "w":1}, "Diffuse":{"x":0.5, "y":0.8, "z":0, "w":1}, "Specular":{"x":0.5, "y":0.5, "z":0.5, "w":20} },
+						"RasterizerType":"FillSolid"
+					},
+					"XCMeshResourceName":"Soldier"
+				}
+			}
+		},
+		{
+			"NodeInstance_type":"FBNPCSoldier",
+			"NodeInstance":
+			{
+				"Base":
+				{
+					"Base":
+					{
+						"Position":{ "x":-30, "y":2, "z":100, "w":0 },
+						"Rotation":{ "x":0, "y":0, "z":0, "w":0 },
+						"Scaling":{ "x":1, "y":1, "z":1, "w":0 },
+						"Material":{ "Ambient":{"x":1, "y":1, "z":1, "w":1}, "Diffuse":{"x":0.5, "y":0.8, "z":0, "w":1}, "Specular":{"x":0.5, "y":0.5, "z":0.5, "w":20} },
+						"RasterizerType":"FillSolid"
+					},
+					"XCMeshResourceName":"Soldier"
+				}
+			}
+		},
+		
+		{
+			"NodeInstance_type":"FBPCCar",
+			"NodeInstance":
+			{
+				"Base":
+				{
+					"Base":
+					{
+						"Position":{ "x":0, "y":2, "z":0, "w":0 },
+						"Rotation":{ "x":0, "y":0, "z":0, "w":0 },
+						"Scaling":{ "x":1, "y":1, "z":1, "w":0 },
+						"Material":{ "Ambient":{"x":1, "y":1, "z":1, "w":1}, "Diffuse":{"x":0.5, "y":0.8, "z":0, "w":1}, "Specular":{"x":0.5, "y":0.5, "z":0.5, "w":20} },
+						"RasterizerType":"FillSolid"
+					},
+					"XCMeshResourceName":"PorcheCar"
+				}
+			}
+		},
+		{
+			"NodeInstance_type":"FBNPCCar",
+			"NodeInstance":
+			{
+				"Base":
+				{
+					"Base":
+					{
+						"Position":{ "x":10, "y":2, "z":30, "w":0 },
+						"Rotation":{ "x":0, "y":0, "z":0, "w":0 },
+						"Scaling":{ "x":1, "y":1, "z":1, "w":0 },
+						"Material":{ "Ambient":{"x":1, "y":1, "z":1, "w":1}, "Diffuse":{"x":0.5, "y":0.8, "z":0, "w":1}, "Specular":{"x":0.5, "y":0.5, "z":0.5, "w":20} },
+						"RasterizerType":"FillSolid"
+					},
+					"XCMeshResourceName":"PorcheCar"
+				}
+			}
+		},
+		
+		{
+			"NodeInstance_type":"FBMultiTexturedTerrain",
+			"NodeInstance":
+			{
+				"Base":
+				{
+					"Base":
+					{
+						"Position":{ "x":50, "y":-20, "z":-40, "w":0 },
+						"Rotation":{ "x":0, "y":0, "z":0, "w":0 },
+						"Scaling":{ "x":5, "y":5, "z":5, "w":0 },
+						"Material":{ "Ambient":{"x":1, "y":1, "z":1, "w":1}, "Diffuse":{"x":0.5, "y":0.8, "z":0, "w":1}, "Specular":{"x":0.5, "y":0.5, "z":0.5, "w":20} },
+						"RasterizerType":"FillSolid"
+					},
+					"Rows":25,
+					"Column":25,
+		 			"RowSpacing":1,
+		 			"ColSpacing":1
+				},
+				"BitmapFileName":"Assets\\Textures\\Environment\\Terrain\\SimpleTerrain1.bmp", 
+	     		"Texture2DResourceName":"multi_grass", 
+		 		"Texture2DResourceName1":"multi_ground", 
+		 		"Texture2DResourceName2":"Sand", 
+		 		"Texture2DBlendResourceName3":"multi_blend"
+			}
+		},
+		{
+			"NodeInstance_type":"FBMultiTexturedTerrain",
+			"NodeInstance":
+			{
+				"Base":
+				{
+					"Base":
+					{
+						"Position":{ "x":300, "y":-20, "z":-40, "w":0 },
+						"Rotation":{ "x":0, "y":0, "z":0, "w":0 },
+						"Scaling":{ "x":5, "y":5, "z":5, "w":0 },
+						"Material":{ "Ambient":{"x":1, "y":1, "z":1, "w":1}, "Diffuse":{"x":0.5, "y":0.8, "z":0, "w":1}, "Specular":{"x":0.5, "y":0.5, "z":0.5, "w":20} },
+						"RasterizerType":"FillSolid"
+					},
+					"Rows":25,
+					"Column":25,
+		 			"RowSpacing":1,
+		 			"ColSpacing":1
+				},
+				"BitmapFileName":"Assets\\Textures\\Environment\\Terrain\\terrain1.bmp", 
+	     		"Texture2DResourceName":"Sand", 
+		 		"Texture2DResourceName1":"multi_ground", 
+		 		"Texture2DResourceName2":"multi_grass", 
+		 		"Texture2DBlendResourceName3":"multi_blend"
+			}
+		},
+		
+		{
+			"NodeInstance_type":"FBSimpleSkyBox",
+			"NodeInstance":
+			{
+				"Base":
+				{
+					"Position":{ "x":0, "y":0, "z":0, "w":0 },
+					"Rotation":{ "x":0, "y":0, "z":0, "w":0 },
+					"Scaling":{ "x":1000, "y":1000, "z":1000, "w":0 },
+					"Material":{ "Ambient":{"x":1, "y":1, "z":1, "w":1}, "Diffuse":{"x":0.5, "y":0.8, "z":0, "w":1}, "Specular":{"x":0.5, "y":0.5, "z":0.5, "w":20} },
+					"RasterizerType":"FillSolid"
+				},
+				"CubeTexture3DResourceName":"cubemap_bright"
+			}
+		}
+	]
+}

@@ -25,7 +25,7 @@ public:
     virtual void           PreLoad(const void* fbBuffer)   override;
     virtual void           Load()                          override;
     virtual void           UpdateState()                   override;
-    virtual void           Update(f32 dt)                override;
+    virtual void           Update(f32 dt)                  override;
     virtual void           Draw(RenderContext& context)    override;
     virtual void           Destroy()                       override;
     virtual void           ApplyRotation(XCMatrix4& rotation);

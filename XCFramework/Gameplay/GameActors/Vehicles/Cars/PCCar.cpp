@@ -7,8 +7,6 @@
 #include "GameplayPrecompiledHeader.h"
 
 #include "PCCar.h"
-#include "Assets/Packages/Schema/BasicTypes_generated.h"
-#include "Assets/Packages/Schema/GameplayActors_generated.h"
 
 PCCar::PCCar(void)
 {
@@ -27,10 +25,8 @@ void PCCar::Init(i32 actorId)
 
 void PCCar::PreLoad(const void* fbBuffer)
 {
-    const FBCar* carBuff = (FBCar*)fbBuffer;
-
-    Car::PreLoad(XCVec3(carBuff->Position()->x(), carBuff->Position()->y(), carBuff->Position()->z()), carBuff->XCMeshResourceName()->c_str());
-    PhysicsActor::PreLoad(fbBuffer);
+    const FBPCCar* carBuff = static_cast<const FBPCCar*>(fbBuffer);
+    Car::PreLoad(carBuff->Base());
 }
 
 void PCCar::Load()

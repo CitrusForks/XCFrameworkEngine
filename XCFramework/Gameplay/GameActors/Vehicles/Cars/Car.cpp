@@ -20,18 +20,14 @@ Car::~Car(void)
 {
 }
 
-void Car::PreLoad(XCVec3& initialPosition, std::string pMesh)
+void Car::PreLoad(const void* fbBuffer)
 {
+    const FBCar* carBuff = static_cast<const FBCar*>(fbBuffer);
+    PhysicsActor::PreLoad(carBuff->Base());
+
     ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
-    m_pMesh = &resMgr.AcquireResource(pMesh.c_str());
-    
-    m_material.Ambient = XCVec4Unaligned(0.1f, 0.1f, 0.1f, 1.0f);
-    m_material.Diffuse = XCVec4Unaligned(0.5f, 0.8f, 0.0f, 1.0f);
-    m_material.Specular = XCVec4Unaligned(0.2f, 0.2f, 0.2f, 16.0f);
-    
-    //Get initial position
-    m_currentPosition = initialPosition;
-    
+    m_pMesh = &resMgr.AcquireResource(carBuff->XCMeshResourceName()->c_str());
+
     m_useShaderType = ShaderType_LightTexture;
     m_collisionDetectionType = COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX;
 }

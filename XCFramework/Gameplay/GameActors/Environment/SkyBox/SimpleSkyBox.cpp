@@ -29,35 +29,20 @@ void SimpleSkyBox::Init(i32 actorId)
 {
     SimpleActor::Init(actorId);
 
-    m_material.Ambient = XCVec4Unaligned(1.0f, 1.0f, 1.0f, 1.0f);
-    m_material.Diffuse = XCVec4Unaligned(0.5f, 0.8f, 0.0f, 1.0f);
-    m_material.Specular = XCVec4Unaligned(0.2f, 0.2f, 0.2f, 16.0f);
-
     m_useShaderType = ShaderType_SimpleCubeMap;
-
-    m_rasterType = RasterType_FillSolid;
 }
 
 void SimpleSkyBox::PreLoad(const void* fbBuffer)
 {
     const FBSimpleSkyBox* skyBoxBuff = (FBSimpleSkyBox*)fbBuffer;
-    m_currentPosition.SetValues(skyBoxBuff->Position()->x(), skyBoxBuff->Position()->y(), skyBoxBuff->Position()->z(), skyBoxBuff->Position()->w());
-    m_initialRotation.SetValues(skyBoxBuff->Rotation()->x(), skyBoxBuff->Rotation()->y(), skyBoxBuff->Rotation()->z(), skyBoxBuff->Rotation()->w());
-    m_initialScaling.SetValues(skyBoxBuff->Scaling()->x(),  skyBoxBuff->Scaling()->y(),  skyBoxBuff->Scaling()->z(),  skyBoxBuff->Scaling()->w());
 
-    m_material.Ambient = XCVec4Unaligned(skyBoxBuff->Material()->Ambient()->x(), skyBoxBuff->Material()->Ambient()->y(), skyBoxBuff->Material()->Ambient()->z(), skyBoxBuff->Material()->Ambient()->w());
-    m_material.Diffuse = XCVec4Unaligned(skyBoxBuff->Material()->Diffuse()->x(), skyBoxBuff->Material()->Diffuse()->y(), skyBoxBuff->Material()->Diffuse()->z(), skyBoxBuff->Material()->Diffuse()->w());
-    m_material.Specular = XCVec4Unaligned(skyBoxBuff->Material()->Specular()->x(), skyBoxBuff->Material()->Specular()->y(), skyBoxBuff->Material()->Specular()->z(), skyBoxBuff->Material()->Specular()->w());
+    SimpleActor::PreLoad(skyBoxBuff->Base());
 
     ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
     m_cubeMapTexture = &resMgr.AcquireResource(skyBoxBuff->CubeTexture3DResourceName()->c_str());
 
-    m_rasterType = (RasterType) skyBoxBuff->RasterizerType();
-
     GPUResourceSystem& gpuSys = (GPUResourceSystem&)SystemLocator::GetInstance()->RequestSystem("GPUResourceSystem");
     m_CBwvp = gpuSys.CreateConstantBufferResourceView(GPUResourceDesc(GPUResourceType_CBV, sizeof(cbWVP)));
-
-    SimpleActor::PreLoad(fbBuffer);
 }
 
 void SimpleSkyBox::Load()

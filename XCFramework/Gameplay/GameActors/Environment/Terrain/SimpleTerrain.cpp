@@ -17,8 +17,6 @@
 #include "Graphics/IndexBuffer.h"
 #include "Graphics/GPUResourceSystem.h"
 
-#include "Gameplay/XCCamera/XCCameraManager.h"
-
 SimpleTerrain::SimpleTerrain(void)
 {
     m_useShaderType = ShaderType_SolidColor;
@@ -29,14 +27,16 @@ SimpleTerrain::~SimpleTerrain(void)
 {
 }
 
-void SimpleTerrain::PreLoad(XCVec3& _initialPosition, i32 _rows, i32 _column, f32 _rowSpacing, f32 _colSpacing)
+void SimpleTerrain::PreLoad(const void* fbBuffer)
 {
-    //Get initial position
-    m_initialPosition = _initialPosition;
-    m_rows = _rows;
-    m_cols = _column;
-    m_rowSpacing = _rowSpacing;
-    m_colSpacing = _colSpacing;
+    const FBSimpleTerrain* fbSimpleTerrainBuff = (FBSimpleTerrain*)fbBuffer;
+
+    PhysicsActor::PreLoad(fbSimpleTerrainBuff->Base());
+
+    m_rows = fbSimpleTerrainBuff->Rows();
+    m_cols = fbSimpleTerrainBuff->Column();
+    m_rowSpacing = (f32) fbSimpleTerrainBuff->RowSpacing();
+    m_colSpacing = (f32) fbSimpleTerrainBuff->ColSpacing();
 
     GPUResourceSystem& gpuSys = (GPUResourceSystem&)SystemLocator::GetInstance()->RequestSystem("GPUResourceSystem");
     m_pCBPerObject = gpuSys.CreateConstantBufferResourceView(GPUResourceDesc(GPUResourceType_CBV, sizeof(PerObjectBuffer)));
@@ -68,8 +68,8 @@ void SimpleTerrain::GenerateVertices()
     {
         for (i32 colIndex = 0; colIndex < m_cols; colIndex++)
         {
-            f32 x = m_initialPosition.Get<X>() - (colIndex * m_rowSpacing);
-            f32 z = m_initialPosition.Get<Z>() + (rowIndex * m_colSpacing);
+            f32 x = m_currentPosition.Get<X>() - (colIndex * m_rowSpacing);
+            f32 z = m_currentPosition.Get<Z>() + (rowIndex * m_colSpacing);
             f32 y = GetHeight(x, z);
 
             XCVec4 color;

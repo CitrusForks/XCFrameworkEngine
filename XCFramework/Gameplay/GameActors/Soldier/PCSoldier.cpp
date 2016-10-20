@@ -27,6 +27,13 @@ void PCSoldier::Init(i32 actorId)
     TPCChaseableActor::SetChasingAxis(m_secondaryLookAxis, m_secondaryRightAxis, m_secondaryUpAxis);
 }
 
+void PCSoldier::PreLoad(const void* fbBuffer)
+{
+    const FBPCSoldier* soldierBuff = (FBPCSoldier*)fbBuffer;
+
+    Soldier::PreLoad(soldierBuff->Base());
+}
+
 void PCSoldier::Update(f32 dt)
 {
     m_gun->CheckInput();

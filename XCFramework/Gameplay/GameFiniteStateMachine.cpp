@@ -23,7 +23,7 @@ void GameFiniteStateMachine::Init()
 
     container.RegisterSystem<GameStatesFactory>("GameStatesFactory");
     container.RegisterSystem<GameActorsFactory>("GameActorsFactory");
-    container.RegisterSystem<World>("World");
+    container.RegisterSystem<SceneGraph>("World");
 
     m_gameStateFactory = (GameStatesFactory*) &container.CreateNewSystem("GameStatesFactory");
     m_gameStateFactory->InitFactory();
@@ -31,7 +31,7 @@ void GameFiniteStateMachine::Init()
     m_gameActorFactory = (GameActorsFactory*) &container.CreateNewSystem("GameActorsFactory");
     m_gameActorFactory->InitFactory();
 
-    m_worldSystem = (World*)&container.CreateNewSystem("World");
+    m_worldSystem = (SceneGraph*)&container.CreateNewSystem("World");
     TaskManager* taskMgr = &SystemLocator::GetInstance()->RequestSystem<TaskManager>("TaskManager");
     m_worldSystem->Init(*taskMgr);
 

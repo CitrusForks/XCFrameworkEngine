@@ -54,17 +54,6 @@ void TexturedPlane::PreLoad(const void* fbBuffer)
     m_pCBPerObject = gpuSys.CreateConstantBufferResourceView(GPUResourceDesc(GPUResourceType_CBV, sizeof(PerObjectBuffer)));
 }
 
-void TexturedPlane::PreLoad(XCVec4& initialPosition, XCVec4& initialRotation, XCVec4& initialScaling, Material& material, std::string texture, RasterType rasterType)
-{
-    m_currentPosition = initialPosition;
-    m_initialRotation = initialRotation;
-    m_initialScaling  = initialScaling;
-    m_material        = material;
-
-    ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
-    m_texture = &resMgr.AcquireResource(texture.c_str());
-}
-
 void TexturedPlane::Load()
 {
     m_MTranslation = MatrixTranslate(m_currentPosition);

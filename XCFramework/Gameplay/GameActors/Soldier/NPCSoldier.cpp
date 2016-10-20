@@ -7,7 +7,7 @@
 #include "GameplayPrecompiledHeader.h"
 
 #include "NPCSoldier.h"
-#include "Gameplay/World.h"
+#include "Gameplay/SceneGraph.h"
 
 NPCSoldier::NPCSoldier(void)
 {
@@ -21,7 +21,7 @@ void NPCSoldier::Init(i32 actorId)
 {
     Soldier::Init(actorId);
 
-    World& world = (World&)SystemLocator::GetInstance()->RequestSystem("World");
+    SceneGraph& world = (SceneGraph&)SystemLocator::GetInstance()->RequestSystem("World");
 
     //Initialize the AIBrain
     m_AINavigator = std::make_unique<AINavigator>(this);
@@ -30,6 +30,13 @@ void NPCSoldier::Init(i32 actorId)
 
     //This is a hack, brain needs to decide from the sensors.
     m_AIBrain->SetState(ACTIONSTATE_WALK);
+}
+
+void NPCSoldier::PreLoad(const void* fbBuffer)
+{
+    const FBNPCSoldier* soldierBuff = (FBNPCSoldier*)fbBuffer;
+
+    Soldier::PreLoad(soldierBuff->Base());
 }
 
 void NPCSoldier::Update(f32 dt)

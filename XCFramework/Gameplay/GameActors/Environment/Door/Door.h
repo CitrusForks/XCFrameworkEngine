@@ -21,7 +21,6 @@ public:
     virtual ~Door(void);
     
     virtual void                        PreLoad(const void* fbBuffer);
-    virtual void                        PreLoad(XCVec3& _initialPosition, std::string pMesh);
     virtual void                        Load();
     virtual void                        SetInitialPhysicsProperties();
     virtual void                        Update(f32 dt);
@@ -32,7 +31,5 @@ protected:
     XCVec3                              m_initialPosition;
 
     ShaderType                          m_useShaderType;
-
-    Material                       m_material;
-    XCInput*                        m_directInput;
+    XCInput*                            m_directInput;
 };

@@ -19,7 +19,7 @@ public:
     Car(void);
     virtual  ~Car(void);
 
-    virtual void        PreLoad(XCVec3& initialPosition, std::string pMesh);
+    virtual void        PreLoad(const void* fbBuffer) override;
     virtual void        Load() override;
     virtual void        Update(f32 dt) override;
     virtual void        Draw(RenderContext& context) override;
@@ -31,6 +31,6 @@ public:
                         
 protected:              
     ShaderType          m_useShaderType;
-    Material       m_material;
+    Material            m_material;
     bool                m_isMainCharacter;
 };

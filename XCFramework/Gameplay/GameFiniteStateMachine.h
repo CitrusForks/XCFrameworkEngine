@@ -11,7 +11,7 @@
 #include "Gameplay/GameStates/IGameState.h"
 #include "GameStates/GameStateTypes.h"
 
-#include "Gameplay/World.h"
+#include "Gameplay/SceneGraph.h"
 #include "Gameplay/GameActors/GameActorsFactory.h"
 #include "Gameplay/GameStates/GameStatesFactory.h"
 
@@ -40,7 +40,7 @@ public:
 
     GameStatesFactory&          GetGameStateFactory() { return *m_gameStateFactory; }
     GameActorsFactory&          GetGameActorsFactory() { return *m_gameActorFactory; }
-    World&                      GetWorldSystem() { return *m_worldSystem; }
+    SceneGraph&                      GetWorldSystem() { return *m_worldSystem; }
     
     virtual void                OnEvent(IEvent* event);
 
@@ -56,6 +56,6 @@ private:
 
     GameStatesFactory*          m_gameStateFactory;
     GameActorsFactory*          m_gameActorFactory;
-    World*                      m_worldSystem;
+    SceneGraph*                      m_worldSystem;
 };
 

@@ -42,12 +42,9 @@ protected:
     ResourceHandle*                 m_cubeMapTexture;
 
     ShaderType                      m_useShaderType;
-    Material                        m_material;
     
     VertexBuffer<VertexPos>         m_vertexBuffer;
     IndexBuffer<u32>                m_indexBuffer;
-
-    RasterType                      m_rasterType;
 
     GPUResource*                    m_CBwvp;
 };

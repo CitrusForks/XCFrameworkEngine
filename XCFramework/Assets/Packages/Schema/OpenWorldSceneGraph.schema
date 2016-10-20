@@ -1,0 +1,16 @@
+include "ShaderTypes.schema";
+include "GameplayActors.schema";
+
+//SceneGraph Root
+table FBSceneGraphRoot
+{
+	FPSCamera:bool;
+}
+
+table FBSceneGraph
+{
+	Root:FBSceneGraphRoot;
+	SceneNodes:[FBSceneNode];
+}
+
+root_type FBSceneGraph;

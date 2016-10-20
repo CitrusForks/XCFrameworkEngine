@@ -19,8 +19,9 @@ public:
     NPCSoldier(void);
     virtual ~NPCSoldier(void);
 
-    virtual void                        Init(i32 actorId);
-    virtual void                        Update(f32 dt);
+    void                                Init(i32 actorId) override;
+    void                                PreLoad(const void* fbBuffer) override;
+    void                                Update(f32 dt) override;
 
 protected:
     std::unique_ptr<AIBrain>            m_AIBrain;

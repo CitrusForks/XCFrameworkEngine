@@ -18,9 +18,10 @@ public:
     PCSoldier(void);
     virtual ~PCSoldier(void);
 
-    virtual void                        Init(i32 actorId);
-    virtual void                        Update(f32 dt);
+    void                        Init(i32 actorId);
+    void                        PreLoad(const void* fbBuffer) override;
+    void                        Update(f32 dt);
 
 protected:
-    XCInput*                        m_directInput;
+    XCInput*                    m_directInput;
 };

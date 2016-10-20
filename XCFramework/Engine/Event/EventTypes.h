@@ -9,7 +9,7 @@
 enum EventType
 {
     EventType_GameStateChange,
-    EventType_WorldReady,
+    EventType_SceneReady,
 
     EventType_Unknown
 };

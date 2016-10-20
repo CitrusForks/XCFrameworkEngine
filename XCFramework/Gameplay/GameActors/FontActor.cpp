@@ -29,11 +29,12 @@ void FontActor::Init(i32 actorId)
 
 void FontActor::PreLoad(const void* fbBuffer)
 {
-    IActor::PreLoad(fbBuffer);
+    const FBFont* font = (FBFont*)fbBuffer;
+
+    IActor::PreLoad(font->Base());
 
     ResourceManager& resMgr = (ResourceManager&)SystemLocator::GetInstance()->RequestSystem("ResourceManager");
 
-    const FBFont* font = (FBFont*)fbBuffer;
     m_fontMesh = &resMgr.AcquireResource(font->FontResourceName()->c_str());
 }
 

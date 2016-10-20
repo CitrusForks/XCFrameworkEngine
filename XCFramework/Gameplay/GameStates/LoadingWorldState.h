@@ -7,7 +7,7 @@
 #pragma once
 
 #include "Gameplay/GameStates/IGameState.h"
-#include "Gameplay/WorldSceneLoader.h"
+#include "Gameplay/SceneLoader.h"
 
 namespace GameState
 {
@@ -26,8 +26,8 @@ namespace GameState
 
     private:
 
-        u64           m_taskId;
-        WorldSceneLoader*       m_worldLoader;
-        std::future<i32>        m_futureWorldLoaded;
+        u64						m_taskId;
+        SceneLoader*			m_sceneLoader;
+        std::future<i32>        m_futureSceneLoaded;
     };
 }

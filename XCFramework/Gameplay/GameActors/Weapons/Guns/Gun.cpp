@@ -8,7 +8,7 @@
 
 #include "Gun.h"
 
-#include "Gameplay/World.h"
+#include "Gameplay/SceneGraph.h"
 #include "Gameplay/GameActors/GameActorsFactory.h"
 #include "Gameplay/GameActors/Weapons/Bullets/Bullet.h"
 #include "Gameplay/XCCamera/XCCameraManager.h"
@@ -158,7 +158,7 @@ void Gun::ShootBullet(std::string bulletActorType, XCVec3& startPosition, XCVec3
 {
     GameActorsFactory& actorFactory = SystemLocator::GetInstance()->RequestSystem<GameActorsFactory>("GameActorsFactory");
     ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
-    World& worldSystem = (World&)SystemLocator::GetInstance()->RequestSystem("World");
+    SceneGraph& worldSystem = (SceneGraph&)SystemLocator::GetInstance()->RequestSystem("World");
 
     Bullet* bullet = (Bullet*)actorFactory.CreateActor(bulletActorType);
 

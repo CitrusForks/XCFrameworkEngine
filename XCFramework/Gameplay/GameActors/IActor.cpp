@@ -7,6 +7,7 @@
 #include "GameplayPrecompiledHeader.h"
 
 #include "Gameplay/GameActors/IActor.h"
+#include "Assets/Packages/PackageConsts.h"
 
 IActor::IActor(void)
 {
@@ -20,6 +21,16 @@ IActor::IActor(void)
 void IActor::PreLoad(const void* fbBuffer)
 {
     m_actorState = ActorState_Loading;
+
+    const FBIActor* iactorBuff = (FBIActor*)fbBuffer;
+
+    m_currentPosition.SetValues(iactorBuff->Position()->x(), iactorBuff->Position()->y(), iactorBuff->Position()->z(), iactorBuff->Position()->w());
+    m_initialRotation.SetValues(iactorBuff->Rotation()->x(), iactorBuff->Rotation()->y(), iactorBuff->Rotation()->z(), iactorBuff->Rotation()->w());
+    m_initialScaling.SetValues(iactorBuff->Scaling()->x(), iactorBuff->Scaling()->y(), iactorBuff->Scaling()->z(), iactorBuff->Scaling()->w());
+
+    m_material.Ambient  = XCVec4Unaligned(iactorBuff->Material()->Ambient()->x(), iactorBuff->Material()->Ambient()->y(), iactorBuff->Material()->Ambient()->z(), iactorBuff->Material()->Ambient()->w());
+    m_material.Diffuse  = XCVec4Unaligned(iactorBuff->Material()->Diffuse()->x(), iactorBuff->Material()->Diffuse()->y(), iactorBuff->Material()->Diffuse()->z(), iactorBuff->Material()->Diffuse()->w());
+    m_material.Specular = XCVec4Unaligned(iactorBuff->Material()->Specular()->x(), iactorBuff->Material()->Specular()->y(), iactorBuff->Material()->Specular()->z(), iactorBuff->Material()->Specular()->w());
 }
 
 void IActor::Load()

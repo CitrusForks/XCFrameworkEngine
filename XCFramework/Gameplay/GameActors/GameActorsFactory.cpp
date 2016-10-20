@@ -28,12 +28,12 @@ void GameActorsFactory::RegisterActors()
     RegisterObject<SimpleActor>("SimpleActor");
     RegisterObject<SimpleMeshActor>("SimpleMeshActor");
     RegisterObject<PhysicsActor>("Physics");
-    RegisterObject<FontActor>("FontActor");
+    RegisterObject<FontActor>("Font");
     RegisterObject<AnimatedActor>("AnimatedActor");
     RegisterObject<Door>("Door");
     RegisterObject<Waves>("Waves");
     RegisterObject<SimpleTerrain>("SimpleTerrain");
-    RegisterObject<Terrain>("Terrain");
+    RegisterObject<Terrain>("MultiTexturedTerrain");
     RegisterObject<Soldier>("Soldier");
     RegisterObject<PCSoldier>("PCSoldier");
     RegisterObject<NPCSoldier>("NPCSoldier");

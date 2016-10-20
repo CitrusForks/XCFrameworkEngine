@@ -8,7 +8,7 @@
 
 #include "AIBrain.h"
 
-AIBrain::AIBrain(World& world, AINavigator* navigator)
+AIBrain::AIBrain(SceneGraph& world, AINavigator* navigator)
 {
     m_world = &world;
     m_actionState = ACTIONSTATE_NONE;

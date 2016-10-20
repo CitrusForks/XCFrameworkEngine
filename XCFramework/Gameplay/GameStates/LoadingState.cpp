@@ -46,7 +46,7 @@ void LoadingState::Init()
 void LoadingState::Update(f32 dt)
 {
     //Wait for resource loader to complete the loading of resources. When done move to next state.
-    if (m_futurePackageLoaded._Is_ready() /*&& m_futurePackageLoaded.wait_for(std::chrono::seconds(1)) == std::future_status::ready */)
+    if (m_futurePackageLoaded._Is_ready())
     {
         if(m_futurePackageLoaded.valid() && m_futurePackageLoaded.get() > 0)
         {

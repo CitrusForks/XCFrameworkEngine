@@ -17,9 +17,7 @@ public:
     NPCCar(void);
     virtual ~NPCCar(void);
  
-    virtual void                        PreLoad(const void* fbBuffer);
-    virtual void                        Update(f32 dt);
-    virtual void                        Destroy();
-
-protected:
+    void                        PreLoad(const void* fbBuffer) override;
+    void                        Update(f32 dt) override;
+    void                        Destroy() override;
 };

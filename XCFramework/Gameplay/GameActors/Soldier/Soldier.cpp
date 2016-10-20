@@ -9,11 +9,13 @@
 #include "Soldier.h"
 
 #include "Gameplay/XCCamera/XCCameraManager.h"
+#include "Gameplay/GameActors/GameActorsFactory.h"
+
 #include "Graphics/XCShaders/XCShaderBufferConstants.h"
 #include "Graphics/XCShaders/XCShaderHandle.h"
+
 #include "Engine/Resource/ResourceManager.h"
 
-#include "Gameplay/GameActors/GameActorsFactory.h"
 
 const f32 Soldier::MAX_PITCH_ANGLE = XC_PIDIV4;
 
@@ -29,15 +31,10 @@ void Soldier::PreLoad(const void* fbBuffer)
 {
     const FBSoldier* soldierBuff = (FBSoldier*)fbBuffer;
 
+    PhysicsActor::PreLoad(soldierBuff->Base());
+
     ResourceManager& resMgr = (ResourceManager&)SystemLocator::GetInstance()->RequestSystem("ResourceManager");
     m_pMesh = &resMgr.AcquireResource(soldierBuff->XCMeshResourceName()->c_str());
-
-    //Get initial position
-    m_currentPosition.SetValues(soldierBuff->Position()->x(), soldierBuff->Position()->y(), soldierBuff->Position()->z(), 0.0f);
-
-    m_material.Ambient = XCVec4Unaligned(0.1f, 0.1f, 0.1f, 1.0f);
-    m_material.Diffuse = XCVec4Unaligned(0.5f, 0.8f, 0.0f, 1.0f);
-    m_material.Specular = XCVec4Unaligned(0.2f, 0.2f, 0.2f, 16.0f);
 
     m_collisionDetectionType = COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX;
 
@@ -52,8 +49,6 @@ void Soldier::PreLoad(const void* fbBuffer)
 
     m_gun = ((Gun*) actorFactory.CreateActor("Gun"));
     m_gun->PreLoad(this, m_currentPosition, "Gun");
-
-    PhysicsActor::PreLoad(fbBuffer);
 }
 
 void Soldier::Load()

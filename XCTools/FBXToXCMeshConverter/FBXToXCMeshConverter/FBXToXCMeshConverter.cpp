@@ -106,6 +106,13 @@ public:
 static unsigned int g_nbOfMeshes = 0;
 XCMesh* g_meshContainer = nullptr;
 
+void DisplaySkeleton(FbxNode* pNode);
+void DisplayAnimation(FbxScene* pScene);
+void DisplayAnimation(FbxAnimStack* pAnimStack, FbxNode* pNode);
+void DisplayAnimation(FbxAnimLayer* pAnimLayer, FbxNode* pNode);
+void DisplayChannels(FbxNode* pNode, FbxAnimLayer* pAnimLayer, void(*DisplayCurve) (FbxAnimCurve* pCurve));
+void DisplayCurveKeys(FbxAnimCurve* pCurve);
+
 void TraverseContent(FbxScene* pScene);
 void TraverseContent(FbxNode* pNode);
 void TraverseMesh(FbxNode* pNode);
@@ -237,7 +244,6 @@ void TraverseContent(FbxScene* pScene)
         {
             FbxNode* pNode = lNode->GetChild(i);
             FbxNodeAttribute::EType lAttributeType;
-            int i;
 
             if (pNode->GetNodeAttribute() == NULL)
             {
@@ -271,6 +277,8 @@ void TraverseContent(FbxScene* pScene)
             TraverseContent(lNode->GetChild(i));
         }
     }
+
+	DisplayAnimation(pScene);
 }
 
 void TraverseContent(FbxNode* pNode)
@@ -288,13 +296,15 @@ void TraverseContent(FbxNode* pNode)
 
         switch (lAttributeType)
         {
-        default:
-            break;
-
+		case FbxNodeAttribute::eSkeleton:
+			DisplaySkeleton(pNode);
+			break;
         case FbxNodeAttribute::eMesh:
             TraverseMesh(pNode);
             break;
 
+		default:
+			break;
         }
     }
 
@@ -305,6 +315,290 @@ void TraverseContent(FbxNode* pNode)
 }
 
 static unsigned int g_currentMesh = 0;
+
+void DisplayMetaDataConnections(FbxObject* pObject)
+{
+	int nbMetaData = pObject->GetSrcObjectCount<FbxObjectMetaData>();
+	if (nbMetaData > 0)
+		printf("    MetaData connections ");
+
+	for (int i = 0; i < nbMetaData; i++)
+	{
+		FbxObjectMetaData* metaData = pObject->GetSrcObject<FbxObjectMetaData>(i);
+		printf("        Name: %s", (char*)metaData->GetName());
+	}
+}
+
+void DisplaySkeleton(FbxNode* pNode)
+{
+	FbxSkeleton* lSkeleton = (FbxSkeleton*)pNode->GetNodeAttribute();
+
+	printf("Skeleton Name: %s\n", (char *)pNode->GetName());
+	DisplayMetaDataConnections(lSkeleton);
+
+	const char* lSkeletonTypes[] = { "Root", "Limb", "Limb Node", "Effector" };
+
+	printf("    Type: %s", lSkeletonTypes[lSkeleton->GetSkeletonType()]);
+
+	if (lSkeleton->GetSkeletonType() == FbxSkeleton::eLimb)
+	{
+		printf("    Limb Length: %f", lSkeleton->LimbLength.Get());
+	}
+	else if (lSkeleton->GetSkeletonType() == FbxSkeleton::eLimbNode)
+	{
+		printf("    Limb Node Size: %f", lSkeleton->Size.Get());
+	}
+	else if (lSkeleton->GetSkeletonType() == FbxSkeleton::eRoot)
+	{
+		printf("    Limb Root Size: %f\n", lSkeleton->Size.Get());
+	}
+}
+
+void DisplayAnimation(FbxScene* pScene)
+{
+	int i;
+	for (i = 0; i < pScene->GetSrcObjectCount<FbxAnimStack>(); i++)
+	{
+		FbxAnimStack* lAnimStack = pScene->GetSrcObject<FbxAnimStack>(i);
+
+		FbxString lOutputString = "Animation Stack Name: ";
+		lOutputString += lAnimStack->GetName();
+		lOutputString += "\n\n";
+		printf(lOutputString);
+
+		DisplayAnimation(lAnimStack, pScene->GetRootNode());
+	}
+}
+
+void DisplayAnimation(FbxAnimStack* pAnimStack, FbxNode* pNode)
+{
+	int l;
+	int nbAnimLayers = pAnimStack->GetMemberCount<FbxAnimLayer>();
+	FbxString lOutputString;
+
+	lOutputString = "Animation stack contains ";
+	lOutputString += nbAnimLayers;
+	lOutputString += " Animation Layer(s)\n";
+	printf(lOutputString);
+
+	for (l = 0; l < nbAnimLayers; l++)
+	{
+		FbxAnimLayer* lAnimLayer = pAnimStack->GetMember<FbxAnimLayer>(l);
+
+		lOutputString = "AnimLayer ";
+		lOutputString += l;
+		lOutputString += "\n";
+		printf(lOutputString);
+
+		DisplayAnimation(lAnimLayer, pNode);
+	}
+}
+
+void DisplayAnimation(FbxAnimLayer* pAnimLayer, FbxNode* pNode)
+{
+	int lModelCount;
+	FbxString lOutputString;
+
+	lOutputString = "     Node Name: ";
+	lOutputString += pNode->GetName();
+	lOutputString += "\n\n";
+	printf(lOutputString);
+
+	DisplayChannels(pNode, pAnimLayer, DisplayCurveKeys);
+	printf("\n");
+
+	for (lModelCount = 0; lModelCount < pNode->GetChildCount(); lModelCount++)
+	{
+		DisplayAnimation(pAnimLayer, pNode->GetChild(lModelCount));
+	}
+}
+
+void DisplayChannels(FbxNode* pNode, FbxAnimLayer* pAnimLayer, void(*DisplayCurve) (FbxAnimCurve* pCurve))
+{
+	FbxAnimCurve* lAnimCurve = NULL;
+
+	// Display general curves.
+	{
+		lAnimCurve = pNode->LclTranslation.GetCurve(pAnimLayer, FBXSDK_CURVENODE_COMPONENT_X);
+		if (lAnimCurve)
+		{
+			printf("        TX\n");
+			DisplayCurve(lAnimCurve);
+		}
+		lAnimCurve = pNode->LclTranslation.GetCurve(pAnimLayer, FBXSDK_CURVENODE_COMPONENT_Y);
+		if (lAnimCurve)
+		{
+			printf("        TY\n");
+			DisplayCurve(lAnimCurve);
+		}
+		lAnimCurve = pNode->LclTranslation.GetCurve(pAnimLayer, FBXSDK_CURVENODE_COMPONENT_Z);
+		if (lAnimCurve)
+		{
+			printf("        TZ\n");
+			DisplayCurve(lAnimCurve);
+		}
+
+		lAnimCurve = pNode->LclRotation.GetCurve(pAnimLayer, FBXSDK_CURVENODE_COMPONENT_X);
+		if (lAnimCurve)
+		{
+			printf("        RX\n");
+			DisplayCurve(lAnimCurve);
+		}
+		lAnimCurve = pNode->LclRotation.GetCurve(pAnimLayer, FBXSDK_CURVENODE_COMPONENT_Y);
+		if (lAnimCurve)
+		{
+			printf("        RY\n");
+			DisplayCurve(lAnimCurve);
+		}
+		lAnimCurve = pNode->LclRotation.GetCurve(pAnimLayer, FBXSDK_CURVENODE_COMPONENT_Z);
+		if (lAnimCurve)
+		{
+			printf("        RZ\n");
+			DisplayCurve(lAnimCurve);
+		}
+
+		lAnimCurve = pNode->LclScaling.GetCurve(pAnimLayer, FBXSDK_CURVENODE_COMPONENT_X);
+		if (lAnimCurve)
+		{
+			printf("        SX\n");
+			DisplayCurve(lAnimCurve);
+		}
+		lAnimCurve = pNode->LclScaling.GetCurve(pAnimLayer, FBXSDK_CURVENODE_COMPONENT_Y);
+		if (lAnimCurve)
+		{
+			printf("        SY\n");
+			DisplayCurve(lAnimCurve);
+		}
+		lAnimCurve = pNode->LclScaling.GetCurve(pAnimLayer, FBXSDK_CURVENODE_COMPONENT_Z);
+		if (lAnimCurve)
+		{
+			printf("        SZ\n");
+			DisplayCurve(lAnimCurve);
+		}
+	}
+
+	// Display curves specific to a light or marker.
+	FbxNodeAttribute* lNodeAttribute = pNode->GetNodeAttribute();
+
+	if (lNodeAttribute)
+	{
+		// Display curves specific to a geometry.
+		if (lNodeAttribute->GetAttributeType() == FbxNodeAttribute::eMesh ||
+			lNodeAttribute->GetAttributeType() == FbxNodeAttribute::eNurbs ||
+			lNodeAttribute->GetAttributeType() == FbxNodeAttribute::ePatch)
+		{
+			FbxGeometry* lGeometry = (FbxGeometry*)lNodeAttribute;
+
+			int lBlendShapeDeformerCount = lGeometry->GetDeformerCount(FbxDeformer::eBlendShape);
+			for (int lBlendShapeIndex = 0; lBlendShapeIndex < lBlendShapeDeformerCount; ++lBlendShapeIndex)
+			{
+				FbxBlendShape* lBlendShape = (FbxBlendShape*)lGeometry->GetDeformer(lBlendShapeIndex, FbxDeformer::eBlendShape);
+
+				int lBlendShapeChannelCount = lBlendShape->GetBlendShapeChannelCount();
+				for (int lChannelIndex = 0; lChannelIndex < lBlendShapeChannelCount; ++lChannelIndex)
+				{
+					FbxBlendShapeChannel* lChannel = lBlendShape->GetBlendShapeChannel(lChannelIndex);
+					const char* lChannelName = lChannel->GetName();
+
+					lAnimCurve = lGeometry->GetShapeChannel(lBlendShapeIndex, lChannelIndex, pAnimLayer, true);
+					if (lAnimCurve)
+					{
+						printf("        Shape %s\n", lChannelName);
+						DisplayCurve(lAnimCurve);
+					}
+				}
+			}
+		}
+	}
+}
+
+static int InterpolationFlagToIndex(int flags)
+{
+	if ((flags & FbxAnimCurveDef::eInterpolationConstant) == FbxAnimCurveDef::eInterpolationConstant) return 1;
+	if ((flags & FbxAnimCurveDef::eInterpolationLinear) == FbxAnimCurveDef::eInterpolationLinear) return 2;
+	if ((flags & FbxAnimCurveDef::eInterpolationCubic) == FbxAnimCurveDef::eInterpolationCubic) return 3;
+	return 0;
+}
+
+static int ConstantmodeFlagToIndex(int flags)
+{
+	if ((flags & FbxAnimCurveDef::eConstantStandard) == FbxAnimCurveDef::eConstantStandard) return 1;
+	if ((flags & FbxAnimCurveDef::eConstantNext) == FbxAnimCurveDef::eConstantNext) return 2;
+	return 0;
+}
+
+static int TangentmodeFlagToIndex(int flags)
+{
+	if ((flags & FbxAnimCurveDef::eTangentAuto) == FbxAnimCurveDef::eTangentAuto) return 1;
+	if ((flags & FbxAnimCurveDef::eTangentAutoBreak) == FbxAnimCurveDef::eTangentAutoBreak) return 2;
+	if ((flags & FbxAnimCurveDef::eTangentTCB) == FbxAnimCurveDef::eTangentTCB) return 3;
+	if ((flags & FbxAnimCurveDef::eTangentUser) == FbxAnimCurveDef::eTangentUser) return 4;
+	if ((flags & FbxAnimCurveDef::eTangentGenericBreak) == FbxAnimCurveDef::eTangentGenericBreak) return 5;
+	if ((flags & FbxAnimCurveDef::eTangentBreak) == FbxAnimCurveDef::eTangentBreak) return 6;
+	return 0;
+}
+
+static int TangentweightFlagToIndex(int flags)
+{
+	if ((flags & FbxAnimCurveDef::eWeightedNone) == FbxAnimCurveDef::eWeightedNone) return 1;
+	if ((flags & FbxAnimCurveDef::eWeightedRight) == FbxAnimCurveDef::eWeightedRight) return 2;
+	if ((flags & FbxAnimCurveDef::eWeightedNextLeft) == FbxAnimCurveDef::eWeightedNextLeft) return 3;
+	return 0;
+}
+
+static int TangentVelocityFlagToIndex(int flags)
+{
+	if ((flags & FbxAnimCurveDef::eVelocityNone) == FbxAnimCurveDef::eVelocityNone) return 1;
+	if ((flags & FbxAnimCurveDef::eVelocityRight) == FbxAnimCurveDef::eVelocityRight) return 2;
+	if ((flags & FbxAnimCurveDef::eVelocityNextLeft) == FbxAnimCurveDef::eVelocityNextLeft) return 3;
+	return 0;
+}
+
+void DisplayCurveKeys(FbxAnimCurve* pCurve)
+{
+	static const char* interpolation[] = { "?", "constant", "linear", "cubic" };
+	static const char* constantMode[] = { "?", "Standard", "Next" };
+	static const char* cubicMode[] = { "?", "Auto", "Auto break", "Tcb", "User", "Break", "User break" };
+	static const char* tangentWVMode[] = { "?", "None", "Right", "Next left" };
+
+	FbxTime   lKeyTime;
+	float   lKeyValue;
+	char    lTimeString[256];
+	FbxString lOutputString;
+	int     lCount;
+
+	int lKeyCount = pCurve->KeyGetCount();
+
+	for (lCount = 0; lCount < lKeyCount; lCount++)
+	{
+		lKeyValue = static_cast<float>(pCurve->KeyGetValue(lCount));
+		lKeyTime = pCurve->KeyGetTime(lCount);
+
+		lOutputString = "            Key Time: ";
+		lOutputString += lKeyTime.GetTimeString(lTimeString, FbxUShort(256));
+		lOutputString += ".... Key Value: ";
+		lOutputString += lKeyValue;
+		lOutputString += " [ ";
+		lOutputString += interpolation[InterpolationFlagToIndex(pCurve->KeyGetInterpolation(lCount))];
+		if ((pCurve->KeyGetInterpolation(lCount)&FbxAnimCurveDef::eInterpolationConstant) == FbxAnimCurveDef::eInterpolationConstant)
+		{
+			lOutputString += " | ";
+			lOutputString += constantMode[ConstantmodeFlagToIndex(pCurve->KeyGetConstantMode(lCount))];
+		}
+		else if ((pCurve->KeyGetInterpolation(lCount)&FbxAnimCurveDef::eInterpolationCubic) == FbxAnimCurveDef::eInterpolationCubic)
+		{
+			lOutputString += " | ";
+			lOutputString += cubicMode[TangentmodeFlagToIndex(pCurve->KeyGetTangentMode(lCount))];
+			lOutputString += " | ";
+			lOutputString += tangentWVMode[TangentweightFlagToIndex(pCurve->KeyGet(lCount).GetTangentWeightMode())];
+			lOutputString += " | ";
+			lOutputString += tangentWVMode[TangentVelocityFlagToIndex(pCurve->KeyGet(lCount).GetTangentVelocityMode())];
+		}
+		lOutputString += " ]";
+		lOutputString += "\n";
+		printf(lOutputString);
+	}
+}
 
 void TraverseMesh(FbxNode* pNode)
 {
@@ -352,7 +646,7 @@ void TraverseMesh(FbxNode* pNode)
 
             XCMesh::Vertex vertex = { XMVectorGetX(xmVertex), XMVectorGetY(xmVertex), XMVectorGetZ(xmVertex) };
 
-            printf("Polygon : %f %f %f ", vertex.x, vertex.y, vertex.z);
+            //printf("Polygon : %f %f %f ", vertex.x, vertex.y, vertex.z);
 
             //Find if the vertex is present in our vertices.
             auto foundVertex = std::find_if(vertices.begin(), vertices.end(), [&vertex](XCMesh::Vertex v) -> bool
@@ -360,7 +654,7 @@ void TraverseMesh(FbxNode* pNode)
                 return fabs(v.x) == fabs(vertex.x) && fabs(v.y) == fabs(vertex.y) && fabs(v.z) == fabs(vertex.z);
             });
 
-            if (1/*foundVertex == vertices.end()*/)
+            if (foundVertex == vertices.end())
             {
                 //New vertex found. Add it to our vertices
                 vertices.push_back(vertex);
@@ -482,15 +776,17 @@ int main(int argc, char* argv[])
         std::string meshFilename = argv[2];
         std::vector<XCMesh> meshContainer;
 
-        //if (strcmp(operation.c_str(), "export") == 0)
+        if (strcmp(operation.c_str(), "export") == 0)
         {
-            result = ExportMesh("jd_objectcenter.FBX");
+            result = ExportMesh(meshFilename);
         }
-        //else if (strcmp(operation.c_str(), "import") == 0)
+        else if (strcmp(operation.c_str(), "import") == 0)
         {
-            result = ImportMesh("jd_objectcenter.xcmesh");
+            result = ImportMesh(meshFilename);
         }
         meshContainer.clear();
     }
+	
+	getchar();
     return !result;
 }

@@ -1,19 +1,53 @@
 include "BasicTypes.schema";
 include "ShaderTypes.schema";
 
-table FBFont
+//SceneNodes forward decl. Specify all nodes types over here.
+union FBGenericSceneNode
 {
-	FontResourceName:string;
+	FBIActor,
+	FBFont,
+	FBSimpleSkyBox,
+	FBTexturePlane,
+	FBLiveDriveTexturePlane,
+	FBSimpleTerrain,
+	FBWaves,
+	FBMultiTexturedTerrain,
+	FBCar,
+	FBPCCar,
+	FBNPCCar,
+	FBDoor,
+	FBSoldier,
+	FBPCSoldier,
+	FBNPCSoldier
 }
 
-table FBSimpleSkyBox
+table FBSceneNode
+{
+	NodeInstance:FBGenericSceneNode;
+}
+
+//Base Actor interface. Use Base attribute in implementation object
+table FBIActor
 {
 	Position:Vec4;
 	Rotation:Vec4;
 	Scaling:Vec4;
 	Material:FBBasicMaterial;
-	CubeTexture3DResourceName:string;
 	RasterizerType:RasterType;
+}
+
+table FBFont
+{
+	Base:FBIActor;
+	FontResourceName:string;
+	SceneNodes:[FBSceneNode];
+}
+
+table FBSimpleSkyBox
+{
+	Base:FBIActor;
+	CubeTexture3DResourceName:string;
+	SceneNodes:[FBSceneNode];
 }
 
 table FBTexturePlane
@@ -22,56 +56,85 @@ table FBTexturePlane
 	Rotation:Vec4;
 	Scaling:Vec4;
 	Material:FBBasicMaterial;
-	ResourceName:string;
 	RasterizerType:RasterType;
+	ResourceName:string;
+	SceneNodes:[FBSceneNode];
 }
 
 table FBLiveDriveTexturePlane
 {
-	Position:Vec4;
-	Rotation:Vec4;
-	Scaling:Vec4;
-	Material:FBBasicMaterial;
-	RasterizerType:RasterType;
+	Base:FBIActor;
+	SceneNodes:[FBSceneNode];
 }
 
-table FBWaves
+table FBSimpleTerrain
 {
-	Position:Vec3;
+	Base:FBTexturePlane;	
 	Rows:int;
 	Column:int;
 	RowSpacing:int;
 	ColSpacing:int;
+	SceneNodes:[FBSceneNode];
+}
+
+table FBWaves
+{
+	Base:FBSimpleTerrain;
+	SceneNodes:[FBSceneNode];
 }
 
 table FBMultiTexturedTerrain
 {
+	Base:FBSimpleTerrain;
 	BitmapFileName:string;
 	Texture2DResourceName:string;
 	Texture2DResourceName1:string;
 	Texture2DResourceName2:string;
 	Texture2DBlendResourceName3:string;
-	Position:Vec3;
-	Rows:int;
-	Column:int;
-	RowSpacing:int;
-	ColSpacing:int;
+	SceneNodes:[FBSceneNode];
 }
 
 table FBCar
 {
-	Position:Vec3;
+	Base:FBIActor;
 	XCMeshResourceName:string;
+	SceneNodes:[FBSceneNode];
+}
+
+table FBPCCar
+{
+	Base:FBCar;
+	SceneNodes:[FBSceneNode];
+}
+
+table FBNPCCar
+{
+	Base:FBCar;
+	SceneNodes:[FBSceneNode];
 }
 
 table FBDoor
 {
-	Position:Vec4;
+	Base:FBIActor;
 	XCMeshResourceName:string;
+	SceneNodes:[FBSceneNode];
 }
 
 table FBSoldier
 {
-	Position:Vec3;
+	Base:FBIActor;
+	XCMeshResourceName:string;
+	SceneNodes:[FBSceneNode];
+}
+
+table FBPCSoldier
+{
+	Base:FBSoldier;
+	SceneNodes:[FBSceneNode];
+}
+
+table FBNPCSoldier
+{
+	Base:FBSoldier;
 	XCMeshResourceName:string;
 }

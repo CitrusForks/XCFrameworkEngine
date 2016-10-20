@@ -8,6 +8,10 @@
 #include "BasicTypes_generated.h"
 #include "ShaderTypes_generated.h"
 
+struct FBSceneNode;
+
+struct FBIActor;
+
 struct FBFont;
 
 struct FBSimpleSkyBox;
@@ -16,200 +20,159 @@ struct FBTexturePlane;
 
 struct FBLiveDriveTexturePlane;
 
+struct FBSimpleTerrain;
+
 struct FBWaves;
 
 struct FBMultiTexturedTerrain;
 
 struct FBCar;
 
+struct FBPCCar;
+
+struct FBNPCCar;
+
 struct FBDoor;
 
 struct FBSoldier;
 
-struct FBFont FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+struct FBPCSoldier;
+
+struct FBNPCSoldier;
+
+enum FBGenericSceneNode {
+  FBGenericSceneNode_NONE = 0,
+  FBGenericSceneNode_FBIActor = 1,
+  FBGenericSceneNode_FBFont = 2,
+  FBGenericSceneNode_FBSimpleSkyBox = 3,
+  FBGenericSceneNode_FBTexturePlane = 4,
+  FBGenericSceneNode_FBLiveDriveTexturePlane = 5,
+  FBGenericSceneNode_FBSimpleTerrain = 6,
+  FBGenericSceneNode_FBWaves = 7,
+  FBGenericSceneNode_FBMultiTexturedTerrain = 8,
+  FBGenericSceneNode_FBCar = 9,
+  FBGenericSceneNode_FBPCCar = 10,
+  FBGenericSceneNode_FBNPCCar = 11,
+  FBGenericSceneNode_FBDoor = 12,
+  FBGenericSceneNode_FBSoldier = 13,
+  FBGenericSceneNode_FBPCSoldier = 14,
+  FBGenericSceneNode_FBNPCSoldier = 15,
+  FBGenericSceneNode_MIN = FBGenericSceneNode_NONE,
+  FBGenericSceneNode_MAX = FBGenericSceneNode_FBNPCSoldier
+};
+
+inline const char **EnumNamesFBGenericSceneNode() {
+  static const char *names[] = { "NONE", "FBIActor", "FBFont", "FBSimpleSkyBox", "FBTexturePlane", "FBLiveDriveTexturePlane", "FBSimpleTerrain", "FBWaves", "FBMultiTexturedTerrain", "FBCar", "FBPCCar", "FBNPCCar", "FBDoor", "FBSoldier", "FBPCSoldier", "FBNPCSoldier", nullptr };
+  return names;
+}
+
+inline const char *EnumNameFBGenericSceneNode(FBGenericSceneNode e) { return EnumNamesFBGenericSceneNode()[static_cast<int>(e)]; }
+
+template<typename T> struct FBGenericSceneNodeTraits {
+  static const FBGenericSceneNode enum_value = FBGenericSceneNode_NONE;
+};
+
+template<> struct FBGenericSceneNodeTraits<FBIActor> {
+  static const FBGenericSceneNode enum_value = FBGenericSceneNode_FBIActor;
+};
+
+template<> struct FBGenericSceneNodeTraits<FBFont> {
+  static const FBGenericSceneNode enum_value = FBGenericSceneNode_FBFont;
+};
+
+template<> struct FBGenericSceneNodeTraits<FBSimpleSkyBox> {
+  static const FBGenericSceneNode enum_value = FBGenericSceneNode_FBSimpleSkyBox;
+};
+
+template<> struct FBGenericSceneNodeTraits<FBTexturePlane> {
+  static const FBGenericSceneNode enum_value = FBGenericSceneNode_FBTexturePlane;
+};
+
+template<> struct FBGenericSceneNodeTraits<FBLiveDriveTexturePlane> {
+  static const FBGenericSceneNode enum_value = FBGenericSceneNode_FBLiveDriveTexturePlane;
+};
+
+template<> struct FBGenericSceneNodeTraits<FBSimpleTerrain> {
+  static const FBGenericSceneNode enum_value = FBGenericSceneNode_FBSimpleTerrain;
+};
+
+template<> struct FBGenericSceneNodeTraits<FBWaves> {
+  static const FBGenericSceneNode enum_value = FBGenericSceneNode_FBWaves;
+};
+
+template<> struct FBGenericSceneNodeTraits<FBMultiTexturedTerrain> {
+  static const FBGenericSceneNode enum_value = FBGenericSceneNode_FBMultiTexturedTerrain;
+};
+
+template<> struct FBGenericSceneNodeTraits<FBCar> {
+  static const FBGenericSceneNode enum_value = FBGenericSceneNode_FBCar;
+};
+
+template<> struct FBGenericSceneNodeTraits<FBPCCar> {
+  static const FBGenericSceneNode enum_value = FBGenericSceneNode_FBPCCar;
+};
+
+template<> struct FBGenericSceneNodeTraits<FBNPCCar> {
+  static const FBGenericSceneNode enum_value = FBGenericSceneNode_FBNPCCar;
+};
+
+template<> struct FBGenericSceneNodeTraits<FBDoor> {
+  static const FBGenericSceneNode enum_value = FBGenericSceneNode_FBDoor;
+};
+
+template<> struct FBGenericSceneNodeTraits<FBSoldier> {
+  static const FBGenericSceneNode enum_value = FBGenericSceneNode_FBSoldier;
+};
+
+template<> struct FBGenericSceneNodeTraits<FBPCSoldier> {
+  static const FBGenericSceneNode enum_value = FBGenericSceneNode_FBPCSoldier;
+};
+
+template<> struct FBGenericSceneNodeTraits<FBNPCSoldier> {
+  static const FBGenericSceneNode enum_value = FBGenericSceneNode_FBNPCSoldier;
+};
+
+inline bool VerifyFBGenericSceneNode(flatbuffers::Verifier &verifier, const void *union_obj, FBGenericSceneNode type);
+
+struct FBSceneNode FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
-    VT_FONTRESOURCENAME = 4
+    VT_NODEINSTANCE_TYPE = 4,
+    VT_NODEINSTANCE = 6
   };
-  const flatbuffers::String *FontResourceName() const { return GetPointer<const flatbuffers::String *>(VT_FONTRESOURCENAME); }
+  FBGenericSceneNode NodeInstance_type() const { return static_cast<FBGenericSceneNode>(GetField<uint8_t>(VT_NODEINSTANCE_TYPE, 0)); }
+  const void *NodeInstance() const { return GetPointer<const void *>(VT_NODEINSTANCE); }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, VT_FONTRESOURCENAME) &&
-           verifier.Verify(FontResourceName()) &&
+           VerifyField<uint8_t>(verifier, VT_NODEINSTANCE_TYPE) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_NODEINSTANCE) &&
+           VerifyFBGenericSceneNode(verifier, NodeInstance(), NodeInstance_type()) &&
            verifier.EndTable();
   }
 };
 
-struct FBFontBuilder {
+struct FBSceneNodeBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_FontResourceName(flatbuffers::Offset<flatbuffers::String> FontResourceName) { fbb_.AddOffset(FBFont::VT_FONTRESOURCENAME, FontResourceName); }
-  FBFontBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
-  FBFontBuilder &operator=(const FBFontBuilder &);
-  flatbuffers::Offset<FBFont> Finish() {
-    auto o = flatbuffers::Offset<FBFont>(fbb_.EndTable(start_, 1));
+  void add_NodeInstance_type(FBGenericSceneNode NodeInstance_type) { fbb_.AddElement<uint8_t>(FBSceneNode::VT_NODEINSTANCE_TYPE, static_cast<uint8_t>(NodeInstance_type), 0); }
+  void add_NodeInstance(flatbuffers::Offset<void> NodeInstance) { fbb_.AddOffset(FBSceneNode::VT_NODEINSTANCE, NodeInstance); }
+  FBSceneNodeBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
+  FBSceneNodeBuilder &operator=(const FBSceneNodeBuilder &);
+  flatbuffers::Offset<FBSceneNode> Finish() {
+    auto o = flatbuffers::Offset<FBSceneNode>(fbb_.EndTable(start_, 2));
     return o;
   }
 };
 
-inline flatbuffers::Offset<FBFont> CreateFBFont(flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<flatbuffers::String> FontResourceName = 0) {
-  FBFontBuilder builder_(_fbb);
-  builder_.add_FontResourceName(FontResourceName);
+inline flatbuffers::Offset<FBSceneNode> CreateFBSceneNode(flatbuffers::FlatBufferBuilder &_fbb,
+    FBGenericSceneNode NodeInstance_type = FBGenericSceneNode_NONE,
+    flatbuffers::Offset<void> NodeInstance = 0) {
+  FBSceneNodeBuilder builder_(_fbb);
+  builder_.add_NodeInstance(NodeInstance);
+  builder_.add_NodeInstance_type(NodeInstance_type);
   return builder_.Finish();
 }
 
-inline flatbuffers::Offset<FBFont> CreateFBFontDirect(flatbuffers::FlatBufferBuilder &_fbb,
-    const char *FontResourceName = nullptr) {
-  return CreateFBFont(_fbb, FontResourceName ? _fbb.CreateString(FontResourceName) : 0);
-}
-
-struct FBSimpleSkyBox FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
-    VT_POSITION = 4,
-    VT_ROTATION = 6,
-    VT_SCALING = 8,
-    VT_MATERIAL = 10,
-    VT_CUBETEXTURE3DRESOURCENAME = 12,
-    VT_RASTERIZERTYPE = 14
-  };
-  const Vec4 *Position() const { return GetStruct<const Vec4 *>(VT_POSITION); }
-  const Vec4 *Rotation() const { return GetStruct<const Vec4 *>(VT_ROTATION); }
-  const Vec4 *Scaling() const { return GetStruct<const Vec4 *>(VT_SCALING); }
-  const FBBasicMaterial *Material() const { return GetPointer<const FBBasicMaterial *>(VT_MATERIAL); }
-  const flatbuffers::String *CubeTexture3DResourceName() const { return GetPointer<const flatbuffers::String *>(VT_CUBETEXTURE3DRESOURCENAME); }
-  RasterType RasterizerType() const { return static_cast<RasterType>(GetField<int16_t>(VT_RASTERIZERTYPE, 0)); }
-  bool Verify(flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyField<Vec4>(verifier, VT_POSITION) &&
-           VerifyField<Vec4>(verifier, VT_ROTATION) &&
-           VerifyField<Vec4>(verifier, VT_SCALING) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, VT_MATERIAL) &&
-           verifier.VerifyTable(Material()) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, VT_CUBETEXTURE3DRESOURCENAME) &&
-           verifier.Verify(CubeTexture3DResourceName()) &&
-           VerifyField<int16_t>(verifier, VT_RASTERIZERTYPE) &&
-           verifier.EndTable();
-  }
-};
-
-struct FBSimpleSkyBoxBuilder {
-  flatbuffers::FlatBufferBuilder &fbb_;
-  flatbuffers::uoffset_t start_;
-  void add_Position(const Vec4 *Position) { fbb_.AddStruct(FBSimpleSkyBox::VT_POSITION, Position); }
-  void add_Rotation(const Vec4 *Rotation) { fbb_.AddStruct(FBSimpleSkyBox::VT_ROTATION, Rotation); }
-  void add_Scaling(const Vec4 *Scaling) { fbb_.AddStruct(FBSimpleSkyBox::VT_SCALING, Scaling); }
-  void add_Material(flatbuffers::Offset<FBBasicMaterial> Material) { fbb_.AddOffset(FBSimpleSkyBox::VT_MATERIAL, Material); }
-  void add_CubeTexture3DResourceName(flatbuffers::Offset<flatbuffers::String> CubeTexture3DResourceName) { fbb_.AddOffset(FBSimpleSkyBox::VT_CUBETEXTURE3DRESOURCENAME, CubeTexture3DResourceName); }
-  void add_RasterizerType(RasterType RasterizerType) { fbb_.AddElement<int16_t>(FBSimpleSkyBox::VT_RASTERIZERTYPE, static_cast<int16_t>(RasterizerType), 0); }
-  FBSimpleSkyBoxBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
-  FBSimpleSkyBoxBuilder &operator=(const FBSimpleSkyBoxBuilder &);
-  flatbuffers::Offset<FBSimpleSkyBox> Finish() {
-    auto o = flatbuffers::Offset<FBSimpleSkyBox>(fbb_.EndTable(start_, 6));
-    return o;
-  }
-};
-
-inline flatbuffers::Offset<FBSimpleSkyBox> CreateFBSimpleSkyBox(flatbuffers::FlatBufferBuilder &_fbb,
-    const Vec4 *Position = 0,
-    const Vec4 *Rotation = 0,
-    const Vec4 *Scaling = 0,
-    flatbuffers::Offset<FBBasicMaterial> Material = 0,
-    flatbuffers::Offset<flatbuffers::String> CubeTexture3DResourceName = 0,
-    RasterType RasterizerType = RasterType_FillWireframe) {
-  FBSimpleSkyBoxBuilder builder_(_fbb);
-  builder_.add_CubeTexture3DResourceName(CubeTexture3DResourceName);
-  builder_.add_Material(Material);
-  builder_.add_Scaling(Scaling);
-  builder_.add_Rotation(Rotation);
-  builder_.add_Position(Position);
-  builder_.add_RasterizerType(RasterizerType);
-  return builder_.Finish();
-}
-
-inline flatbuffers::Offset<FBSimpleSkyBox> CreateFBSimpleSkyBoxDirect(flatbuffers::FlatBufferBuilder &_fbb,
-    const Vec4 *Position = 0,
-    const Vec4 *Rotation = 0,
-    const Vec4 *Scaling = 0,
-    flatbuffers::Offset<FBBasicMaterial> Material = 0,
-    const char *CubeTexture3DResourceName = nullptr,
-    RasterType RasterizerType = RasterType_FillWireframe) {
-  return CreateFBSimpleSkyBox(_fbb, Position, Rotation, Scaling, Material, CubeTexture3DResourceName ? _fbb.CreateString(CubeTexture3DResourceName) : 0, RasterizerType);
-}
-
-struct FBTexturePlane FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
-    VT_POSITION = 4,
-    VT_ROTATION = 6,
-    VT_SCALING = 8,
-    VT_MATERIAL = 10,
-    VT_RESOURCENAME = 12,
-    VT_RASTERIZERTYPE = 14
-  };
-  const Vec4 *Position() const { return GetStruct<const Vec4 *>(VT_POSITION); }
-  const Vec4 *Rotation() const { return GetStruct<const Vec4 *>(VT_ROTATION); }
-  const Vec4 *Scaling() const { return GetStruct<const Vec4 *>(VT_SCALING); }
-  const FBBasicMaterial *Material() const { return GetPointer<const FBBasicMaterial *>(VT_MATERIAL); }
-  const flatbuffers::String *ResourceName() const { return GetPointer<const flatbuffers::String *>(VT_RESOURCENAME); }
-  RasterType RasterizerType() const { return static_cast<RasterType>(GetField<int16_t>(VT_RASTERIZERTYPE, 0)); }
-  bool Verify(flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyField<Vec4>(verifier, VT_POSITION) &&
-           VerifyField<Vec4>(verifier, VT_ROTATION) &&
-           VerifyField<Vec4>(verifier, VT_SCALING) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, VT_MATERIAL) &&
-           verifier.VerifyTable(Material()) &&
-           VerifyField<flatbuffers::uoffset_t>(verifier, VT_RESOURCENAME) &&
-           verifier.Verify(ResourceName()) &&
-           VerifyField<int16_t>(verifier, VT_RASTERIZERTYPE) &&
-           verifier.EndTable();
-  }
-};
-
-struct FBTexturePlaneBuilder {
-  flatbuffers::FlatBufferBuilder &fbb_;
-  flatbuffers::uoffset_t start_;
-  void add_Position(const Vec4 *Position) { fbb_.AddStruct(FBTexturePlane::VT_POSITION, Position); }
-  void add_Rotation(const Vec4 *Rotation) { fbb_.AddStruct(FBTexturePlane::VT_ROTATION, Rotation); }
-  void add_Scaling(const Vec4 *Scaling) { fbb_.AddStruct(FBTexturePlane::VT_SCALING, Scaling); }
-  void add_Material(flatbuffers::Offset<FBBasicMaterial> Material) { fbb_.AddOffset(FBTexturePlane::VT_MATERIAL, Material); }
-  void add_ResourceName(flatbuffers::Offset<flatbuffers::String> ResourceName) { fbb_.AddOffset(FBTexturePlane::VT_RESOURCENAME, ResourceName); }
-  void add_RasterizerType(RasterType RasterizerType) { fbb_.AddElement<int16_t>(FBTexturePlane::VT_RASTERIZERTYPE, static_cast<int16_t>(RasterizerType), 0); }
-  FBTexturePlaneBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
-  FBTexturePlaneBuilder &operator=(const FBTexturePlaneBuilder &);
-  flatbuffers::Offset<FBTexturePlane> Finish() {
-    auto o = flatbuffers::Offset<FBTexturePlane>(fbb_.EndTable(start_, 6));
-    return o;
-  }
-};
-
-inline flatbuffers::Offset<FBTexturePlane> CreateFBTexturePlane(flatbuffers::FlatBufferBuilder &_fbb,
-    const Vec4 *Position = 0,
-    const Vec4 *Rotation = 0,
-    const Vec4 *Scaling = 0,
-    flatbuffers::Offset<FBBasicMaterial> Material = 0,
-    flatbuffers::Offset<flatbuffers::String> ResourceName = 0,
-    RasterType RasterizerType = RasterType_FillWireframe) {
-  FBTexturePlaneBuilder builder_(_fbb);
-  builder_.add_ResourceName(ResourceName);
-  builder_.add_Material(Material);
-  builder_.add_Scaling(Scaling);
-  builder_.add_Rotation(Rotation);
-  builder_.add_Position(Position);
-  builder_.add_RasterizerType(RasterizerType);
-  return builder_.Finish();
-}
-
-inline flatbuffers::Offset<FBTexturePlane> CreateFBTexturePlaneDirect(flatbuffers::FlatBufferBuilder &_fbb,
-    const Vec4 *Position = 0,
-    const Vec4 *Rotation = 0,
-    const Vec4 *Scaling = 0,
-    flatbuffers::Offset<FBBasicMaterial> Material = 0,
-    const char *ResourceName = nullptr,
-    RasterType RasterizerType = RasterType_FillWireframe) {
-  return CreateFBTexturePlane(_fbb, Position, Rotation, Scaling, Material, ResourceName ? _fbb.CreateString(ResourceName) : 0, RasterizerType);
-}
-
-struct FBLiveDriveTexturePlane FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+struct FBIActor FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
     VT_POSITION = 4,
     VT_ROTATION = 6,
@@ -234,29 +197,29 @@ struct FBLiveDriveTexturePlane FLATBUFFERS_FINAL_CLASS : private flatbuffers::Ta
   }
 };
 
-struct FBLiveDriveTexturePlaneBuilder {
+struct FBIActorBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_Position(const Vec4 *Position) { fbb_.AddStruct(FBLiveDriveTexturePlane::VT_POSITION, Position); }
-  void add_Rotation(const Vec4 *Rotation) { fbb_.AddStruct(FBLiveDriveTexturePlane::VT_ROTATION, Rotation); }
-  void add_Scaling(const Vec4 *Scaling) { fbb_.AddStruct(FBLiveDriveTexturePlane::VT_SCALING, Scaling); }
-  void add_Material(flatbuffers::Offset<FBBasicMaterial> Material) { fbb_.AddOffset(FBLiveDriveTexturePlane::VT_MATERIAL, Material); }
-  void add_RasterizerType(RasterType RasterizerType) { fbb_.AddElement<int16_t>(FBLiveDriveTexturePlane::VT_RASTERIZERTYPE, static_cast<int16_t>(RasterizerType), 0); }
-  FBLiveDriveTexturePlaneBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
-  FBLiveDriveTexturePlaneBuilder &operator=(const FBLiveDriveTexturePlaneBuilder &);
-  flatbuffers::Offset<FBLiveDriveTexturePlane> Finish() {
-    auto o = flatbuffers::Offset<FBLiveDriveTexturePlane>(fbb_.EndTable(start_, 5));
+  void add_Position(const Vec4 *Position) { fbb_.AddStruct(FBIActor::VT_POSITION, Position); }
+  void add_Rotation(const Vec4 *Rotation) { fbb_.AddStruct(FBIActor::VT_ROTATION, Rotation); }
+  void add_Scaling(const Vec4 *Scaling) { fbb_.AddStruct(FBIActor::VT_SCALING, Scaling); }
+  void add_Material(flatbuffers::Offset<FBBasicMaterial> Material) { fbb_.AddOffset(FBIActor::VT_MATERIAL, Material); }
+  void add_RasterizerType(RasterType RasterizerType) { fbb_.AddElement<int16_t>(FBIActor::VT_RASTERIZERTYPE, static_cast<int16_t>(RasterizerType), 0); }
+  FBIActorBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
+  FBIActorBuilder &operator=(const FBIActorBuilder &);
+  flatbuffers::Offset<FBIActor> Finish() {
+    auto o = flatbuffers::Offset<FBIActor>(fbb_.EndTable(start_, 5));
     return o;
   }
 };
 
-inline flatbuffers::Offset<FBLiveDriveTexturePlane> CreateFBLiveDriveTexturePlane(flatbuffers::FlatBufferBuilder &_fbb,
+inline flatbuffers::Offset<FBIActor> CreateFBIActor(flatbuffers::FlatBufferBuilder &_fbb,
     const Vec4 *Position = 0,
     const Vec4 *Rotation = 0,
     const Vec4 *Scaling = 0,
     flatbuffers::Offset<FBBasicMaterial> Material = 0,
     RasterType RasterizerType = RasterType_FillWireframe) {
-  FBLiveDriveTexturePlaneBuilder builder_(_fbb);
+  FBIActorBuilder builder_(_fbb);
   builder_.add_Material(Material);
   builder_.add_Scaling(Scaling);
   builder_.add_Rotation(Rotation);
@@ -265,26 +228,330 @@ inline flatbuffers::Offset<FBLiveDriveTexturePlane> CreateFBLiveDriveTexturePlan
   return builder_.Finish();
 }
 
-struct FBWaves FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+struct FBFont FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_BASE = 4,
+    VT_FONTRESOURCENAME = 6,
+    VT_SCENENODES = 8
+  };
+  const FBIActor *Base() const { return GetPointer<const FBIActor *>(VT_BASE); }
+  const flatbuffers::String *FontResourceName() const { return GetPointer<const flatbuffers::String *>(VT_FONTRESOURCENAME); }
+  const flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>> *SceneNodes() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>> *>(VT_SCENENODES); }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_BASE) &&
+           verifier.VerifyTable(Base()) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_FONTRESOURCENAME) &&
+           verifier.Verify(FontResourceName()) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_SCENENODES) &&
+           verifier.Verify(SceneNodes()) &&
+           verifier.VerifyVectorOfTables(SceneNodes()) &&
+           verifier.EndTable();
+  }
+};
+
+struct FBFontBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_Base(flatbuffers::Offset<FBIActor> Base) { fbb_.AddOffset(FBFont::VT_BASE, Base); }
+  void add_FontResourceName(flatbuffers::Offset<flatbuffers::String> FontResourceName) { fbb_.AddOffset(FBFont::VT_FONTRESOURCENAME, FontResourceName); }
+  void add_SceneNodes(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>>> SceneNodes) { fbb_.AddOffset(FBFont::VT_SCENENODES, SceneNodes); }
+  FBFontBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
+  FBFontBuilder &operator=(const FBFontBuilder &);
+  flatbuffers::Offset<FBFont> Finish() {
+    auto o = flatbuffers::Offset<FBFont>(fbb_.EndTable(start_, 3));
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<FBFont> CreateFBFont(flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<FBIActor> Base = 0,
+    flatbuffers::Offset<flatbuffers::String> FontResourceName = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>>> SceneNodes = 0) {
+  FBFontBuilder builder_(_fbb);
+  builder_.add_SceneNodes(SceneNodes);
+  builder_.add_FontResourceName(FontResourceName);
+  builder_.add_Base(Base);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<FBFont> CreateFBFontDirect(flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<FBIActor> Base = 0,
+    const char *FontResourceName = nullptr,
+    const std::vector<flatbuffers::Offset<FBSceneNode>> *SceneNodes = nullptr) {
+  return CreateFBFont(_fbb, Base, FontResourceName ? _fbb.CreateString(FontResourceName) : 0, SceneNodes ? _fbb.CreateVector<flatbuffers::Offset<FBSceneNode>>(*SceneNodes) : 0);
+}
+
+struct FBSimpleSkyBox FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_BASE = 4,
+    VT_CUBETEXTURE3DRESOURCENAME = 6,
+    VT_SCENENODES = 8
+  };
+  const FBIActor *Base() const { return GetPointer<const FBIActor *>(VT_BASE); }
+  const flatbuffers::String *CubeTexture3DResourceName() const { return GetPointer<const flatbuffers::String *>(VT_CUBETEXTURE3DRESOURCENAME); }
+  const flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>> *SceneNodes() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>> *>(VT_SCENENODES); }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_BASE) &&
+           verifier.VerifyTable(Base()) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_CUBETEXTURE3DRESOURCENAME) &&
+           verifier.Verify(CubeTexture3DResourceName()) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_SCENENODES) &&
+           verifier.Verify(SceneNodes()) &&
+           verifier.VerifyVectorOfTables(SceneNodes()) &&
+           verifier.EndTable();
+  }
+};
+
+struct FBSimpleSkyBoxBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_Base(flatbuffers::Offset<FBIActor> Base) { fbb_.AddOffset(FBSimpleSkyBox::VT_BASE, Base); }
+  void add_CubeTexture3DResourceName(flatbuffers::Offset<flatbuffers::String> CubeTexture3DResourceName) { fbb_.AddOffset(FBSimpleSkyBox::VT_CUBETEXTURE3DRESOURCENAME, CubeTexture3DResourceName); }
+  void add_SceneNodes(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>>> SceneNodes) { fbb_.AddOffset(FBSimpleSkyBox::VT_SCENENODES, SceneNodes); }
+  FBSimpleSkyBoxBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
+  FBSimpleSkyBoxBuilder &operator=(const FBSimpleSkyBoxBuilder &);
+  flatbuffers::Offset<FBSimpleSkyBox> Finish() {
+    auto o = flatbuffers::Offset<FBSimpleSkyBox>(fbb_.EndTable(start_, 3));
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<FBSimpleSkyBox> CreateFBSimpleSkyBox(flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<FBIActor> Base = 0,
+    flatbuffers::Offset<flatbuffers::String> CubeTexture3DResourceName = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>>> SceneNodes = 0) {
+  FBSimpleSkyBoxBuilder builder_(_fbb);
+  builder_.add_SceneNodes(SceneNodes);
+  builder_.add_CubeTexture3DResourceName(CubeTexture3DResourceName);
+  builder_.add_Base(Base);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<FBSimpleSkyBox> CreateFBSimpleSkyBoxDirect(flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<FBIActor> Base = 0,
+    const char *CubeTexture3DResourceName = nullptr,
+    const std::vector<flatbuffers::Offset<FBSceneNode>> *SceneNodes = nullptr) {
+  return CreateFBSimpleSkyBox(_fbb, Base, CubeTexture3DResourceName ? _fbb.CreateString(CubeTexture3DResourceName) : 0, SceneNodes ? _fbb.CreateVector<flatbuffers::Offset<FBSceneNode>>(*SceneNodes) : 0);
+}
+
+struct FBTexturePlane FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
     VT_POSITION = 4,
+    VT_ROTATION = 6,
+    VT_SCALING = 8,
+    VT_MATERIAL = 10,
+    VT_RASTERIZERTYPE = 12,
+    VT_RESOURCENAME = 14,
+    VT_SCENENODES = 16
+  };
+  const Vec4 *Position() const { return GetStruct<const Vec4 *>(VT_POSITION); }
+  const Vec4 *Rotation() const { return GetStruct<const Vec4 *>(VT_ROTATION); }
+  const Vec4 *Scaling() const { return GetStruct<const Vec4 *>(VT_SCALING); }
+  const FBBasicMaterial *Material() const { return GetPointer<const FBBasicMaterial *>(VT_MATERIAL); }
+  RasterType RasterizerType() const { return static_cast<RasterType>(GetField<int16_t>(VT_RASTERIZERTYPE, 0)); }
+  const flatbuffers::String *ResourceName() const { return GetPointer<const flatbuffers::String *>(VT_RESOURCENAME); }
+  const flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>> *SceneNodes() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>> *>(VT_SCENENODES); }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<Vec4>(verifier, VT_POSITION) &&
+           VerifyField<Vec4>(verifier, VT_ROTATION) &&
+           VerifyField<Vec4>(verifier, VT_SCALING) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_MATERIAL) &&
+           verifier.VerifyTable(Material()) &&
+           VerifyField<int16_t>(verifier, VT_RASTERIZERTYPE) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_RESOURCENAME) &&
+           verifier.Verify(ResourceName()) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_SCENENODES) &&
+           verifier.Verify(SceneNodes()) &&
+           verifier.VerifyVectorOfTables(SceneNodes()) &&
+           verifier.EndTable();
+  }
+};
+
+struct FBTexturePlaneBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_Position(const Vec4 *Position) { fbb_.AddStruct(FBTexturePlane::VT_POSITION, Position); }
+  void add_Rotation(const Vec4 *Rotation) { fbb_.AddStruct(FBTexturePlane::VT_ROTATION, Rotation); }
+  void add_Scaling(const Vec4 *Scaling) { fbb_.AddStruct(FBTexturePlane::VT_SCALING, Scaling); }
+  void add_Material(flatbuffers::Offset<FBBasicMaterial> Material) { fbb_.AddOffset(FBTexturePlane::VT_MATERIAL, Material); }
+  void add_RasterizerType(RasterType RasterizerType) { fbb_.AddElement<int16_t>(FBTexturePlane::VT_RASTERIZERTYPE, static_cast<int16_t>(RasterizerType), 0); }
+  void add_ResourceName(flatbuffers::Offset<flatbuffers::String> ResourceName) { fbb_.AddOffset(FBTexturePlane::VT_RESOURCENAME, ResourceName); }
+  void add_SceneNodes(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>>> SceneNodes) { fbb_.AddOffset(FBTexturePlane::VT_SCENENODES, SceneNodes); }
+  FBTexturePlaneBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
+  FBTexturePlaneBuilder &operator=(const FBTexturePlaneBuilder &);
+  flatbuffers::Offset<FBTexturePlane> Finish() {
+    auto o = flatbuffers::Offset<FBTexturePlane>(fbb_.EndTable(start_, 7));
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<FBTexturePlane> CreateFBTexturePlane(flatbuffers::FlatBufferBuilder &_fbb,
+    const Vec4 *Position = 0,
+    const Vec4 *Rotation = 0,
+    const Vec4 *Scaling = 0,
+    flatbuffers::Offset<FBBasicMaterial> Material = 0,
+    RasterType RasterizerType = RasterType_FillWireframe,
+    flatbuffers::Offset<flatbuffers::String> ResourceName = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>>> SceneNodes = 0) {
+  FBTexturePlaneBuilder builder_(_fbb);
+  builder_.add_SceneNodes(SceneNodes);
+  builder_.add_ResourceName(ResourceName);
+  builder_.add_Material(Material);
+  builder_.add_Scaling(Scaling);
+  builder_.add_Rotation(Rotation);
+  builder_.add_Position(Position);
+  builder_.add_RasterizerType(RasterizerType);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<FBTexturePlane> CreateFBTexturePlaneDirect(flatbuffers::FlatBufferBuilder &_fbb,
+    const Vec4 *Position = 0,
+    const Vec4 *Rotation = 0,
+    const Vec4 *Scaling = 0,
+    flatbuffers::Offset<FBBasicMaterial> Material = 0,
+    RasterType RasterizerType = RasterType_FillWireframe,
+    const char *ResourceName = nullptr,
+    const std::vector<flatbuffers::Offset<FBSceneNode>> *SceneNodes = nullptr) {
+  return CreateFBTexturePlane(_fbb, Position, Rotation, Scaling, Material, RasterizerType, ResourceName ? _fbb.CreateString(ResourceName) : 0, SceneNodes ? _fbb.CreateVector<flatbuffers::Offset<FBSceneNode>>(*SceneNodes) : 0);
+}
+
+struct FBLiveDriveTexturePlane FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_BASE = 4,
+    VT_SCENENODES = 6
+  };
+  const FBIActor *Base() const { return GetPointer<const FBIActor *>(VT_BASE); }
+  const flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>> *SceneNodes() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>> *>(VT_SCENENODES); }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_BASE) &&
+           verifier.VerifyTable(Base()) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_SCENENODES) &&
+           verifier.Verify(SceneNodes()) &&
+           verifier.VerifyVectorOfTables(SceneNodes()) &&
+           verifier.EndTable();
+  }
+};
+
+struct FBLiveDriveTexturePlaneBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_Base(flatbuffers::Offset<FBIActor> Base) { fbb_.AddOffset(FBLiveDriveTexturePlane::VT_BASE, Base); }
+  void add_SceneNodes(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>>> SceneNodes) { fbb_.AddOffset(FBLiveDriveTexturePlane::VT_SCENENODES, SceneNodes); }
+  FBLiveDriveTexturePlaneBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
+  FBLiveDriveTexturePlaneBuilder &operator=(const FBLiveDriveTexturePlaneBuilder &);
+  flatbuffers::Offset<FBLiveDriveTexturePlane> Finish() {
+    auto o = flatbuffers::Offset<FBLiveDriveTexturePlane>(fbb_.EndTable(start_, 2));
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<FBLiveDriveTexturePlane> CreateFBLiveDriveTexturePlane(flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<FBIActor> Base = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>>> SceneNodes = 0) {
+  FBLiveDriveTexturePlaneBuilder builder_(_fbb);
+  builder_.add_SceneNodes(SceneNodes);
+  builder_.add_Base(Base);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<FBLiveDriveTexturePlane> CreateFBLiveDriveTexturePlaneDirect(flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<FBIActor> Base = 0,
+    const std::vector<flatbuffers::Offset<FBSceneNode>> *SceneNodes = nullptr) {
+  return CreateFBLiveDriveTexturePlane(_fbb, Base, SceneNodes ? _fbb.CreateVector<flatbuffers::Offset<FBSceneNode>>(*SceneNodes) : 0);
+}
+
+struct FBSimpleTerrain FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_BASE = 4,
     VT_ROWS = 6,
     VT_COLUMN = 8,
     VT_ROWSPACING = 10,
-    VT_COLSPACING = 12
+    VT_COLSPACING = 12,
+    VT_SCENENODES = 14
   };
-  const Vec3 *Position() const { return GetStruct<const Vec3 *>(VT_POSITION); }
+  const FBTexturePlane *Base() const { return GetPointer<const FBTexturePlane *>(VT_BASE); }
   int32_t Rows() const { return GetField<int32_t>(VT_ROWS, 0); }
   int32_t Column() const { return GetField<int32_t>(VT_COLUMN, 0); }
   int32_t RowSpacing() const { return GetField<int32_t>(VT_ROWSPACING, 0); }
   int32_t ColSpacing() const { return GetField<int32_t>(VT_COLSPACING, 0); }
+  const flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>> *SceneNodes() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>> *>(VT_SCENENODES); }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<Vec3>(verifier, VT_POSITION) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_BASE) &&
+           verifier.VerifyTable(Base()) &&
            VerifyField<int32_t>(verifier, VT_ROWS) &&
            VerifyField<int32_t>(verifier, VT_COLUMN) &&
            VerifyField<int32_t>(verifier, VT_ROWSPACING) &&
            VerifyField<int32_t>(verifier, VT_COLSPACING) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_SCENENODES) &&
+           verifier.Verify(SceneNodes()) &&
+           verifier.VerifyVectorOfTables(SceneNodes()) &&
+           verifier.EndTable();
+  }
+};
+
+struct FBSimpleTerrainBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_Base(flatbuffers::Offset<FBTexturePlane> Base) { fbb_.AddOffset(FBSimpleTerrain::VT_BASE, Base); }
+  void add_Rows(int32_t Rows) { fbb_.AddElement<int32_t>(FBSimpleTerrain::VT_ROWS, Rows, 0); }
+  void add_Column(int32_t Column) { fbb_.AddElement<int32_t>(FBSimpleTerrain::VT_COLUMN, Column, 0); }
+  void add_RowSpacing(int32_t RowSpacing) { fbb_.AddElement<int32_t>(FBSimpleTerrain::VT_ROWSPACING, RowSpacing, 0); }
+  void add_ColSpacing(int32_t ColSpacing) { fbb_.AddElement<int32_t>(FBSimpleTerrain::VT_COLSPACING, ColSpacing, 0); }
+  void add_SceneNodes(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>>> SceneNodes) { fbb_.AddOffset(FBSimpleTerrain::VT_SCENENODES, SceneNodes); }
+  FBSimpleTerrainBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
+  FBSimpleTerrainBuilder &operator=(const FBSimpleTerrainBuilder &);
+  flatbuffers::Offset<FBSimpleTerrain> Finish() {
+    auto o = flatbuffers::Offset<FBSimpleTerrain>(fbb_.EndTable(start_, 6));
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<FBSimpleTerrain> CreateFBSimpleTerrain(flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<FBTexturePlane> Base = 0,
+    int32_t Rows = 0,
+    int32_t Column = 0,
+    int32_t RowSpacing = 0,
+    int32_t ColSpacing = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>>> SceneNodes = 0) {
+  FBSimpleTerrainBuilder builder_(_fbb);
+  builder_.add_SceneNodes(SceneNodes);
+  builder_.add_ColSpacing(ColSpacing);
+  builder_.add_RowSpacing(RowSpacing);
+  builder_.add_Column(Column);
+  builder_.add_Rows(Rows);
+  builder_.add_Base(Base);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<FBSimpleTerrain> CreateFBSimpleTerrainDirect(flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<FBTexturePlane> Base = 0,
+    int32_t Rows = 0,
+    int32_t Column = 0,
+    int32_t RowSpacing = 0,
+    int32_t ColSpacing = 0,
+    const std::vector<flatbuffers::Offset<FBSceneNode>> *SceneNodes = nullptr) {
+  return CreateFBSimpleTerrain(_fbb, Base, Rows, Column, RowSpacing, ColSpacing, SceneNodes ? _fbb.CreateVector<flatbuffers::Offset<FBSceneNode>>(*SceneNodes) : 0);
+}
+
+struct FBWaves FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_BASE = 4,
+    VT_SCENENODES = 6
+  };
+  const FBSimpleTerrain *Base() const { return GetPointer<const FBSimpleTerrain *>(VT_BASE); }
+  const flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>> *SceneNodes() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>> *>(VT_SCENENODES); }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_BASE) &&
+           verifier.VerifyTable(Base()) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_SCENENODES) &&
+           verifier.Verify(SceneNodes()) &&
+           verifier.VerifyVectorOfTables(SceneNodes()) &&
            verifier.EndTable();
   }
 };
@@ -292,59 +559,52 @@ struct FBWaves FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct FBWavesBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_Position(const Vec3 *Position) { fbb_.AddStruct(FBWaves::VT_POSITION, Position); }
-  void add_Rows(int32_t Rows) { fbb_.AddElement<int32_t>(FBWaves::VT_ROWS, Rows, 0); }
-  void add_Column(int32_t Column) { fbb_.AddElement<int32_t>(FBWaves::VT_COLUMN, Column, 0); }
-  void add_RowSpacing(int32_t RowSpacing) { fbb_.AddElement<int32_t>(FBWaves::VT_ROWSPACING, RowSpacing, 0); }
-  void add_ColSpacing(int32_t ColSpacing) { fbb_.AddElement<int32_t>(FBWaves::VT_COLSPACING, ColSpacing, 0); }
+  void add_Base(flatbuffers::Offset<FBSimpleTerrain> Base) { fbb_.AddOffset(FBWaves::VT_BASE, Base); }
+  void add_SceneNodes(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>>> SceneNodes) { fbb_.AddOffset(FBWaves::VT_SCENENODES, SceneNodes); }
   FBWavesBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
   FBWavesBuilder &operator=(const FBWavesBuilder &);
   flatbuffers::Offset<FBWaves> Finish() {
-    auto o = flatbuffers::Offset<FBWaves>(fbb_.EndTable(start_, 5));
+    auto o = flatbuffers::Offset<FBWaves>(fbb_.EndTable(start_, 2));
     return o;
   }
 };
 
 inline flatbuffers::Offset<FBWaves> CreateFBWaves(flatbuffers::FlatBufferBuilder &_fbb,
-    const Vec3 *Position = 0,
-    int32_t Rows = 0,
-    int32_t Column = 0,
-    int32_t RowSpacing = 0,
-    int32_t ColSpacing = 0) {
+    flatbuffers::Offset<FBSimpleTerrain> Base = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>>> SceneNodes = 0) {
   FBWavesBuilder builder_(_fbb);
-  builder_.add_ColSpacing(ColSpacing);
-  builder_.add_RowSpacing(RowSpacing);
-  builder_.add_Column(Column);
-  builder_.add_Rows(Rows);
-  builder_.add_Position(Position);
+  builder_.add_SceneNodes(SceneNodes);
+  builder_.add_Base(Base);
   return builder_.Finish();
+}
+
+inline flatbuffers::Offset<FBWaves> CreateFBWavesDirect(flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<FBSimpleTerrain> Base = 0,
+    const std::vector<flatbuffers::Offset<FBSceneNode>> *SceneNodes = nullptr) {
+  return CreateFBWaves(_fbb, Base, SceneNodes ? _fbb.CreateVector<flatbuffers::Offset<FBSceneNode>>(*SceneNodes) : 0);
 }
 
 struct FBMultiTexturedTerrain FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
-    VT_BITMAPFILENAME = 4,
-    VT_TEXTURE2DRESOURCENAME = 6,
-    VT_TEXTURE2DRESOURCENAME1 = 8,
-    VT_TEXTURE2DRESOURCENAME2 = 10,
-    VT_TEXTURE2DBLENDRESOURCENAME3 = 12,
-    VT_POSITION = 14,
-    VT_ROWS = 16,
-    VT_COLUMN = 18,
-    VT_ROWSPACING = 20,
-    VT_COLSPACING = 22
+    VT_BASE = 4,
+    VT_BITMAPFILENAME = 6,
+    VT_TEXTURE2DRESOURCENAME = 8,
+    VT_TEXTURE2DRESOURCENAME1 = 10,
+    VT_TEXTURE2DRESOURCENAME2 = 12,
+    VT_TEXTURE2DBLENDRESOURCENAME3 = 14,
+    VT_SCENENODES = 16
   };
+  const FBSimpleTerrain *Base() const { return GetPointer<const FBSimpleTerrain *>(VT_BASE); }
   const flatbuffers::String *BitmapFileName() const { return GetPointer<const flatbuffers::String *>(VT_BITMAPFILENAME); }
   const flatbuffers::String *Texture2DResourceName() const { return GetPointer<const flatbuffers::String *>(VT_TEXTURE2DRESOURCENAME); }
   const flatbuffers::String *Texture2DResourceName1() const { return GetPointer<const flatbuffers::String *>(VT_TEXTURE2DRESOURCENAME1); }
   const flatbuffers::String *Texture2DResourceName2() const { return GetPointer<const flatbuffers::String *>(VT_TEXTURE2DRESOURCENAME2); }
   const flatbuffers::String *Texture2DBlendResourceName3() const { return GetPointer<const flatbuffers::String *>(VT_TEXTURE2DBLENDRESOURCENAME3); }
-  const Vec3 *Position() const { return GetStruct<const Vec3 *>(VT_POSITION); }
-  int32_t Rows() const { return GetField<int32_t>(VT_ROWS, 0); }
-  int32_t Column() const { return GetField<int32_t>(VT_COLUMN, 0); }
-  int32_t RowSpacing() const { return GetField<int32_t>(VT_ROWSPACING, 0); }
-  int32_t ColSpacing() const { return GetField<int32_t>(VT_COLSPACING, 0); }
+  const flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>> *SceneNodes() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>> *>(VT_SCENENODES); }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_BASE) &&
+           verifier.VerifyTable(Base()) &&
            VerifyField<flatbuffers::uoffset_t>(verifier, VT_BITMAPFILENAME) &&
            verifier.Verify(BitmapFileName()) &&
            VerifyField<flatbuffers::uoffset_t>(verifier, VT_TEXTURE2DRESOURCENAME) &&
@@ -355,11 +615,9 @@ struct FBMultiTexturedTerrain FLATBUFFERS_FINAL_CLASS : private flatbuffers::Tab
            verifier.Verify(Texture2DResourceName2()) &&
            VerifyField<flatbuffers::uoffset_t>(verifier, VT_TEXTURE2DBLENDRESOURCENAME3) &&
            verifier.Verify(Texture2DBlendResourceName3()) &&
-           VerifyField<Vec3>(verifier, VT_POSITION) &&
-           VerifyField<int32_t>(verifier, VT_ROWS) &&
-           VerifyField<int32_t>(verifier, VT_COLUMN) &&
-           VerifyField<int32_t>(verifier, VT_ROWSPACING) &&
-           VerifyField<int32_t>(verifier, VT_COLSPACING) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_SCENENODES) &&
+           verifier.Verify(SceneNodes()) &&
+           verifier.VerifyVectorOfTables(SceneNodes()) &&
            verifier.EndTable();
   }
 };
@@ -367,75 +625,69 @@ struct FBMultiTexturedTerrain FLATBUFFERS_FINAL_CLASS : private flatbuffers::Tab
 struct FBMultiTexturedTerrainBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
+  void add_Base(flatbuffers::Offset<FBSimpleTerrain> Base) { fbb_.AddOffset(FBMultiTexturedTerrain::VT_BASE, Base); }
   void add_BitmapFileName(flatbuffers::Offset<flatbuffers::String> BitmapFileName) { fbb_.AddOffset(FBMultiTexturedTerrain::VT_BITMAPFILENAME, BitmapFileName); }
   void add_Texture2DResourceName(flatbuffers::Offset<flatbuffers::String> Texture2DResourceName) { fbb_.AddOffset(FBMultiTexturedTerrain::VT_TEXTURE2DRESOURCENAME, Texture2DResourceName); }
   void add_Texture2DResourceName1(flatbuffers::Offset<flatbuffers::String> Texture2DResourceName1) { fbb_.AddOffset(FBMultiTexturedTerrain::VT_TEXTURE2DRESOURCENAME1, Texture2DResourceName1); }
   void add_Texture2DResourceName2(flatbuffers::Offset<flatbuffers::String> Texture2DResourceName2) { fbb_.AddOffset(FBMultiTexturedTerrain::VT_TEXTURE2DRESOURCENAME2, Texture2DResourceName2); }
   void add_Texture2DBlendResourceName3(flatbuffers::Offset<flatbuffers::String> Texture2DBlendResourceName3) { fbb_.AddOffset(FBMultiTexturedTerrain::VT_TEXTURE2DBLENDRESOURCENAME3, Texture2DBlendResourceName3); }
-  void add_Position(const Vec3 *Position) { fbb_.AddStruct(FBMultiTexturedTerrain::VT_POSITION, Position); }
-  void add_Rows(int32_t Rows) { fbb_.AddElement<int32_t>(FBMultiTexturedTerrain::VT_ROWS, Rows, 0); }
-  void add_Column(int32_t Column) { fbb_.AddElement<int32_t>(FBMultiTexturedTerrain::VT_COLUMN, Column, 0); }
-  void add_RowSpacing(int32_t RowSpacing) { fbb_.AddElement<int32_t>(FBMultiTexturedTerrain::VT_ROWSPACING, RowSpacing, 0); }
-  void add_ColSpacing(int32_t ColSpacing) { fbb_.AddElement<int32_t>(FBMultiTexturedTerrain::VT_COLSPACING, ColSpacing, 0); }
+  void add_SceneNodes(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>>> SceneNodes) { fbb_.AddOffset(FBMultiTexturedTerrain::VT_SCENENODES, SceneNodes); }
   FBMultiTexturedTerrainBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
   FBMultiTexturedTerrainBuilder &operator=(const FBMultiTexturedTerrainBuilder &);
   flatbuffers::Offset<FBMultiTexturedTerrain> Finish() {
-    auto o = flatbuffers::Offset<FBMultiTexturedTerrain>(fbb_.EndTable(start_, 10));
+    auto o = flatbuffers::Offset<FBMultiTexturedTerrain>(fbb_.EndTable(start_, 7));
     return o;
   }
 };
 
 inline flatbuffers::Offset<FBMultiTexturedTerrain> CreateFBMultiTexturedTerrain(flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<FBSimpleTerrain> Base = 0,
     flatbuffers::Offset<flatbuffers::String> BitmapFileName = 0,
     flatbuffers::Offset<flatbuffers::String> Texture2DResourceName = 0,
     flatbuffers::Offset<flatbuffers::String> Texture2DResourceName1 = 0,
     flatbuffers::Offset<flatbuffers::String> Texture2DResourceName2 = 0,
     flatbuffers::Offset<flatbuffers::String> Texture2DBlendResourceName3 = 0,
-    const Vec3 *Position = 0,
-    int32_t Rows = 0,
-    int32_t Column = 0,
-    int32_t RowSpacing = 0,
-    int32_t ColSpacing = 0) {
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>>> SceneNodes = 0) {
   FBMultiTexturedTerrainBuilder builder_(_fbb);
-  builder_.add_ColSpacing(ColSpacing);
-  builder_.add_RowSpacing(RowSpacing);
-  builder_.add_Column(Column);
-  builder_.add_Rows(Rows);
-  builder_.add_Position(Position);
+  builder_.add_SceneNodes(SceneNodes);
   builder_.add_Texture2DBlendResourceName3(Texture2DBlendResourceName3);
   builder_.add_Texture2DResourceName2(Texture2DResourceName2);
   builder_.add_Texture2DResourceName1(Texture2DResourceName1);
   builder_.add_Texture2DResourceName(Texture2DResourceName);
   builder_.add_BitmapFileName(BitmapFileName);
+  builder_.add_Base(Base);
   return builder_.Finish();
 }
 
 inline flatbuffers::Offset<FBMultiTexturedTerrain> CreateFBMultiTexturedTerrainDirect(flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<FBSimpleTerrain> Base = 0,
     const char *BitmapFileName = nullptr,
     const char *Texture2DResourceName = nullptr,
     const char *Texture2DResourceName1 = nullptr,
     const char *Texture2DResourceName2 = nullptr,
     const char *Texture2DBlendResourceName3 = nullptr,
-    const Vec3 *Position = 0,
-    int32_t Rows = 0,
-    int32_t Column = 0,
-    int32_t RowSpacing = 0,
-    int32_t ColSpacing = 0) {
-  return CreateFBMultiTexturedTerrain(_fbb, BitmapFileName ? _fbb.CreateString(BitmapFileName) : 0, Texture2DResourceName ? _fbb.CreateString(Texture2DResourceName) : 0, Texture2DResourceName1 ? _fbb.CreateString(Texture2DResourceName1) : 0, Texture2DResourceName2 ? _fbb.CreateString(Texture2DResourceName2) : 0, Texture2DBlendResourceName3 ? _fbb.CreateString(Texture2DBlendResourceName3) : 0, Position, Rows, Column, RowSpacing, ColSpacing);
+    const std::vector<flatbuffers::Offset<FBSceneNode>> *SceneNodes = nullptr) {
+  return CreateFBMultiTexturedTerrain(_fbb, Base, BitmapFileName ? _fbb.CreateString(BitmapFileName) : 0, Texture2DResourceName ? _fbb.CreateString(Texture2DResourceName) : 0, Texture2DResourceName1 ? _fbb.CreateString(Texture2DResourceName1) : 0, Texture2DResourceName2 ? _fbb.CreateString(Texture2DResourceName2) : 0, Texture2DBlendResourceName3 ? _fbb.CreateString(Texture2DBlendResourceName3) : 0, SceneNodes ? _fbb.CreateVector<flatbuffers::Offset<FBSceneNode>>(*SceneNodes) : 0);
 }
 
 struct FBCar FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
-    VT_POSITION = 4,
-    VT_XCMESHRESOURCENAME = 6
+    VT_BASE = 4,
+    VT_XCMESHRESOURCENAME = 6,
+    VT_SCENENODES = 8
   };
-  const Vec3 *Position() const { return GetStruct<const Vec3 *>(VT_POSITION); }
+  const FBIActor *Base() const { return GetPointer<const FBIActor *>(VT_BASE); }
   const flatbuffers::String *XCMeshResourceName() const { return GetPointer<const flatbuffers::String *>(VT_XCMESHRESOURCENAME); }
+  const flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>> *SceneNodes() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>> *>(VT_SCENENODES); }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<Vec3>(verifier, VT_POSITION) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_BASE) &&
+           verifier.VerifyTable(Base()) &&
            VerifyField<flatbuffers::uoffset_t>(verifier, VT_XCMESHRESOURCENAME) &&
            verifier.Verify(XCMeshResourceName()) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_SCENENODES) &&
+           verifier.Verify(SceneNodes()) &&
+           verifier.VerifyVectorOfTables(SceneNodes()) &&
            verifier.EndTable();
   }
 };
@@ -443,43 +695,145 @@ struct FBCar FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct FBCarBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_Position(const Vec3 *Position) { fbb_.AddStruct(FBCar::VT_POSITION, Position); }
+  void add_Base(flatbuffers::Offset<FBIActor> Base) { fbb_.AddOffset(FBCar::VT_BASE, Base); }
   void add_XCMeshResourceName(flatbuffers::Offset<flatbuffers::String> XCMeshResourceName) { fbb_.AddOffset(FBCar::VT_XCMESHRESOURCENAME, XCMeshResourceName); }
+  void add_SceneNodes(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>>> SceneNodes) { fbb_.AddOffset(FBCar::VT_SCENENODES, SceneNodes); }
   FBCarBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
   FBCarBuilder &operator=(const FBCarBuilder &);
   flatbuffers::Offset<FBCar> Finish() {
-    auto o = flatbuffers::Offset<FBCar>(fbb_.EndTable(start_, 2));
+    auto o = flatbuffers::Offset<FBCar>(fbb_.EndTable(start_, 3));
     return o;
   }
 };
 
 inline flatbuffers::Offset<FBCar> CreateFBCar(flatbuffers::FlatBufferBuilder &_fbb,
-    const Vec3 *Position = 0,
-    flatbuffers::Offset<flatbuffers::String> XCMeshResourceName = 0) {
+    flatbuffers::Offset<FBIActor> Base = 0,
+    flatbuffers::Offset<flatbuffers::String> XCMeshResourceName = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>>> SceneNodes = 0) {
   FBCarBuilder builder_(_fbb);
+  builder_.add_SceneNodes(SceneNodes);
   builder_.add_XCMeshResourceName(XCMeshResourceName);
-  builder_.add_Position(Position);
+  builder_.add_Base(Base);
   return builder_.Finish();
 }
 
 inline flatbuffers::Offset<FBCar> CreateFBCarDirect(flatbuffers::FlatBufferBuilder &_fbb,
-    const Vec3 *Position = 0,
-    const char *XCMeshResourceName = nullptr) {
-  return CreateFBCar(_fbb, Position, XCMeshResourceName ? _fbb.CreateString(XCMeshResourceName) : 0);
+    flatbuffers::Offset<FBIActor> Base = 0,
+    const char *XCMeshResourceName = nullptr,
+    const std::vector<flatbuffers::Offset<FBSceneNode>> *SceneNodes = nullptr) {
+  return CreateFBCar(_fbb, Base, XCMeshResourceName ? _fbb.CreateString(XCMeshResourceName) : 0, SceneNodes ? _fbb.CreateVector<flatbuffers::Offset<FBSceneNode>>(*SceneNodes) : 0);
+}
+
+struct FBPCCar FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_BASE = 4,
+    VT_SCENENODES = 6
+  };
+  const FBCar *Base() const { return GetPointer<const FBCar *>(VT_BASE); }
+  const flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>> *SceneNodes() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>> *>(VT_SCENENODES); }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_BASE) &&
+           verifier.VerifyTable(Base()) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_SCENENODES) &&
+           verifier.Verify(SceneNodes()) &&
+           verifier.VerifyVectorOfTables(SceneNodes()) &&
+           verifier.EndTable();
+  }
+};
+
+struct FBPCCarBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_Base(flatbuffers::Offset<FBCar> Base) { fbb_.AddOffset(FBPCCar::VT_BASE, Base); }
+  void add_SceneNodes(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>>> SceneNodes) { fbb_.AddOffset(FBPCCar::VT_SCENENODES, SceneNodes); }
+  FBPCCarBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
+  FBPCCarBuilder &operator=(const FBPCCarBuilder &);
+  flatbuffers::Offset<FBPCCar> Finish() {
+    auto o = flatbuffers::Offset<FBPCCar>(fbb_.EndTable(start_, 2));
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<FBPCCar> CreateFBPCCar(flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<FBCar> Base = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>>> SceneNodes = 0) {
+  FBPCCarBuilder builder_(_fbb);
+  builder_.add_SceneNodes(SceneNodes);
+  builder_.add_Base(Base);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<FBPCCar> CreateFBPCCarDirect(flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<FBCar> Base = 0,
+    const std::vector<flatbuffers::Offset<FBSceneNode>> *SceneNodes = nullptr) {
+  return CreateFBPCCar(_fbb, Base, SceneNodes ? _fbb.CreateVector<flatbuffers::Offset<FBSceneNode>>(*SceneNodes) : 0);
+}
+
+struct FBNPCCar FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_BASE = 4,
+    VT_SCENENODES = 6
+  };
+  const FBCar *Base() const { return GetPointer<const FBCar *>(VT_BASE); }
+  const flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>> *SceneNodes() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>> *>(VT_SCENENODES); }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_BASE) &&
+           verifier.VerifyTable(Base()) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_SCENENODES) &&
+           verifier.Verify(SceneNodes()) &&
+           verifier.VerifyVectorOfTables(SceneNodes()) &&
+           verifier.EndTable();
+  }
+};
+
+struct FBNPCCarBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_Base(flatbuffers::Offset<FBCar> Base) { fbb_.AddOffset(FBNPCCar::VT_BASE, Base); }
+  void add_SceneNodes(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>>> SceneNodes) { fbb_.AddOffset(FBNPCCar::VT_SCENENODES, SceneNodes); }
+  FBNPCCarBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
+  FBNPCCarBuilder &operator=(const FBNPCCarBuilder &);
+  flatbuffers::Offset<FBNPCCar> Finish() {
+    auto o = flatbuffers::Offset<FBNPCCar>(fbb_.EndTable(start_, 2));
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<FBNPCCar> CreateFBNPCCar(flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<FBCar> Base = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>>> SceneNodes = 0) {
+  FBNPCCarBuilder builder_(_fbb);
+  builder_.add_SceneNodes(SceneNodes);
+  builder_.add_Base(Base);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<FBNPCCar> CreateFBNPCCarDirect(flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<FBCar> Base = 0,
+    const std::vector<flatbuffers::Offset<FBSceneNode>> *SceneNodes = nullptr) {
+  return CreateFBNPCCar(_fbb, Base, SceneNodes ? _fbb.CreateVector<flatbuffers::Offset<FBSceneNode>>(*SceneNodes) : 0);
 }
 
 struct FBDoor FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
-    VT_POSITION = 4,
-    VT_XCMESHRESOURCENAME = 6
+    VT_BASE = 4,
+    VT_XCMESHRESOURCENAME = 6,
+    VT_SCENENODES = 8
   };
-  const Vec4 *Position() const { return GetStruct<const Vec4 *>(VT_POSITION); }
+  const FBIActor *Base() const { return GetPointer<const FBIActor *>(VT_BASE); }
   const flatbuffers::String *XCMeshResourceName() const { return GetPointer<const flatbuffers::String *>(VT_XCMESHRESOURCENAME); }
+  const flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>> *SceneNodes() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>> *>(VT_SCENENODES); }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<Vec4>(verifier, VT_POSITION) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_BASE) &&
+           verifier.VerifyTable(Base()) &&
            VerifyField<flatbuffers::uoffset_t>(verifier, VT_XCMESHRESOURCENAME) &&
            verifier.Verify(XCMeshResourceName()) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_SCENENODES) &&
+           verifier.Verify(SceneNodes()) &&
+           verifier.VerifyVectorOfTables(SceneNodes()) &&
            verifier.EndTable();
   }
 };
@@ -487,43 +841,53 @@ struct FBDoor FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct FBDoorBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_Position(const Vec4 *Position) { fbb_.AddStruct(FBDoor::VT_POSITION, Position); }
+  void add_Base(flatbuffers::Offset<FBIActor> Base) { fbb_.AddOffset(FBDoor::VT_BASE, Base); }
   void add_XCMeshResourceName(flatbuffers::Offset<flatbuffers::String> XCMeshResourceName) { fbb_.AddOffset(FBDoor::VT_XCMESHRESOURCENAME, XCMeshResourceName); }
+  void add_SceneNodes(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>>> SceneNodes) { fbb_.AddOffset(FBDoor::VT_SCENENODES, SceneNodes); }
   FBDoorBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
   FBDoorBuilder &operator=(const FBDoorBuilder &);
   flatbuffers::Offset<FBDoor> Finish() {
-    auto o = flatbuffers::Offset<FBDoor>(fbb_.EndTable(start_, 2));
+    auto o = flatbuffers::Offset<FBDoor>(fbb_.EndTable(start_, 3));
     return o;
   }
 };
 
 inline flatbuffers::Offset<FBDoor> CreateFBDoor(flatbuffers::FlatBufferBuilder &_fbb,
-    const Vec4 *Position = 0,
-    flatbuffers::Offset<flatbuffers::String> XCMeshResourceName = 0) {
+    flatbuffers::Offset<FBIActor> Base = 0,
+    flatbuffers::Offset<flatbuffers::String> XCMeshResourceName = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>>> SceneNodes = 0) {
   FBDoorBuilder builder_(_fbb);
+  builder_.add_SceneNodes(SceneNodes);
   builder_.add_XCMeshResourceName(XCMeshResourceName);
-  builder_.add_Position(Position);
+  builder_.add_Base(Base);
   return builder_.Finish();
 }
 
 inline flatbuffers::Offset<FBDoor> CreateFBDoorDirect(flatbuffers::FlatBufferBuilder &_fbb,
-    const Vec4 *Position = 0,
-    const char *XCMeshResourceName = nullptr) {
-  return CreateFBDoor(_fbb, Position, XCMeshResourceName ? _fbb.CreateString(XCMeshResourceName) : 0);
+    flatbuffers::Offset<FBIActor> Base = 0,
+    const char *XCMeshResourceName = nullptr,
+    const std::vector<flatbuffers::Offset<FBSceneNode>> *SceneNodes = nullptr) {
+  return CreateFBDoor(_fbb, Base, XCMeshResourceName ? _fbb.CreateString(XCMeshResourceName) : 0, SceneNodes ? _fbb.CreateVector<flatbuffers::Offset<FBSceneNode>>(*SceneNodes) : 0);
 }
 
 struct FBSoldier FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
-    VT_POSITION = 4,
-    VT_XCMESHRESOURCENAME = 6
+    VT_BASE = 4,
+    VT_XCMESHRESOURCENAME = 6,
+    VT_SCENENODES = 8
   };
-  const Vec3 *Position() const { return GetStruct<const Vec3 *>(VT_POSITION); }
+  const FBIActor *Base() const { return GetPointer<const FBIActor *>(VT_BASE); }
   const flatbuffers::String *XCMeshResourceName() const { return GetPointer<const flatbuffers::String *>(VT_XCMESHRESOURCENAME); }
+  const flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>> *SceneNodes() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>> *>(VT_SCENENODES); }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<Vec3>(verifier, VT_POSITION) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_BASE) &&
+           verifier.VerifyTable(Base()) &&
            VerifyField<flatbuffers::uoffset_t>(verifier, VT_XCMESHRESOURCENAME) &&
            verifier.Verify(XCMeshResourceName()) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_SCENENODES) &&
+           verifier.Verify(SceneNodes()) &&
+           verifier.VerifyVectorOfTables(SceneNodes()) &&
            verifier.EndTable();
   }
 };
@@ -531,29 +895,146 @@ struct FBSoldier FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct FBSoldierBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_Position(const Vec3 *Position) { fbb_.AddStruct(FBSoldier::VT_POSITION, Position); }
+  void add_Base(flatbuffers::Offset<FBIActor> Base) { fbb_.AddOffset(FBSoldier::VT_BASE, Base); }
   void add_XCMeshResourceName(flatbuffers::Offset<flatbuffers::String> XCMeshResourceName) { fbb_.AddOffset(FBSoldier::VT_XCMESHRESOURCENAME, XCMeshResourceName); }
+  void add_SceneNodes(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>>> SceneNodes) { fbb_.AddOffset(FBSoldier::VT_SCENENODES, SceneNodes); }
   FBSoldierBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
   FBSoldierBuilder &operator=(const FBSoldierBuilder &);
   flatbuffers::Offset<FBSoldier> Finish() {
-    auto o = flatbuffers::Offset<FBSoldier>(fbb_.EndTable(start_, 2));
+    auto o = flatbuffers::Offset<FBSoldier>(fbb_.EndTable(start_, 3));
     return o;
   }
 };
 
 inline flatbuffers::Offset<FBSoldier> CreateFBSoldier(flatbuffers::FlatBufferBuilder &_fbb,
-    const Vec3 *Position = 0,
-    flatbuffers::Offset<flatbuffers::String> XCMeshResourceName = 0) {
+    flatbuffers::Offset<FBIActor> Base = 0,
+    flatbuffers::Offset<flatbuffers::String> XCMeshResourceName = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>>> SceneNodes = 0) {
   FBSoldierBuilder builder_(_fbb);
+  builder_.add_SceneNodes(SceneNodes);
   builder_.add_XCMeshResourceName(XCMeshResourceName);
-  builder_.add_Position(Position);
+  builder_.add_Base(Base);
   return builder_.Finish();
 }
 
 inline flatbuffers::Offset<FBSoldier> CreateFBSoldierDirect(flatbuffers::FlatBufferBuilder &_fbb,
-    const Vec3 *Position = 0,
+    flatbuffers::Offset<FBIActor> Base = 0,
+    const char *XCMeshResourceName = nullptr,
+    const std::vector<flatbuffers::Offset<FBSceneNode>> *SceneNodes = nullptr) {
+  return CreateFBSoldier(_fbb, Base, XCMeshResourceName ? _fbb.CreateString(XCMeshResourceName) : 0, SceneNodes ? _fbb.CreateVector<flatbuffers::Offset<FBSceneNode>>(*SceneNodes) : 0);
+}
+
+struct FBPCSoldier FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_BASE = 4,
+    VT_SCENENODES = 6
+  };
+  const FBSoldier *Base() const { return GetPointer<const FBSoldier *>(VT_BASE); }
+  const flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>> *SceneNodes() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>> *>(VT_SCENENODES); }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_BASE) &&
+           verifier.VerifyTable(Base()) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_SCENENODES) &&
+           verifier.Verify(SceneNodes()) &&
+           verifier.VerifyVectorOfTables(SceneNodes()) &&
+           verifier.EndTable();
+  }
+};
+
+struct FBPCSoldierBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_Base(flatbuffers::Offset<FBSoldier> Base) { fbb_.AddOffset(FBPCSoldier::VT_BASE, Base); }
+  void add_SceneNodes(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>>> SceneNodes) { fbb_.AddOffset(FBPCSoldier::VT_SCENENODES, SceneNodes); }
+  FBPCSoldierBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
+  FBPCSoldierBuilder &operator=(const FBPCSoldierBuilder &);
+  flatbuffers::Offset<FBPCSoldier> Finish() {
+    auto o = flatbuffers::Offset<FBPCSoldier>(fbb_.EndTable(start_, 2));
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<FBPCSoldier> CreateFBPCSoldier(flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<FBSoldier> Base = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<FBSceneNode>>> SceneNodes = 0) {
+  FBPCSoldierBuilder builder_(_fbb);
+  builder_.add_SceneNodes(SceneNodes);
+  builder_.add_Base(Base);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<FBPCSoldier> CreateFBPCSoldierDirect(flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<FBSoldier> Base = 0,
+    const std::vector<flatbuffers::Offset<FBSceneNode>> *SceneNodes = nullptr) {
+  return CreateFBPCSoldier(_fbb, Base, SceneNodes ? _fbb.CreateVector<flatbuffers::Offset<FBSceneNode>>(*SceneNodes) : 0);
+}
+
+struct FBNPCSoldier FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_BASE = 4,
+    VT_XCMESHRESOURCENAME = 6
+  };
+  const FBSoldier *Base() const { return GetPointer<const FBSoldier *>(VT_BASE); }
+  const flatbuffers::String *XCMeshResourceName() const { return GetPointer<const flatbuffers::String *>(VT_XCMESHRESOURCENAME); }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_BASE) &&
+           verifier.VerifyTable(Base()) &&
+           VerifyField<flatbuffers::uoffset_t>(verifier, VT_XCMESHRESOURCENAME) &&
+           verifier.Verify(XCMeshResourceName()) &&
+           verifier.EndTable();
+  }
+};
+
+struct FBNPCSoldierBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_Base(flatbuffers::Offset<FBSoldier> Base) { fbb_.AddOffset(FBNPCSoldier::VT_BASE, Base); }
+  void add_XCMeshResourceName(flatbuffers::Offset<flatbuffers::String> XCMeshResourceName) { fbb_.AddOffset(FBNPCSoldier::VT_XCMESHRESOURCENAME, XCMeshResourceName); }
+  FBNPCSoldierBuilder(flatbuffers::FlatBufferBuilder &_fbb) : fbb_(_fbb) { start_ = fbb_.StartTable(); }
+  FBNPCSoldierBuilder &operator=(const FBNPCSoldierBuilder &);
+  flatbuffers::Offset<FBNPCSoldier> Finish() {
+    auto o = flatbuffers::Offset<FBNPCSoldier>(fbb_.EndTable(start_, 2));
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<FBNPCSoldier> CreateFBNPCSoldier(flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<FBSoldier> Base = 0,
+    flatbuffers::Offset<flatbuffers::String> XCMeshResourceName = 0) {
+  FBNPCSoldierBuilder builder_(_fbb);
+  builder_.add_XCMeshResourceName(XCMeshResourceName);
+  builder_.add_Base(Base);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<FBNPCSoldier> CreateFBNPCSoldierDirect(flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<FBSoldier> Base = 0,
     const char *XCMeshResourceName = nullptr) {
-  return CreateFBSoldier(_fbb, Position, XCMeshResourceName ? _fbb.CreateString(XCMeshResourceName) : 0);
+  return CreateFBNPCSoldier(_fbb, Base, XCMeshResourceName ? _fbb.CreateString(XCMeshResourceName) : 0);
+}
+
+inline bool VerifyFBGenericSceneNode(flatbuffers::Verifier &verifier, const void *union_obj, FBGenericSceneNode type) {
+  switch (type) {
+    case FBGenericSceneNode_NONE: return true;
+    case FBGenericSceneNode_FBIActor: return verifier.VerifyTable(reinterpret_cast<const FBIActor *>(union_obj));
+    case FBGenericSceneNode_FBFont: return verifier.VerifyTable(reinterpret_cast<const FBFont *>(union_obj));
+    case FBGenericSceneNode_FBSimpleSkyBox: return verifier.VerifyTable(reinterpret_cast<const FBSimpleSkyBox *>(union_obj));
+    case FBGenericSceneNode_FBTexturePlane: return verifier.VerifyTable(reinterpret_cast<const FBTexturePlane *>(union_obj));
+    case FBGenericSceneNode_FBLiveDriveTexturePlane: return verifier.VerifyTable(reinterpret_cast<const FBLiveDriveTexturePlane *>(union_obj));
+    case FBGenericSceneNode_FBSimpleTerrain: return verifier.VerifyTable(reinterpret_cast<const FBSimpleTerrain *>(union_obj));
+    case FBGenericSceneNode_FBWaves: return verifier.VerifyTable(reinterpret_cast<const FBWaves *>(union_obj));
+    case FBGenericSceneNode_FBMultiTexturedTerrain: return verifier.VerifyTable(reinterpret_cast<const FBMultiTexturedTerrain *>(union_obj));
+    case FBGenericSceneNode_FBCar: return verifier.VerifyTable(reinterpret_cast<const FBCar *>(union_obj));
+    case FBGenericSceneNode_FBPCCar: return verifier.VerifyTable(reinterpret_cast<const FBPCCar *>(union_obj));
+    case FBGenericSceneNode_FBNPCCar: return verifier.VerifyTable(reinterpret_cast<const FBNPCCar *>(union_obj));
+    case FBGenericSceneNode_FBDoor: return verifier.VerifyTable(reinterpret_cast<const FBDoor *>(union_obj));
+    case FBGenericSceneNode_FBSoldier: return verifier.VerifyTable(reinterpret_cast<const FBSoldier *>(union_obj));
+    case FBGenericSceneNode_FBPCSoldier: return verifier.VerifyTable(reinterpret_cast<const FBPCSoldier *>(union_obj));
+    case FBGenericSceneNode_FBNPCSoldier: return verifier.VerifyTable(reinterpret_cast<const FBNPCSoldier *>(union_obj));
+    default: return false;
+  }
 }
 
 #endif  // FLATBUFFERS_GENERATED_GAMEPLAYACTORS_H_

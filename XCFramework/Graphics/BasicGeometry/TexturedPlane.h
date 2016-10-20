@@ -27,14 +27,13 @@ public:
     virtual ~TexturedPlane();
 
     virtual void                     PreLoad(const void* fbBuffer);
-    virtual void                     PreLoad(XCVec4& initialPosition, XCVec4& initialRotation, XCVec4& initialScaling, Material& material, std::string texture, RasterType rasterType);
     virtual void                     Load();
     virtual void                     Update(f32 dt);
     virtual void                     Draw(RenderContext& renderContext);
     virtual void                     Destroy();
-    virtual void                     BuildGeometryBuffers();
 
 protected:
+    virtual void                     BuildGeometryBuffers();
 
     ShaderType                        m_useShaderType;
     ResourceHandle*                   m_texture;

@@ -9,10 +9,10 @@
 #include "Engine/Event/IEvent.h"
 
  //World Events
-class Event_World : public IEvent
+class Event_Scene : public IEvent
 {
 public:
-    Event_World(EventType type)
+    Event_Scene(EventType type)
         : IEvent(type)
     {
     }

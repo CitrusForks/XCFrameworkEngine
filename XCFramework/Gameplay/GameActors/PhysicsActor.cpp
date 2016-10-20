@@ -7,7 +7,7 @@
 #include "GameplayPrecompiledHeader.h"
 
 #include "Gameplay/GameActors/PhysicsActor.h"
-#include "Gameplay/World.h"
+#include "Gameplay/SceneGraph.h"
 
 PhysicsActor::PhysicsActor()
 {

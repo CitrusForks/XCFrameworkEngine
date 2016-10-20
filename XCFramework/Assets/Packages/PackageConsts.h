@@ -14,7 +14,7 @@
 #include "Assets/Packages/Schema/Shaders_generated.h"
 #include "Assets/Packages/Schema/Resources_generated.h"
 #include "Assets/Packages/Schema/GameplayActors_generated.h"
-#include "Assets/Packages/Schema/OpenWorldScene_generated.h"
+#include "Assets/Packages/Schema/OpenWorldSceneGraph_generated.h"
 #include "Assets/Packages/Schema/XCMeshJson_generated.h"
 
 //Resource specifics
@@ -36,8 +36,8 @@ static const char* TEST_XCMESHJSON_DATA_FILEPATH    = "Assets/Meshes/Soldiers/Ar
 
 static const char* BASICTYPES_SCHEMA_FILEPATH = "Assets/Packages/Schema/BasicTypes.schema";
 static const char* GAMEACTORS_SCHEMA_FILEPATH = "Assets/Packages/Schema/GameplayActors.schema";
-static const char* OPENWORLD_SCHEMA_FILEPATH  = "Assets/Packages/Schema/OpenWorldScene.schema";
-static const char* WORLD_DATA_FILEPATH        = "Assets/Packages/Data/World.pak";
+static const char* SCENE_SCHEMA_FILEPATH      = "Assets/Packages/Schema/OpenWorldSceneGraph.schema";
+static const char* SCENE_DATA_FILEPATH        = "Assets/Packages/Data/SceneGraph.pak";
 
 static const char* SHADER_FOLDERPATH            = "Assets/Shaders/";
 static const char* SHADER_SCHEMA_FILEPATH       = "Assets/Packages/Schema/Shaders.schema";

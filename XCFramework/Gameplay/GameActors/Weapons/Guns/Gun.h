@@ -10,7 +10,6 @@
 
 #include "Graphics/XCShaders/XCVertexFormat.h"
 #include "Graphics/XCGraphicsDx11.h"
-#include "Graphics/XCMaterials/MaterialTypes.h"
 
 #include "Gameplay/GameActors/SimpleMeshActor.h"
 #include "Gameplay/GameActors/SubActor.h"
@@ -40,8 +39,6 @@ public:
 
 protected:
     ShaderType         m_useShaderType;
-
-    Material      m_material;
 
     XCVec4             m_secondaryLookAxis;
     XCVec4             m_secondaryUpAxis;

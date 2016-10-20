@@ -18,21 +18,23 @@ public:
     SimpleTerrain(void);
     virtual ~SimpleTerrain(void);
  
-    virtual void                        PreLoad(XCVec3& _initialPosition, i32 _rows, i32 _column, f32 _rowSpacing, f32 _colSpacing);
-    virtual void                        Load();
-    virtual void                        GenerateVertices();
-    virtual void                        GenerateIndicesWithTextureMapping();
-    virtual void                        BuildGeometryBuffer();
-    virtual void                        Update(f32 dt);
-    virtual void                        Draw(RenderContext& context);
-    virtual void                        Destroy();
+    virtual void                        PreLoad(const void* fbBuffer) override;
+    virtual void                        Load() override;
+    virtual void                        Update(f32 dt) override;
+    virtual void                        Draw(RenderContext& context) override;
+    virtual void                        Destroy() override;
 
-    void                                ComputeVertices();
-    f32                                 GetHeight(f32 _x, f32 _z); //Builds a hill height
-    virtual i32                         GetNoOfVertices() const         { return m_totalVertices;  }
+    i32                                 GetNoOfVertices() const { return m_totalVertices; }
 
 protected:
-    XCVec3                              m_initialPosition;
+    virtual void                        BuildGeometryBuffer();
+    virtual void                        GenerateVertices();
+
+    void                                ComputeVertices();
+    void                                GenerateIndicesWithTextureMapping();
+    f32                                 GetHeight(f32 _x, f32 _z); //Builds a hill height
+
+    //Member Variables
     i32                                 m_rows;
     i32                                 m_cols;
     i32                                 m_totalVertices;

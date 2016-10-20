@@ -17,26 +17,16 @@ Waves::~Waves(void)
 {
 }
 
-void Waves::Preload(const void* fbBuffer)
+void Waves::PreLoad(const void* fbBuffer)
 {
     const FBWaves* fbWavesBuff = (FBWaves*)fbBuffer;
-    m_currentPosition.SetValues(fbWavesBuff->Position()->x(), fbWavesBuff->Position()->y(), fbWavesBuff->Position()->z(), 0);
-    m_rows = fbWavesBuff->Rows();
-    m_cols = fbWavesBuff->Column();
-    m_rowSpacing = (f32)fbWavesBuff->RowSpacing();
-    m_colSpacing = (f32)fbWavesBuff->ColSpacing();
+
+    SimpleTerrain::PreLoad(fbWavesBuff->Base());
 
     ComputeVertices();
-}
-
-void Waves::PreLoad(XCVec3& _initialPosition, i32 _rows, i32 _column, f32 _rowSpacing, f32 _colSpacing)
-{
-    SimpleTerrain::PreLoad(_initialPosition, _rows, _column, _rowSpacing, _colSpacing);
 
     m_useShaderType = ShaderType_SolidColor;
     m_collisionDetectionType = COLLISIONDETECTIONTYPE_TRIANGLE;
-
-    ComputeVertices();
 }
 
 void Waves::Update(f32 dt)

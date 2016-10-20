@@ -7,7 +7,7 @@
 #pragma once
 
 #include "AINavigator.h"
-#include "Gameplay/World.h"
+#include "Gameplay/SceneGraph.h"
 
 enum EActionState
 {
@@ -23,7 +23,7 @@ enum EActionState
 class AIBrain
 {
 public:
-    AIBrain(World& world, AINavigator* navigator);
+    AIBrain(SceneGraph& world, AINavigator* navigator);
     ~AIBrain(void);
 
     void virtual                        Update(f32 dt);
@@ -33,5 +33,5 @@ public:
 private:
     EActionState                        m_actionState;
     AINavigator*                        m_bindedNavigator;
-    World*                              m_world;
+    SceneGraph*                              m_world;
 };

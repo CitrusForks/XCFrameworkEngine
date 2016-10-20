@@ -20,26 +20,26 @@ public:
     Terrain();
     virtual ~Terrain(void);
  
-    virtual void                        PreLoad(const void* fbBuffer);
-    virtual void                        PreLoad(const char* _pHeightMapFileName, std::string terrainTexture, std::string terrainTexture1, std::string terrainTexture2, std::string blendMap, XCVec3& _initialPosition, i32 _rows, i32 _column, f32 _rowSpacing, f32 _colSpacing);
-    virtual void                        UpdateState();
-    virtual void                        Load();
-    virtual void                        GenerateVertices();
-    virtual void                        GenerateVerticesNormal();
-    virtual void                        Update(f32 dt);
-    virtual void                        Draw(RenderContext& context);
-    virtual void                        Destroy();
+    void                                PreLoad(const void* fbBuffer) override;
+    void                                UpdateState() override;
+    void                                Load() override;
+    void                                Update(f32 dt) override;
+    void                                Draw(RenderContext& context) override;
+    void                                Destroy() override;
 
+    XCVec4                              CheckTerrainCollisionFromPoint(OrientedBoundingBox* bbox);
+    XCVec4                              GetPointAtIndex(i32 pointIndex) const;
+
+protected:
     void                                LoadHeightMap();
     void                                UnloadHeightMap();
 
+    void                                GenerateVertices() override;
+    void                                GenerateVerticesNormal();
     char                                GetHeightAt(i32 _index) const;
     XCVec3                              GetTerrainNormal(f32 x, f32 z) const;
-    XCVec4                              GetPointAtIndex(i32 pointIndex) const;
 
-    XCVec4                              CheckTerrainCollisionFromPoint(OrientedBoundingBox* bbox);
-
-protected:
+private:
     std::string                         m_pHeightMapFileName;    //Height Map Filename
     u8*                                 m_pBitmapImage;
     Material                            m_material;

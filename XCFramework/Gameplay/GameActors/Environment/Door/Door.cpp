@@ -16,10 +16,6 @@ Door::Door(void)
 {
     m_directInput = (XCInput*) &SystemLocator::GetInstance()->RequestSystem("InputSystem");
 
-    m_material.Ambient = XCVec4Unaligned(1.0f, 1.0f, 1.0f, 1.0f);
-    m_material.Diffuse = XCVec4Unaligned(0.5f, 0.8f, 0.0f, 1.0f);
-    m_material.Specular = XCVec4Unaligned(0.2f, 0.2f, 0.2f, 16.0f);
-
     m_useShaderType = ShaderType_LightTexture;
     m_collisionDetectionType = COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX;
 }
@@ -31,17 +27,11 @@ Door::~Door(void)
 void Door::PreLoad(const void* fbBuffer)
 {
     const FBDoor* doorBuff = (FBDoor*)fbBuffer;
+    
+    PhysicsActor::PreLoad(doorBuff->Base());
+
     ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
     m_pMesh = &resMgr.AcquireResource(doorBuff->XCMeshResourceName()->c_str());
-
-    PhysicsActor::PreLoad(fbBuffer);
-}
-
-void Door::PreLoad(XCVec3& _initialPosition, std::string pMesh)
-{
-    ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
-    m_pMesh = &resMgr.AcquireResource(pMesh.c_str());
-    m_initialPosition = _initialPosition;
 }
 
 void Door::Load()

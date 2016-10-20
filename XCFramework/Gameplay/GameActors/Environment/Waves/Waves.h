@@ -16,9 +16,8 @@ public:
     Waves(void);
     virtual ~Waves(void);
  
-    virtual void                        Preload(const void* fbBuff);
-    virtual void                        PreLoad(XCVec3& _initialPosition, i32 _rows, i32 _column, f32 _rowSpacing, f32 _colSpacing);
-    virtual void                        Update(f32 dt);
-    virtual void                        Draw(RenderContext& context);
-    virtual void                        Destroy();
+    void                        PreLoad(const void* fbBuff) override;
+    void                        Update(f32 dt) override;
+    void                        Draw(RenderContext& context) override;
+    void                        Destroy() override;
 };

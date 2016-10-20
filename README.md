@@ -9,12 +9,10 @@ XCFramework is a cross platform Game engine written in C++ with DirectX12, Direc
 # Features
 - Rendering
 	- Multi threaded rendering technique using render pools and deferred rendering
-	- Deferred Lighting using Gbuffers and MRT technique
 	- Reflection API, to fetch description of shaders and create respective layouts and slots.
 	- Offline Shader tools to build the shader binaries.
 	- All Mesh are Instance rendered
 	- Vector Font Rendering
-	- Skinning Mesh Animation
 	- Mesh :
 		- .3ds Mesh Loader - to read .3ds files created from 3D modelling tools such as 3dsMax, Maya. It parses the .3ds files and creates a XC_Mesh which is engine custom format and renders the mesh in the scene.
 		- Assimp API to load the animated skinned mesh

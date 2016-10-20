@@ -26,18 +26,18 @@ LoadingWorldState::~LoadingWorldState(void)
 void GameState::LoadingWorldState::Init()
 {
     IGameState::Init();
-    World& world = SystemLocator::GetInstance()->RequestSystem<World>("World");
+    SceneGraph& world = SystemLocator::GetInstance()->RequestSystem<SceneGraph>("World");
 
-    m_worldLoader = XCNEW(WorldSceneLoader)(world, WORLD_DATA_FILEPATH);
+    m_sceneLoader = XCNEW(SceneLoader)(world, SCENE_DATA_FILEPATH);
 
     TaskManager& taskMgr = SystemLocator::GetInstance()->RequestSystem<TaskManager>("TaskManager");
-    m_futureWorldLoaded = taskMgr.RegisterTask(m_worldLoader);
+    m_futureSceneLoaded = taskMgr.RegisterTask(m_sceneLoader);
 }
 
 void LoadingWorldState::Update(f32 dt)
 {
     //Wait for resource loader to complete the loading of resources. When done move to next state.
-    if (m_futureWorldLoaded._Is_ready() && m_futureWorldLoaded.valid() && m_futureWorldLoaded.get() > 0)
+    if (m_futureSceneLoaded._Is_ready() && m_futureSceneLoaded.valid() && m_futureSceneLoaded.get() > 0)
     {
         Event_GameStateChange event("RunningState", STATE_DESTROY);
         EventBroadcaster& broadcaster = (EventBroadcaster&)SystemLocator::GetInstance()->RequestSystem("EventBroadcaster");
@@ -55,8 +55,8 @@ void LoadingWorldState::Destroy()
     IGameState::Destroy();
 
     TaskManager& taskMgr = SystemLocator::GetInstance()->RequestSystem<TaskManager>("TaskManager");
-    taskMgr.UnregisterTask(m_worldLoader->GetThreadId());
+    taskMgr.UnregisterTask(m_sceneLoader->GetThreadId());
     
-    XCDELETE(m_worldLoader);
+    XCDELETE(m_sceneLoader);
 
 }

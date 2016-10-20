@@ -39,15 +39,15 @@ Terrain::Terrain()
 
 Terrain::~Terrain(void)
 {
-    if (m_pBitmapImage)
-    {
-        XCDELETEARRAY(m_pBitmapImage);
-    }
+    XCDELETEARRAY(m_pBitmapImage);
 }
 
 void Terrain::PreLoad(const void* fbBuffer)
 {
     const FBMultiTexturedTerrain* fbTerrainBuff = (FBMultiTexturedTerrain*)fbBuffer;
+
+    SimpleTerrain::PreLoad(fbTerrainBuff->Base());
+
     m_pHeightMapFileName = getPlatformPath(fbTerrainBuff->BitmapFileName()->c_str());
 
     ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
@@ -55,48 +55,6 @@ void Terrain::PreLoad(const void* fbBuffer)
     m_textures.push_back(&resMgr.AcquireResource(fbTerrainBuff->Texture2DResourceName1()->c_str()));
     m_textures.push_back(&resMgr.AcquireResource(fbTerrainBuff->Texture2DResourceName2()->c_str()));
     m_textures.push_back(&resMgr.AcquireResource(fbTerrainBuff->Texture2DBlendResourceName3()->c_str()));
-
-    m_initialPosition = XCVec3(fbTerrainBuff->Position()->x(), fbTerrainBuff->Position()->y(), fbTerrainBuff->Position()->z());
-    m_currentPosition = m_initialPosition;
-    
-    m_rows = fbTerrainBuff->Rows();
-    m_cols = fbTerrainBuff->Column();
-    m_rowSpacing = (f32)fbTerrainBuff->RowSpacing();
-    m_colSpacing = (f32)fbTerrainBuff->ColSpacing();
-
-    ComputeVertices();
-
-    PhysicsActor::PreLoad(fbBuffer);
-
-    GPUResourceSystem& gpuSys = (GPUResourceSystem&)SystemLocator::GetInstance()->RequestSystem("GPUResourceSystem");
-    m_pCBPerObject = gpuSys.CreateConstantBufferResourceView(GPUResourceDesc(GPUResourceType_CBV, sizeof(PerObjectBuffer)));
-}
-
-//Multi Textured Terrain
-void Terrain::PreLoad(const char* _pHeightMapFileName, 
-    std::string terrainTexture,
-    std::string terrainTexture1,
-    std::string terrainTexture2,
-    std::string blendMap,
-    XCVec3& initialPosition, 
-    i32 _rows, 
-    i32 _column, 
-    f32 _rowSpacing, 
-    f32 _colSpacing)
-{
-    m_pHeightMapFileName = getPlatformPath(_pHeightMapFileName);
-
-    ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
-    m_textures.push_back(&resMgr.AcquireResource(terrainTexture.c_str()));
-    m_textures.push_back(&resMgr.AcquireResource(terrainTexture1.c_str()));
-    m_textures.push_back(&resMgr.AcquireResource(terrainTexture2.c_str()));
-    m_textures.push_back(&resMgr.AcquireResource(blendMap.c_str()));
-    
-    m_currentPosition = initialPosition;
-    m_rows = _rows;
-    m_cols = _column;
-    m_rowSpacing = _rowSpacing;
-    m_colSpacing = _colSpacing;
 
     ComputeVertices();
 
@@ -114,10 +72,10 @@ void Terrain::Load()
     UnloadHeightMap();
 
     XCVec3 vec = XCVec3(0, 0, 0);
-    InitXPhysics(XCVec4(m_initialPosition), XCVec4(vec), XCVec4(vec), 1000, (f32)0.2); //Immovable
+    InitXPhysics(m_currentPosition, XCVec4(vec), XCVec4(vec), 1000, (f32)0.2); //Immovable
     
     //Terrain is loaded, so fire up the world ready event
-    Event_World event(EventType_WorldReady);
+    Event_Scene event(EventType_SceneReady);
     EventBroadcaster& broadcaster = (EventBroadcaster&)SystemLocator::GetInstance()->RequestSystem("EventBroadcaster");
     broadcaster.BroadcastEvent(&event);
 
@@ -154,8 +112,8 @@ void Terrain::GenerateVertices()
     {
         for (i32 colIndex = 0; colIndex < m_cols; colIndex++)
         {
-            f32 x = m_initialPosition.Get<X>() - (colIndex * m_rowSpacing);
-            f32 z = m_initialPosition.Get<Z>() + (rowIndex * m_colSpacing);
+            f32 x = m_currentPosition.Get<X>() - (colIndex * m_rowSpacing);
+            f32 z = m_currentPosition.Get<Z>() + (rowIndex * m_colSpacing);
       
             //float y = m_initialPosition.y + (float)GetHeightAt( (m_rows * rowIndex) + colIndex)/15.0f;
             //float y = m_initialPosition.y + ((float) GetHeightAt(k) / 10.0f);
@@ -293,11 +251,7 @@ void Terrain::LoadHeightMap()
 
 void Terrain::UnloadHeightMap()
 {
-    if (m_pBitmapImage)
-    {
-        XCDELETEARRAY(m_pBitmapImage);
-        m_pBitmapImage = nullptr;
-    }
+    XCDELETEARRAY(m_pBitmapImage);
 }
 
 char Terrain::GetHeightAt(i32 _index) const

@@ -20,12 +20,9 @@ NPCCar::~NPCCar(void)
 
 void NPCCar::PreLoad(const void* fbBuffer)
 {
-    const FBCar* carBuff = (FBCar*)fbBuffer;
-
-    Car::PreLoad(XCVec3(carBuff->Position()->x(), carBuff->Position()->y(), carBuff->Position()->z()), carBuff->XCMeshResourceName()->c_str());
-    PhysicsActor::PreLoad(fbBuffer);
+    const FBNPCCar* carBuff = static_cast<const FBNPCCar*>(fbBuffer);
+    Car::PreLoad(carBuff->Base());
 }
-
 void NPCCar::Update(f32 dt)
 {
     Integrator(dt);
