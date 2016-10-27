@@ -7,8 +7,8 @@
 #pragma once
 
 #include "Engine/Utils/EngineUtils.h"
-#include "Gameplay/GameActors/SimpleMeshActor.h"
-#include "Gameplay/GameActors/SubActor.h"
+#include "Engine/GameplayBase/Actors/SimpleMeshActor.h"
+#include "Engine/GameplayBase/Actors/SubActor.h"
 
 #include "Graphics/XCShaders/XCVertexFormat.h"
 #include "Graphics/XCMaterials/MaterialTypes.h"
@@ -36,7 +36,7 @@ public:
 protected:
 
     ShaderType                 m_useShaderType;
-    Material              m_material;
+    Material                   m_material;
     XCVec4                     m_secondaryLookAxis;
     XCVec4                     m_secondaryUpAxis;
     XCVec4                     m_secondaryRightAxis;

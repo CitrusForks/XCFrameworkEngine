@@ -7,7 +7,8 @@
 #pragma once
 
 #include "Gameplay/GameActors/Vehicles/Cars/Car.h"
-#include "Gameplay/GameActors/NonPlayableCharacterActor.h"
+
+#include "Engine/GameplayBase/Actors/NonPlayableCharacterActor.h"
 
 class NPCCar : public Car, public NonPlayableCharacterActor
 {

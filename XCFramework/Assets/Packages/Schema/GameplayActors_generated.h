@@ -473,7 +473,7 @@ struct FBSimpleTerrain FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_COLSPACING = 12,
     VT_SCENENODES = 14
   };
-  const FBTexturePlane *Base() const { return GetPointer<const FBTexturePlane *>(VT_BASE); }
+  const FBIActor *Base() const { return GetPointer<const FBIActor *>(VT_BASE); }
   int32_t Rows() const { return GetField<int32_t>(VT_ROWS, 0); }
   int32_t Column() const { return GetField<int32_t>(VT_COLUMN, 0); }
   int32_t RowSpacing() const { return GetField<int32_t>(VT_ROWSPACING, 0); }
@@ -497,7 +497,7 @@ struct FBSimpleTerrain FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct FBSimpleTerrainBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_Base(flatbuffers::Offset<FBTexturePlane> Base) { fbb_.AddOffset(FBSimpleTerrain::VT_BASE, Base); }
+  void add_Base(flatbuffers::Offset<FBIActor> Base) { fbb_.AddOffset(FBSimpleTerrain::VT_BASE, Base); }
   void add_Rows(int32_t Rows) { fbb_.AddElement<int32_t>(FBSimpleTerrain::VT_ROWS, Rows, 0); }
   void add_Column(int32_t Column) { fbb_.AddElement<int32_t>(FBSimpleTerrain::VT_COLUMN, Column, 0); }
   void add_RowSpacing(int32_t RowSpacing) { fbb_.AddElement<int32_t>(FBSimpleTerrain::VT_ROWSPACING, RowSpacing, 0); }
@@ -512,7 +512,7 @@ struct FBSimpleTerrainBuilder {
 };
 
 inline flatbuffers::Offset<FBSimpleTerrain> CreateFBSimpleTerrain(flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<FBTexturePlane> Base = 0,
+    flatbuffers::Offset<FBIActor> Base = 0,
     int32_t Rows = 0,
     int32_t Column = 0,
     int32_t RowSpacing = 0,
@@ -529,7 +529,7 @@ inline flatbuffers::Offset<FBSimpleTerrain> CreateFBSimpleTerrain(flatbuffers::F
 }
 
 inline flatbuffers::Offset<FBSimpleTerrain> CreateFBSimpleTerrainDirect(flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<FBTexturePlane> Base = 0,
+    flatbuffers::Offset<FBIActor> Base = 0,
     int32_t Rows = 0,
     int32_t Column = 0,
     int32_t RowSpacing = 0,

@@ -12,6 +12,7 @@
 #include "Assets/Packages/Schema/GameplayActors_generated.h"
 
 #include "Graphics/XCGraphics.h"
+#include "Graphics/XCTextures/Texture2D.h"
 
 #include "Engine/Resource/ResourceHandle.h"
 

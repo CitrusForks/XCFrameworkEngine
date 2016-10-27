@@ -11,12 +11,13 @@
 //A kind of precompiled header. Define all actors according to their sequence.
 #include "Base/Serializer/IBase.h"
 
-#include "IActor.h"
-#include "SimpleActor.h"
-#include "SimpleMeshActor.h"
-#include "PhysicsActor.h"
-#include "FontActor.h"
-#include "AnimatedActor.h"
+#include "Engine/GameplayBase/Actors/IActor.h"
+#include "Engine/GameplayBase/Actors/SimpleActor.h"
+#include "Engine/GameplayBase/Actors/SimpleMeshActor.h"
+#include "Engine/GameplayBase/Actors/PhysicsActor.h"
+#include "Engine/GameplayBase/Actors/FontActor.h"
+#include "Engine/GameplayBase/Actors/AnimatedActor.h"
+#include "Engine/GameplayBase/SceneRoot.h"
 
 #include "Environment/Door/Door.h"
 #include "Environment/Terrain/SimpleTerrain.h"

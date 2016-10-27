@@ -7,7 +7,10 @@
 #include "GameplayPrecompiledHeader.h"
 
 #include "NPCSoldier.h"
-#include "Gameplay/SceneGraph.h"
+
+#include "Engine/GameplayBase/SceneGraph.h"
+#include "Engine/AI/AIBrain.h"
+#include "Engine/AI/AINavigator.h"
 
 NPCSoldier::NPCSoldier(void)
 {
@@ -21,7 +24,7 @@ void NPCSoldier::Init(i32 actorId)
 {
     Soldier::Init(actorId);
 
-    SceneGraph& world = (SceneGraph&)SystemLocator::GetInstance()->RequestSystem("World");
+    SceneGraph& world = (SceneGraph&)SystemLocator::GetInstance()->RequestSystem("SceneGraph");
 
     //Initialize the AIBrain
     m_AINavigator = std::make_unique<AINavigator>(this);

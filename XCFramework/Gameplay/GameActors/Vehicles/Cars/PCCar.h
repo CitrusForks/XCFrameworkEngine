@@ -6,9 +6,10 @@
 
 #pragma once
 
-#include "Engine/Input/XCInput.h"
 #include "Gameplay/GameActors/Vehicles/Cars/Car.h"
-#include "Gameplay/GameActors/PlayableCharacterActor.h"
+#include "Engine/GameplayBase/Actors/PlayableCharacterActor.h"
+
+class XCInput;
 
 class PCCar : public Car, public PlayableCharacterActor
 {

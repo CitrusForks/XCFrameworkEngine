@@ -8,8 +8,7 @@
 
 #include "Engine/Utils/EngineUtils.h"
 
-#include "Gameplay/GameActors/SimpleMeshActor.h"
-#include "Gameplay/GameActors/PhysicsActor.h"
+#include "Engine/GameplayBase/Actors/PhysicsActor.h"
 
 #include "Graphics/XCMaterials/MaterialTypes.h"
 #include "Graphics/XCShaders/XCVertexFormat.h"
@@ -33,6 +32,6 @@ public:
 
 protected:
     ShaderType                          m_useShaderType;
-    Material                       m_material;
+    Material                            m_material;
     XCVec4                              m_target;
 };

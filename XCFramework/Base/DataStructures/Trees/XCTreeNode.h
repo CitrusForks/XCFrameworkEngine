@@ -19,28 +19,23 @@ class XCTreeNode
 public:
 
     XCTreeNode()
-        : m_data(nullptr)
     {}
 
-    explicit XCTreeNode(const T& data)
-        : m_data(data)
-    {}
-
-    inline bool operator ==(const XCTreeNode<T>& otherObj)
+    inline bool operator ==(const T& otherObj)
     {
-        return Get() == otherObj.Get();
+        return Get() == otherObj->Get();
     }
 
-    inline bool operator !=(const XCTreeNode<T>& otherObj)
+    inline bool operator !=(const T& otherObj)
     {
-        return Get() != otherObj.Get();
+        return Get() != otherObj->Get();
     }
 
-    const T&                         Get() const         { return m_data; }
-    T&                               GetMutable()        { return m_data; }
-    std::vector<XCTreeNode<T>* >&    GetNodesMutable()   { return m_childNodes; }
+    const T                          Get() const         { return (const T)(this); }
+    T                                GetMutable()        { return static_cast<T>(this); }
+    std::vector<T>&                  GetNodesMutable()   { return m_childNodes; }
 
-    bool                             HasChildNodes() { m_childNodes.size() > 0; }
+    bool                             HasChildNodes()     { m_childNodes.size() > 0; }
     void                             Print();
 
 protected:
@@ -48,9 +43,6 @@ protected:
     //Protect this dtor and call delete on derived ones.
     ~XCTreeNode()
     {
-        //Delete contained data.
-        XCDELETE(m_data);
-
         //Delete all child nodes
         while (m_childNodes.size() > 0)
         {
@@ -64,8 +56,7 @@ protected:
     }
 
 protected:
-    std::vector<XCTreeNode<T>* >     m_childNodes;
-    T                                m_data;
+    std::vector<T>                   m_childNodes;
 };
 
 template<class T>
@@ -91,13 +82,13 @@ class DepthFirstSearch
 public:
     //TODO : Create DFS iterators maintaining info on levels.
     template<class T>
-    static XCTreeNode<T>* GetParentNode(XCTreeNode<T>& parentNode, const XCTreeNode<T>& childNode);
+    static T GetParentNode(T& parentNode, const T& childNode);
 };
 
 template<class T>
-XCTreeNode<T>* DepthFirstSearch::GetParentNode(XCTreeNode<T>& parentNode, const XCTreeNode<T>& childNode)
+T DepthFirstSearch::GetParentNode(T& parentNode, const T& childNode)
 {
-    XCTreeNode<T>* outNode = nullptr;
+    T outNode = nullptr;
     auto& childNodesList = parentNode.GetNodesMutable();
 
     for (auto& node : childNodesList)
@@ -126,21 +117,21 @@ class BreathFirstSearch
 public:
     //TODO : Create BFS iterators maintaining info on levels.
     template<class T>
-    static XCTreeNode<T>* GetParentNode(XCTreeNode<T>& parentNode, const XCTreeNode<T>& childNode);
+    static T GetParentNode(T& parentNode, const T& childNode);
 };
 
 template<class T>
-XCTreeNode<T>* BreathFirstSearch::GetParentNode(XCTreeNode<T>& parentNode, const XCTreeNode<T>& childNode)
+T BreathFirstSearch::GetParentNode(T& parentNode, const T& childNode)
 {
-    XCTreeNode<T>* outNode = nullptr;
-    auto& childNodesList = parentNode.GetNodesMutable();
+    T outNode = nullptr;
+    auto& childNodesList = parentNode->GetNodesMutable();
 
     //First check within this list
     for (auto& node : childNodesList)
     {
         if (*node == childNode)
         {
-            outNode = &parentNode;
+            outNode = parentNode;
             break;
         }
     }
@@ -150,7 +141,7 @@ XCTreeNode<T>* BreathFirstSearch::GetParentNode(XCTreeNode<T>& parentNode, const
         //Ask the child nodes
         for (auto& node : childNodesList)
         {
-            outNode = GetParentNode(*node, childNode);
+            outNode = GetParentNode(node, childNode);
             if (outNode != nullptr)
             {
                 break;
@@ -172,74 +163,63 @@ public:
     XCTreeNodeModifier()
     {}
 
-    explicit XCTreeNodeModifier(const T& data)
-        : XCTreeNode(data)
-    {}
-
     //Adds the node to its child list.
-    inline XCTreeNode<T>& AddNode(const T& data)
+    inline T& AddNode(const T& data)
     {
         (static_cast<TreeStrategy*>(this))->AddNode(data);
     }
 
     //Removes a child node. Does not traverse. Use GetParentNode to find the parent.
-    inline void RemoveNode(const XCTreeNode<T>& node)
+    inline void RemoveNode(const T& node)
     {
         (static_cast<TreeStrategy*>(this))->RemoveNode(data);
     }
 
-    inline XCTreeNode<T>* GetParentNode(const XCTreeNode<T>& childNode)
+    inline T GetParentNode(const T& childNode)
     {
-        return SearchStartegy::GetParentNode<T>(*this, childNode);
+        T currentNode = GetMutable();
+        return SearchStartegy::GetParentNode<T>(currentNode, childNode);
     }
-
-protected:
-    ~XCTreeNodeModifier()
-    {}
 };
 
 #pragma endregion
 
-#pragma region NTree
+#pragma region NTreeNode
 
 template<class T, class SearchStrategy = BreathFirstSearch>
-class NTree : public XCTreeNodeModifier<T, NTree<T>, SearchStrategy>
+class NTreeNode : public XCTreeNodeModifier<T, NTreeNode<T>, SearchStrategy>
 {
 public:
-    NTree()
-    {}
-
-    explicit NTree(const T& data)
-        : XCTreeNodeModifier(data)
+    NTreeNode()
     {}
 
     //Adds the node to its child list.
-    XCTreeNode<T>&                   AddNode(const T& data);
+    T&                   AddNode(const T& data);
 
     //Removes a child node. Does not traverse. Use GetParentNode to find the parent.
-    void                             RemoveNode(const XCTreeNode<T>& node);
+    void                 RemoveNode(const T& node);
 };
 
 template<class T, class SearchStrategy>
-XCTreeNode<T>& NTree<T, SearchStrategy>::AddNode(const T& data)
+T& NTreeNode<T, SearchStrategy>::AddNode(const T& data)
 {
-    XCTreeNode<T>* node = XCNEW(NTree<T>)(data);
-    m_childNodes.push_back(node);
+    m_childNodes.push_back(data);
 
-    return *m_childNodes.back();
+    return m_childNodes.back();
 }
 
 template<class T, class SearchStrategy>
-void NTree<T, SearchStrategy>::RemoveNode(const XCTreeNode<T>& node)
+void NTreeNode<T, SearchStrategy>::RemoveNode(const T& node)
 {
     auto findResult = std::find_if(m_childNodes.begin(), m_childNodes.end(),
-        [&node](const XCTreeNode<T>* val) -> bool
+        [&node](const T val) -> bool
     {
-        return val->Get() == node.Get();
+        return val->Get() == node->Get();
     });
 
     if (findResult != m_childNodes.end())
     {
+        XCDELETE(*findResult);
         m_childNodes.erase(findResult);
     }
     else
@@ -251,52 +231,52 @@ void NTree<T, SearchStrategy>::RemoveNode(const XCTreeNode<T>& node)
 
 #pragma endregion
 
-#pragma region BinaryTree
+#pragma region BinaryTreeNode
 
 template<class T, class SearchStrategy = BreathFirstSearch>
-class BinaryTree : public XCTreeNodeModifier<T, BinaryTree<T>, SearchStrategy>
+class BinaryTreeNode : public XCTreeNodeModifier<T, BinaryTreeNode<T>, SearchStrategy>
 {
 public:
     static const u32 LeftChild  = 0;
     static const u32 RightChild = 1;
 
-    BinaryTree()
+    BinaryTreeNode()
     {}
 
-    explicit BinaryTree(const T& data)
+    explicit BinaryTreeNode(const T& data)
         : XCTreeNodeModifier(data)
     {}
 
     //Adds the node to its child list.
-    XCTreeNode<T>&                   AddNode(const T& data);
+    T&                   AddNode(const T& data);
 
     //Removes a child node. Does not traverse. Use GetParentNode to find the parent.
-    void                             RemoveNode(const XCTreeNode<T>& node);
+    void                 RemoveNode(const T& node);
 };
 
 template<class T, class SearchStrategy>
-XCTreeNode<T>& BinaryTree<T, SearchStrategy>::AddNode(const T& data)
+T& BinaryTreeNode<T, SearchStrategy>::AddNode(const T& data)
 {
     //TODO : This needs to be handled based on weights
     XCASSERT(m_childNodes.size() < 2);
 
-    XCTreeNode<T>* node = XCNEW(BinaryTree<T>)(data);
-    m_childNodes.push_back(node);
+    m_childNodes.push_back(data);
 
-    return *m_childNodes.back();
+    return m_childNodes.back();
 }
 
 template<class T, class SearchStrategy>
-void BinaryTree<T, SearchStrategy>::RemoveNode(const XCTreeNode<T>& node)
+void BinaryTreeNode<T, SearchStrategy>::RemoveNode(const T& node)
 {
     auto findResult = std::find_if(m_childNodes.begin(), m_childNodes.end(),
-        [node](const XCTreeNode<T>* val) -> bool
+        [node](const T val) -> bool
     {
         return val->Get() == node.Get();
     });
 
     if (findResult != m_childNodes.end())
     {
+        XCDELETE(*findResult);
         m_childNodes.erase(findResult);
     }
     else

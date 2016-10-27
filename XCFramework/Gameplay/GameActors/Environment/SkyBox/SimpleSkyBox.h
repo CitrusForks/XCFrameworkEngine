@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "Gameplay/GameActors/SimpleActor.h"
+#include "Engine/GameplayBase/Actors/SimpleActor.h"
 
 #include "Engine/Resource/ResourceHandle.h"
 

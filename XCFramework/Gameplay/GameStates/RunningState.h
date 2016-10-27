@@ -10,7 +10,8 @@
 #include "Engine/Input/XCInput.h"
 #include "Gameplay/XCCamera/XCCameraManager.h"
 #include "Graphics/XCLighting/XCLightManager.h"
-#include "Gameplay/SceneGraph.h"
+
+class SceneGraph;
 
 namespace GameState
 {
@@ -33,6 +34,6 @@ namespace GameState
 
         XCCameraManager*       m_cameraSystem;
         XCInput*               m_directInput;
-        SceneGraph*                 m_worldSystem;
+        SceneGraph*            m_worldSystem;
     };
 }

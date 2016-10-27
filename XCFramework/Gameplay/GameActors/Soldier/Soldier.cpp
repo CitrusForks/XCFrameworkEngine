@@ -9,7 +9,7 @@
 #include "Soldier.h"
 
 #include "Gameplay/XCCamera/XCCameraManager.h"
-#include "Gameplay/GameActors/GameActorsFactory.h"
+#include "Engine/GameplayBase/Actors/GameActorsFactory.h"
 
 #include "Graphics/XCShaders/XCShaderBufferConstants.h"
 #include "Graphics/XCShaders/XCShaderHandle.h"

@@ -54,13 +54,15 @@ void SimpleSkyBox::Load()
 
     BuildBuffers();
     SimpleActor::Load();
+
+    m_actorState = IActor::ActorState_Loaded;
+
 }
 
 void SimpleSkyBox::UpdateState()
 {
     if (m_cubeMapTexture->m_Resource->IsLoaded())
     {
-        m_actorState = IActor::ActorState_Loaded;
     }
 
     SimpleActor::UpdateState();

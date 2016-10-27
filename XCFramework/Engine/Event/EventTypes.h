@@ -10,6 +10,7 @@ enum EventType
 {
     EventType_GameStateChange,
     EventType_SceneReady,
+    EventType_TerrainLoaded,
 
     EventType_Unknown
 };

@@ -13,6 +13,7 @@
 #include "Engine/TaskManager/TaskManager.h"
 #include "Engine/Resource/ResourceManager.h"
 #include "Engine/Resource/LoadPackageFileFBTask.h"
+#include "Engine/GameplayBase/SceneGraph.h"
 
 #include "Graphics/XCGraphics.h"
 #include "Graphics/BasicGeometry/MeshGeneratorSystem.h"
@@ -64,6 +65,9 @@ void LoadingState::Update(f32 dt)
             broadcaster.BroadcastEvent(&event);
         }
     }
+
+    SceneGraph& scene = SystemLocator::GetInstance()->RequestSystem<SceneGraph>("SceneGraph");
+    scene.Update(dt);
 }
 
 void GameState::LoadingState::Draw(XCGraphics& graphicsSystem)

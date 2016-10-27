@@ -7,7 +7,7 @@
 #pragma once
 
 #include "Graphics/XCShaders/XCVertexFormat.h"
-#include "Gameplay/GameActors/PhysicsActor.h"
+#include "Engine/GameplayBase/Actors/PhysicsActor.h"
 #include "Graphics/XCMaterials/MaterialTypes.h"
 
 

@@ -7,7 +7,8 @@
 #pragma once
 
 #include "Gameplay/GameStates/IGameState.h"
-#include "Gameplay/SceneLoader.h"
+
+class SceneLoader;
 
 namespace GameState
 {
@@ -25,9 +26,8 @@ namespace GameState
         void                    Destroy();
 
     private:
-
-        u64						m_taskId;
-        SceneLoader*			m_sceneLoader;
+        u64                     m_taskId;
+        SceneLoader*            m_sceneLoader;
         std::future<i32>        m_futureSceneLoaded;
     };
 }

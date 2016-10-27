@@ -8,12 +8,13 @@
 
 #include "Gun.h"
 
-#include "Gameplay/SceneGraph.h"
-#include "Gameplay/GameActors/GameActorsFactory.h"
+#include "Engine/GameplayBase/SceneGraph.h"
+#include "Engine/GameplayBase/Actors/GameActorsFactory.h"
+#include "Engine/Resource/ResourceManager.h"
+
 #include "Gameplay/GameActors/Weapons/Bullets/Bullet.h"
 #include "Gameplay/XCCamera/XCCameraManager.h"
 
-#include "Engine/Resource/ResourceManager.h"
 #include "Graphics/XCShaders/XCShaderBufferConstants.h"
 #include "Graphics/XCShaders/XCShaderHandle.h"
 
@@ -158,14 +159,14 @@ void Gun::ShootBullet(std::string bulletActorType, XCVec3& startPosition, XCVec3
 {
     GameActorsFactory& actorFactory = SystemLocator::GetInstance()->RequestSystem<GameActorsFactory>("GameActorsFactory");
     ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
-    SceneGraph& worldSystem = (SceneGraph&)SystemLocator::GetInstance()->RequestSystem("World");
+    SceneGraph& worldSystem = (SceneGraph&)SystemLocator::GetInstance()->RequestSystem("SceneGraph");
 
     Bullet* bullet = (Bullet*)actorFactory.CreateActor(bulletActorType);
 
     if (bullet)
     {
         bullet->PreLoad(startPosition, target, "PistolBullet");
-        worldSystem.RequestAddActor(bullet);
+        worldSystem.RequestLoadActor(bullet);
     }
 }
 

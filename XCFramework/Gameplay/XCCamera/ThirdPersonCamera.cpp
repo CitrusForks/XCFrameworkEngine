@@ -7,8 +7,8 @@
 #include "GameplayPrecompiledHeader.h"
 
 #include "ThirdPersonCamera.h"
-#include "Gameplay/GameActors/IActor.h"
-#include "Gameplay/GameActors/TPCChaseableActor.h"
+#include "Engine/GameplayBase/Actors/IActor.h"
+#include "Engine/GameplayBase/Actors/TPCChaseableActor.h"
 
 ThirdPersonCamera::ThirdPersonCamera()
 {

@@ -8,6 +8,8 @@
 
 #include "PCSoldier.h"
 
+#include "Engine/Input/XCInput.h"
+
 PCSoldier::PCSoldier(void)
 {
 }

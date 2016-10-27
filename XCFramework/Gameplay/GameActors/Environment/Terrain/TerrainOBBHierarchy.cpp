@@ -21,67 +21,52 @@ TerrainOBBHierarchy::~TerrainOBBHierarchy()
 void TerrainQuad::Update(f32 dt)
 {
     m_bbox->Update(dt);
+
+    //Check further in its child nodes
+    for (auto& childNode : GetNodesMutable())
+    {
+        childNode->GetMutable()->Update(dt);
+    }
 }
 
 void TerrainOBBHierarchy::Update(f32 dt)
 {
-    XCTreeNode<TerrainQuad*>& rootNode = m_terrainQuadTree->GetRootNode();
-    Update(rootNode, dt);
-}
-
-void TerrainOBBHierarchy::Update(XCTreeNode<TerrainQuad*>& node, f32 dt)
-{
-    node.Get()->Update(dt);
-
-    //Check further in its child nodes
-    for (auto& childNode : node.GetNodesMutable())
-    {
-        Update(*childNode, dt);
-    }
+    TerrainQuad* rootNode = m_terrainQuadTree->GetRootNode();
+    rootNode->GetMutable()->Update(dt);
 }
 
 void TerrainQuad::Transform(XCMatrix4& translateMat, XCMatrix4& rotateMatrix)
 {
     m_bbox->Transform(translateMat, rotateMatrix);
+
+    //Check further in its child nodes
+    for (auto& childNode : GetNodesMutable())
+    {
+        childNode->GetMutable()->Transform(translateMat, rotateMatrix);
+    }
 }
 
 void TerrainOBBHierarchy::Transform(XCMatrix4& translateMat, XCMatrix4& rotateMatrix)
 {
-    XCTreeNode<TerrainQuad*>& rootNode = m_terrainQuadTree->GetRootNode();
-    Transform(rootNode, translateMat, rotateMatrix);
-}
-
-void TerrainOBBHierarchy::Transform(XCTreeNode<TerrainQuad*>& node, XCMatrix4& translateMat, XCMatrix4& rotateMatrix)
-{
-    node.Get()->Transform(translateMat, rotateMatrix);
-
-    //Check further in its child nodes
-    for (auto& childNode : node.GetNodesMutable())
-    {
-        Transform(*childNode, translateMat, rotateMatrix);
-    }
+    TerrainQuad* rootNode = m_terrainQuadTree->GetRootNode();
+    rootNode->GetMutable()->Transform(translateMat, rotateMatrix);
 }
 
 void TerrainQuad::Draw(RenderContext& context)
 {
     m_bbox->Draw(context);
+
+    //Check further in its child nodes
+    for (auto& childNode : GetNodesMutable())
+    {
+        childNode->GetMutable()->Draw(context);
+    }
 }
 
 void TerrainOBBHierarchy::Draw(RenderContext& context)
 {
-    XCTreeNode<TerrainQuad*>& rootNode = m_terrainQuadTree->GetRootNode();
-    Draw(rootNode, context);
-}
-
-void TerrainOBBHierarchy::Draw(XCTreeNode<TerrainQuad*>& node, RenderContext& context)
-{
-    node.Get()->Draw(context);
-
-    //Check further in its child nodes
-    for (auto& childNode : node.GetNodesMutable())
-    {
-        Draw(*childNode, context);
-    }
+    TerrainQuad* rootNode = m_terrainQuadTree->GetRootNode();
+    rootNode->GetMutable()->Draw(context);
 }
 
 void TerrainOBBHierarchy::CreateTerrainOBBHierarchy(i32 rowStart, i32 totalRows, i32 colStart, i32 totalColumns, i32 totalWidth)
@@ -94,11 +79,11 @@ void TerrainOBBHierarchy::CreateTerrainOBBHierarchy(i32 rowStart, i32 totalRows,
     //Setup of quadruples, which divides the terrain into smaller quads. Conduct object test on the quads and moving towards the most inner quad within the OBBHierarchy
     //First create root bound box
     TerrainQuad* rootQuad = XCNEW(TerrainQuad)(rowStart, totalRows, colStart, totalColumns, totalColumns, vMin, vMax);
-    m_terrainQuadTree = XCNEW(XCNTreeBFS<TerrainQuad*>)(rootQuad);
+    m_terrainQuadTree = XCNEW(XCTree<TerrainQuad*>)(rootQuad);
 
     //1st degree Child nodes
-    TerrainQuad* quad1 = XCNEW(TerrainQuad)(0, totalRows / (noOfQuads / 2), 0, totalColumns / (noOfQuads / 2), totalColumns, vMin, vMax);
-    XCTreeNode<TerrainQuad*>& quadNode1 = m_terrainQuadTree->AddNode(quad1);
+    TerrainQuad* quad1     = XCNEW(TerrainQuad)(0, totalRows / (noOfQuads / 2), 0, totalColumns / (noOfQuads / 2), totalColumns, vMin, vMax);
+    TerrainQuad* quadNode1 = m_terrainQuadTree->AddNode(quad1);
 
     TerrainQuad* quad11 = XCNEW(TerrainQuad)(0, (totalRows / (noOfQuads / 2)) / 2, 0, (totalColumns / (noOfQuads / 2)) / 2, totalColumns, vMin, vMax);
     TerrainQuad* quad22 = XCNEW(TerrainQuad)(0, (totalRows / (noOfQuads / 2)) / 2, (totalColumns / (noOfQuads / 2)) / 2, totalColumns / (noOfQuads / 2), totalColumns, vMin, vMax);
@@ -201,23 +186,18 @@ bool TerrainQuad::ComputeQuad(i32 row, i32 col, XCVec4& pos)
         retVal = true;
     }
 
+    //Check further in its child nodes
+    for (auto& childNode : GetNodesMutable())
+    {
+        childNode->GetMutable()->ComputeQuad(row, col, pos);
+    }
+
     return retVal;
 }
 void TerrainOBBHierarchy::ComputeQuad(i32 row, i32 col, XCVec4& pos)
 {
-    XCTreeNode<TerrainQuad*>& rootNode = m_terrainQuadTree->GetRootNode();
-    ComputeQuad(rootNode, row, col, pos);
-}
-
-void TerrainOBBHierarchy::ComputeQuad(XCTreeNode<TerrainQuad*>& node, i32 row, i32 col, XCVec4& pos)
-{
-    node.GetMutable()->ComputeQuad(row, col, pos);
-
-    //Check further in its child nodes
-    for (auto& childNode : node.GetNodesMutable())
-    {
-        ComputeQuad(*childNode, row, col, pos);
-    }
+    TerrainQuad* rootNode = m_terrainQuadTree->GetRootNode();
+    rootNode->GetMutable()->ComputeQuad(row, col, pos);
 }
 
 void TerrainQuad::ComputeOBBForAllQuads()
@@ -225,23 +205,18 @@ void TerrainQuad::ComputeOBBForAllQuads()
     m_bbox = std::make_unique<RenderableOBB>();
     m_bbox->Init();
     m_bbox->CreateBoundBox(m_vMin, m_vMax);
+
+    //Compute on child nodes
+    for (auto& list : GetNodesMutable())
+    {
+        list->GetMutable()->ComputeOBBForAllQuads();
+    }
 }
 
 void TerrainOBBHierarchy::ComputeOBBForAllQuads()
 {
-    XCTreeNode<TerrainQuad*>& rootNode = m_terrainQuadTree->GetRootNode();
-    ComputeOBBForAllQuads(rootNode);
-}
-
-void TerrainOBBHierarchy::ComputeOBBForAllQuads(XCTreeNode<TerrainQuad*>& node)
-{
-    node.GetMutable()->ComputeOBBForAllQuads();
-
-    //Compute on child nodes
-    for (auto& list : node.GetNodesMutable())
-    {
-        ComputeOBBForAllQuads(*list);
-    }
+    TerrainQuad* rootNode = m_terrainQuadTree->GetRootNode();
+    rootNode->GetMutable()->ComputeOBBForAllQuads();
 }
 
 TerrainQuad* TerrainQuad::GetQuadCollidingWithOBB(OrientedBoundingBox* bbox)
@@ -253,6 +228,12 @@ TerrainQuad* TerrainQuad::GetQuadCollidingWithOBB(OrientedBoundingBox* bbox)
         return this;
     }
 
+    //Compute on child nodes
+    for (auto& list : GetNodesMutable())
+    {
+        return list->GetMutable()->GetQuadCollidingWithOBB(bbox);
+    }
+
     //No collision detected, OBB must be outside the quad
     return nullptr;
 }
@@ -261,27 +242,6 @@ TerrainQuad* TerrainQuad::GetQuadCollidingWithOBB(OrientedBoundingBox* bbox)
 TerrainQuad* TerrainOBBHierarchy::GetQuadCollidingWithOBB(OrientedBoundingBox* bbox)
 {
     //Check if colliding with current quads
-    XCTreeNode<TerrainQuad*>& rootNode = m_terrainQuadTree->GetRootNode();
-    return GetQuadCollidingWithOBB(rootNode, bbox);
-}
-
-TerrainQuad* TerrainOBBHierarchy::GetQuadCollidingWithOBB(XCTreeNode<TerrainQuad*>& node, OrientedBoundingBox* bbox)
-{
-    TerrainQuad* outResult = node.GetMutable()->GetQuadCollidingWithOBB(bbox);
-
-    if (outResult == nullptr)
-    {
-        //Compute on child nodes
-        for (auto& list : node.GetNodesMutable())
-        {
-            outResult = GetQuadCollidingWithOBB(*list, bbox);
-
-            if (outResult)
-            {
-                break;
-            }
-        }
-    }
-
-    return outResult;
+    TerrainQuad* rootNode = m_terrainQuadTree->GetRootNode();
+    return rootNode->GetMutable()->GetQuadCollidingWithOBB(bbox);
 }

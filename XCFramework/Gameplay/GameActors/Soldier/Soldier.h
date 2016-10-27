@@ -9,7 +9,7 @@
 #include "Graphics/XCShaders/XCVertexFormat.h"
 #include "Graphics/XCMaterials/MaterialTypes.h"
 
-#include "Gameplay/GameActors/PhysicsActor.h"
+#include "Engine/GameplayBase/Actors/PhysicsActor.h"
 #include "Gameplay/GameActors/Weapons/Guns/Gun.h"
 
 class Soldier : public PhysicsActor

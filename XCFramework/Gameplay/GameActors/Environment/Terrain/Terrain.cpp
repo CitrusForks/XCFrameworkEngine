@@ -13,7 +13,6 @@
 #include "Terrain.h"
 #include "TerrainOBBHierarchy.h"
 
-#include "Gameplay/WorldEventTypes.h"
 #include "Gameplay/XCCamera/XCCameraManager.h"
 
 #include "Graphics/XCGraphics.h"
@@ -22,6 +21,7 @@
 #include "Graphics/XCLighting/XCLightManager.h"
 #include "Graphics/GPUResourceSystem.h"
 
+#include "Engine/GameplayBase/WorldEventTypes.h"
 #include "Engine/Resource/ResourceManager.h"
 #include "Engine/Event/EventBroadcaster.h"
 
@@ -74,8 +74,8 @@ void Terrain::Load()
     XCVec3 vec = XCVec3(0, 0, 0);
     InitXPhysics(m_currentPosition, XCVec4(vec), XCVec4(vec), 1000, (f32)0.2); //Immovable
     
-    //Terrain is loaded, so fire up the world ready event
-    Event_Scene event(EventType_SceneReady);
+    //Terrain is loaded, so fire up the physics
+    Event_Scene event(EventType_TerrainLoaded);
     EventBroadcaster& broadcaster = (EventBroadcaster&)SystemLocator::GetInstance()->RequestSystem("EventBroadcaster");
     broadcaster.BroadcastEvent(&event);
 

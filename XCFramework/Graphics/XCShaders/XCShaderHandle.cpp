@@ -505,7 +505,7 @@ void XCShaderHandle::SetResource(std::string bufferName, ID3DDeviceContext& cont
         return strcmp(bufferName.c_str(), slot.GetBufferName().c_str()) == 0;
     });
 
-    if (tex && bufferRes != m_shaderSlots.end())
+    if (tex && tex->GetResource<IResource*>()-> bufferRes != m_shaderSlots.end())
     {
         u32 slotNb = bufferRes - m_shaderSlots.begin();
 

@@ -10,6 +10,8 @@
 #include "Gameplay/GameStates/GameStateTypes.h"
 
 #include "Engine/TaskManager/TaskManager.h"
+#include "Engine/GameplayBase/SceneLoader.h"
+#include "Engine/GameplayBase/WorldEventTypes.h"
 
 #include "Assets/Packages/PackageConsts.h"
 
@@ -26,7 +28,7 @@ LoadingWorldState::~LoadingWorldState(void)
 void GameState::LoadingWorldState::Init()
 {
     IGameState::Init();
-    SceneGraph& world = SystemLocator::GetInstance()->RequestSystem<SceneGraph>("World");
+    SceneGraph& world = SystemLocator::GetInstance()->RequestSystem<SceneGraph>("SceneGraph");
 
     m_sceneLoader = XCNEW(SceneLoader)(world, SCENE_DATA_FILEPATH);
 
@@ -39,9 +41,13 @@ void LoadingWorldState::Update(f32 dt)
     //Wait for resource loader to complete the loading of resources. When done move to next state.
     if (m_futureSceneLoaded._Is_ready() && m_futureSceneLoaded.valid() && m_futureSceneLoaded.get() > 0)
     {
-        Event_GameStateChange event("RunningState", STATE_DESTROY);
         EventBroadcaster& broadcaster = (EventBroadcaster&)SystemLocator::GetInstance()->RequestSystem("EventBroadcaster");
+
+        Event_Scene event(EventType_SceneReady);
         broadcaster.BroadcastEvent(&event);
+
+        Event_GameStateChange gsEvent("RunningState", STATE_DESTROY);
+        broadcaster.BroadcastEvent(&gsEvent);
     }
 }
 

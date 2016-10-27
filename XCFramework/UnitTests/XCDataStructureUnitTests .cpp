@@ -16,12 +16,17 @@ namespace XCFrameworkUnitTest
     {
     public:
 
-        class Data
+        class Data : public NTreeNode<Data*, BreathFirstSearch>
         {
         public:
             Data(u32 val)
                 : m_value(val)
             {}
+
+            ~Data()
+            {
+                m_value = 0;
+            }
 
             u32     m_value;
         };
@@ -30,22 +35,22 @@ namespace XCFrameworkUnitTest
         {
             Data* data = XCNEW(Data)(10);
             
-            XCNTreeDFS<Data*>* tree = XCNEW((XCNTreeDFS<Data*>)) (data);
+            XCTree<Data*>* tree = XCNEW((XCTree<Data*>)) (data);
 
-            XCTreeNode<Data*>* lastNode;
+            Data* lastNode;
 
             //Add 4 nodes to root node
             for (u32 index = 0; index < 4; ++index)
             {
                 data = XCNEW(Data)(10 * (index + 1));
-                XCTreeNode<Data*>& level1Nodes = tree->AddNode(data);
+                Data* level1Nodes = tree->AddNode(data);
 
                 //Add 5 nodes to this level node
                 for (u32 subindex = 4; subindex < 10; ++subindex)
                 {
                     if (index == 2)
                     {
-                        lastNode = &level1Nodes;
+                        lastNode = level1Nodes;
                         data = XCNEW(Data)(10 * (subindex + 1) + 1);
                     }
                     else
@@ -55,7 +60,7 @@ namespace XCFrameworkUnitTest
             }
 
             data = XCNEW(Data)(200);
-            XCTreeNode<Data*>& deleteThisNode = tree->AddNode(*lastNode, data);
+            Data* deleteThisNode = tree->AddNode(lastNode, data);
 
             tree->PrintAll();
 

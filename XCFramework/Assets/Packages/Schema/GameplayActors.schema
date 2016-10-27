@@ -69,7 +69,7 @@ table FBLiveDriveTexturePlane
 
 table FBSimpleTerrain
 {
-	Base:FBTexturePlane;	
+	Base:FBIActor;	
 	Rows:int;
 	Column:int;
 	RowSpacing:int;

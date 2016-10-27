@@ -7,9 +7,12 @@
 #pragma once
 
 #include "Gameplay/GameActors/Soldier/Soldier.h"
-#include "Gameplay/GameActors/NonPlayableCharacterActor.h"
-#include "Gameplay/AI/AIBrain.h"
-#include "Gameplay/AI/AINavigator.h"
+
+
+#include "Engine/GameplayBase/Actors/NonPlayableCharacterActor.h"
+
+class AIBrain;
+class AINavigator;
 
 class NPCSoldier : public Soldier, public NonPlayableCharacterActor
 {

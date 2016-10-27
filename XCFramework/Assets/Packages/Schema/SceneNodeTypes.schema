@@ -1,0 +1,10 @@
+enum SceneNodeType : byte
+{
+    SceneRoot,
+    Actor,
+    Frustum,
+    Camera,
+    Light,
+
+    Max
+}

@@ -6,10 +6,11 @@
 
 #pragma once
 
-#include "Gameplay/GameActors/SimpleActor.h"
+#include "Engine/GameplayBase/Actors/SimpleActor.h"
 
 #include "Graphics/BasicGeometry/TexturedPlane.h"
-#include "Graphics/XCTextures/Texture2D.h"
+
+class Texture2D;
 
 class LiveDriveTexturePlane : public TexturedPlane
 {

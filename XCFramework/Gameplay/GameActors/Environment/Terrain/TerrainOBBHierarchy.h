@@ -13,8 +13,10 @@ class OrientedBoundingBox;
 class RenderableOBB;
 
 //TerrainQuad is a Node, which can contain child nodes
-struct TerrainQuad
+class TerrainQuad : public NTreeNode<TerrainQuad*, BreathFirstSearch>
 {
+public:
+
     TerrainQuad()
     {
         m_vMin = XCVec4(Infinity, Infinity, Infinity, 1);
@@ -77,17 +79,6 @@ public:
 
     TerrainQuad*                GetQuadCollidingWithOBB(OrientedBoundingBox* bbox);
 
-protected:
-    //Recursive calls to traverse the tree
-    void                        ComputeQuad(XCTreeNode<TerrainQuad*>& node, i32 row, i32 col, XCVec4& pos);
-    void                        ComputeOBBForAllQuads(XCTreeNode<TerrainQuad*>& node);
-    TerrainQuad*                GetQuadCollidingWithOBB(XCTreeNode<TerrainQuad*>& node, OrientedBoundingBox* bbox);
-
-    void                        Update(XCTreeNode<TerrainQuad*>& node, f32 dt);
-    void                        Draw(XCTreeNode<TerrainQuad*>& node, RenderContext& context);
-
-    void                        Transform(XCTreeNode<TerrainQuad*>& node, XCMatrix4& translateMat, XCMatrix4& rotateMatrix);
-
 private:
-    XCNTreeBFS<TerrainQuad*>*   m_terrainQuadTree;
+    XCTree<TerrainQuad*>*       m_terrainQuadTree;
 };

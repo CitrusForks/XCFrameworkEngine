@@ -7,8 +7,10 @@
 #pragma once
 
 #include "Gameplay/GameActors/Soldier/Soldier.h"
-#include "Gameplay/GameActors/PlayableCharacterActor.h"
-#include "Engine/Input/XCInput.h"
+
+#include "Engine/GameplayBase/Actors/PlayableCharacterActor.h"
+
+class XCInput;
 
 class PCSoldier : public Soldier, public PlayableCharacterActor
 {

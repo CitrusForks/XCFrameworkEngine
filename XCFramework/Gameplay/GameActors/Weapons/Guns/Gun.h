@@ -7,13 +7,9 @@
 #pragma once
 
 #include "Engine/Input/XCInput.h"
-
-#include "Graphics/XCShaders/XCVertexFormat.h"
-#include "Graphics/XCGraphicsDx11.h"
-
-#include "Gameplay/GameActors/SimpleMeshActor.h"
-#include "Gameplay/GameActors/SubActor.h"
-#include "Gameplay/GameActors/Weapons/Bullets/Bullet.h"
+#include "Engine/GameplayBase/Actors/SimpleMeshActor.h"
+#include "Engine/GameplayBase/Actors/SubActor.h"
+#include "Assets/Packages/Schema/ShaderTypes_generated.h"
 
 class Gun : public SimpleMeshActor, public SubActor
 {
@@ -50,5 +46,5 @@ protected:
     f32                m_recoilMaxTime;
     bool               m_canShootBullet;
 
-    XCInput*       m_directInput;
+    XCInput*           m_directInput;
 };

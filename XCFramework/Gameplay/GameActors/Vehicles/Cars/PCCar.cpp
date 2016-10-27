@@ -7,6 +7,7 @@
 #include "GameplayPrecompiledHeader.h"
 
 #include "PCCar.h"
+#include "Engine/Input/XCInput.h"
 
 PCCar::PCCar(void)
 {

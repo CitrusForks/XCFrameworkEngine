@@ -9,11 +9,13 @@
 #include "Base/System/ISystem.h"
 
 #include "Gameplay/GameStates/IGameState.h"
+#include "Gameplay/GameStates/GameStatesFactory.h"
+
 #include "GameStates/GameStateTypes.h"
 
-#include "Gameplay/SceneGraph.h"
-#include "Gameplay/GameActors/GameActorsFactory.h"
-#include "Gameplay/GameStates/GameStatesFactory.h"
+#include "Engine/GameplayBase/Actors/GameActorsFactory.h"
+
+class SceneGraph;
 
 using namespace GameState;
 
@@ -40,7 +42,7 @@ public:
 
     GameStatesFactory&          GetGameStateFactory() { return *m_gameStateFactory; }
     GameActorsFactory&          GetGameActorsFactory() { return *m_gameActorFactory; }
-    SceneGraph&                      GetWorldSystem() { return *m_worldSystem; }
+    SceneGraph&                 GetWorldSystem() { return *m_worldSystem; }
     
     virtual void                OnEvent(IEvent* event);
 
@@ -56,6 +58,6 @@ private:
 
     GameStatesFactory*          m_gameStateFactory;
     GameActorsFactory*          m_gameActorFactory;
-    SceneGraph*                      m_worldSystem;
+    SceneGraph*                 m_worldSystem;
 };
 

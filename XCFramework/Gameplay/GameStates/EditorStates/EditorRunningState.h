@@ -1,11 +1,11 @@
 #pragma once
 
 #include "Gameplay/GameStates/IGameState.h"
-#include "Gameplay/GameActors/GameActorsFactory.h"
 
 #include "Graphics/XCLighting/XCLightManager.h"
 
 class WorldEditor;
+class GameActorsFactory;
 
 namespace GameState
 {

@@ -3,6 +3,7 @@
 #include "Gameplay/GameStates/EditorStates/EditorRunningState.h"
 #include "Gameplay/WorldEditor.h"
 
+#include "Engine/GameplayBase/GameActorsFactory.h"
 #include "Engine/Graphics/XCCamera/XCCameraManager.h"
 
 using namespace GameState;

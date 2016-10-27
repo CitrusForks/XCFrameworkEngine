@@ -3,9 +3,10 @@
 #include "Base/Memory/MemorySystem.h"
 #include "Base/Memory/MemorySystemWin32.h"
 
-#include "Gameplay/GameActors/IActor.h"
+#include "Engine/GameplayBase/Actors/IActor.h"
+#include "Engine/GameplayBase/Actors/GameActorsFactory.h"
+
 #include "Gameplay/GameActors/Soldier/Soldier.h"
-#include "Gameplay/GameActors/GameActorsFactory.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 

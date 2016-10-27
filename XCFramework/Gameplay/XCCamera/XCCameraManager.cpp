@@ -12,11 +12,12 @@
 
 #include "Graphics/XCShaders/XCShaderContainer.h"
 
-#include "Gameplay/GameActors/IActor.h"
+#include "Engine/GameplayBase/Actors/IActor.h"
+#include "Engine/GameplayBase/Actors/TPCChaseableActor.h"
+
 #include "Gameplay/XCCamera/BasicCamera.h"
 #include "Gameplay/XCCamera/FirstPersonCamera.h"
 #include "Gameplay/XCCamera/ThirdPersonCamera.h"
-#include "Gameplay/GameActors/TPCChaseableActor.h"
 
 XCCameraManager::XCCameraManager()
 {

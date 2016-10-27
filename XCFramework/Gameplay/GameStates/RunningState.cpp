@@ -7,6 +7,7 @@
 #include "GameplayPrecompiledHeader.h"
 
 #include "Engine/Resource/ResourceManager.h"
+#include "Engine/GameplayBase/SceneGraph.h"
 
 #include "Gameplay/GameStates/RunningState.h"
 
@@ -33,7 +34,7 @@ void RunningState::Init()
 
     m_cameraSystem = &SystemLocator::GetInstance()->RequestSystem<XCCameraManager>("CameraManager");
     m_directInput = &SystemLocator::GetInstance()->RequestSystem<XCInput>("InputSystem");
-    m_worldSystem = &SystemLocator::GetInstance()->RequestSystem<SceneGraph>("World");
+    m_worldSystem = &SystemLocator::GetInstance()->RequestSystem<SceneGraph>("SceneGraph");
 
     ResourceManager& resMgr         = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
     XCGraphics& graphicsSystem     = SystemLocator::GetInstance()->RequestSystem<XCGraphics>("GraphicsSystem");

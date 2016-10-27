@@ -11,6 +11,7 @@
 //Data Schemas- which are auto generated
 #include "Assets/Packages/Schema/BasicTypes_generated.h"
 #include "Assets/Packages/Schema/ShaderTypes_generated.h"
+#include "Assets/Packages/Schema/SceneNodeTypes_generated.h"
 #include "Assets/Packages/Schema/Shaders_generated.h"
 #include "Assets/Packages/Schema/Resources_generated.h"
 #include "Assets/Packages/Schema/GameplayActors_generated.h"

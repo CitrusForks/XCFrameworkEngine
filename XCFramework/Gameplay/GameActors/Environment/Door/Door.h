@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "Gameplay/GameActors/PhysicsActor.h"
+#include "Engine/GameplayBase/Actors/PhysicsActor.h"
 
 #include "Graphics/XCMaterials/MaterialTypes.h"
 #include "Graphics/XCShaders/XCShaderTypes.h"

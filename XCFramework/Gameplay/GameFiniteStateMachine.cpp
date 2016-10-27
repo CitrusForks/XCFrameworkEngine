@@ -7,7 +7,10 @@
 #include "GameplayPrecompiledHeader.h"
 
 #include "Gameplay/GameFiniteStateMachine.h"
+
 #include "Engine/Event/IEventListener.h"
+#include "Engine/GameplayBase/SceneGraph.h"
+
 
 GameFiniteStateMachine::GameFiniteStateMachine()
 {
@@ -23,7 +26,7 @@ void GameFiniteStateMachine::Init()
 
     container.RegisterSystem<GameStatesFactory>("GameStatesFactory");
     container.RegisterSystem<GameActorsFactory>("GameActorsFactory");
-    container.RegisterSystem<SceneGraph>("World");
+    container.RegisterSystem<SceneGraph>("SceneGraph");
 
     m_gameStateFactory = (GameStatesFactory*) &container.CreateNewSystem("GameStatesFactory");
     m_gameStateFactory->InitFactory();
@@ -31,7 +34,7 @@ void GameFiniteStateMachine::Init()
     m_gameActorFactory = (GameActorsFactory*) &container.CreateNewSystem("GameActorsFactory");
     m_gameActorFactory->InitFactory();
 
-    m_worldSystem = (SceneGraph*)&container.CreateNewSystem("World");
+    m_worldSystem = (SceneGraph*)&container.CreateNewSystem("SceneGraph");
     TaskManager* taskMgr = &SystemLocator::GetInstance()->RequestSystem<TaskManager>("TaskManager");
     m_worldSystem->Init(*taskMgr);
 
@@ -73,7 +76,7 @@ void GameFiniteStateMachine::Destroy()
     SystemContainer& container = SystemLocator::GetInstance()->GetSystemContainer();
     container.RemoveSystem("GameStatesFactory");
     container.RemoveSystem("GameActorsFactory");
-    container.RemoveSystem("World");
+    container.RemoveSystem("SceneGraph");
 
     m_worldSystem->Destroy();
     m_gameActorFactory->DestroyFactory();
