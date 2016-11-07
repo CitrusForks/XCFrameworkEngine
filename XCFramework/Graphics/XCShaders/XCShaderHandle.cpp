@@ -505,7 +505,7 @@ void XCShaderHandle::SetResource(std::string bufferName, ID3DDeviceContext& cont
         return strcmp(bufferName.c_str(), slot.GetBufferName().c_str()) == 0;
     });
 
-    if (tex && tex->GetResource<IResource*>()-> bufferRes != m_shaderSlots.end())
+    if (tex && tex->m_Resource->GetResourceState() == IResource::ResourceState_Loaded && bufferRes != m_shaderSlots.end())
     {
         u32 slotNb = bufferRes - m_shaderSlots.begin();
 
@@ -538,8 +538,6 @@ void XCShaderHandle::SetResource(std::string bufferName, ID3DDeviceContext& cont
 #endif
         return;
     }
-
-    XCASSERT(false);
 }
 
 void* XCShaderHandle::CreateVertexBuffer()
