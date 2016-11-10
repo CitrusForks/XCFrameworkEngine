@@ -28,7 +28,6 @@ public:
     virtual void            Destroy();
 
     ETaskState              GetState()                       { return m_eCurrentState; }
-    void                    SetState(ETaskState _state);
     
     void                    SetInstanceId(i32 _id)           { m_InstanceId = _id; }
     i32                     GetInstanceId()                  { return m_InstanceId; }
@@ -50,6 +49,8 @@ public:
     std::string             GetTaskName()                    { return m_taskName;}
 
 protected:
+    void                    SetState(ETaskState _state)      { m_eCurrentState = _state; }
+
     bool                    m_isAsync;
     ETaskState              m_eCurrentState;
     i32                     m_InstanceId;
@@ -60,5 +61,4 @@ private:
     u64                     m_threadID;
     i32                     m_taskPriority;
     std::string             m_taskName;
-    std::mutex              m_stateLock;
 };

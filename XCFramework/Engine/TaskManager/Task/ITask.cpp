@@ -21,17 +21,7 @@ ITask::ITask(std::string taskName)
 
 ITask::~ITask(void)
 {
-    if (m_threadHandle)
-    {
-        XCDELETE(m_threadHandle);
-    }
-}
-
-void ITask::SetState(ETaskState _state)
-{
-    std::unique_lock<std::mutex> m(m_stateLock);
-    m_eCurrentState = _state;
-    m.unlock();
+    XCDELETE(m_threadHandle);
 }
 
 void ITask::Destroy()
