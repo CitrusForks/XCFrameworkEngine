@@ -9,6 +9,8 @@
 #include "Engine/GameplayBase/Actors/PhysicsActor.h"
 #include "Graphics/XCShaders/XCVertexFormat.h"
 #include "Graphics/XCShaders/XCShaderTypes.h"
+#include "Graphics/VertexBuffer.h"
+#include "Graphics/IndexBuffer.h"
 
 class SimpleTerrain : public PhysicsActor
 {

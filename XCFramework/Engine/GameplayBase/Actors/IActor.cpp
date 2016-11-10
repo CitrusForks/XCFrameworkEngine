@@ -17,6 +17,11 @@ IActor::IActor(void)
 {
 }
 
+IActor::~IActor(void)
+{
+    Logger("[IActor] Destructor called for %s", m_userFriendlyName.c_str());
+}
+
 void IActor::PreLoad(const void* fbBuffer)
 {
     if (fbBuffer)
@@ -60,11 +65,6 @@ void IActor::UpdateState()
     {
         actor->UpdateState();
     }
-}
-
-IActor::~IActor(void)
-{
-    Logger("[IActor] Destructor called for %s", m_userFriendlyName.c_str());
 }
 
 void IActor::Update(f32 dt)

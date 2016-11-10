@@ -17,6 +17,7 @@
 
 #include "Graphics/XCShaders/XCShaderBufferConstants.h"
 #include "Graphics/XCShaders/XCShaderHandle.h"
+#include "Graphics/XCMesh/XCMesh.h"
 
 Gun::Gun(void)
 {

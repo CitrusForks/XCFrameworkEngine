@@ -13,7 +13,6 @@
 
 #include "Engine/AI/INavigator.h"
 
-#include "Graphics/XCMesh/XCMesh.h"
 #include "Graphics/BasicGeometry/RenderableOBB.h"
 
 class PhysicsActor : public AnimatedActor, public XPhysics, public INavigator
@@ -29,7 +28,7 @@ public:
     virtual void                PreLoad(const void* fbBuffer) override   { AnimatedActor::PreLoad(fbBuffer); }
     virtual void                Load()                        override;
     virtual void                UpdateState()                 override;
-    virtual void                Update(f32 dt)              override;
+    virtual void                Update(f32 dt)                override;
     virtual void                Draw(RenderContext& context)  override;
     virtual void                Unload()                      override;
     virtual void                Destroy()                     override;

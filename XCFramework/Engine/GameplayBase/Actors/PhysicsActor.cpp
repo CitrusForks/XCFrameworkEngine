@@ -8,6 +8,8 @@
 
 #include "PhysicsActor.h"
 
+#include "Graphics/XCMesh/XCMesh.h"
+
 PhysicsActor::PhysicsActor()
 {
     m_pMesh = nullptr;

@@ -13,6 +13,7 @@
 
 #include "Graphics/XCShaders/XCShaderBufferConstants.h"
 #include "Graphics/XCShaders/XCShaderHandle.h"
+#include "Graphics/XCMesh/XCMesh.h"
 
 #include "Engine/Resource/ResourceManager.h"
 
@@ -20,6 +21,10 @@
 const f32 Soldier::MAX_PITCH_ANGLE = XC_PIDIV4;
 
 Soldier::Soldier(void)
+    : m_useShaderType(ShaderType_LightTexture)
+    , m_isMainCharacter(false)
+    , m_totalPitchAngle(0.0f)
+    , m_gun(nullptr)
 {
 }
 
@@ -37,12 +42,6 @@ void Soldier::PreLoad(const void* fbBuffer)
     m_pMesh = &resMgr.AcquireResource(soldierBuff->XCMeshResourceName()->c_str());
 
     m_collisionDetectionType = COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX;
-
-    m_secondaryLookAxis  = XCVec4();
-    m_secondaryUpAxis    = XCVec4();
-    m_secondaryRightAxis = XCVec4();
-
-    m_totalPitchAngle = 0.0f;
 
     //Gun mesh
     GameActorsFactory& actorFactory = (GameActorsFactory&)SystemLocator::GetInstance()->RequestSystem("GameActorsFactory");

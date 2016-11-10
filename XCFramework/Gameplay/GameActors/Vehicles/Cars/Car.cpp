@@ -7,9 +7,13 @@
 #include "GameplayPrecompiledHeader.h"
 
 #include "Car.h"
+
 #include "Graphics/XCShaders/XCShaderBufferConstants.h"
 #include "Graphics/XCShaders/XCShaderHandle.h"
+#include "Graphics/XCMesh/XCMesh.h"
+
 #include "Gameplay/XCCamera/XCCameraManager.h"
+
 #include "Engine/Resource/ResourceManager.h"
 
 Car::Car(void)
