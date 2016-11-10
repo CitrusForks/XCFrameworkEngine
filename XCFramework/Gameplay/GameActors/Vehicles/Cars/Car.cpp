@@ -40,7 +40,7 @@ void Car::Load()
 {
     m_MTranslation = MatrixTranslate(m_currentPosition);
     
-    m_MRotation= MatrixRotationX(-XC_PIDIV2);
+    m_MRotation= MatrixRotationXYZ(m_initialRotation);
     
     m_World = m_MScaling * m_MRotation * m_MTranslation;
     

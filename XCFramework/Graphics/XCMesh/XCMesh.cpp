@@ -177,9 +177,9 @@ void XCMesh::LoadDynamic()
 
 XCMatrix4Unaligned XCMesh::GetRootTransform()
 {
-    XCMatrix out = MatrixScale(m_globalScaling.x, m_globalScaling.y, m_globalScaling.z)
-        * MatrixRotationXYZ(m_globalRotation.x, m_globalRotation.y, m_globalRotation.z)
-        * MatrixTranslate(m_globalTranslation.x, m_globalTranslation.y, m_globalTranslation.z)
+    XCMatrix out = MatrixScale(XCVec4(m_globalScaling))
+        * MatrixRotationXYZ(XCVec4(m_globalRotation))
+        * MatrixTranslate(XCVec4(m_globalTranslation))
         * aiMatrixToMatrix4(m_sceneAnimator->GetGlobalTransform(m_scene->mRootNode));
 
     return out.GetUnaligned();

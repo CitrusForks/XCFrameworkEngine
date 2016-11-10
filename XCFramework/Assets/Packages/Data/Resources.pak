@@ -24,7 +24,7 @@
     FBXCMeshes:
     [
         { ResourceName:"WoodenDoor", ResourcePath:"Assets\\Meshes\\Door\\door.3ds", TextureRes:"grey_mat", InitialScaling:{x:0.1, y:0.1, z:0.1}, InitialRotation:{x:0.0, y:0.0, z:0.0}, ShaderUsage:LightTexture },
-        { ResourceName:"PorcheCar", ResourcePath:"Assets\\Meshes\\Vehicles\\Cars\\car.3ds", TextureRes:"car_mat_red", InitialScaling:{x:0.001, y:0.001, z:0.001}, InitialRotation:{x:0.0, y:0.0, z:0.0}, ShaderUsage:LightTexture },
+        { ResourceName:"PorcheCar", ResourcePath:"Assets\\Meshes\\Vehicles\\Cars\\car.3ds", TextureRes:"car_mat_red", InitialScaling:{x:0.001, y:0.001, z:0.001}, InitialRotation:{x:-1.57, y:0.0, z:0.0}, ShaderUsage:LightTexture },
         { ResourceName:"Soldier", ResourcePath:"Assets\\Meshes\\Soldiers\\Soldier3ds\\soldier.3ds", TextureRes:"soldier_mesh_tex", InitialScaling:{x:0.04, y:0.04, z:0.04}, InitialRotation:{x:-1.57, y:-1.57, z:0.0}, ShaderUsage:LightTexture },
         { ResourceName:"Gun", ResourcePath:"Assets\\Meshes\\Weapons\\Guns\\gun.3ds", TextureRes:"Placeholder", InitialScaling:{x:0.01, y:0.01, z:0.01}, InitialRotation:{x:0.0, y:0.0, z:0.0}, ShaderUsage:LightTexture },
         { ResourceName:"PistolBullet", ResourcePath:"Assets\\Meshes\\Weapons\\Bullets\\PistolBullet\\Bullet.3ds", TextureRes:"pistol_bullet_mesh_tex", InitialScaling:{x:0.06, y:0.06, z:0.06}, InitialRotation:{x:0.0, y:0.0, z:0.0}, ShaderUsage:LightTexture }

@@ -399,6 +399,11 @@ namespace XCMath
         return MatrixRotationX(angleX) * MatrixRotationY(angleY) * MatrixRotationZ(angleZ);
     }
 
+    inline XCMatrix MatrixRotationXYZ(const XCFloat4& angles)
+    {
+        return MatrixRotationX(angles.Get<X>()) * MatrixRotationY(angles.Get<Y>()) * MatrixRotationZ(angles.Get<Z>());
+    }
+
     inline XCMatrix MatrixRotationAxis(const XCFloat4& axis, f32 angle)
     {
         return XCMatrix(DirectX::XMMatrixRotationAxis(axis.GetPlatformIntrinsic(), angle));
