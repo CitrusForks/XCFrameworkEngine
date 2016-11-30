@@ -23,7 +23,7 @@ public:
 
     virtual ~IRenderableObject() {}
 
-    virtual void        Draw(RenderContext& context) = 0;
+    virtual bool        Draw(RenderContext& renderContext) = 0;
     virtual void        RenderContextCallback(ID3DDeviceContext& renderContext) {}
     virtual void        OnRenderComplete() {}
 

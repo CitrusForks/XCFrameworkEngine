@@ -14,11 +14,11 @@ public:
     SimpleActor();
     virtual ~SimpleActor(void);
 
-    virtual void                    Init(i32 actorId) override;
-    virtual void                    PreLoad(const void* fbBuffer) override { IActor::PreLoad(fbBuffer); }
-    virtual void                    Load() override { IActor::Load(); }
-    virtual void                    UpdateState() override { IActor::UpdateState(); }
-    virtual void                    Update(f32 dt) override;
-    virtual void                    Draw(RenderContext& renderContext) override;
-    virtual void                    Destroy() override;
+    virtual IActor::ActorReturnState Init() override;
+    virtual IActor::ActorReturnState LoadMetaData(const void* metaData) override { return IActor::LoadMetaData(metaData); }
+    virtual IActor::ActorReturnState Load() override { return IActor::Load(); }
+    virtual IActor::ActorReturnState OnLoaded() override { return IActor::OnLoaded(); }
+    virtual IActor::ActorReturnState Update(f32 dt) override;
+    virtual bool                     Draw(RenderContext& renderContext) override;
+    virtual IActor::ActorReturnState Destroy() override;
 };

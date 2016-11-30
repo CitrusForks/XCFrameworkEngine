@@ -27,12 +27,12 @@ Gun::~Gun(void)
 {
 }
 
-void Gun::PreLoad(IActor* parentActor, XCVec3& initialPosition, std::string pMesh)
+IActor::ActorReturnState Gun::LoadMetaData( const void* metaData )
 {
-    SubActor::Init(parentActor);
+    SimpleActor::LoadMetaData(metaData);
 
     ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
-    m_pMesh = &resMgr.AcquireResource(pMesh.c_str());
+    m_pMesh = &resMgr.AcquireResource("Gun");
 
     m_directInput = (XCInput*)&SystemLocator::GetInstance()->RequestSystem("InputSystem");
 
@@ -41,22 +41,24 @@ void Gun::PreLoad(IActor* parentActor, XCVec3& initialPosition, std::string pMes
     m_material.Specular = XCVec4Unaligned(0.2f, 0.2f, 0.2f, 16.0f);
 
     //Get initial position
-    m_currentPosition = initialPosition;
+    //m_currentPosition = initialPosition;
 
     m_useShaderType = ShaderType_LightTexture;
 
-    m_secondaryLookAxis  = XCVec4(0, 0, 0, 0);
-    m_secondaryUpAxis    = XCVec4(0, 0, 0, 0);
-    m_secondaryRightAxis = XCVec4(0, 0, 0, 0);
+    m_secondaryLookAxis  = XCVec4::XCFloat4ZeroVector;
+    m_secondaryUpAxis    = XCVec4::XCFloat4ZeroVector;
+    m_secondaryRightAxis = XCVec4::XCFloat4ZeroVector;
 
     //Bullets
     m_noOfBullets = 100;
     m_recoilDelta = 0.0f;
     m_recoilMaxTime = 0.5f;
     m_canShootBullet = true;
+
+    return IActor::ActorReturnState_Success;
 }
 
-void Gun::Load()
+IActor::ActorReturnState Gun::Load()
 {
     m_currentPosition += GetOffsetPosition();
 
@@ -73,9 +75,28 @@ void Gun::Load()
     m_secondaryLookAxis = m_look;
     m_secondaryUpAxis = m_up;
     m_secondaryRightAxis = m_right;
+
+    return SimpleActor::Load();
 }
 
-void Gun::Update(f32 dt)
+IActor::ActorReturnState Gun::OnLoaded()
+{
+    IActor::ActorReturnState result = SimpleMeshActor::OnLoaded();
+
+    //Since resources are interleaved. We need to wait for them to be loaded. Further way to improve this is, having callbacks when resource is loaded.
+    if (m_pMesh == nullptr || (m_pMesh && m_pMesh->GetResource<XCMesh>()->IsLoaded()))
+    {
+        result = IActor::ActorReturnState_Success;
+    }
+    else
+    {
+        result = IActor::ActorReturnState_Processing;
+    }
+
+    return result;
+}
+
+IActor::ActorReturnState Gun::Update(f32 dt)
 {
     UpdateGunRecoil(dt);
 
@@ -89,7 +110,7 @@ void Gun::Update(f32 dt)
 
     m_pMesh->GetResource<XCMesh>()->Update(dt);
 
-    SimpleMeshActor::Update(dt);
+    return SimpleMeshActor::Update(dt);
 }
 
 void Gun::UpdateGunRecoil(f32 dt)
@@ -128,10 +149,10 @@ void Gun::ApplyOffsetRotation()
     m_transformedRotation *= GetOffsetRotation();
 }
 
-void Gun::Draw(RenderContext& context)
+bool Gun::Draw(RenderContext& renderContext)
 {
     // Set constants
-    ICamera& cam = context.GetGlobalShaderData().m_camera;
+    ICamera& cam = renderContext.GetGlobalShaderData().m_camera;
     PerObjectBuffer perObject = {
         MatrixTranspose(m_World).GetUnaligned(),
         MatrixTranspose(m_World * cam.GetViewMatrix() * cam.GetProjectionMatrix()).GetUnaligned(),
@@ -141,7 +162,7 @@ void Gun::Draw(RenderContext& context)
     };
 
     m_pMesh->GetResource<XCMesh>()->DrawInstanced(perObject);
-    SimpleMeshActor::Draw(context);
+    return SimpleMeshActor::Draw(renderContext);
 }
 
 void Gun::CheckInput()
@@ -166,15 +187,15 @@ void Gun::ShootBullet(std::string bulletActorType, XCVec3& startPosition, XCVec3
 
     if (bullet)
     {
-        bullet->PreLoad(startPosition, target, "PistolBullet");
+        bullet->LoadMetaData(nullptr);
         worldSystem.RequestLoadActor(bullet);
     }
 }
 
-void Gun::Destroy()
+IActor::ActorReturnState Gun::Destroy()
 {
-    SimpleMeshActor::Destroy();
-
     ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
     resMgr.ReleaseResource(m_pMesh);
+
+    return SimpleMeshActor::Destroy();
 }

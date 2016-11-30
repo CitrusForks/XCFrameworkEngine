@@ -18,12 +18,13 @@ public:
     SimpleMeshActor();
     virtual ~SimpleMeshActor(void);
 
-    virtual void                Init(i32 actorId);
-    virtual void                PreLoad(const void* fbBuffer) { SimpleActor::PreLoad(fbBuffer); }
-    virtual void                Update(f32 dt);
-    virtual void                Draw(RenderContext& renderContext);
-    virtual void                Destroy();
+    virtual IActor::ActorReturnState    Init();
+    virtual IActor::ActorReturnState    LoadMetaData(const void* metaData) { return SimpleActor::LoadMetaData(metaData); }
+    virtual IActor::ActorReturnState    OnLoaded() override { return SimpleActor::OnLoaded(); }
+    virtual IActor::ActorReturnState    Update(f32 dt);
+    virtual bool                        Draw(RenderContext& renderContext);
+    virtual IActor::ActorReturnState    Destroy();
 
 protected:
-    ResourceHandle*             m_pMesh;
+    ResourceHandle*                     m_pMesh;
 };

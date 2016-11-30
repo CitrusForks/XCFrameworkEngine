@@ -19,11 +19,12 @@ public:
     Gun(void);
     virtual ~Gun(void);
 
-    virtual void       PreLoad(IActor* parentActor, XCVec3& initialPosition, std::string pMesh);
-    virtual void       Load();
-    virtual void       Update(f32 dt);
-    virtual void       Draw(RenderContext& renderContext);
-    virtual void       Destroy();
+    virtual IActor::ActorReturnState LoadMetaData(const void* metaData);
+    virtual IActor::ActorReturnState Load();
+    virtual IActor::ActorReturnState OnLoaded() override;
+    virtual IActor::ActorReturnState Update(f32 dt);
+    virtual bool                     Draw(RenderContext& renderContext);
+    virtual IActor::ActorReturnState Destroy();
 
     virtual void       UpdateOffsets(f32 dt);
     virtual void       ApplyOffsetRotation();

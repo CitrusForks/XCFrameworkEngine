@@ -8,6 +8,10 @@
 
 #include "SystemFactory.h"
 
+SystemFactory::SystemFactory()
+    : m_systemInstanceCount(0)
+{
+}
 
 SystemFactory::~SystemFactory()
 {
@@ -26,6 +30,7 @@ ISystem* SystemFactory::CreateSystem(std::string classKey)
     ISystem* outSystem = (ISystem*) CreateObject(classKey);
     XCASSERT(outSystem);
 
+    outSystem->SetBaseObjectId(++m_systemInstanceCount);
     outSystem->SetSystemName(classKey);
 
     return outSystem;

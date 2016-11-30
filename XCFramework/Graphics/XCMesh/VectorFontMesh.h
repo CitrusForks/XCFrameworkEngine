@@ -33,14 +33,14 @@ public:
     VectorFontMesh();
     virtual ~VectorFontMesh();
 
-    void            Init(i32 resourceId, std::string userFriendlyName) override;
+    void            Init(std::string userFriendlyName) override;
     void            DrawText(std::string text, XCVec3Unaligned& position, RenderContext& context);
     void            Destroy() override;
 
 protected:
     void            CreateConstantBuffer() override;
 
-    void            Draw(RenderContext& context) override;
+    bool            Draw(RenderContext& context) override;
     void            DrawSubMesh(RenderContext& renderContext, u32 meshIndex, u32 instanceCount = 1);
 
 private:

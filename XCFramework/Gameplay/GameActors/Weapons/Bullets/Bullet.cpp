@@ -21,29 +21,32 @@ Bullet::~Bullet(void)
 {
 }
 
-void Bullet::PreLoad(XCVec3& initialPosition, XCVec3& target, std::string pMeshName)
+IActor::ActorReturnState Bullet::LoadMetaData( const void* metaData )
 {
+    //TODO : Gen a fb in runtime
+    XCASSERT(false);
+
     ResourceManager& resMgr = (ResourceManager&)SystemLocator::GetInstance()->RequestSystem("ResourceManager");
-    m_pMesh     = &resMgr.AcquireResource(pMeshName.c_str());
+    //m_pMesh     = &resMgr.AcquireResource(pMeshName.c_str());
 
     m_material.Ambient = XCVec4Unaligned(1.0f, 1.0f, 1.0f, 1.0f);
     m_material.Diffuse = XCVec4Unaligned(0.5f, 0.8f, 0.0f, 1.0f);
     m_material.Specular = XCVec4Unaligned(0.2f, 0.2f, 0.2f, 16.0f);
 
     //Get initial position
-    m_currentPosition = initialPosition;
+    //m_currentPosition = initialPosition;
 
     m_useShaderType = ShaderType_LightTexture;
     m_collisionDetectionType = COLLISIONDETECTIONTYPE_BULLET;
 
     //Assign the look
-    m_target = target;
+    //m_target = target;
 
     Logger("[Bullet] Preload done");
-    PhysicsActor::PreLoad(nullptr);
+    return PhysicsActor::LoadMetaData(metaData);
 }
 
-void Bullet::Load()
+IActor::ActorReturnState Bullet::Load()
 {
     m_MTranslation = MatrixTranslate(m_currentPosition.Get<X>(), m_currentPosition.Get<Y>(), m_currentPosition.Get<Z>());
 
@@ -60,7 +63,7 @@ void Bullet::Load()
 
     Logger("[Bullet] Load done");
 
-    PhysicsActor::Load();
+    return PhysicsActor::Load();
 }
 
 void Bullet::SetInitialPhysicsProperties()
@@ -77,10 +80,8 @@ void Bullet::Shoot(f32 scalarForce)
     AddForce(m_look * scalarForce);
 }
 
-void Bullet::Update(f32 dt)
+IActor::ActorReturnState Bullet::Update(f32 dt)
 {
-    PhysicsActor::Update(dt);
-
     Integrator(dt);
 
     m_MTranslation = MatrixTranslate(m_Position.Get<X>(), m_Position.Get<Y>(), m_Position.Get<Z>());
@@ -99,18 +100,20 @@ void Bullet::Update(f32 dt)
     {
         Invalidate();
     }
+
+    return PhysicsActor::Update(dt);
 }
 
-void Bullet::Draw(RenderContext& context)
+bool Bullet::Draw(RenderContext& renderContext)
 {
 #if defined(XCGRAPHICS_DX11)
-    context.GetDeviceContext().IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    renderContext.GetDeviceContext().IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 #endif
     u32 stride = sizeof(VertexPosNormTex);
     u32 offset = 0;
     
     // Set constants
-    ICamera& cam = context.GetGlobalShaderData().m_camera;
+    ICamera& cam = renderContext.GetGlobalShaderData().m_camera;
     PerObjectBuffer perObject = {
         MatrixTranspose(m_World).GetUnaligned(),
         MatrixTranspose(m_World * cam.GetViewMatrix() * cam.GetProjectionMatrix()).GetUnaligned(),
@@ -121,10 +124,10 @@ void Bullet::Draw(RenderContext& context)
 
     m_pMesh->GetResource<XCMesh>()->DrawInstanced(perObject);
 
-    PhysicsActor::Draw(context);
+    return PhysicsActor::Draw(renderContext);
 }
 
-void Bullet::Destroy()
+IActor::ActorReturnState Bullet::Destroy()
 {
-    PhysicsActor::Destroy();
+    return PhysicsActor::Destroy();
 }

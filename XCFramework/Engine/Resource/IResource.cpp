@@ -9,7 +9,6 @@
 
 IResource::IResource()
     : m_resourceType(RESOURCETYPE_MAX)
-    , m_resourceId(-1)
     , m_resourceState(ResourceState_UnLoaded)
     , m_userFriendlyName("")
     , m_resourcePath("")
@@ -19,9 +18,8 @@ IResource::IResource()
     m_renderWorkerMask = WorkerMask_None;
 }
 
-void IResource::Init(i32 id, std::string userFriendlyName)
+void IResource::Init(std::string userFriendlyName)
 {
-    m_resourceId = id;
     m_userFriendlyName = userFriendlyName;
 }
 

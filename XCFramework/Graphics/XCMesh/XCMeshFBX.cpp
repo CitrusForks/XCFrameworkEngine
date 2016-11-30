@@ -69,9 +69,9 @@ void XCMeshFBX::CreateConstantBuffer()
     XCMesh::CreateConstantBuffer();
 }
 
-void XCMeshFBX::Draw(RenderContext & context)
+bool XCMeshFBX::Draw(RenderContext & context)
 {
-    XCMesh::Draw(context);
+    return XCMesh::Draw(context);
 }
 
 void DisplayString(const c8* pHeader, const c8* pValue = "", const c8* pSuffix = "")

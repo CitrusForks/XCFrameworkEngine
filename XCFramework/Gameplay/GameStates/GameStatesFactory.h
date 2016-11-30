@@ -8,18 +8,19 @@
 
 #include "Base/Serializer/ObjectFactory.h"
 #include "Base/System/ISystem.h"
+
 #include "IGameState.h"
 #include "GameStateTypes.h"
 
 using namespace GameState;
 
-class GameStatesFactory: ObjectFactory, public ISystem
+class GameStatesFactory : ObjectFactory, public ISystem
 {
 public:
     DECLARE_SYSTEMOBJECT_CREATION(GameStatesFactory)
 
     GameStatesFactory();
-    virtual ~GameStatesFactory();
+    ~GameStatesFactory();
 
     void                            InitFactory()       override final;
     void                            DestroyFactory()    override final;
@@ -27,11 +28,9 @@ public:
     void                            RegisterStates();
 
     IGameState*                     CreateState(std::string userFriendlyName);
-    void                            LoadStates(FILE* packageFile, IGameState* const gameState);
 
 private:
 
     i32                                  m_statesCount;
     std::map<EGameState, std::string>    m_registeredStates;
-    std::mutex                           m_gameStatesFactoryLock;
 };

@@ -20,12 +20,12 @@ public:
     Terrain();
     virtual ~Terrain(void);
  
-    void                                PreLoad(const void* fbBuffer) override;
-    void                                UpdateState() override;
-    void                                Load() override;
-    void                                Update(f32 dt) override;
-    void                                Draw(RenderContext& context) override;
-    void                                Destroy() override;
+    IActor::ActorReturnState            LoadMetaData(const void* metaData) override;
+    IActor::ActorReturnState            Load() override;
+    IActor::ActorReturnState            OnLoaded() override;
+    IActor::ActorReturnState            Update(f32 dt) override;
+    bool                                Draw(RenderContext& renderContext) override;
+    IActor::ActorReturnState            Destroy() override;
 
     XCVec4                              CheckTerrainCollisionFromPoint(OrientedBoundingBox* bbox);
     XCVec4                              GetPointAtIndex(i32 pointIndex) const;

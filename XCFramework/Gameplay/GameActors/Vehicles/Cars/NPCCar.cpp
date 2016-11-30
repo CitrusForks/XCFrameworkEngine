@@ -18,12 +18,12 @@ NPCCar::~NPCCar(void)
 {
 }
 
-void NPCCar::PreLoad(const void* fbBuffer)
+IActor::ActorReturnState NPCCar::LoadMetaData( const void* metaData )
 {
-    const FBNPCCar* carBuff = static_cast<const FBNPCCar*>(fbBuffer);
-    Car::PreLoad(carBuff->Base());
+    const FBNPCCar* carBuff = static_cast<const FBNPCCar*>(metaData);
+    return Car::LoadMetaData(carBuff->Base());
 }
-void NPCCar::Update(f32 dt)
+IActor::ActorReturnState NPCCar::Update(f32 dt)
 {
     Integrator(dt);
     ClearForce();
@@ -32,10 +32,10 @@ void NPCCar::Update(f32 dt)
 
     m_currentPosition = m_Position;
 
-    Car::Update(dt);
+    return Car::Update(dt);
 }
 
-void NPCCar::Destroy()
+IActor::ActorReturnState NPCCar::Destroy()
 {
-    Car::Destroy();
+    return Car::Destroy();
 }

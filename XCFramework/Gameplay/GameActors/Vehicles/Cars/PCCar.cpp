@@ -17,29 +17,29 @@ PCCar::~PCCar(void)
 {
 }
 
-void PCCar::Init(i32 actorId)
+IActor::ActorReturnState PCCar::Init()
 {
-    Car::Init(actorId);
-
     m_directInput = (XCInput*)&SystemLocator::GetInstance()->RequestSystem("InputSystem");
+
+    return Car::Init();
 }
 
-void PCCar::PreLoad(const void* fbBuffer)
+IActor::ActorReturnState PCCar::LoadMetaData( const void* metaData )
 {
-    const FBPCCar* carBuff = static_cast<const FBPCCar*>(fbBuffer);
-    Car::PreLoad(carBuff->Base());
+    const FBPCCar* carBuff = static_cast<const FBPCCar*>(metaData);
+    return Car::LoadMetaData(carBuff->Base());
 }
 
-void PCCar::Load()
+IActor::ActorReturnState PCCar::Load()
 {
     XCVec4 distance(0.0f, 7.0f, 25.0f, 0.0f);
     TPCChaseableActor::SetDistanceFromTarget(distance);
     TPCChaseableActor::SetChasingAxis(IActor::m_look, IActor::m_right, IActor::m_up);
 
-    Car::Load();
+    return Car::Load();
 }
 
-void PCCar::Update(f32 dt)
+IActor::ActorReturnState PCCar::Update(f32 dt)
 {
     if (getIsControlled())
     {
@@ -71,10 +71,10 @@ void PCCar::Update(f32 dt)
 
     m_currentPosition = m_Position;
 
-    Car::Update(dt);
+    return Car::Update(dt);
 }
 
-void PCCar::Destroy()
+IActor::ActorReturnState PCCar::Destroy()
 {
-    Car::Destroy();
+    return Car::Destroy();
 }

@@ -7,25 +7,23 @@
 #pragma once
 
 #include "Base/Serializer/ObjectFactory.h"
+
 #include "IResource.h"
 #include "ResourceTypes.h"
 
-class ResourceFactory : public ObjectFactory, public ISystem
+class ResourceFactory : ObjectFactory, public ISystem
 {
 public:
     DECLARE_SYSTEMOBJECT_CREATION(ResourceFactory)
 
     ResourceFactory();
-    virtual ~ResourceFactory();
+    ~ResourceFactory();
 
     void                            InitFactory()    override final;
     void                            DestroyFactory() override final;
 
-    IResource*                      createResource(std::string classKey, std::string userFriendlyName);
-    IResource*                      createResource(std::string classKey);
-
-    void                            loadResource(FILE* packageFile, IResource* const resource);
-    void                            loadResource(const void* buffer, IResource* const resource);
+    IResource*                      CreateResource(std::string classKey, std::string userFriendlyName);
+    IResource*                      CreateResource(std::string classKey);
 
 private:
     i32                             m_resourceCount;

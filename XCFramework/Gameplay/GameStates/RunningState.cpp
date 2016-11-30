@@ -52,7 +52,7 @@ void RunningState::Init()
 #endif
 
     std::unique_ptr<SimpleSkyBox> pSkyBox = (std::unique_ptr<SimpleSkyBox>)(SimpleSkyBox*)actorFactory.CreateActor("SimpleSkyBox");
-    pSkyBox->PreLoad(toXMVECTOR(0.0f, 0.0f, 0.0f, 1.0f), toXMVECTOR(0.0f, 0.0f, 0.0f, 1.0f), toXMVECTOR(1000.0f, 1000.0f, 1000.0f, 1.0f), Material(), (CubeTexture3D*)resMgr.AcquireResource("cubemap_bright"), RasterType_FillSolid);
+    pSkyBox->LoadMetaData();
     m_worldSystem->RequestAddActor(std::move(pSkyBox));
 
     std::unique_ptr<TexturedPlane> pTexturedPlane = (std::unique_ptr<TexturedPlane>)(TexturedPlane*)actorFactory.CreateActor("TexturedPlane");
@@ -60,36 +60,21 @@ void RunningState::Init()
     m_worldSystem->RequestAddActor(std::move(pTexturedPlane));
 
     std::unique_ptr<Waves> pWave = (std::unique_ptr<Waves>)(Waves*)actorFactory.CreateActor("Waves");
-    pWave->PreLoad(XCVec3(100, 0, 0), 50, 50, 1, 1);
+    pWave->LoadMetaData();
     m_worldSystem->RequestAddActor(std::move(pWave));
     
     std::unique_ptr<Terrain> pHeightMapTerrain = (std::unique_ptr<Terrain>)(Terrain*)actorFactory.CreateActor("Terrain");
-    pHeightMapTerrain->PreLoad("Assets\\Textures\\Environment\\Terrain\\SimpleTerrain1.bmp",
-                                                    (Texture2D*)resMgr.AcquireResource("multi_grass"),
-                                                    (Texture2D*)resMgr.AcquireResource("multi_ground"), 
-                                                    (Texture2D*)resMgr.AcquireResource("Sand"),
-                                                    (Texture2D*)resMgr.AcquireResource("multi_blend"),
-                                                    XCVec3(50, -20, -40), 25, 25, 1.0f, 1.0f);
+    pHeightMapTerrain->LoadMetaData();
     m_worldSystem->RequestAddActor(std::move(pHeightMapTerrain));
     
     pHeightMapTerrain = (std::unique_ptr<Terrain>)(Terrain*)actorFactory.CreateActor("Terrain");
-    pHeightMapTerrain->PreLoad("Assets\\Textures\\Environment\\Terrain\\terrain1.bmp",
-                                                  (Texture2D*)resMgr.AcquireResource("Sand"),
-                                                  (Texture2D*)resMgr.AcquireResource("multi_ground"),
-                                                  (Texture2D*)resMgr.AcquireResource("multi_grass"),
-                                                  (Texture2D*)resMgr.AcquireResource("multi_blend"),
-                                                  XCVec3(300, -20, -40), 25, 25, 1.0f, 1.0f);
+    pHeightMapTerrain->LoadMetaData();
     m_worldSystem->RequestAddActor(std::move(pHeightMapTerrain));
 
 
 #if LOAD_STRESS_ENABLE
     pHeightMapTerrain = (std::unique_ptr<Terrain>)(Terrain*)actorFactory.CreateActor("Terrain");
-    pHeightMapTerrain->PreLoad("Assets\\Textures\\Environment\\Terrain\\GrayscaleImages\\gradient1.bmp",
-                                                  (Texture2D*)resMgr.AcquireResource("Sand"),
-                                                  (Texture2D*)resMgr.AcquireResource("multi_ground"),
-                                                  (Texture2D*)resMgr.AcquireResource("multi_grass"),
-                                                  (Texture2D*)resMgr.AcquireResource("multi_blend"),
-                                                  XCVec3(50, -20, -300), 25, 25, 1.0f, 1.0f);
+    pHeightMapTerrain->LoadMetaData();
     m_worldSystem->RequestAddActor(std::move(pHeightMapTerrain));
 
     pHeightMapTerrain = std::make_unique<Terrain>("Assets\\Textures\\Environment\\Terrain\\GrayscaleImages\\gradient2.bmp",
@@ -108,52 +93,52 @@ void RunningState::Init()
 #endif
 
     std::unique_ptr<PCCar> pCarMesh = (std::unique_ptr<PCCar>)(PCCar*)actorFactory.CreateActor("PCCar");
-    pCarMesh->PreLoad(XCVec3(0, 2, 0), (XCMesh*)resMgr.AcquireResource("PorcheCar"));
+    pCarMesh->LoadMetaData();
     m_worldSystem->RequestAddActor(std::move(pCarMesh));
 
     std::unique_ptr<NPCCar> pCarMeshNPC = (std::unique_ptr<NPCCar>)(NPCCar*)actorFactory.CreateActor("NPCCar");
-    pCarMeshNPC->PreLoad(XCVec3(10, 2, 10), (XCMesh*)resMgr.AcquireResource("PorcheCar"));
+    pCarMeshNPC->LoadMetaData();
     m_worldSystem->RequestAddActor(std::move(pCarMeshNPC));
 
     std::unique_ptr<Door> pDoorMesh = (std::unique_ptr<Door>)(Door*)actorFactory.CreateActor("Door");
-    pDoorMesh->PreLoad((Texture2D*)resMgr.AcquireResource("multi_ground"), XCVec3(0, 2, 10), (XCMesh*)resMgr.AcquireResource("WoodenDoor"));
+    pDoorMesh->LoadMetaData();
     m_worldSystem->RequestAddActor(std::move(pDoorMesh));
 
     std::unique_ptr<PCSoldier> pSoldierMesh = (std::unique_ptr<PCSoldier>)(PCSoldier*)actorFactory.CreateActor("PCSoldier");
-    pSoldierMesh->PreLoad(XCVec3(10, 2, 10), (XCMesh*)resMgr.AcquireResource("Soldier"));
+    pSoldierMesh->LoadMetaData();
     m_worldSystem->RequestAddActor(std::move(pSoldierMesh));
 
     std::unique_ptr<NPCSoldier> pSoldierMeshNPC = (std::unique_ptr<NPCSoldier>)(NPCSoldier*)actorFactory.CreateActor("NPCSoldier");
-    pSoldierMeshNPC->PreLoad(XCVec3(-30, 2, 50), (XCMesh*)resMgr.AcquireResource("Soldier"));
+    pSoldierMeshNPC->LoadMetaData();
     m_worldSystem->RequestAddActor(std::move(pSoldierMeshNPC));
     pSoldierMeshNPC = (std::unique_ptr<NPCSoldier>)(NPCSoldier*)actorFactory.CreateActor("NPCSoldier");
-    pSoldierMeshNPC->PreLoad(XCVec3(-30, 2, 60), (XCMesh*)resMgr.AcquireResource("Soldier"));
+    pSoldierMeshNPC->LoadMetaData();
     m_worldSystem->RequestAddActor(std::move(pSoldierMeshNPC));
     pSoldierMeshNPC = (std::unique_ptr<NPCSoldier>)(NPCSoldier*)actorFactory.CreateActor("NPCSoldier");
-    pSoldierMeshNPC->PreLoad(XCVec3(-30, 2, 70), (XCMesh*)resMgr.AcquireResource("Soldier"));
+    pSoldierMeshNPC->LoadMetaData();
     m_worldSystem->RequestAddActor(std::move(pSoldierMeshNPC));
     pSoldierMeshNPC = (std::unique_ptr<NPCSoldier>)(NPCSoldier*)actorFactory.CreateActor("NPCSoldier");
-    pSoldierMeshNPC->PreLoad(XCVec3(-30, 2, 80), (XCMesh*)resMgr.AcquireResource("Soldier"));
+    pSoldierMeshNPC->LoadMetaData();
     m_worldSystem->RequestAddActor(std::move(pSoldierMeshNPC));
     pSoldierMeshNPC = (std::unique_ptr<NPCSoldier>)(NPCSoldier*)actorFactory.CreateActor("NPCSoldier");
-    pSoldierMeshNPC->PreLoad(XCVec3(-30, 2, 90), (XCMesh*)resMgr.AcquireResource("Soldier"));
+    pSoldierMeshNPC->LoadMetaData();
     m_worldSystem->RequestAddActor(std::move(pSoldierMeshNPC));
     
 #if LOAD_STRESS_ENABLE
     pSoldierMeshNPC = (std::unique_ptr<NPCSoldier>)(NPCSoldier*)actorFactory.CreateActor("NPCSoldier");
-    pSoldierMeshNPC->PreLoad(XCVec3(-30, 2, 10), (XCMesh*)resMgr.AcquireResource("Soldier"));
+    pSoldierMeshNPC->LoadMetaData();
     m_worldSystem->RequestAddActor(std::move(pSoldierMeshNPC));
     pSoldierMeshNPC = (std::unique_ptr<NPCSoldier>)(NPCSoldier*)actorFactory.CreateActor("NPCSoldier");
-    pSoldierMeshNPC->PreLoad(XCVec3(-30, 2, 20), (XCMesh*)resMgr.AcquireResource("Soldier"));
+    pSoldierMeshNPC->LoadMetaData();
     m_worldSystem->RequestAddActor(std::move(pSoldierMeshNPC));
     pSoldierMeshNPC = (std::unique_ptr<NPCSoldier>)(NPCSoldier*)actorFactory.CreateActor("NPCSoldier");
-    pSoldierMeshNPC->PreLoad(XCVec3(-30, 2, 30), (XCMesh*)resMgr.AcquireResource("Soldier"));
+    pSoldierMeshNPC->LoadMetaData();
     m_worldSystem->RequestAddActor(std::move(pSoldierMeshNPC));
     pSoldierMeshNPC = (std::unique_ptr<NPCSoldier>)(NPCSoldier*)actorFactory.CreateActor("NPCSoldier");
-    pSoldierMeshNPC->PreLoad(XCVec3(-30, 2, 40), (XCMesh*)resMgr.AcquireResource("Soldier"));
+    pSoldierMeshNPC->LoadMetaData();
     m_worldSystem->RequestAddActor(std::move(pSoldierMeshNPC));
     pSoldierMeshNPC = (std::unique_ptr<NPCSoldier>)(NPCSoldier*)actorFactory.CreateActor("NPCSoldier");
-    pSoldierMeshNPC->PreLoad(XCVec3(-30, 2, 100), (XCMesh*)resMgr.AcquireResource("Soldier"));
+    pSoldierMeshNPC->LoadMetaData();
     m_worldSystem->RequestAddActor(std::move(pSoldierMeshNPC));
 #endif
 #endif
@@ -186,16 +171,16 @@ void RunningState::Update(f32 dt)
 
         if (m_directInput->KeyDown(INPUT_KEY_5))
         {
-            m_worldSystem->EnablePhysics(true);
+            //m_worldSystem->EnablePhysics(true);
         }
 
         if (m_directInput->KeyDown(INPUT_KEY_6))
         {
-            m_worldSystem->EnablePhysics(false);
+            //m_worldSystem->EnablePhysics(false);
         }
-
-        m_worldSystem->Update(dt);
     }
+
+    m_worldSystem->Update(dt);
 
     if (m_directInput->KeyDown(INPUT_KEY_ESCAPE))
     {

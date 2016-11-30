@@ -123,11 +123,6 @@ i32 ResourceManager::LoadResourcesFromPackage(char* filePath)
 }
 #endif
 
-i32 ResourceManager::LoadResourcesFromPackageFB(const char* dataPath)
-{
-    return true;
-}
-
 bool ResourceManager::IsPackageLoaded()
 {
     return m_packageLoaded;
@@ -135,7 +130,7 @@ bool ResourceManager::IsPackageLoaded()
 
 IResource* ResourceManager::CreateResource(std::string resourceTypeName, std::string userFriendlyName)
 {
-    return m_resourceFactory->createResource(resourceTypeName, userFriendlyName);
+    return m_resourceFactory->CreateResource(resourceTypeName, userFriendlyName);
 }
 
 void ResourceManager::AddResource(ResourceHandle& resource)

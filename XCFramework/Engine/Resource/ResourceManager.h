@@ -36,8 +36,6 @@ public:
     i32                                    LoadResourcesFromPackage(char* filePath);
 #endif
 
-    i32                                    LoadResourcesFromPackageFB(const char* dataPath);
-
     ResourceHandle&                        AcquireResource(const char* userFriendlyName);
     void                                   ReleaseResource(ResourceHandle* resHandle);
 

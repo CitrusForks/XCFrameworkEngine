@@ -32,11 +32,11 @@ Soldier::~Soldier(void)
 {
 }
 
-void Soldier::PreLoad(const void* fbBuffer)
+IActor::ActorReturnState Soldier::LoadMetaData( const void* metaData )
 {
-    const FBSoldier* soldierBuff = (FBSoldier*)fbBuffer;
+    const FBSoldier* soldierBuff = (FBSoldier*)metaData;
 
-    PhysicsActor::PreLoad(soldierBuff->Base());
+    PhysicsActor::LoadMetaData(soldierBuff->Base());
 
     ResourceManager& resMgr = (ResourceManager&)SystemLocator::GetInstance()->RequestSystem("ResourceManager");
     m_pMesh = &resMgr.AcquireResource(soldierBuff->XCMeshResourceName()->c_str());
@@ -44,13 +44,15 @@ void Soldier::PreLoad(const void* fbBuffer)
     m_collisionDetectionType = COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX;
 
     //Gun mesh
-    GameActorsFactory& actorFactory = (GameActorsFactory&)SystemLocator::GetInstance()->RequestSystem("GameActorsFactory");
+    //GameActorsFactory& actorFactory = (GameActorsFactory&)SystemLocator::GetInstance()->RequestSystem("GameActorsFactory");
 
-    m_gun = ((Gun*) actorFactory.CreateActor("Gun"));
-    m_gun->PreLoad(this, m_currentPosition, "Gun");
+    //m_gun = ((Gun*) actorFactory.CreateActor("Gun"));
+    //m_gun->LoadMetaData(nullptr);
+
+    return IActor::ActorReturnState_Success;
 }
 
-void Soldier::Load()
+IActor::ActorReturnState Soldier::Load()
 {
     m_MTranslation = MatrixTranslate(m_currentPosition);
 
@@ -63,12 +65,12 @@ void Soldier::Load()
     m_secondaryRightAxis = m_right;
 
     //Call the sub actors methods
-    m_gun->Load();
+    //m_gun->Load();
 
     XCVec4 pos = XCVec4(1.0f, 3.0f, 2.0f, 0.0f);
-    m_gun->GetSubActor()->InitOffsets(pos, m_secondaryLookAxis, m_secondaryRightAxis, m_secondaryUpAxis);
+    //m_gun->GetSubActor()->InitOffsets(pos, m_secondaryLookAxis, m_secondaryRightAxis, m_secondaryUpAxis);
 
-    PhysicsActor::Load();
+    return PhysicsActor::Load();
 }
 
 void Soldier::SetInitialPhysicsProperties()
@@ -77,17 +79,20 @@ void Soldier::SetInitialPhysicsProperties()
     InitXPhysics(m_currentPosition, XCVec4(), XCVec4(), 10, (f32)0.8);
 }
 
-void Soldier::UpdateState()
+IActor::ActorReturnState Soldier::OnLoaded()
 {
-    if (m_pMesh && m_pMesh->GetResource<XCMesh>()->IsLoaded())
+    //if (m_gun->OnLoaded() == IActor::ActorReturnState_Success)
     {
-        m_useShaderType = m_pMesh->GetResource<XCMesh>()->IsSkinnedMesh() ? ShaderType_SkinnedCharacter : ShaderType_LightTexture;
+        if (m_pMesh == nullptr || (m_pMesh && m_pMesh->GetResource<XCMesh>()->IsLoaded()))
+        {
+            m_useShaderType = m_pMesh->GetResource<XCMesh>()->IsSkinnedMesh() ? ShaderType_SkinnedCharacter : ShaderType_LightTexture;
+            return PhysicsActor::OnLoaded();
+        }
     }
-
-    PhysicsActor::UpdateState();
+    return IActor::ActorReturnState_Processing;
 }
 
-void Soldier::Update(f32 dt)
+IActor::ActorReturnState Soldier::Update(f32 dt)
 {
     //Update the rotation based on initial and transformed.
     m_MRotation = m_transformedRotation;
@@ -98,7 +103,9 @@ void Soldier::Update(f32 dt)
 
     PhysicsActor::Update(dt);
 
-    m_gun->Update(dt);
+    //m_gun->Update(dt);
+
+    return PhysicsActor::Update(dt);
 }
 
 void Soldier::AccelerateCar(f32 distance)
@@ -139,11 +146,11 @@ void Soldier::Yaw(f32 angle, f32 scalarForce)
     m_transformedRotation *= rotation;
 
     //Set the offset gun rotation too
-    m_gun->SetOffsetLook(m_secondaryLookAxis);
-    m_gun->SetOffsetUp(m_secondaryUpAxis);
-    m_gun->SetOffsetRight(m_secondaryRightAxis);
-
-    m_gun->SetOffsetRotation(rotation);
+    //m_gun->SetOffsetLook(m_secondaryLookAxis);
+    //m_gun->SetOffsetUp(m_secondaryUpAxis);
+    //m_gun->SetOffsetRight(m_secondaryRightAxis);
+    //
+    //m_gun->SetOffsetRotation(rotation);
 }
 
 void Soldier::Pitch(f32 angle, f32 scalarForce)
@@ -166,28 +173,28 @@ void Soldier::Pitch(f32 angle, f32 scalarForce)
         m_secondaryUpAxis   = VectorTransformNormal(m_secondaryUpAxis, rotation);
         m_secondaryLookAxis = VectorTransformNormal(m_secondaryLookAxis, rotation);
     
-        m_gun->SetOffsetLook(m_secondaryLookAxis);
-        m_gun->SetOffsetUp(m_secondaryUpAxis);
-        m_gun->SetOffsetRight(m_secondaryRightAxis);
-    
-        //This rotation needs to be set for offsets
-        m_gun->SetOffsetRotation(m_gun->GetOffsetRotation() * rotation);
+        //m_gun->SetOffsetLook(m_secondaryLookAxis);
+        //m_gun->SetOffsetUp(m_secondaryUpAxis);
+        //m_gun->SetOffsetRight(m_secondaryRightAxis);
+        //
+        ////This rotation needs to be set for offsets
+        //m_gun->SetOffsetRotation(m_gun->GetOffsetRotation() * rotation);
     }
 
-    m_gun->ApplyOffsetRotation();
+    //m_gun->ApplyOffsetRotation();
 }
 
 void Soldier::ApplyRotation(XCMatrix4& rotation)
 {
     //This method makes sure that the rotation is applied to parent and it's sub actors.
     m_MRotation *= rotation;
-    m_gun->SetOffsetRotation(m_gun->GetOffsetRotation() * rotation);
+    //m_gun->SetOffsetRotation(m_gun->GetOffsetRotation() * rotation);
 }
 
-void Soldier::Draw(RenderContext& context)
+bool Soldier::Draw(RenderContext& renderContext)
 {
     // Set constants
-    ICamera& cam = context.GetGlobalShaderData().m_camera;
+    ICamera& cam = renderContext.GetGlobalShaderData().m_camera;
 
     PerObjectBuffer perObject = {};
 
@@ -217,17 +224,17 @@ void Soldier::Draw(RenderContext& context)
 
     m_pMesh->GetResource<XCMesh>()->DrawInstanced(perObject);
 
-    PhysicsActor::Draw(context);
+    //m_gun->Draw(renderContext);
 
-    m_gun->Draw(context);
+    return PhysicsActor::Draw(renderContext);
 }
 
-void Soldier::Destroy()
+IActor::ActorReturnState Soldier::Destroy()
 {
-    PhysicsActor::Destroy();
-
     ResourceManager& resMgr = (ResourceManager&)SystemLocator::GetInstance()->RequestSystem("ResourceManager");
     resMgr.ReleaseResource(m_pMesh);
 
-    m_gun->Destroy();
+    //m_gun->Destroy();
+
+    return PhysicsActor::Destroy();
 }

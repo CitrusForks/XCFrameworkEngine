@@ -66,7 +66,7 @@ struct cbInstancedBuffer
 
 struct cbBoneBuffer
 {
-    XCMatrixUnaligned34   gBoneMatrix[100];
+    XCMatrix4Unaligned    gBoneMatrix[100];
 };
 
 struct cbVectorFontInstanced

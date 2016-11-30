@@ -18,9 +18,9 @@ VectorFontMesh::~VectorFontMesh()
 {
 }
 
-void VectorFontMesh::Init(i32 resourceId, std::string userFriendlyName)
+void VectorFontMesh::Init(std::string userFriendlyName)
 {
-    XCMeshFBX::Init(resourceId, userFriendlyName);
+    XCMeshFBX::Init(userFriendlyName);
 
     m_material.Ambient = XCVec4Unaligned(1.0f, 1.0f, 1.0f, 1.0f);
     m_material.Diffuse = XCVec4Unaligned(0.5f, 0.8f, 0.0f, 1.0f);
@@ -127,7 +127,7 @@ void VectorFontMesh::CreateConstantBuffer()
     }
 }
 
-void VectorFontMesh::Draw(RenderContext& context)
+bool VectorFontMesh::Draw(RenderContext& context)
 {
     context.ApplyShader(m_shaderType);
 
@@ -149,6 +149,8 @@ void VectorFontMesh::Draw(RenderContext& context)
 
     //Clear the existing buffer
     m_subMeshesIdBuffer.clear();
+
+    return true;
 }
 
 void VectorFontMesh::DrawSubMesh(RenderContext & renderContext, u32 meshIndex, u32 instanceCount)

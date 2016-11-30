@@ -19,11 +19,11 @@ public:
     PCCar(void);
     virtual ~PCCar(void);
 
-    void                        Init(i32 actorId) override;
-    void                        PreLoad(const void* fbBuffer) override;
-    void                        Load() override;
-    void                        Update(f32 dt) override;
-    void                        Destroy() override;
+    IActor::ActorReturnState Init() override;
+    IActor::ActorReturnState LoadMetaData(const void* metaData) override;
+    IActor::ActorReturnState Load() override;
+    IActor::ActorReturnState Update(f32 dt) override;
+    IActor::ActorReturnState Destroy() override;
 
 private:
     XCInput*                    m_directInput;

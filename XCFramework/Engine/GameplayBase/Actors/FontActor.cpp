@@ -19,57 +19,55 @@ FontActor::~FontActor(void)
 {
 }
 
-void FontActor::Init(i32 actorId)
+IActor::ActorReturnState FontActor::Init()
 {
-    IActor::Init(actorId);
+    IActor::ActorReturnState result = IActor::Init();
 
     m_transformedRotation = m_MRotation;
 
     m_World = m_MScaling * m_MRotation * m_MTranslation;
+
+    return result;
 }
 
-void FontActor::PreLoad(const void* fbBuffer)
+IActor::ActorReturnState FontActor::LoadMetaData( const void* metaData )
 {
-    const FBFont* font = (FBFont*)fbBuffer;
+    const FBFont* font = (FBFont*)metaData;
 
-    IActor::PreLoad(font->Base());
+    IActor::LoadMetaData(font->Base());
 
     ResourceManager& resMgr = (ResourceManager&)SystemLocator::GetInstance()->RequestSystem("ResourceManager");
 
     m_fontMesh = &resMgr.AcquireResource(font->FontResourceName()->c_str());
+
+    return IActor::ActorReturnState_Success;
 }
 
-void FontActor::Load()
+IActor::ActorReturnState FontActor::Load()
 {
-    IActor::Load();
-}
-
-void FontActor::UpdateState()
-{
-    if (m_fontMesh && m_fontMesh->GetResource<VectorFontMesh>()->IsLoaded())
+    if (m_fontMesh == nullptr || (m_fontMesh && m_fontMesh->GetResource<VectorFontMesh>()->IsLoaded()))
     {
-        m_actorState = IActor::ActorState_Loaded;
+        return IActor::Load();
     }
-    else if (m_fontMesh == nullptr)
-    {
-        m_actorState = IActor::ActorState_Loaded;
-    }
+
+    return IActor::ActorReturnState_Processing;
 }
 
-void FontActor::Update(f32 dt)
+IActor::ActorReturnState FontActor::Update(f32 dt)
 {
-    IActor::Update(dt);
+    return IActor::Update(dt);
 }
 
-void FontActor::Draw(RenderContext& context)
+bool FontActor::Draw(RenderContext& renderContext)
 {
-    IActor::Draw(context);
+    IActor::Draw(renderContext);
 
-    m_fontMesh->GetResource<VectorFontMesh>()->DrawText("ABCD", XCVec3Unaligned(1.0f, 10.0f, 0.0f), context);
-    //m_fontMesh->DrawText("0123456789", XCVec3Unaligned(1.0f, 0.0f, 0.0f), context);
+    m_fontMesh->GetResource<VectorFontMesh>()->DrawText("ABCD", XCVec3Unaligned(1.0f, 10.0f, 0.0f), renderContext);
+
+    return true;
 }
 
-void FontActor::Destroy()
+IActor::ActorReturnState FontActor::Destroy()
 {
-    IActor::Destroy();
+    return IActor::Destroy();
 }

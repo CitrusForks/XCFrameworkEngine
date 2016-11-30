@@ -33,9 +33,9 @@ XCMesh::XCMesh()
     m_resourceType = RESOURCETYPE_MESH;
 }
 
-void XCMesh::Init(i32 resourceId, std::string userFriendlyName)
+void XCMesh::Init(std::string userFriendlyName)
 {
-    IResource::Init(resourceId, userFriendlyName);
+    IResource::Init(userFriendlyName);
 
     m_computedBoundBox = std::make_unique<OrientedBoundingBox>();
     m_computedBoundBox->Init();
@@ -177,6 +177,8 @@ void XCMesh::LoadDynamic()
 
 XCMatrix4Unaligned XCMesh::GetRootTransform()
 {
+    //There  is a reason why we do this scaling/rotation/translate in world space.
+    //If we do it in object space, the animation data would also be required to be modified since they contain static transformations.
     XCMatrix out = MatrixScale(XCVec4(m_globalScaling))
         * MatrixRotationXYZ(XCVec4(m_globalRotation))
         * MatrixTranslate(XCVec4(m_globalTranslation))
@@ -606,7 +608,7 @@ void XCMesh::UnregisterDrawable()
     renderPool.RemoveResourceDrawable(this);
 }
 
-void XCMesh::Draw(RenderContext& context)
+bool XCMesh::Draw(RenderContext& context)
 {
     if (m_instanceCount > 0)
     {
@@ -621,6 +623,8 @@ void XCMesh::Draw(RenderContext& context)
 
         DrawSubMeshes(context);
     }
+
+    return true;
 }
 
 void XCMesh::DrawSubMesh(RenderContext& renderContext, u32 meshIndex)
@@ -642,22 +646,35 @@ void XCMesh::DrawSubMesh(RenderContext& renderContext, u32 meshIndex)
 
         std::vector<aiMatrix4x4> boneMatrix = m_sceneAnimator->GetBoneMatrices(m_scene->mRootNode, meshIndex);
 
+#if defined(OPTIMIZATION)
+        //This works with a float4x3 in skinning shaders.
         XCMatrixUnaligned mat = XCMatrix::XCMatrixIdentity.GetUnaligned();
 
         for (u32 index = 0; index < boneMatrix.size(); ++index)
         {
             //First transpose normally in 4x4 space
-             mat = aiMatrixToMatrix4(boneMatrix[index]).GetUnaligned();
-             mat = MatrixTranspose(mat).GetUnaligned();
+            mat = aiMatrixToMatrix4(boneMatrix[index]).GetUnaligned();
+            mat = MatrixTranspose(mat).GetUnaligned();
 
-             //Fit the transposed matrix into 4 vector 3 component matrix aka 4x3
-             XCMatrixUnaligned43 mat43 = XCMatrixUnaligned43(mat.r1, mat.r2, mat.r3, mat.r4);
+            //Fit the transposed matrix into 4 vector 3 component matrix aka 4x3
+            XCMatrixUnaligned43 mat43 = XCMatrixUnaligned43(mat.r1, mat.r2, mat.r3, mat.r4);
 
-             //Transpose to column matrix with 3x4
-             XCMatrixUnaligned34 mat34 = mat43.Transpose();
+            //Transpose to column matrix with 3x4
+            XCMatrixUnaligned34 mat34 = mat43.Transpose();
 
-             m_boneBuffers[meshIndex].m_cbBoneBuffer.gBoneMatrix[index] = mat34;
+            m_boneBuffers[meshIndex].m_cbBoneBuffer.gBoneMatrix[index] = mat34;
         }
+#else
+        XCMatrix4Unaligned mat = XCMatrix::XCMatrixIdentity.GetUnaligned();
+
+        for (u32 index = 0; index < boneMatrix.size(); ++index)
+        {
+            //First transpose normally in 4x4 space
+             mat = aiMatrixToMatrix4(boneMatrix[index]).GetUnaligned();
+
+             m_boneBuffers[meshIndex].m_cbBoneBuffer.gBoneMatrix[index] = mat;
+        }
+#endif
 
         m_boneBuffers[meshIndex].m_cbBoneBufferGPU->UploadDataOnGPU(renderContext.GetDeviceContext(), &m_boneBuffers[meshIndex].m_cbBoneBuffer, sizeof(cbBoneBuffer));
         m_shaderHandler->SetConstantBuffer("cbBoneBuffer", renderContext.GetDeviceContext(), *m_boneBuffers[meshIndex].m_cbBoneBufferGPU);

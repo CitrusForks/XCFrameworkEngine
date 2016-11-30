@@ -17,22 +17,22 @@ SimpleMeshActor::~SimpleMeshActor(void)
 {
 }
 
-void SimpleMeshActor::Init(i32 actorId)
+IActor::ActorReturnState SimpleMeshActor::Init()
 {
-    SimpleActor::Init(actorId);
+    return SimpleActor::Init();
 }
 
-void SimpleMeshActor::Update(f32 dt)
+IActor::ActorReturnState SimpleMeshActor::Update(f32 dt)
 {
-    SimpleActor::Update(dt);
+    return SimpleActor::Update(dt);
 }
 
-void SimpleMeshActor::Draw(RenderContext& renderContext)
+bool SimpleMeshActor::Draw(RenderContext& renderContext)
 {
-    SimpleActor::Draw(renderContext);
+    return SimpleActor::Draw(renderContext);
 }
 
-void SimpleMeshActor::Destroy()
+IActor::ActorReturnState SimpleMeshActor::Destroy()
 {
-    SimpleActor::Destroy();
+    return SimpleActor::Destroy();
 }

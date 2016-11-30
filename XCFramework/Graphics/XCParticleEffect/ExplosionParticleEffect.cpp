@@ -74,6 +74,7 @@ void ExplosionParticleEffect::Update(f32 dt)
     }
 }
 
-void ExplosionParticleEffect::Draw(RenderContext& context)
+bool ExplosionParticleEffect::Draw(RenderContext& context)
 {
+    return true;
 }

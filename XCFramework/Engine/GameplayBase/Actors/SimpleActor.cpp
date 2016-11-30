@@ -16,22 +16,22 @@ SimpleActor::~SimpleActor(void)
 {
 }
 
-void SimpleActor::Init(i32 actorId)
+IActor::ActorReturnState SimpleActor::Init()
 {
-    IActor::Init(actorId);
+    return IActor::Init();
 }
 
-void SimpleActor::Update(f32 dt)
+IActor::ActorReturnState SimpleActor::Update(f32 dt)
 {
-    IActor::Update(dt);
+    return IActor::Update(dt);
 }
 
-void SimpleActor::Draw(RenderContext& renderContext)
+bool SimpleActor::Draw(RenderContext& renderContext)
 {
-    IActor::Draw(renderContext);
+    return IActor::Draw(renderContext);
 }
 
-void SimpleActor::Destroy()
+IActor::ActorReturnState SimpleActor::Destroy()
 {
-    IActor::Destroy();
+    return IActor::Destroy();
 }

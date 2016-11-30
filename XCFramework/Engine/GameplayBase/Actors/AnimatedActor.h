@@ -16,9 +16,17 @@ public:
     AnimatedActor(void);
     virtual ~AnimatedActor(void);
 
-    virtual void                    Init(i32 actorId);
-    virtual void                    PreLoad(const void* fbBuffer) { IActor::PreLoad(fbBuffer); }
-    virtual void                    Update(f32 dt);
-    virtual void                    Draw(RenderContext& context);
-    virtual void                    Destroy();
+    virtual IActor::ActorReturnState Init() override;
+
+    virtual IActor::ActorReturnState LoadMetaData(const void* metaData) override;
+    virtual IActor::ActorReturnState Load() override;
+    virtual IActor::ActorReturnState OnLoaded() override;
+    
+    virtual IActor::ActorReturnState Update(f32 dt) override;
+    virtual bool                     Draw(RenderContext& renderContext) override;
+    
+    virtual IActor::ActorReturnState Unload() override;
+    virtual IActor::ActorReturnState OnUnloaded() override;
+
+    virtual IActor::ActorReturnState Destroy() override;
 };

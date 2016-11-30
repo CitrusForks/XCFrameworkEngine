@@ -17,22 +17,47 @@ AnimatedActor::~AnimatedActor(void)
 {
 }
 
-void AnimatedActor::Init(i32 actorId)
+IActor::IActor::ActorReturnState AnimatedActor::Init()
 {
-    IActor::Init(actorId);
+    return IActor::Init();
 }
 
-void AnimatedActor::Update(f32 dt)
+IActor::IActor::ActorReturnState AnimatedActor::LoadMetaData(const void* metaData)
 {
-    IActor::Update(dt);
+    return IActor::LoadMetaData(metaData);
 }
 
-void AnimatedActor::Draw(RenderContext& context)
+IActor::IActor::ActorReturnState AnimatedActor::Load()
 {
-    IActor::Draw(context);
+    return IActor::Load();
 }
 
-void AnimatedActor::Destroy()
+IActor::IActor::ActorReturnState AnimatedActor::OnLoaded()
 {
-    IActor::Destroy();
+    return IActor::OnLoaded();
+}
+
+IActor::IActor::ActorReturnState AnimatedActor::Update(f32 dt)
+{
+    return IActor::Update(dt);
+}
+
+bool AnimatedActor::Draw(RenderContext& renderContext)
+{
+    return IActor::Draw(renderContext);
+}
+
+IActor::IActor::ActorReturnState AnimatedActor::Unload()
+{
+    return IActor::Unload();
+}
+
+IActor::IActor::ActorReturnState AnimatedActor::OnUnloaded()
+{
+    return IActor::OnUnloaded();
+}
+
+IActor::IActor::ActorReturnState AnimatedActor::Destroy()
+{
+    return IActor::Destroy();
 }

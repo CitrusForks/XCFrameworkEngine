@@ -21,13 +21,13 @@
 #include "Gameplay/GameStates/LoadingWorldState.h"
 
 GameStatesFactory::GameStatesFactory()
+    : m_statesCount(0)
 {
-    m_statesCount = 0;
 }
-
 
 GameStatesFactory::~GameStatesFactory()
 {
+    m_statesCount = 0;
 }
 
 void GameStatesFactory::InitFactory()
@@ -52,37 +52,14 @@ void GameStatesFactory::RegisterStates()
 #endif
 }
 
-
 IGameState* GameStatesFactory::CreateState(std::string stateName)
 {
-    std::unique_lock<std::mutex> m(m_gameStatesFactoryLock);
-
     IGameState* state = (IGameState*) CreateObject(stateName);
+    state->SetBaseObjectId(++m_statesCount);
 
     Logger("[GAME STATES FACTORY] State : %s  ID : %d created", stateName.c_str(), m_statesCount);
 
-    m.unlock();
-
     return state;
-}
-
-
-void GameStatesFactory::LoadStates(FILE* packageFile, IGameState* const state)
-{
-    //char rscPath[256];
-  
-    //fscanf(packageFile, "%s", rscPath);
-    //Based on every resources init parameters, load it.
-    /*if (resource->getResourceType() == RESOURCETYPE_TEXTURE2D)
-    {
-        resource->load(rscPath);
-    }
-    else if (resource->getResourceType() == RESOURCETYPE_MESH)
-    {
-        float scaling = 0.0f;
-        fscanf(packageFile, "%f", &scaling);
-        ((XCMesh*)resource)->load(rscPath, scaling);
-    }*/
 }
 
 void GameStatesFactory::DestroyFactory()

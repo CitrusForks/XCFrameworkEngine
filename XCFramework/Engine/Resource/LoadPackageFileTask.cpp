@@ -54,13 +54,13 @@ void LoadPackageFileTask::Run()
                 
                 std::string usrName(userFriendlyName);
                 
-                IResource* resource = m_resourceManager->GetResourceFactory().createResource(resourceType, userFriendlyName);
+                IResource* resource = m_resourceManager->GetResourceFactory().CreateResource(resourceType, userFriendlyName);
                 
                 if (resource)
                 {
                     //TODO: May be now it's not required to not load -> take it from data, if wanted to load at some other time
                     //Anyway load the resource
-                    m_resourceManager->GetResourceFactory().loadResource(fp, resource);
+                    //m_resourceManager->GetResourceFactory().LoadResource(fp, resource);
                     
                     ResourceHandle resHandle = {};
                     resHandle.m_Resource = resource;

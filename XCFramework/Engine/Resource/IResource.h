@@ -29,7 +29,7 @@ public:
     IResource();
     virtual ~IResource();
 
-    virtual void            Init(i32 id, std::string userFriendlyName);
+    virtual void            Init(std::string userFriendlyName);
 
     //Dynamic loading/spawning or legacy data structure
     virtual void            Load(std::string resourcePath);
@@ -40,7 +40,7 @@ public:
 
     virtual void            UpdateState();
     virtual void            Update(f32 dt) {}
-    virtual void            Draw(RenderContext& context) {}
+    virtual bool            Draw(RenderContext& context) { return true; }
 
     virtual void            RenderContextCallback(ID3DDeviceContext& renderContext);
 
@@ -48,7 +48,7 @@ public:
 
     void                    WaitResourceUpdate();
 
-    i32                     GetResourecId()                                  { return m_resourceId; }
+    i32                     GetResourecId()                                  { return m_baseObjectId; }
     EResourceType           GetResourceType()                                { return m_resourceType;  }
     
     std::string             SetUserFriendlyName(std::string usrFriendlyName) { m_userFriendlyName = usrFriendlyName; }
@@ -62,7 +62,6 @@ public:
 
 protected:
     EResourceType           m_resourceType;
-    i32                     m_resourceId;
     ResourceState           m_resourceState;
 
     std::string             m_resourcePath;

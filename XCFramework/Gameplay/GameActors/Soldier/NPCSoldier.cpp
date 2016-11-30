@@ -20,9 +20,9 @@ NPCSoldier::~NPCSoldier(void)
 {
 }
 
-void NPCSoldier::Init(i32 actorId)
+IActor::ActorReturnState NPCSoldier::Init()
 {
-    Soldier::Init(actorId);
+    Soldier::Init();
 
     SceneGraph& world = (SceneGraph&)SystemLocator::GetInstance()->RequestSystem("SceneGraph");
 
@@ -33,16 +33,20 @@ void NPCSoldier::Init(i32 actorId)
 
     //This is a hack, brain needs to decide from the sensors.
     m_AIBrain->SetState(ACTIONSTATE_WALK);
+
+    return IActor::ActorReturnState_Success;
 }
 
-void NPCSoldier::PreLoad(const void* fbBuffer)
+IActor::ActorReturnState NPCSoldier::LoadMetaData( const void* metaData )
 {
-    const FBNPCSoldier* soldierBuff = (FBNPCSoldier*)fbBuffer;
+    const FBNPCSoldier* soldierBuff = (FBNPCSoldier*)metaData;
 
-    Soldier::PreLoad(soldierBuff->Base());
+    Soldier::LoadMetaData(soldierBuff->Base());
+
+    return IActor::ActorReturnState_Success;
 }
 
-void NPCSoldier::Update(f32 dt)
+IActor::ActorReturnState NPCSoldier::Update(f32 dt)
 {
     //Update Brain with current scenarios.
     m_AIBrain->Update(dt);
@@ -55,5 +59,5 @@ void NPCSoldier::Update(f32 dt)
 
     m_currentPosition = m_Position;
 
-    Soldier::Update(dt);
+    return Soldier::Update(dt);
 }

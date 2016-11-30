@@ -24,19 +24,21 @@ Car::~Car(void)
 {
 }
 
-void Car::PreLoad(const void* fbBuffer)
+IActor::ActorReturnState Car::LoadMetaData( const void* metaData )
 {
-    const FBCar* carBuff = static_cast<const FBCar*>(fbBuffer);
-    PhysicsActor::PreLoad(carBuff->Base());
+    const FBCar* carBuff = static_cast<const FBCar*>(metaData);
+    PhysicsActor::LoadMetaData(carBuff->Base());
 
     ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
     m_pMesh = &resMgr.AcquireResource(carBuff->XCMeshResourceName()->c_str());
 
     m_useShaderType = ShaderType_LightTexture;
     m_collisionDetectionType = COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX;
+
+    return IActor::ActorReturnState_Success;
 }
 
-void Car::Load()
+IActor::ActorReturnState Car::Load()
 {
     m_MTranslation = MatrixTranslate(m_currentPosition);
     
@@ -44,7 +46,7 @@ void Car::Load()
     
     m_World = m_MScaling * m_MRotation * m_MTranslation;
     
-    PhysicsActor::Load();
+    return PhysicsActor::Load();
 }
 
 void Car::SetInitialPhysicsProperties()
@@ -53,13 +55,13 @@ void Car::SetInitialPhysicsProperties()
     PhysicsActor::SetInitialPhysicsProperties();
 }
 
-void Car::Update(f32 dt)
+IActor::ActorReturnState Car::Update(f32 dt)
 {
     m_World = m_MScaling * m_MRotation * m_MTranslation;
     
     m_pMesh->GetResource<XCMesh>()->Update(dt);
     
-    PhysicsActor::Update(dt);
+    return PhysicsActor::Update(dt);
 }
 
 void Car::Accelerate(f32 distance)
@@ -81,10 +83,10 @@ void Car::Steer(f32 angle, f32 scalarForce)
     AddForce(m_look * scalarForce);
 }
 
-void Car::Draw(RenderContext& context)
+bool Car::Draw(RenderContext& renderContext)
 {
     // Set constants
-    ICamera& cam = context.GetGlobalShaderData().m_camera;
+    ICamera& cam = renderContext.GetGlobalShaderData().m_camera;
     PerObjectBuffer perObject = {
        MatrixTranspose(m_World).GetUnaligned(),
        MatrixTranspose(m_World * cam.GetViewMatrix() * cam.GetProjectionMatrix()).GetUnaligned(),
@@ -95,13 +97,13 @@ void Car::Draw(RenderContext& context)
 
     m_pMesh->GetResource<XCMesh>()->DrawInstanced(perObject);
 
-    PhysicsActor::Draw(context);
+    return PhysicsActor::Draw(renderContext);
 }
 
-void Car::Destroy()
+IActor::ActorReturnState Car::Destroy()
 {
-    PhysicsActor::Destroy();
-
     ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
     resMgr.ReleaseResource(m_pMesh);
+
+    return PhysicsActor::Destroy();
 }

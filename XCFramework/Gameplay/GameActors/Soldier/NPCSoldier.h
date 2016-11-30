@@ -8,7 +8,6 @@
 
 #include "Gameplay/GameActors/Soldier/Soldier.h"
 
-
 #include "Engine/GameplayBase/Actors/NonPlayableCharacterActor.h"
 
 class AIBrain;
@@ -20,11 +19,11 @@ public:
     DECLARE_OBJECT_CREATION(NPCSoldier)
 
     NPCSoldier(void);
-    virtual ~NPCSoldier(void);
+    ~NPCSoldier(void);
 
-    void                                Init(i32 actorId) override;
-    void                                PreLoad(const void* fbBuffer) override;
-    void                                Update(f32 dt) override;
+    IActor::ActorReturnState Init() override;
+    IActor::ActorReturnState LoadMetaData(const void* metaData) override;
+    IActor::ActorReturnState Update(f32 dt) override;
 
 protected:
     std::unique_ptr<AIBrain>            m_AIBrain;

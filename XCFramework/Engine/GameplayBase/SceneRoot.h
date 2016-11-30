@@ -17,8 +17,8 @@ public:
 
     SceneRoot()
     {
-        //Keep it loaded for now.
-        m_actorState = IActor::ActorState_PreLoaded;
+        //Keep it ready. Since its dummy container for now.
+        m_actorState = IActor::ActorState_Ready;
     }
 
     ~SceneRoot() {}

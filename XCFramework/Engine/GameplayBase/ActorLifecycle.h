@@ -4,19 +4,10 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
-#include "BasePrecompiledHeader.h"
-#include "IBase.h"
+#pragma once
 
-IBase::IBase()
+class ActorLifecycle
 {
-    m_baseObjectId = -1;
-}
+public:
 
-IBase::~IBase()
-{
-}
-
-void IBase::SetBaseObjectId(i32 baseId)
-{
-    m_baseObjectId = baseId;
-}
+};

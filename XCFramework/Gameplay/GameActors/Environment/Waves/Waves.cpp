@@ -17,25 +17,27 @@ Waves::~Waves(void)
 {
 }
 
-void Waves::PreLoad(const void* fbBuffer)
+IActor::ActorReturnState Waves::LoadMetaData( const void* metaData )
 {
-    const FBWaves* fbWavesBuff = (FBWaves*)fbBuffer;
+    const FBWaves* fbWavesBuff = (FBWaves*)metaData;
 
-    SimpleTerrain::PreLoad(fbWavesBuff->Base());
+    SimpleTerrain::LoadMetaData(fbWavesBuff->Base());
 
     ComputeVertices();
 
     m_useShaderType = ShaderType_SolidColor;
     m_collisionDetectionType = COLLISIONDETECTIONTYPE_TRIANGLE;
+
+    return IActor::ActorReturnState_Success;
 }
 
-void Waves::Update(f32 dt)
+IActor::ActorReturnState Waves::Update(f32 dt)
 {
-    SimpleTerrain::Update(dt);
- 
-    XCGraphics& graphicsSystem = (XCGraphics&)SystemLocator::GetInstance()->RequestSystem("GraphicsSystem");
+    return SimpleTerrain::Update(dt);
 
 #if defined(TODO)
+    XCGraphics& graphicsSystem = (XCGraphics&)SystemLocator::GetInstance()->RequestSystem("GraphicsSystem");
+
     //Create moving terrain using Dynamic Vertex Buffer
     D3D11_MAPPED_SUBRESOURCE mappedData;
     ValidateResult(graphicsSystem.GetDeviceContext()->Map(m_pVB, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData));
@@ -50,12 +52,12 @@ void Waves::Update(f32 dt)
 #endif
 }
 
-void Waves::Draw(RenderContext& context)
+bool Waves::Draw(RenderContext& renderContext)
 {
-    SimpleTerrain::Draw(context);
+    return SimpleTerrain::Draw(renderContext);
 }
 
-void Waves::Destroy()
+IActor::ActorReturnState Waves::Destroy()
 {
-    SimpleTerrain::Destroy();
+    return SimpleTerrain::Destroy();
 }

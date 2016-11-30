@@ -25,7 +25,7 @@ cbuffer cbInstancedBuffer : register(b0)
 
 cbuffer cbBoneBuffer : register(b1)
 {
-    float4x3    gBoneMatrix[100];
+    float4x4    gBoneMatrix[100];
 };
 
 

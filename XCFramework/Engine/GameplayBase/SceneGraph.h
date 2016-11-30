@@ -15,6 +15,7 @@
 
 #include "Engine/Physics/ParticleContact.h"
 #include "Engine/Physics/XPhysics.h"
+#include "Engine/FlatBuffersInterface/FlatBuffersSystem.h"
 
 class IActor;
 class SceneGraph;
@@ -26,8 +27,8 @@ class SceneGraphPendingTasks : public AsyncTask
 public:
     enum PendingTaskType
     {
-        PENDINGTASK_ADD,
-        PENDINGTASK_REMOVE,
+        PendingTaskType_Load,
+        PendingTaskType_Unload,
     };
 
     class IPendingTask
@@ -40,10 +41,10 @@ public:
         PendingTaskType         m_TaskType;
     };
 
-    class PendingTaskAdd : public IPendingTask
+    class PendingTaskLoad : public IPendingTask
     {
     public:
-        PendingTaskAdd(PendingTaskType type, IActor* actor)
+        PendingTaskLoad(PendingTaskType type, IActor* actor)
             : IPendingTask(type)
             , m_actor(actor)
         {}
@@ -51,23 +52,21 @@ public:
         IActor* m_actor;
     };
 
-    class PendingTaskRemove : public IPendingTask
+    class PendingTaskUnload : public IPendingTask
     {
     public:
-        PendingTaskRemove(PendingTaskType type, i32 actorId)
+        PendingTaskUnload(PendingTaskType type, IActor* actor)
             : IPendingTask(type)
-            , m_actorId(actorId)
+            , m_actorRef(actor)
         {}
 
-        i32                     m_actorId;
+        IActor*                 m_actorRef;
     };
 
     SceneGraphPendingTasks(SceneGraph& scene)
         : AsyncTask("WorldPendingTasks")
-        , m_parentWorld(scene)
     {
         m_pendingTaskLock.Create();
-        m_bufferedPendingTaskList.clear();
     }
 
     void                        Init();
@@ -75,35 +74,13 @@ public:
     void                        Destroy();
 
     void                        AddTask(IPendingTask* task);
-    void                        ProcessFromScene();
-    bool                        HasBufferedPendingTasks() { return m_bufferedPendingTaskList.size() > 0; }
 
 private:
 
     std::queue<IPendingTask*>   m_pendingTaskList;
-    std::vector<IPendingTask*>  m_bufferedPendingTaskList;
     CriticalSection             m_pendingTaskLock;
-
-    SceneGraph&                 m_parentWorld;
 };
 
-
-class SceneGraphCollisionTask : public AsyncTask
-{
-public:
-    SceneGraphCollisionTask(SceneGraph& scene)
-        : AsyncTask("WorldCollisionTask")
-        , m_parentScene(scene)
-    {}
-    ~SceneGraphCollisionTask() {}
-
-    void                        Init();
-    void                        Run();
-    void                        Destroy();
-
-private:
-    SceneGraph&                 m_parentScene;
-};
 
 class SceneGraph : public ISystem, public IEventListener
 {
@@ -113,50 +90,42 @@ public:
     SceneGraph();
     virtual ~SceneGraph(void);
     
-    virtual void                                Init(TaskManager& taskMgr);
-    virtual void                                Update(f32 dt);
-    virtual void                                Draw(XCGraphics& graphicsSystem);
-    virtual void                                Destroy();
+    virtual void                                     Init(TaskManager& taskMgr);
+    virtual void                                     Update(f32 dt);
+    virtual void                                     Draw(XCGraphics& graphicsSystem);
+    virtual void                                     Destroy();
 
-    void                                        CheckAllCollisions();
-    
-    XCTree<IActor*>&                            GetSceneGraphTree() { return *m_sceneGraph; }
-    IActor*                                     GetActor(i32 _instanceId);
-    i32                                         GetNumOfActors()                            {  return m_GameObjects.size();  }
-    
-    void                                        SetMainPlayableCharacter(i32 instanceId);
-    i32                                         GetMainPlayableCharacter()                  { return m_currentMainPlayableCharacter;                      }
-    IActor*                                     GetMainPlayableActor()                      { return m_GameObjects[m_currentMainPlayableCharacter]; }
-    i32                                         GetInstanceIdOfActor(IActor* actor);
-    i32                                         GetNextPlayableActor(i32 instanceId);
-    
-    bool                                        IsWorldReady()                              { return m_sceneReady;  }
-    void                                        SetSceneReady(bool value)                   { m_sceneReady = true;  }
+    XCTree<IActor*>&                                 GetSceneGraphTree() { return *m_sceneGraph; }
+    IActor*                                          GetActor(i32 _instanceId);
+    i32                                              GetNumOfActors() { return m_GameObjects.size(); }
 
-    void                                        RequestLoadActor(IActor* actor);
-    void                                        RequestRemoveActor(i32 key);
+    void                                             SetMainPlayableCharacter(i32 instanceId);
+    i32                                              GetMainPlayableCharacter() { return m_currentMainPlayableCharacter; }
+    IActor*                                          GetMainPlayableActor() { return m_GameObjects[m_currentMainPlayableCharacter]; }
+    i32                                              GetNextPlayableActor(i32 instanceId);
 
-    void                                        AddActor(IActor* actor);
-    void                                        RemoveActor(i32 key);
+    bool                                             IsWorldReady() { return m_sceneReady; }
+    void                                             SetSceneReady(bool value) { m_sceneReady = true; }
 
-    bool                                        IsActorReady(i32 actorId);
-    bool                                        IsSceneQuiting()                            { return m_sceneQuiting; }
+    //Async removal of actors.
+    void                                             RequestLoadActor(IActor* actor);
+    void                                             RequestRemoveActor(IActor* actor);
 
-    void                                        EnablePhysics(bool enable)                  { m_isPhysicsEnabled = enable; XPhysics::s_enableGravity = enable; }
-    bool                                        IsPhysicsEnabled()                          { return m_isPhysicsEnabled; }
+    void                                             AddActor(IActor* actor);
+    void                                             RemoveActor(IActor* actor);
 
-    void                                        OnEvent(IEvent* evt);
+    bool                                             IsActorReady(i32 actorId);
+    bool                                             IsSceneQuiting() { return m_sceneQuiting; }
 
-protected: 
-    bool                                        CheckCollision(PhysicsActor* obj1, PhysicsActor* obj2);
+    void                                             OnEvent(IEvent* evt);
+    FlatBuffersSystem::FBBuffer&                     GetMutableFlatBuffer() { return m_fbBuffer; }
 
 private:
-    void                                        RemoveKey(std::vector<i32>& list, i32 key);
+    void                                             RemoveKey(std::vector<i32>& list, i32 key);
 
     XCTree<IActor*>*                                 m_sceneGraph;
     std::map<i32, IActor*>                           m_GameObjects;
 
-    std::vector<i32>                                 m_PhysicsActorIDs;
     std::vector<i32>                                 m_PlayableCharacterActors;
     std::vector<i32>                                 m_NonPlayableCharacterActors;
     
@@ -168,10 +137,8 @@ private:
     std::atomic<bool>                                m_addRemoveFlag;       
 
     SceneGraphPendingTasks*                          m_scenePendingTasks;
-    SceneGraphCollisionTask*                         m_sceneCollisionTask;
     bool                                             m_sceneQuiting;
-    bool                                             m_isPhysicsEnabled;
 
-    ParticleContact                                  m_particleContact;
     TaskManager*                                     m_taskManager;
+    FlatBuffersSystem::FBBuffer                      m_fbBuffer;
 };

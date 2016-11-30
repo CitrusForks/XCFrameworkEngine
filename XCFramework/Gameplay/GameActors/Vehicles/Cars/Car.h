@@ -19,11 +19,11 @@ public:
     Car(void);
     virtual  ~Car(void);
 
-    virtual void        PreLoad(const void* fbBuffer) override;
-    virtual void        Load() override;
-    virtual void        Update(f32 dt) override;
-    virtual void        Draw(RenderContext& context) override;
-    virtual void        Destroy() override;
+    virtual IActor::ActorReturnState LoadMetaData(const void* metaData) override;
+    virtual IActor::ActorReturnState Load() override;
+    virtual IActor::ActorReturnState Update(f32 dt) override;
+    virtual bool                     Draw(RenderContext& renderContext) override;
+    virtual IActor::ActorReturnState Destroy() override;
                         
     void                SetInitialPhysicsProperties() override;
     void                Accelerate(f32 dt);

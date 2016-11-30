@@ -30,6 +30,7 @@ void PointParticleEffect::Update(f32 dt)
     IParticleEffect::Update(dt);
 }
 
-void PointParticleEffect::Draw(RenderContext& context)
+bool PointParticleEffect::Draw(RenderContext& context)
 {
+    return true;
 }

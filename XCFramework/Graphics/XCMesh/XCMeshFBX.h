@@ -30,7 +30,7 @@ public:
 protected:
     virtual bool            LoadMesh();
     virtual void            CreateConstantBuffer();
-    virtual void            Draw(RenderContext& context);
+    virtual bool            Draw(RenderContext& context);
 
     bool                    LoadScene(FbxManager* pManager, FbxDocument* pScene, const char* pFilename);
     void                    DisplayMetaData(FbxScene* pScene);

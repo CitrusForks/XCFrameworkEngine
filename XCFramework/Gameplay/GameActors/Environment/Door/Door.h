@@ -18,14 +18,14 @@ public:
     DECLARE_OBJECT_CREATION(Door)
 
     Door(void);
-    virtual ~Door(void);
+    ~Door(void);
     
-    virtual void                        PreLoad(const void* fbBuffer);
-    virtual void                        Load();
-    virtual void                        SetInitialPhysicsProperties();
-    virtual void                        Update(f32 dt);
-    virtual void                        Draw(RenderContext& context);
-    virtual void                        Destroy();
+    virtual IActor::ActorReturnState LoadMetaData(const void* metaData);
+    virtual IActor::ActorReturnState Load();
+    virtual void                     SetInitialPhysicsProperties();
+    virtual IActor::ActorReturnState Update(f32 dt);
+    virtual bool                     Draw(RenderContext& renderContext);
+    virtual IActor::ActorReturnState Destroy();
 
 protected:
     XCVec3                              m_initialPosition;

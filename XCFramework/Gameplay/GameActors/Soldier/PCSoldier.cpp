@@ -18,27 +18,29 @@ PCSoldier::~PCSoldier(void)
 {
 }
 
-void PCSoldier::Init(i32 actorId)
+IActor::ActorReturnState PCSoldier::Init()
 {
-    Soldier::Init(actorId);
+    Soldier::Init();
 
     m_directInput = (XCInput*) &SystemLocator::GetInstance()->RequestSystem("InputSystem");
 
     XCVec4 distance(1.5f, 5.0f, 10.0f, 0.0f);
     TPCChaseableActor::SetDistanceFromTarget(distance);
     TPCChaseableActor::SetChasingAxis(m_secondaryLookAxis, m_secondaryRightAxis, m_secondaryUpAxis);
+
+    return IActor::ActorReturnState_Success;
 }
 
-void PCSoldier::PreLoad(const void* fbBuffer)
+IActor::ActorReturnState PCSoldier::LoadMetaData( const void* metaData )
 {
-    const FBPCSoldier* soldierBuff = (FBPCSoldier*)fbBuffer;
+    const FBPCSoldier* soldierBuff = (FBPCSoldier*)metaData;
 
-    Soldier::PreLoad(soldierBuff->Base());
+    return Soldier::LoadMetaData(soldierBuff->Base());
 }
 
-void PCSoldier::Update(f32 dt)
+IActor::ActorReturnState PCSoldier::Update(f32 dt)
 {
-    m_gun->CheckInput();
+    //m_gun->CheckInput();
 
     if (getIsControlled())
     {
@@ -90,5 +92,5 @@ void PCSoldier::Update(f32 dt)
 
     m_currentPosition = m_Position;
 
-    Soldier::Update(dt);
+    return Soldier::Update(dt);
 }

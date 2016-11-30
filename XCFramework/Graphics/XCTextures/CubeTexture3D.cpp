@@ -19,9 +19,9 @@ CubeTexture3D::~CubeTexture3D()
 {
 }
 
-void CubeTexture3D::Init(i32 resourceId, std::string userFriendlyName)
+void CubeTexture3D::Init(std::string userFriendlyName)
 {
-    Texture2D::Init(resourceId, userFriendlyName);
+    Texture2D::Init(userFriendlyName);
 }
 
 void CubeTexture3D::Load(const void* buffer)

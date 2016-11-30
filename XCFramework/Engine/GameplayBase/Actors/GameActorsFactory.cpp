@@ -15,6 +15,7 @@ GameActorsFactory::GameActorsFactory()
 
 GameActorsFactory::~GameActorsFactory()
 {
+    m_actorsCount = 0;
 }
 
 void GameActorsFactory::InitFactory()
@@ -53,7 +54,7 @@ IActor* GameActorsFactory::CreateActor(std::string actorName)
     std::unique_lock<std::mutex> m(m_gameActorsFactoryLock);
 
     IActor* actor = (IActor*) CreateObject(actorName);
-    actor->Init(++m_actorsCount);
+    actor->SetBaseObjectId(++m_actorsCount);
 
     Logger("[GAME ACTORS FACTORY] Actor : %s  ID : %d", actorName.c_str(), m_actorsCount);
 

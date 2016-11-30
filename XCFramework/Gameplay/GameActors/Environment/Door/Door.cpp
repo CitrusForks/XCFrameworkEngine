@@ -24,19 +24,21 @@ Door::~Door(void)
 {
 }
 
-void Door::PreLoad(const void* fbBuffer)
+IActor::ActorReturnState Door::LoadMetaData( const void* metaData )
 {
-    const FBDoor* doorBuff = (FBDoor*)fbBuffer;
+    const FBDoor* doorBuff = (FBDoor*)metaData;
     
-    PhysicsActor::PreLoad(doorBuff->Base());
+    PhysicsActor::LoadMetaData(doorBuff->Base());
 
     ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
     m_pMesh = &resMgr.AcquireResource(doorBuff->XCMeshResourceName()->c_str());
+
+    return IActor::ActorReturnState_Success;
 }
 
-void Door::Load()
+IActor::ActorReturnState Door::Load()
 {
-    PhysicsActor::Load();
+    return PhysicsActor::Load();
 }
 
 void Door::SetInitialPhysicsProperties()
@@ -45,7 +47,7 @@ void Door::SetInitialPhysicsProperties()
     InitXPhysics(XCVec4(m_initialPosition), XCVec4(), XCVec4(), 1000, (f32)0.2);
 }
 
-void Door::Update(f32 dt)
+IActor::ActorReturnState Door::Update(f32 dt)
 {
     if (m_directInput->KeyDown(INPUT_KEY_I))
     {
@@ -66,13 +68,13 @@ void Door::Update(f32 dt)
 
     m_pMesh->GetResource<XCMesh>()->Update(dt);
 
-    PhysicsActor::Update(dt);
+    return PhysicsActor::Update(dt);
 }
 
-void Door::Draw(RenderContext& context)
+bool Door::Draw(RenderContext& renderContext)
 {
     // Set constants
-    ICamera& cam = context.GetGlobalShaderData().m_camera;
+    ICamera& cam = renderContext.GetGlobalShaderData().m_camera;
 
     PerObjectBuffer perObject = {
         MatrixTranspose(m_World).GetUnaligned(),
@@ -83,13 +85,15 @@ void Door::Draw(RenderContext& context)
     };
 
     m_pMesh->GetResource<XCMesh>()->DrawInstanced(perObject);
-    PhysicsActor::Draw(context);
+    PhysicsActor::Draw(renderContext);
+
+    return true;
 }
 
-void Door::Destroy()
+IActor::ActorReturnState Door::Destroy()
 {
-    PhysicsActor::Destroy();
-
     ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
     resMgr.ReleaseResource(m_pMesh);
+
+    return PhysicsActor::Destroy();
 }

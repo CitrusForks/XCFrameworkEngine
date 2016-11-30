@@ -16,8 +16,8 @@ public:
     Waves(void);
     virtual ~Waves(void);
  
-    void                        PreLoad(const void* fbBuff) override;
-    void                        Update(f32 dt) override;
-    void                        Draw(RenderContext& context) override;
-    void                        Destroy() override;
+    IActor::ActorReturnState LoadMetaData(const void* metaData) override;
+    IActor::ActorReturnState Update(f32 dt) override;
+    bool                     Draw(RenderContext& renderContext) override;
+    IActor::ActorReturnState Destroy() override;
 };

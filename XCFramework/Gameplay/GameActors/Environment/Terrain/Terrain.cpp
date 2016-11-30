@@ -26,6 +26,9 @@
 #include "Engine/Event/EventBroadcaster.h"
 
 Terrain::Terrain()
+    : m_pHeightMapFileName("")
+    , m_pBitmapImage(nullptr)
+    , m_OBBHierarchy(nullptr)
 {
     m_material.Ambient = XCVec4Unaligned(0.1f, 0.1f, 0.1f, 1.0f);
     m_material.Diffuse = XCVec4Unaligned(0.48f, 0.77f, 0.46f, 1.0f);
@@ -42,11 +45,11 @@ Terrain::~Terrain(void)
     XCDELETEARRAY(m_pBitmapImage);
 }
 
-void Terrain::PreLoad(const void* fbBuffer)
+IActor::ActorReturnState Terrain::LoadMetaData( const void* metaData )
 {
-    const FBMultiTexturedTerrain* fbTerrainBuff = (FBMultiTexturedTerrain*)fbBuffer;
+    const FBMultiTexturedTerrain* fbTerrainBuff = (FBMultiTexturedTerrain*)metaData;
 
-    SimpleTerrain::PreLoad(fbTerrainBuff->Base());
+    SimpleTerrain::LoadMetaData(fbTerrainBuff->Base());
 
     m_pHeightMapFileName = getPlatformPath(fbTerrainBuff->BitmapFileName()->c_str());
 
@@ -60,9 +63,11 @@ void Terrain::PreLoad(const void* fbBuffer)
 
     GPUResourceSystem& gpuSys = (GPUResourceSystem&)SystemLocator::GetInstance()->RequestSystem("GPUResourceSystem");
     m_pCBPerObject = gpuSys.CreateConstantBufferResourceView(GPUResourceDesc(GPUResourceType_CBV, sizeof(PerObjectBuffer)));
+
+    return IActor::ActorReturnState_Success;
 }
 
-void Terrain::Load()
+IActor::ActorReturnState Terrain::Load()
 {
     LoadHeightMap();
     GenerateVertices();
@@ -73,27 +78,26 @@ void Terrain::Load()
 
     XCVec3 vec = XCVec3(0, 0, 0);
     InitXPhysics(m_currentPosition, XCVec4(vec), XCVec4(vec), 1000, (f32)0.2); //Immovable
-    
-    //Terrain is loaded, so fire up the physics
-    Event_Scene event(EventType_TerrainLoaded);
-    EventBroadcaster& broadcaster = (EventBroadcaster&)SystemLocator::GetInstance()->RequestSystem("EventBroadcaster");
-    broadcaster.BroadcastEvent(&event);
 
-    IActor::Load();
+    return IActor::Load();
 }
 
-void Terrain::UpdateState()
+IActor::ActorReturnState Terrain::OnLoaded()
 {
     for (auto& tex : m_textures)
     {
         if (!tex->m_Resource->IsLoaded())
         {
-            return;
+            return IActor::ActorReturnState_Processing;
         }
     }
 
-    m_actorState = IActor::ActorState_Loaded;
-    IActor::UpdateState();
+    //Terrain is loaded, so fire up the physics
+    Event_Scene event(EventType_TerrainLoaded);
+    EventBroadcaster& broadcaster = (EventBroadcaster&)SystemLocator::GetInstance()->RequestSystem("EventBroadcaster");
+    broadcaster.BroadcastEvent(&event);
+
+    return IActor::OnLoaded();
 }
 
 void Terrain::GenerateVertices()
@@ -265,22 +269,22 @@ XCVec4 Terrain::GetPointAtIndex(i32 pointIndex) const
     return XCVec4(vec);
 }
 
-void Terrain::Update(f32 dt)
+IActor::ActorReturnState Terrain::Update(f32 dt)
 {
-    SimpleTerrain::Update(dt);
-
     m_OBBHierarchy->Transform(XCMatrix(), XCMatrix());
     m_OBBHierarchy->Update(dt);
+
+    return SimpleTerrain::Update(dt);
 }
 
-void Terrain::Draw(RenderContext& context)
+bool Terrain::Draw(RenderContext& renderContext)
 {
-    context.ApplyShader(m_useShaderType);
+    renderContext.ApplyShader(m_useShaderType);
 
     XCShaderHandle* shaderHandle = nullptr;
 
     // Set constants
-    ICamera& cam = context.GetGlobalShaderData().m_camera;
+    ICamera& cam = renderContext.GetGlobalShaderData().m_camera;
     PerObjectBuffer perObject = {
         MatrixTranspose(m_World).GetUnaligned(),
         MatrixTranspose(m_World * cam.GetViewMatrix() * cam.GetProjectionMatrix()).GetUnaligned(),
@@ -288,41 +292,41 @@ void Terrain::Draw(RenderContext& context)
         XCMatrix().GetUnaligned(),
         m_material
     };
-    m_pCBPerObject->UploadDataOnGPU(context.GetDeviceContext(), &perObject, sizeof(PerObjectBuffer));
+    m_pCBPerObject->UploadDataOnGPU(renderContext.GetDeviceContext(), &perObject, sizeof(PerObjectBuffer));
 
     if (m_useShaderType == ShaderType_LightTexture)
     {
-        shaderHandle = (XCShaderHandle*)context.GetShader(ShaderType_LightTexture);
-        shaderHandle->SetConstantBuffer("PerObjectBuffer", context.GetDeviceContext(), *m_pCBPerObject);
-        shaderHandle->SetResource("gDiffuseMap", context.GetDeviceContext(), m_textures[0]);
+        shaderHandle = (XCShaderHandle*)renderContext.GetShader(ShaderType_LightTexture);
+        shaderHandle->SetConstantBuffer("PerObjectBuffer", renderContext.GetDeviceContext(), *m_pCBPerObject);
+        shaderHandle->SetResource("gDiffuseMap", renderContext.GetDeviceContext(), m_textures[0]);
     }
     else if (m_useShaderType == ShaderType_TerrainMultiTexture)
     {
-        shaderHandle = (XCShaderHandle*)context.GetShader(ShaderType_TerrainMultiTexture);
-        shaderHandle->SetConstantBuffer("PerObjectBuffer", context.GetDeviceContext(), *m_pCBPerObject);
-        shaderHandle->SetResource("gDiffuseMap",  context.GetDeviceContext(), m_textures[0]);
-        shaderHandle->SetResource("gDiffuseMap1", context.GetDeviceContext(), m_textures[1]);
-        shaderHandle->SetResource("gDiffuseMap2", context.GetDeviceContext(), m_textures[2]);
-        shaderHandle->SetResource("gBlendMap",    context.GetDeviceContext(), m_textures[3]);
+        shaderHandle = (XCShaderHandle*)renderContext.GetShader(ShaderType_TerrainMultiTexture);
+        shaderHandle->SetConstantBuffer("PerObjectBuffer", renderContext.GetDeviceContext(), *m_pCBPerObject);
+        shaderHandle->SetResource("gDiffuseMap",  renderContext.GetDeviceContext(), m_textures[0]);
+        shaderHandle->SetResource("gDiffuseMap1", renderContext.GetDeviceContext(), m_textures[1]);
+        shaderHandle->SetResource("gDiffuseMap2", renderContext.GetDeviceContext(), m_textures[2]);
+        shaderHandle->SetResource("gBlendMap",    renderContext.GetDeviceContext(), m_textures[3]);
     }
 
 #if defined(FORWARD_LIGHTING)
     XCLightManager* lightMgr = (XCLightManager*)&SystemLocator::GetInstance()->RequestSystem("LightsManager");
-    shaderHandle->SetConstantBuffer("cbLightsPerFrame", context.GetDeviceContext(), lightMgr->GetLightConstantBuffer());
+    shaderHandle->SetConstantBuffer("cbLightsPerFrame", renderContext.GetDeviceContext(), lightMgr->GetLightConstantBuffer());
 #endif
 
-    shaderHandle->SetVertexBuffer(context.GetDeviceContext(), &m_vertexPosNormTexBuffer);
-    shaderHandle->SetIndexBuffer(context.GetDeviceContext(), m_indexBuffer);
+    shaderHandle->SetVertexBuffer(renderContext.GetDeviceContext(), &m_vertexPosNormTexBuffer);
+    shaderHandle->SetIndexBuffer(renderContext.GetDeviceContext(), m_indexBuffer);
 
-    context.DrawIndexedInstanced(m_indexBuffer.m_indexData.size(), m_indexBuffer.GetIndexBufferInGPUMem());
+    renderContext.DrawIndexedInstanced(m_indexBuffer.m_indexData.size(), m_indexBuffer.GetIndexBufferInGPUMem());
 
-    m_OBBHierarchy->Draw(context);
+    m_OBBHierarchy->Draw(renderContext);
+
+    return true;
 }
 
-void Terrain::Destroy()
+IActor::ActorReturnState Terrain::Destroy()
 {
-    SimpleTerrain::Destroy();
-
     ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
 
     for (auto& tex : m_textures)
@@ -334,6 +338,8 @@ void Terrain::Destroy()
     gpuSys.DestroyResource(m_pCBPerObject);
 
     XCDELETE(m_OBBHierarchy);
+
+    return SimpleTerrain::Destroy();
 }
 
 XCVec3 Terrain::GetTerrainNormal(f32 x, f32 z) const

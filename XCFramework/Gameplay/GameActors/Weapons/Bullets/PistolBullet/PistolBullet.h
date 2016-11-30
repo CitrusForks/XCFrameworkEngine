@@ -20,18 +20,17 @@ public:
     DECLARE_OBJECT_CREATION(PistolBullet)
 
     PistolBullet(void);
-    PistolBullet(IActor* parentActor, XCVec3& initialPosition, std::string pMesh);
+    ~PistolBullet(void);
     
-    virtual ~PistolBullet(void);
-    
-    virtual void               Init(i32 actorId);
-    virtual void               Update(f32 dt);
-    virtual void               UpdateOffsets(f32 dt);
-    virtual void               Draw(RenderContext& renderContext);
-    virtual void               Destroy();
-    virtual void               ApplyOffsetRotation();
+    IActor::ActorReturnState         Init() override;
+    IActor::ActorReturnState         LoadMetaData(const void* metaData) override;
+    IActor::ActorReturnState         Update(f32 dt) override;
+    void                             UpdateOffsets(f32 dt);
+    bool                             Draw(RenderContext& renderContext) override;
+    IActor::ActorReturnState         Destroy() override;
 
-    SubActor*                  GetSubActor() { return (SubActor*)this; }
+    void                             ApplyOffsetRotation();
+    SubActor*                        GetSubActor() { return (SubActor*)this; }
 
 protected:
 

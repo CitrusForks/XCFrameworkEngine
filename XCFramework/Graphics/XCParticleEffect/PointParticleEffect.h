@@ -14,8 +14,8 @@ public:
     PointParticleEffect(XCVec3Unaligned& position, const f32 lifeSpan);
     ~PointParticleEffect();
 
-    void                            Update(f32 dt);
-    void                            Draw(RenderContext& context);
+    void                            Update(f32 dt) override;
+    bool                            Draw(RenderContext& context) override;
 
 private:
     

@@ -16,9 +16,9 @@ public:
     DECLARE_OBJECT_CREATION(NPCCar)
 
     NPCCar(void);
-    virtual ~NPCCar(void);
+    ~NPCCar(void);
  
-    void                        PreLoad(const void* fbBuffer) override;
-    void                        Update(f32 dt) override;
-    void                        Destroy() override;
+    IActor::ActorReturnState LoadMetaData(const void* metaData) override;
+    IActor::ActorReturnState Update(f32 dt) override;
+    IActor::ActorReturnState Destroy() override;
 };

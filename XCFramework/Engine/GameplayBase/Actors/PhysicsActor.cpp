@@ -23,9 +23,9 @@ PhysicsActor::~PhysicsActor(void)
     XCDELETE(m_boundBox);
 }
 
-void PhysicsActor::Init(i32 actorId)
+IActor::IActor::ActorReturnState PhysicsActor::Init()
 {
-    IActor::Init(actorId);
+    IActor::IActor::ActorReturnState result = AnimatedActor::Init();
 
     m_look = XCVec4(0, 0, 1, 0);
     XCVec3 up(0, 1, 0);
@@ -37,27 +37,31 @@ void PhysicsActor::Init(i32 actorId)
     m_World = m_MScaling * m_MRotation * m_MTranslation;
 
     m_boundBox->Init();
+
+    return result;
 }
 
-void PhysicsActor::Load()
+IActor::IActor::ActorReturnState PhysicsActor::Load()
 {
-    AnimatedActor::Load();
+    return AnimatedActor::Load();
 }
 
-void PhysicsActor::UpdateState()
+IActor::IActor::ActorReturnState PhysicsActor::OnLoaded()
 {
-    if (m_pMesh && m_pMesh->GetResource<XCMesh>()->IsLoaded())
+    IActor::IActor::ActorReturnState result = AnimatedActor::OnLoaded();
+
+    //Since resources are interleaved. We need to wait for them to be loaded. Further way to improve this is, having callbacks when resource is loaded.
+    if (m_pMesh == nullptr || (m_pMesh && m_pMesh->GetResource<XCMesh>()->IsLoaded()))
     {
         SetInitialPhysicsProperties();
-        m_actorState = IActor::ActorState_Loaded;
+        result = IActor::IActor::ActorReturnState_Success;
     }
-    else if (m_pMesh == nullptr)
+    else
     {
-        //We do not have a mesh. SO its loaded
-        m_actorState = IActor::ActorState_Loaded;
+        result = IActor::IActor::ActorReturnState_Processing;
     }
 
-    IActor::UpdateState();
+    return result;
 }
 
 void PhysicsActor::SetInitialPhysicsProperties()
@@ -69,38 +73,42 @@ void PhysicsActor::SetInitialPhysicsProperties()
     }
 }
 
-void PhysicsActor::Update(f32 dt)
+IActor::IActor::ActorReturnState PhysicsActor::Update(f32 dt)
 {
-    IActor::Update(dt);
+    IActor::IActor::ActorReturnState result = IActor::Update(dt);
 
     if (m_pMesh)
     {
         m_boundBox->Transform(m_MTranslation, m_MRotation);
         m_boundBox->Update(dt);
     }
+
+    return result;
 }
 
-void PhysicsActor::Draw(RenderContext& context)
+bool PhysicsActor::Draw(RenderContext& renderContext)
 {
-    IActor::Draw(context);
+    bool result = IActor::Draw(renderContext);
 
     if (m_pMesh)
     {
-        m_boundBox->Draw(context);
+        m_boundBox->Draw(renderContext);
     }
+
+    return result;
 }
 
-void PhysicsActor::Unload()
+IActor::IActor::ActorReturnState PhysicsActor::Unload()
 {
-    IActor::Unload();
+    return IActor::Unload();
 }
 
-void PhysicsActor::Destroy()
+IActor::IActor::ActorReturnState PhysicsActor::Destroy()
 {
     if (m_pMesh)
     {
         m_boundBox->Destroy();
     }
 
-    IActor::Destroy();
+    return IActor::Destroy();
 }

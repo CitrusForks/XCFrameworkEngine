@@ -9,12 +9,10 @@
 #include "Base/Serializer/ObjectFactory.h"
 #include "ISystem.h"
 
-class SystemFactory : public ObjectFactory, public ISystem
+class SystemFactory : ObjectFactory, public ISystem
 {
 public:
-    SystemFactory()
-    { }
-
+    SystemFactory();
     virtual ~SystemFactory();
 
     void                            InitFactory()     override final;
@@ -23,8 +21,11 @@ public:
     ISystem*                        CreateSystem(std::string sysName);
 
     template<class T>
-    void RegisterSystem(std::string systemName)
+    void                            RegisterSystem(std::string systemName)
     {
         RegisterObject<T>(systemName);
     }
+
+private:
+    i32                             m_systemInstanceCount;
 };

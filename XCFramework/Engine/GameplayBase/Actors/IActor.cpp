@@ -10,10 +10,11 @@
 #include "Assets/Packages/PackageConsts.h"
 
 IActor::IActor(void)
-    : m_userFriendlyName("None")
-    , m_actorReady(false)
+    : m_userFriendlyName("IActor")
+    , m_actorLoaded(false)
     , m_invalidated(false)
-    , m_actorState(ActorState_None)
+    , m_actorState(ActorState_Initialize)
+    , m_metaData(nullptr)
 {
 }
 
@@ -22,11 +23,16 @@ IActor::~IActor(void)
     Logger("[IActor] Destructor called for %s", m_userFriendlyName.c_str());
 }
 
-void IActor::PreLoad(const void* fbBuffer)
+IActor::IActor::ActorReturnState IActor::Init()
 {
-    if (fbBuffer)
+    return IActor::ActorReturnState_Success;
+}
+
+IActor::IActor::ActorReturnState IActor::LoadMetaData(const void* metaData)
+{
+    if (metaData)
     {
-        const FBIActor* iactorBuff = (FBIActor*)fbBuffer;
+        const FBIActor* iactorBuff = (FBIActor*)metaData;
 
         m_currentPosition.SetValues(iactorBuff->Position()->x(), iactorBuff->Position()->y(), iactorBuff->Position()->z(), iactorBuff->Position()->w());
         m_initialRotation.SetValues(iactorBuff->Rotation()->x(), iactorBuff->Rotation()->y(), iactorBuff->Rotation()->z(), iactorBuff->Rotation()->w());
@@ -37,74 +43,123 @@ void IActor::PreLoad(const void* fbBuffer)
         m_material.Specular = XCVec4Unaligned(iactorBuff->Material()->Specular()->x(), iactorBuff->Material()->Specular()->y(), iactorBuff->Material()->Specular()->z(), iactorBuff->Material()->Specular()->w());
     }
 
-    m_actorState = ActorState_PreLoaded;
+    return IActor::ActorReturnState_Success;
 }
 
-void IActor::Load()
+IActor::IActor::ActorReturnState IActor::Load()
 {
-    for (auto& actor : m_childNodes)
-    {
-        actor->Load();
-    }
-}
-
-void IActor::UpdateState()
-{
-    if (!m_actorReady && m_actorState == ActorState_Loaded)
-    {
-        m_invalidated  = false;
-        m_actorReady   = true;
-        m_isRenderable = true;
-    }
-    else if (m_actorReady && m_actorState == ActorState_Unloaded)
-    {
-        Invalidate();
-    }
+    IActor::ActorReturnState result = IActor::ActorReturnState_Success;
 
     for (auto& actor : m_childNodes)
     {
-        actor->UpdateState();
+        if (result == IActor::ActorReturnState_Success)
+            result = actor->Load();
+        else
+            break;
     }
+
+    m_actorLoaded = true;
+
+    return result;
 }
 
-void IActor::Update(f32 dt)
+IActor::IActor::ActorReturnState IActor::OnLoaded()
 {
+    IActor::ActorReturnState result = IActor::ActorReturnState_Success;
+
+    m_invalidated = false;
+    m_isRenderable = true;
+
     for (auto& actor : m_childNodes)
     {
-        actor->Update(dt);
+        if (result == IActor::ActorReturnState_Success)
+            result = actor->OnLoaded();
+        else
+            break;
     }
+
+    return result;
 }
 
-void IActor::Draw(RenderContext& renderContext)
+IActor::IActor::ActorReturnState IActor::OnUnloaded()
 {
+    IActor::ActorReturnState result = IActor::ActorReturnState_Success;
+
     for (auto& actor : m_childNodes)
     {
-        actor->Draw(renderContext);
+        if (result == IActor::ActorReturnState_Success)
+            result = actor->OnUnloaded();
+        else
+            break;
     }
+
+    return result;
 }
 
-void IActor::Unload()
+IActor::IActor::ActorReturnState IActor::Update(f32 dt)
 {
+    IActor::ActorReturnState result = IActor::ActorReturnState_Success;
+
     for (auto& actor : m_childNodes)
     {
-        actor->Unload();
+        if (result == IActor::ActorReturnState_Success)
+            result = actor->Update(dt);
+        else
+            break;
     }
 
-    m_actorState = ActorState_Unloaded;
+    return result;
 }
 
-void IActor::Destroy()
+bool IActor::Draw(RenderContext& renderContext)
 {
+    bool result = false;
+
     for (auto& actor : m_childNodes)
     {
-        actor->Destroy();
+        if (result)
+            result = actor->Draw(renderContext);
+        else
+            break;
     }
+
+    return result;
+}
+
+IActor::IActor::ActorReturnState IActor::Unload()
+{
+    IActor::ActorReturnState result = IActor::ActorReturnState_Success;
+
+    for (auto& actor : m_childNodes)
+    {
+        if (result == IActor::ActorReturnState_Success)
+            result = actor->Unload();
+        else
+            break;
+    }
+
+    return result;
+}
+
+IActor::IActor::ActorReturnState IActor::Destroy()
+{
+    IActor::ActorReturnState result = IActor::ActorReturnState_Success;
+
+    for (auto& actor : m_childNodes)
+    {
+        if (result == IActor::ActorReturnState_Success)
+            result = actor->Destroy();
+        else
+            break;
+    }
+
+    return result;
 }
 
 void IActor::Invalidate()
 {
     m_invalidated   = true;
-    m_actorReady    = false;
+    m_actorLoaded    = false;
     m_isRenderable  = false;
 
     for (auto& actor : m_childNodes)

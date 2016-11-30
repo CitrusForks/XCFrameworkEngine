@@ -15,10 +15,9 @@
 #include "Graphics/XCMesh/VectorFontMesh.h"
 
 ResourceFactory::ResourceFactory()
+    : m_resourceCount(0)
 {
-    m_resourceCount = 0;
 }
-
 
 ResourceFactory::~ResourceFactory()
 {
@@ -39,43 +38,24 @@ void ResourceFactory::DestroyFactory()
     m_resourceCount = 0;
 }
 
-
-IResource* ResourceFactory::createResource(std::string classKey, std::string userFriendlyName)
+IResource* ResourceFactory::CreateResource(std::string classKey, std::string userFriendlyName)
 {
     IResource* outResource = (IResource*) CreateObject(classKey);
-    outResource->Init(++m_resourceCount, userFriendlyName);
+    outResource->SetBaseObjectId(++m_resourceCount);
+    outResource->Init(userFriendlyName);
 
     return outResource;
 }
 
-IResource* ResourceFactory::createResource(std::string classKey)
+IResource* ResourceFactory::CreateResource(std::string classKey)
 {
     //Use this for Flatbuffers
     IResource* outResource = (IResource*) CreateObject(classKey);
-    outResource->Init(++m_resourceCount, "");
+    outResource->SetBaseObjectId(++m_resourceCount);
+
+    char usrFrndName[1024];
+    sprintf(usrFrndName, "%s+%d", classKey, m_resourceCount);
+    outResource->Init(usrFrndName);
 
     return outResource;
-}
-
-void ResourceFactory::loadResource(FILE* packageFile, IResource* const resource)
-{
-    char rscPath[256];
-
-    fscanf(packageFile, "%s", rscPath);
-    //Based on every resources init parameters, load it.
-    if (resource->GetResourceType() == RESOURCETYPE_TEXTURE2D || resource->GetResourceType() == RESOURCETYPE_CUBETEXTURE3D)
-    {
-        resource->Load(rscPath);
-    }
-    else if (resource->GetResourceType() == RESOURCETYPE_MESH)
-    {
-        f32 scaling = 0.0f;
-        fscanf(packageFile, "%f", &scaling);
-        ((XCMesh*)resource)->Load(rscPath, scaling);
-    }
-}
-
-void ResourceFactory::loadResource(const void* buffer, IResource* const resource)
-{
-    resource->Load(buffer);
 }

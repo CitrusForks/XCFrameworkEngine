@@ -21,13 +21,14 @@ public:
     Bullet(void);
     virtual ~Bullet(void);
 
-    virtual void                        Load();
-    virtual void                        SetInitialPhysicsProperties();
-    virtual void                        Update(f32 dt);
-    virtual void                        Draw(RenderContext& context);
-    virtual void                        Destroy();
+    virtual IActor::ActorReturnState    LoadMetaData(const void* metaData) override;
+    virtual IActor::ActorReturnState    Load() override;
+    virtual IActor::ActorReturnState    Update(f32 dt) override;
+    virtual bool                        Draw(RenderContext& renderContext) override;
+    virtual IActor::ActorReturnState    Destroy() override;
+    virtual void                        SetInitialPhysicsProperties() override;
 
-    void                                PreLoad(XCVec3& initialPosition, XCVec3& target, std::string pMeshName);
+protected:
     void                                Shoot(f32 scalarForce);
 
 protected:

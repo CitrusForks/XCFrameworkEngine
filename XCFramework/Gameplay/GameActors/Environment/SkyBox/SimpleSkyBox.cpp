@@ -25,27 +25,29 @@ SimpleSkyBox::~SimpleSkyBox(void)
 {
 }
 
-void SimpleSkyBox::Init(i32 actorId)
+IActor::ActorReturnState SimpleSkyBox::Init()
 {
-    SimpleActor::Init(actorId);
-
     m_useShaderType = ShaderType_SimpleCubeMap;
+
+    return SimpleActor::Init();
 }
 
-void SimpleSkyBox::PreLoad(const void* fbBuffer)
+IActor::ActorReturnState SimpleSkyBox::LoadMetaData( const void* metaData )
 {
-    const FBSimpleSkyBox* skyBoxBuff = (FBSimpleSkyBox*)fbBuffer;
+    const FBSimpleSkyBox* skyBoxBuff = (FBSimpleSkyBox*) metaData;
 
-    SimpleActor::PreLoad(skyBoxBuff->Base());
+    SimpleActor::LoadMetaData(skyBoxBuff->Base());
 
     ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
     m_cubeMapTexture = &resMgr.AcquireResource(skyBoxBuff->CubeTexture3DResourceName()->c_str());
 
     GPUResourceSystem& gpuSys = (GPUResourceSystem&)SystemLocator::GetInstance()->RequestSystem("GPUResourceSystem");
     m_CBwvp = gpuSys.CreateConstantBufferResourceView(GPUResourceDesc(GPUResourceType_CBV, sizeof(cbWVP)));
+
+    return IActor::ActorReturnState_Success;
 }
 
-void SimpleSkyBox::Load()
+IActor::ActorReturnState SimpleSkyBox::Load()
 {
     m_MTranslation = MatrixTranslate(m_currentPosition);
     ApplyRotation(m_initialRotation);
@@ -53,19 +55,8 @@ void SimpleSkyBox::Load()
     m_World = m_MScaling * m_MRotation * m_MTranslation;
 
     BuildBuffers();
-    SimpleActor::Load();
 
-    m_actorState = IActor::ActorState_Loaded;
-
-}
-
-void SimpleSkyBox::UpdateState()
-{
-    if (m_cubeMapTexture->m_Resource->IsLoaded())
-    {
-    }
-
-    SimpleActor::UpdateState();
+    return SimpleActor::Load();
 }
 
 void SimpleSkyBox::BuildBuffers()
@@ -112,47 +103,49 @@ void SimpleSkyBox::BuildBuffers()
     m_indexBuffer.BuildIndexBuffer();
 }
 
-void SimpleSkyBox::Update(f32 dt)
+IActor::ActorReturnState SimpleSkyBox::Update(f32 dt)
 {
-    SimpleActor::Update(dt);
+    return SimpleActor::Update(dt);
 }
 
-void SimpleSkyBox::Draw(RenderContext& context)
+bool SimpleSkyBox::Draw(RenderContext& renderContext)
 {
-    IActor::Draw(context);
+    IActor::Draw(renderContext);
     
-    context.ApplyShader(m_useShaderType);
+    renderContext.ApplyShader(m_useShaderType);
 
     XCGraphics& graphicsSystem = (XCGraphics&)SystemLocator::GetInstance()->RequestSystem("GraphicsSystem");
-    graphicsSystem.SetLessEqualDepthStencilView(context.GetDeviceContext(), true);
+    graphicsSystem.SetLessEqualDepthStencilView(renderContext.GetDeviceContext(), true);
 
     // Set constants
     //Calculate wvp and set it to the constant.
-    ICamera& cam = context.GetGlobalShaderData().m_camera;
+    ICamera& cam = renderContext.GetGlobalShaderData().m_camera;
 
     cbWVP wbuffer = { MatrixTranspose(m_World * cam.GetViewMatrix() * cam.GetProjectionMatrix()).GetUnaligned() };
-    m_CBwvp->UploadDataOnGPU(context.GetDeviceContext(), &wbuffer, sizeof(cbWVP));
+    m_CBwvp->UploadDataOnGPU(renderContext.GetDeviceContext(), &wbuffer, sizeof(cbWVP));
 
     // Set constants
-    XCShaderHandle* cubeMapShader = (XCShaderHandle*) context.GetShader(ShaderType_SimpleCubeMap);
+    XCShaderHandle* cubeMapShader = (XCShaderHandle*) renderContext.GetShader(ShaderType_SimpleCubeMap);
 
-    cubeMapShader->SetVertexBuffer(context.GetDeviceContext(), &m_vertexBuffer);
-    cubeMapShader->SetIndexBuffer(context.GetDeviceContext(), m_indexBuffer);
+    cubeMapShader->SetVertexBuffer(renderContext.GetDeviceContext(), &m_vertexBuffer);
+    cubeMapShader->SetIndexBuffer(renderContext.GetDeviceContext(), m_indexBuffer);
 
-    cubeMapShader->SetConstantBuffer("cbWVP", context.GetDeviceContext(), *m_CBwvp);
-    cubeMapShader->SetResource("gCubeMap", context.GetDeviceContext(), m_cubeMapTexture);
+    cubeMapShader->SetConstantBuffer("cbWVP", renderContext.GetDeviceContext(), *m_CBwvp);
+    cubeMapShader->SetResource("gCubeMap", renderContext.GetDeviceContext(), m_cubeMapTexture);
     
-    context.DrawIndexedInstanced(36, m_indexBuffer.GetIndexBufferInGPUMem());
-    graphicsSystem.SetLessEqualDepthStencilView(context.GetDeviceContext(), false);
+    renderContext.DrawIndexedInstanced(36, m_indexBuffer.GetIndexBufferInGPUMem());
+    graphicsSystem.SetLessEqualDepthStencilView(renderContext.GetDeviceContext(), false);
+
+    return true;
 }
 
-void SimpleSkyBox::Destroy()
+IActor::ActorReturnState SimpleSkyBox::Destroy()
 {
-    SimpleActor::Destroy();
-
     GPUResourceSystem& gpuSys = (GPUResourceSystem&)SystemLocator::GetInstance()->RequestSystem("GPUResourceSystem");
     gpuSys.DestroyResource(m_CBwvp);
 
     ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
     resMgr.ReleaseResource(m_cubeMapTexture);
+
+    return SimpleActor::Destroy();
 }

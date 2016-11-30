@@ -16,7 +16,7 @@ struct GameActorsInfo
     char    m_actorName[50];
 };
 
-class GameActorsFactory : public ObjectFactory, public ISystem
+class GameActorsFactory : ObjectFactory, public ISystem
 {
 public:
     DECLARE_SYSTEMOBJECT_CREATION(GameActorsFactory)
@@ -25,26 +25,14 @@ public:
     virtual ~GameActorsFactory();
 
     void                            InitFactory();
+    void                            DestroyFactory();
+
     void                            RegisterActors();
 
     IActor*                         CreateActor(std::string userFriendlyName);
     
     template<class T>
-    T*                              CreateActor(std::string actorName)
-    {
-        std::unique_lock<std::mutex> m(m_gameActorsFactoryLock);
-
-        IActor* actor = (IActor*)CreateObject(actorName);
-        actor->Init(++m_actorsCount);
-
-        Logger("[GAME ACTORS FACTORY] Actor : %s  ID : %d", actorName.c_str(), m_actorsCount);
-
-        m.unlock();
-
-        return (T*) actor;
-    }
-
-    void                            DestroyFactory();
+    T*                              CreateActor(std::string actorName);
 
     i32                             GetNoOfActorTypes() { return GAMEACTOR_MAX; }
     void                            GetAllActorTypes(GameActorsInfo* actorTypes);
@@ -55,3 +43,18 @@ private:
 
     i32                                         m_actorsCount;
 };
+
+template<class T>
+T* GameActorsFactory::CreateActor(std::string actorName)
+{
+    std::unique_lock<std::mutex> m(m_gameActorsFactoryLock);
+
+    IActor* actor = (IActor*)CreateObject(actorName);
+    actor->Init(++m_actorsCount);
+
+    Logger("[GAME ACTORS FACTORY] Actor : %s  ID : %d", actorName.c_str(), m_actorsCount);
+
+    m.unlock();
+
+    return (T*)actor;
+}

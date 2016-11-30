@@ -18,12 +18,12 @@ public:
     DECLARE_OBJECT_CREATION(PCSoldier)
 
     PCSoldier(void);
-    virtual ~PCSoldier(void);
+    ~PCSoldier(void);
 
-    void                        Init(i32 actorId);
-    void                        PreLoad(const void* fbBuffer) override;
-    void                        Update(f32 dt);
+    IActor::ActorReturnState Init() override;
+    IActor::ActorReturnState LoadMetaData(const void* metaData) override;
+    IActor::ActorReturnState Update(f32 dt) override;
 
 protected:
-    XCInput*                    m_directInput;
+    XCInput*                 m_directInput;
 };

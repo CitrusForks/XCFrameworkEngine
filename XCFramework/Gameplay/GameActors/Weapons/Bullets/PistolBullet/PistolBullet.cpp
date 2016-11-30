@@ -23,27 +23,31 @@ PistolBullet::~PistolBullet(void)
 {
 }
 
-PistolBullet::PistolBullet(IActor* parentActor, XCVec3& initialPosition, std::string pMesh)
+IActor::ActorReturnState PistolBullet::LoadMetaData(const void* metaData)
 {
+    //TODO : Gen FB and parse
+    XCASSERT(false);
+
     ResourceManager& resMgr = (ResourceManager&)SystemLocator::GetInstance()->RequestSystem("ResourceManager");
-    m_pMesh = &resMgr.AcquireResource(pMesh.c_str());
+    //m_pMesh = &resMgr.AcquireResource(pMesh.c_str());
 
     m_material.Ambient = XCVec4Unaligned(1.0f, 1.0f, 1.0f, 1.0f);
     m_material.Diffuse = XCVec4Unaligned(0.5f, 0.8f, 0.0f, 1.0f);
     m_material.Specular = XCVec4Unaligned(0.2f, 0.2f, 0.2f, 16.0f);
 
-
     //Get initial position
-    m_currentPosition = initialPosition;
+    //m_currentPosition = initialPosition;
 
     m_useShaderType = ShaderType_LightTexture;
 
     m_secondaryLookAxis  = XCFloat4::XCFloat4ZeroVector;
     m_secondaryUpAxis    = XCFloat4::XCFloat4ZeroVector;
     m_secondaryRightAxis = XCFloat4::XCFloat4ZeroVector;
+
+    return IActor::ActorReturnState_Success;
 }
 
-void PistolBullet::Init(i32 actorId)
+IActor::ActorReturnState PistolBullet::Init()
 {
     m_currentPosition += GetOffsetPosition();
 
@@ -60,9 +64,11 @@ void PistolBullet::Init(i32 actorId)
     m_secondaryLookAxis = m_look;
     m_secondaryUpAxis = m_up;
     m_secondaryRightAxis = m_right;
+
+    return IActor::ActorReturnState_Success;
 }
 
-void PistolBullet::Update(f32 dt)
+IActor::ActorReturnState PistolBullet::Update(f32 dt)
 {
     UpdateOffsets(dt);
 
@@ -74,7 +80,7 @@ void PistolBullet::Update(f32 dt)
 
     m_pMesh->GetResource<XCMesh>()->Update(dt);
 
-    SimpleMeshActor::Update(dt);
+    return SimpleMeshActor::Update(dt);
 }
 
 void PistolBullet::UpdateOffsets(f32 dt)
@@ -101,17 +107,17 @@ void PistolBullet::ApplyOffsetRotation()
     m_transformedRotation *= GetOffsetRotation();
 }
 
-void PistolBullet::Draw(RenderContext& context)
+bool PistolBullet::Draw(RenderContext& renderContext)
 {
-    context.ApplyShader(m_useShaderType);
+    renderContext.ApplyShader(m_useShaderType);
 #if defined(XCGRAPHICS_DX11)
-    context.GetDeviceContext().IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    renderContext.GetDeviceContext().IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 #endif
     u32 stride = sizeof(VertexPosNormTex);
     u32 offset = 0;
     
     // Set constants
-    ICamera& cam = context.GetGlobalShaderData().m_camera;
+    ICamera& cam = renderContext.GetGlobalShaderData().m_camera;
     PerObjectBuffer perObject = {
         MatrixTranspose(m_World).GetUnaligned(),
         MatrixTranspose(m_World * cam.GetViewMatrix() * cam.GetProjectionMatrix()).GetUnaligned(),
@@ -122,10 +128,12 @@ void PistolBullet::Draw(RenderContext& context)
   
     //m_pMesh->DrawAllInstanced(perObject);
 
-    SimpleMeshActor::Draw(context);
+    SimpleMeshActor::Draw(renderContext);
+
+    return true;
 }
 
-void PistolBullet::Destroy()
+IActor::ActorReturnState PistolBullet::Destroy()
 {
-    SimpleMeshActor::Destroy();
+    return SimpleMeshActor::Destroy();
 }

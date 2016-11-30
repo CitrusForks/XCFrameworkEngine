@@ -16,7 +16,7 @@ public:
     virtual ~IParticleEffect();
 
     virtual void       Update(f32 dt);
-    virtual void       Draw(RenderContext& renderContext) {}
+    virtual bool       Draw(RenderContext& renderContext) { return true; }
                        
     virtual bool       IsAlive() const                        { return m_isAlive; }
     virtual void       SetAlive(bool alive)                   { m_isAlive = alive; }

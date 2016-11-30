@@ -18,8 +18,15 @@
 #include "Graphics/GPUResourceSystem.h"
 
 SimpleTerrain::SimpleTerrain(void)
+    : m_rows(0)
+    , m_cols(0)
+    , m_totalVertices(0)
+    , m_totalIndices(0)
+    , m_rowSpacing(0)
+    , m_colSpacing(0)
+    , m_useShaderType(ShaderType_SolidColor)
+    , m_pCBPerObject(nullptr)
 {
-    m_useShaderType = ShaderType_SolidColor;
     m_collisionDetectionType = COLLISIONDETECTIONTYPE_TRIANGLE;
 }
 
@@ -27,11 +34,11 @@ SimpleTerrain::~SimpleTerrain(void)
 {
 }
 
-void SimpleTerrain::PreLoad(const void* fbBuffer)
+IActor::ActorReturnState SimpleTerrain::LoadMetaData( const void* metaData )
 {
-    const FBSimpleTerrain* fbSimpleTerrainBuff = (FBSimpleTerrain*)fbBuffer;
+    const FBSimpleTerrain* fbSimpleTerrainBuff = (FBSimpleTerrain*)metaData;
 
-    PhysicsActor::PreLoad(fbSimpleTerrainBuff->Base());
+    PhysicsActor::LoadMetaData(fbSimpleTerrainBuff->Base());
 
     m_rows = fbSimpleTerrainBuff->Rows();
     m_cols = fbSimpleTerrainBuff->Column();
@@ -40,15 +47,17 @@ void SimpleTerrain::PreLoad(const void* fbBuffer)
 
     GPUResourceSystem& gpuSys = (GPUResourceSystem&)SystemLocator::GetInstance()->RequestSystem("GPUResourceSystem");
     m_pCBPerObject = gpuSys.CreateConstantBufferResourceView(GPUResourceDesc(GPUResourceType_CBV, sizeof(PerObjectBuffer)));
+
+    return IActor::ActorReturnState_Success;
 }
 
-void SimpleTerrain::Load()
+IActor::ActorReturnState SimpleTerrain::Load()
 {
     GenerateVertices();
     GenerateIndicesWithTextureMapping();
 
     BuildGeometryBuffer();
-    PhysicsActor::Load();
+    return PhysicsActor::Load();
 }
 
 void SimpleTerrain::ComputeVertices()
@@ -172,35 +181,40 @@ f32 SimpleTerrain::GetHeight(f32 _x, f32 _z)
     return 0.3f*(_z*sinf(0.1f*_x) + _x*cosf(0.1f*_z));
 }
 
-void SimpleTerrain::Update(f32 dt)
+IActor::ActorReturnState SimpleTerrain::Update(f32 dt)
 {
+    return PhysicsActor::Update(dt);
 }
 
-void SimpleTerrain::Draw(RenderContext& context)
+bool SimpleTerrain::Draw(RenderContext& renderContext)
 {
-    context.ApplyShader(m_useShaderType);
+    renderContext.ApplyShader(m_useShaderType);
     
     // Set constants
     cbWorld wbuffer = { MatrixTranspose(m_World).GetUnaligned() };
-    ICamera& cam = context.GetGlobalShaderData().m_camera;
+    ICamera& cam = renderContext.GetGlobalShaderData().m_camera;
     
     cbWVP perObject = {
         MatrixTranspose(cam.GetViewMatrix() * cam.GetProjectionMatrix() * m_World).GetUnaligned(),
     };
-    m_pCBPerObject->UploadDataOnGPU(context.GetDeviceContext(), &perObject, sizeof(PerObjectBuffer));
+    m_pCBPerObject->UploadDataOnGPU(renderContext.GetDeviceContext(), &perObject, sizeof(PerObjectBuffer));
     
-    XCShaderHandle* solidColorShader = (XCShaderHandle*)context.GetShader(m_useShaderType);
-    solidColorShader->SetVertexBuffer(context.GetDeviceContext(), &m_vertexPosColorBuffer);
-    solidColorShader->SetIndexBuffer(context.GetDeviceContext(), m_indexBuffer);
+    XCShaderHandle* solidColorShader = (XCShaderHandle*)renderContext.GetShader(m_useShaderType);
+    solidColorShader->SetVertexBuffer(renderContext.GetDeviceContext(), &m_vertexPosColorBuffer);
+    solidColorShader->SetIndexBuffer(renderContext.GetDeviceContext(), m_indexBuffer);
 
-    solidColorShader->SetConstantBuffer("cbWVP", context.GetDeviceContext(), *m_pCBPerObject);
+    solidColorShader->SetConstantBuffer("cbWVP", renderContext.GetDeviceContext(), *m_pCBPerObject);
 
 
-    context.DrawIndexedInstanced(m_indexBuffer.m_indexData.size());
+    renderContext.DrawIndexedInstanced(m_indexBuffer.m_indexData.size());
+
+    return true;
 }
 
-void SimpleTerrain::Destroy()
+IActor::ActorReturnState SimpleTerrain::Destroy()
 {
     GPUResourceSystem& gpuSys = (GPUResourceSystem&)SystemLocator::GetInstance()->RequestSystem("GPUResourceSystem");
     gpuSys.DestroyResource(m_pCBPerObject);
+
+    return PhysicsActor::Destroy();
 }
