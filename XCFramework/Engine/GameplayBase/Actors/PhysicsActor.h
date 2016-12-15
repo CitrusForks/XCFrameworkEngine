@@ -15,7 +15,7 @@
 
 #include "Graphics/BasicGeometry/RenderableOBB.h"
 
-class PhysicsActor : public AnimatedActor, public XPhysics, public INavigator
+class PhysicsActor : public AnimatedActor, public IPhysicsFeature, public INavigator
 {
 public:
     DECLARE_OBJECT_CREATION(PhysicsActor)

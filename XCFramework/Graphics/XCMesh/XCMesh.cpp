@@ -723,3 +723,13 @@ void XCMesh::Destroy()
 {
     UnregisterDrawable();
 }
+
+void XCMesh::GetMeshInfo(MeshInfo& meshInfo, u32 subMeshIndex) const
+{
+    if (m_resourceState == IResource::ResourceState_Loaded)
+    {
+        const IndexBuffer<u32>& indexBuffer = m_subMeshes[subMeshIndex]->GetIndexBuffer();
+        std::copy(m_subMeshes[subMeshIndex]->m_vertices.begin(), m_subMeshes[subMeshIndex]->m_vertices.end(), std::back_inserter(meshInfo.m_vertices));
+        std::copy(indexBuffer.m_indexData.begin(), indexBuffer.m_indexData.end(), std::back_inserter(meshInfo.m_indices));
+    }
+}

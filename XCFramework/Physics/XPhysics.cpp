@@ -7,14 +7,14 @@
 #include "EnginePrecompiledHeader.h"
 #include "Physics/XPhysics.h"
 
-bool XPhysics::s_enableGravity = false;
+bool IPhysicsFeature::s_enableGravity = false;
 
-XPhysics::XPhysics()
+IPhysicsFeature::IPhysicsFeature()
 {
     m_GAcceleration = XCVec4(0, -5, 0, 0);
 }
 
-void XPhysics::InitXPhysics(const XCVec4& position, const XCVec4& velocity, const XCVec4& acceleration, f32 mass, f32 damping)
+void IPhysicsFeature::InitXPhysics(const XCVec4& position, const XCVec4& velocity, const XCVec4& acceleration, f32 mass, f32 damping)
 {
     m_Position = position;
     m_Velocity = velocity;
@@ -36,16 +36,16 @@ void XPhysics::InitXPhysics(const XCVec4& position, const XCVec4& velocity, cons
     m_ContactNormal      = XCVec3(0, 0, 0);
 }
 
-XPhysics::~XPhysics()
+IPhysicsFeature::~IPhysicsFeature()
 {
 }
 
-void XPhysics::AddForce(const XCVec4& _newForce)
+void IPhysicsFeature::AddForce(const XCVec4& _newForce)
 {
     m_ForceAccumulator += _newForce;
 }
 
-void XPhysics::Integrator(f32 dt)
+void IPhysicsFeature::Integrator(f32 dt)
 {
     //Add gravity to force accumulator
     if (s_enableGravity)
@@ -66,22 +66,22 @@ void XPhysics::Integrator(f32 dt)
     m_Velocity *= (f32)pow( m_Damping, dt);
 }
 
-void XPhysics::ClearForce()
+void IPhysicsFeature::ClearForce()
 {
     m_ForceAccumulator = XCVec3(0, 0, 0);
 }
 
-void XPhysics::ClearVelocity()
+void IPhysicsFeature::ClearVelocity()
 {
     m_Velocity = XCVec3(0, 0, 0);
 }
 
-bool XPhysics::HasFiniteMass() const
+bool IPhysicsFeature::HasFiniteMass() const
 {
     return m_InverseMass >= 0.0f;
 }
 
-f32 XPhysics::GetMass() const
+f32 IPhysicsFeature::GetMass() const
 {
     if (m_InverseMass == 0)
     {

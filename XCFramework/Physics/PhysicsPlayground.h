@@ -41,6 +41,7 @@ public:
     void                              AddPhysicsActor(const PhysicsActor& phyActor);
     void                              RemovePhysicsActor(const PhysicsActor& phyActor);
     void                              TestCollision();
+    XCVec4&                           GetAcceleratedGravity() const { return m_GAcceleration; }
 
 protected:
     bool                              CheckCollision(PhysicsActor* obj1, PhysicsActor* obj2);
@@ -50,4 +51,7 @@ private:
     PhysicsCollisionResolverTask*     m_collisionResolverTask;
     TaskManager*                      m_taskManager;
     ParticleContact                   m_particleContact;
+
+    XCVec4                            m_GAcceleration;
+
 };

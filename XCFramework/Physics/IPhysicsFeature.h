@@ -1,18 +1,16 @@
 /* XCFrameworkEngine
- * Copyright (C) Abhishek Porwal, 2016
- * Any queries? Contact author <https://github.com/abhishekp314>
- * This program is complaint with GNU General Public License, version 3.
- * For complete license, read License.txt in source root directory. */
+* Copyright (C) Abhishek Porwal, 2016
+* Any queries? Contact author <https://github.com/abhishekp314>
+* This program is complaint with GNU General Public License, version 3.
+* For complete license, read License.txt in source root directory. */
 
 #pragma once
 
-class XPhysics
+class IPhysicsFeature
 {
 public:
-    static bool s_enableGravity;
-
-    XPhysics();
-    virtual ~XPhysics();
+    IPhysicsFeature();
+    virtual ~IPhysicsFeature();
 
     void                InitXPhysics(const XCVec4& position, const XCVec4& velocity, const XCVec4& acceleration, f32 mass, f32 damping);
     void                Integrator(f32 dtS);
@@ -39,7 +37,6 @@ protected:
     XCVec4              m_Position;
     XCVec4              m_Acceleration;
     XCVec4              m_ForceAccumulator;
-    XCVec4              m_GAcceleration;
     XCVec4              m_ContactNormal;
 
     f32                 m_Damping;

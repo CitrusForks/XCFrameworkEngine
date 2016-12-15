@@ -11,6 +11,10 @@ print("Building C++ Win32 Project XCEngine")
 include "Engine"
 print("Project Generation done...")
 
+print("Building C++ Win32 Project XCPhysics")
+include "Physics"
+print("Project Generation done...")
+
 print("Building C++ Win32 Project XCGraphics")
 include "Graphics"
 print("Project Generation done...")

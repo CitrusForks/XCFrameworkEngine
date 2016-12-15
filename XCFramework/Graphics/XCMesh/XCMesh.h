@@ -9,6 +9,7 @@
 #include "Engine/Resource/IResource.h"
 
 #include "Engine/Resource/ResourceHandle.h"
+#include "Engine/GraphicsBase/MeshTypes.h"
 #include "Graphics/XCShaders/XCVertexFormat.h"
 #include "Graphics/XCShaders/XCShaderBufferConstants.h"
 
@@ -62,6 +63,8 @@ public:
 #endif
 
     void                                    SetRasterType(RasterType type) { m_rasterType = type; }
+
+    void                                    GetMeshInfo(MeshInfo& meshInfo, u32 meshIndex) const;
 
 protected:
 

@@ -22,8 +22,6 @@ void PhysicsCollisionResolverTask::Init()
 void PhysicsCollisionResolverTask::Run()
 {
     AsyncTask::Run();
-
-
 }
 
 void PhysicsCollisionResolverTask::Destroy()
