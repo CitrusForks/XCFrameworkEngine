@@ -9,83 +9,55 @@
 #include "IPhysicsFeature.h"
 
 IPhysicsFeature::IPhysicsFeature()
+    : m_damping(0.0f)
+    , m_inverseMass(0.0f)
+    , m_mass(0.0f)
 {
 }
 
-void IPhysicsFeature::InitXPhysics(const XCVec4& position, const XCVec4& velocity, const XCVec4& acceleration, f32 mass, f32 damping)
+void IPhysicsFeature::Init(const PhysicsDesc& desc)
 {
-    m_Position = position;
-    m_Velocity = velocity;
-    m_Acceleration = acceleration;
-    m_Mass = mass;
-    m_Damping = damping;
+    m_position = desc.m_position;
+    m_mass = desc.m_mass;
+    m_damping = desc.m_dampForce;
+    m_physicsBoundType = desc.m_boundBoxDesc.m_boundType;
 
-    if (mass >= 999)
+    if(m_mass >= 999)
     {
         SetInverseMass(0);
-        m_Mass = 1;
+        m_mass = 1;
     }
     else
     {
-        m_InverseMass = 1 / m_Mass;
+        m_inverseMass = 1 / m_mass;
     }
-
-    m_ForceAccumulator = XCVec3(0, 0, 0);
-    m_ContactNormal = XCVec3(0, 0, 0);
 }
 
 IPhysicsFeature::~IPhysicsFeature()
 {
 }
 
-void IPhysicsFeature::AddForce(const XCVec4& _newForce)
+void IPhysicsFeature::Update(f32 dt)
 {
-    m_ForceAccumulator += _newForce;
 }
 
-void IPhysicsFeature::Integrator(f32 dt)
+void IPhysicsFeature::Draw(RenderContext& context)
 {
-    //Add gravity to force accumulator
-    m_ForceAccumulator += PhysicsPlayground::GetAcceleratedGravity();
-
-    XCVec4 currentAcceleration = m_Acceleration;
-
-    //Update the position
-    m_Position += (m_Velocity * dt);
-
-    //Update the Resulting Acceleration
-    currentAcceleration += m_ForceAccumulator * m_InverseMass;
-
-    //Update linear Velocity
-    m_Velocity += currentAcceleration * dt;
-
-    //Impose Draging force
-    m_Velocity *= (f32)pow(m_Damping, dt);
-}
-
-void IPhysicsFeature::ClearForce()
-{
-    m_ForceAccumulator = XCVec3(0, 0, 0);
-}
-
-void IPhysicsFeature::ClearVelocity()
-{
-    m_Velocity = XCVec3(0, 0, 0);
 }
 
 bool IPhysicsFeature::HasFiniteMass() const
 {
-    return m_InverseMass >= 0.0f;
+    return m_inverseMass >= 0.0f;
 }
 
 f32 IPhysicsFeature::GetMass() const
 {
-    if (m_InverseMass == 0)
+    if (m_inverseMass == 0)
     {
         return 0.0f;
     }
     else
     {
-        return 1 / m_InverseMass;
+        return 1 / m_inverseMass;
     }
 }

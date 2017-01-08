@@ -20,6 +20,7 @@ class ResourceManager;
 class XCCameraManager;
 class XCLightManager;
 class GameFiniteStateMachine;
+class PhysicsPlayground;
 class NetworkManager;
 class INetPeer;
 
@@ -47,12 +48,13 @@ private:
     EventBroadcaster*            m_eventBroadcaster;
     TaskManager*                 m_taskManagingSystem;
     FlatBuffersSystem*           m_fbSystem;
-    XCGraphics*                 m_graphicsSystem;
-    XCInput*                 m_directInputSystem;
+    XCGraphics*                  m_graphicsSystem;
+    XCInput*                     m_directInputSystem;
     ResourceManager*             m_resourceManagingSystem;
-    XCCameraManager*            m_cameraManagingSystem;
-    XCLightManager*             m_lightsSystem;
+    XCCameraManager*             m_cameraManagingSystem;
+    XCLightManager*              m_lightsSystem;
     GameFiniteStateMachine*      m_gameFSM;
+    PhysicsPlayground*           m_physicsPlayground;
     NetworkManager*              m_networkManagingSystem;
     INetPeer*                    m_liveDriveClient;
 };

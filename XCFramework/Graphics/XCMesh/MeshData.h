@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include "Engine/GraphicsBase/MeshTypes.h"
+
 #include "Graphics/XCShaders/XCVertexFormat.h"
 #include "Graphics/IndexBuffer.h"
 #include "Graphics/VertexBuffer.h"
@@ -16,37 +18,6 @@
 class MeshData
 {
 public:
-
-    struct Vertex
-    {
-        f32 x;
-        f32 y;
-        f32 z;
-    };
-
-    struct MapCoord
-    {
-        f32 u;
-        f32 v;
-    };
-
-    struct Face
-    {
-        Face(u16 x, u16 y, u16 z, u16 w = 0)
-            : a(x)
-            , b(y)
-            , c(z)
-            , flags(w)
-        {}
-
-        u16 a;
-        u16 b;
-        u16 c;
-
-        u16 flags;
-    };
-
-
     MeshData(ShaderType shaderType);
 
     void        Init();

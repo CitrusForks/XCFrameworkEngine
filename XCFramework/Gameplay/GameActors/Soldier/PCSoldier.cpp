@@ -9,6 +9,7 @@
 #include "PCSoldier.h"
 
 #include "Engine/Input/XCInput.h"
+#include "Physics/IPhysicsFeature.h"
 
 PCSoldier::PCSoldier(void)
 {
@@ -78,19 +79,13 @@ IActor::ActorReturnState PCSoldier::Update(f32 dt)
             Jump(20);
             isMoving = true;
         }
-
-        if (!isMoving)
-        {
-            ClearVelocity();
-        }
     }
 
-    Integrator(dt);
-    ClearForce();
-
-    m_MTranslation = MatrixTranslate(m_Position);
-
-    m_currentPosition = m_Position;
+    if(m_physicsFeature->IsDirty())
+    {
+        m_currentPosition = m_physicsFeature->GetTransformedPosition();
+        m_MTranslation = MatrixTranslate(m_currentPosition);
+    }
 
     return Soldier::Update(dt);
 }

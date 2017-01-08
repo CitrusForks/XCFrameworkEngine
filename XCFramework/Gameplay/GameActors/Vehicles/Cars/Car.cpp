@@ -16,6 +16,9 @@
 
 #include "Engine/Resource/ResourceManager.h"
 
+#include "Physics/PhysicsPlayground.h"
+#include "Physics/Phusike/RigidBody.h"
+
 Car::Car(void)
 {
 }
@@ -33,7 +36,6 @@ IActor::ActorReturnState Car::LoadMetaData( const void* metaData )
     m_pMesh = &resMgr.AcquireResource(carBuff->XCMeshResourceName()->c_str());
 
     m_useShaderType = ShaderType_LightTexture;
-    m_collisionDetectionType = COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX;
 
     return IActor::ActorReturnState_Success;
 }
@@ -51,8 +53,15 @@ IActor::ActorReturnState Car::Load()
 
 void Car::SetInitialPhysicsProperties()
 {
-    InitXPhysics(m_currentPosition, XCFloat4::XCFloat4ZeroVector, XCFloat4::XCFloat4ZeroVector, 10, (f32)0.8);
     PhysicsActor::SetInitialPhysicsProperties();
+
+    PhysicsPlayground& playground = SystemLocator::GetInstance()->RequestSystem<PhysicsPlayground>("PhysicsPlayground");
+    m_physicsFeature = playground.CreatePhysicsFeature(
+        PhysicsDesc(PhysicsBodyType_RigidDynamic,
+                    PhysicsBoundType_Box,
+                    m_currentPosition,
+                    10,
+                    (f32) 0.8));
 }
 
 IActor::ActorReturnState Car::Update(f32 dt)
@@ -66,7 +75,7 @@ IActor::ActorReturnState Car::Update(f32 dt)
 
 void Car::Accelerate(f32 distance)
 {
-    m_Position += (distance * m_look);
+    m_currentPosition += (distance * m_look);
 }
 
 void Car::Steer(f32 angle, f32 scalarForce)
@@ -80,7 +89,7 @@ void Car::Steer(f32 angle, f32 scalarForce)
     //Rotate the car with it's initial rotations.
     m_MRotation *= rotation;
 
-    AddForce(m_look * scalarForce);
+    m_physicsFeature->GetTyped<RigidBody>()->AddForce(m_look * scalarForce);
 }
 
 bool Car::Draw(RenderContext& renderContext)

@@ -16,6 +16,7 @@
 #include "Engine/GameplayBase/Actors/GameActorsFactory.h"
 
 class SceneGraph;
+class PhysicsPlayground;
 
 using namespace GameState;
 
@@ -59,5 +60,5 @@ private:
     GameStatesFactory*          m_gameStateFactory;
     GameActorsFactory*          m_gameActorFactory;
     SceneGraph*                 m_worldSystem;
+    PhysicsPlayground*          m_physicsPlayground;
 };
-

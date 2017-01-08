@@ -9,14 +9,15 @@
 #include "Soldier.h"
 
 #include "Gameplay/XCCamera/XCCameraManager.h"
+
 #include "Engine/GameplayBase/Actors/GameActorsFactory.h"
+#include "Engine/Resource/ResourceManager.h"
 
 #include "Graphics/XCShaders/XCShaderBufferConstants.h"
 #include "Graphics/XCShaders/XCShaderHandle.h"
 #include "Graphics/XCMesh/XCMesh.h"
 
-#include "Engine/Resource/ResourceManager.h"
-
+#include "Physics/PhysicsPlayground.h"
 
 const f32 Soldier::MAX_PITCH_ANGLE = XC_PIDIV4;
 
@@ -40,8 +41,6 @@ IActor::ActorReturnState Soldier::LoadMetaData( const void* metaData )
 
     ResourceManager& resMgr = (ResourceManager&)SystemLocator::GetInstance()->RequestSystem("ResourceManager");
     m_pMesh = &resMgr.AcquireResource(soldierBuff->XCMeshResourceName()->c_str());
-
-    m_collisionDetectionType = COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX;
 
     //Gun mesh
     //GameActorsFactory& actorFactory = (GameActorsFactory&)SystemLocator::GetInstance()->RequestSystem("GameActorsFactory");
@@ -76,7 +75,14 @@ IActor::ActorReturnState Soldier::Load()
 void Soldier::SetInitialPhysicsProperties()
 {
     PhysicsActor::SetInitialPhysicsProperties();
-    InitXPhysics(m_currentPosition, XCVec4(), XCVec4(), 10, (f32)0.8);
+
+    PhysicsPlayground& playground = SystemLocator::GetInstance()->RequestSystem<PhysicsPlayground>("PhysicsPlayground");
+    m_physicsFeature = playground.CreatePhysicsFeature(
+        PhysicsDesc(PhysicsBodyType_RigidDynamic, 
+                    PhysicsBoundType_Box, 
+                    m_currentPosition, 
+                    10, 
+                    0.8));
 }
 
 IActor::ActorReturnState Soldier::OnLoaded()
@@ -110,7 +116,8 @@ IActor::ActorReturnState Soldier::Update(f32 dt)
 
 void Soldier::AccelerateCar(f32 distance)
 {
-    m_Position += (distance * m_look);
+    m_currentPosition += (distance * m_look);
+    m_physicsFeature->SetTransformedPosition(m_currentPosition);
 }
 
 void Soldier::Walk(f32 scalarForce)

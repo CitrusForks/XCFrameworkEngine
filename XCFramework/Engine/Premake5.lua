@@ -19,7 +19,7 @@ print("Building C++ Win32 Project XCEngine")
 
 		excludes { "**/Orbis/**", "**orbis.cpp", "**/Durango/**", "**durango.cpp", "**editor.cpp", "**/Editor/**", "**Editor.cpp", "**Editor**.*", "**/DDSTextureLoader_Legacy/**", "**.pssl", "**/XC_Shaders/src/**"}
 		
-		links { "FlatBuffers", "ws2_32", "dinput8", "XCGraphics" }
+		links { "FlatBuffers", "ws2_32", "dinput8", "XCGraphics", "XCPhysics" }
 		
 		defines { "DEBUG", "WIN_32", "WIN32", "_DEBUG", "_WINDOWS" }
 		pchheader "EnginePrecompiledHeader.h"
@@ -39,7 +39,7 @@ print("Building C++ Win32 Project XCEngine")
 
 		excludes { "**/Orbis/**", "**orbis.cpp", "**/Durango/**", "**durango.cpp", "**editor.cpp", "**/Editor/**", "**Editor.cpp", "**Editor**.*", "**/DDSTextureLoader_Legacy/**", "**.pssl", "**/XC_Shaders/src/**"}
 		
-		links { "FlatBuffers", "ws2_32", "dinput8", "XCGraphics" }
+		links { "FlatBuffers", "ws2_32", "dinput8", "XCGraphics", "XCPhysics" }
 		
 		defines { "NDEBUG", "WIN_32", "WIN32", "_WINDOWS" }
 		pchheader "EnginePrecompiledHeader.h"

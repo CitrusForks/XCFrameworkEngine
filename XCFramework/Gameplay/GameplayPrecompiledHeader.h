@@ -9,3 +9,4 @@
 #include "Base/BaseCommonIncludes.h"
 #include "Engine/EngineCommonIncludes.h"
 #include "Graphics/GraphicsCommonIncludes.h"
+#include "Physics/PhysicsCommonIncludes.h"

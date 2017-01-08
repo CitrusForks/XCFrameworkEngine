@@ -12,6 +12,7 @@
 #include "Graphics/XCLighting/XCLightManager.h"
 
 class SceneGraph;
+class PhysicsPlayground;
 
 namespace GameState
 {
@@ -35,5 +36,6 @@ namespace GameState
         XCCameraManager*       m_cameraSystem;
         XCInput*               m_directInput;
         SceneGraph*            m_worldSystem;
+        PhysicsPlayground*     m_physicsPlayground;
     };
 }

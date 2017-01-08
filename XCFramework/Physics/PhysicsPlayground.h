@@ -6,12 +6,14 @@
 
 #pragma once
 
-#include "Engine/GameplayBase/Actors/PhysicsActor.h"
+#include "IPhysicsFeature.h"
+
 #include "Engine/TaskManager/Task/AsyncTask.h"
 #include "Engine/TaskManager/TaskManager.h"
 
 #include "ParticleContact.h"
 
+class RenderContext;
 class PhysicsPlayground;
 
 class PhysicsCollisionResolverTask : public AsyncTask
@@ -32,26 +34,30 @@ private:
 };
 
 
-class PhysicsPlayground
+class PhysicsPlayground : public ISystem
 {
 public:
+    DECLARE_SYSTEMOBJECT_CREATION(PhysicsPlayground)
 
     void                              Init(TaskManager& m_taskManager);
+    void                              Update(float dt);
+    void                              Draw(RenderContext& context);
     void                              Destroy();
-    void                              AddPhysicsActor(const PhysicsActor& phyActor);
-    void                              RemovePhysicsActor(const PhysicsActor& phyActor);
+    
+    IPhysicsFeature*                  CreatePhysicsFeature(const PhysicsDesc& phydesc);
+    void                              RemovePhysicsFeature(IPhysicsFeature* phyFeature);
+    
     void                              TestCollision();
-    XCVec4&                           GetAcceleratedGravity() const { return m_GAcceleration; }
+    XCVec4                            GetAcceleratedGravity() const { return m_GAcceleration; }
 
 protected:
-    bool                              CheckCollision(PhysicsActor* obj1, PhysicsActor* obj2);
+    bool                              CheckCollision(IPhysicsFeature* obj1, IPhysicsFeature* obj2);
 
 private:
-    std::vector<PhysicsActor*>        m_physicsObjects;
+    std::vector<IPhysicsFeature*>     m_physicsFeatures;
     PhysicsCollisionResolverTask*     m_collisionResolverTask;
     TaskManager*                      m_taskManager;
     ParticleContact                   m_particleContact;
 
     XCVec4                            m_GAcceleration;
-
 };

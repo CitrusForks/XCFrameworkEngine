@@ -26,7 +26,6 @@ IActor::ActorReturnState Waves::LoadMetaData( const void* metaData )
     ComputeVertices();
 
     m_useShaderType = ShaderType_SolidColor;
-    m_collisionDetectionType = COLLISIONDETECTIONTYPE_TRIANGLE;
 
     return IActor::ActorReturnState_Success;
 }

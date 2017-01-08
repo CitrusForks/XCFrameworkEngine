@@ -499,12 +499,12 @@ void XCMeshFBX::ParseMesh(FbxNode* pNode)
                 i32 vIndex = lMesh->GetPolygonVertex(polygonIndex, faceVertexIndex);
 
                 FbxVector4 v1Data = lControlPoints[vIndex];
-                MeshData::Vertex vertex = { v1Data[0], v1Data[1], v1Data[2] };
+                Vertex vertex = { v1Data[0], v1Data[1], v1Data[2] };
 
                 //Logger("Polygon : %f %f %f ", vertex.x, vertex.y, vertex.z);
 
                 //Find if the vertex is present in our vertices.
-                auto foundVertex = std::find_if(submesh->m_vertices.begin(), submesh->m_vertices.end(), [&vertex](MeshData::Vertex v) -> bool
+                auto foundVertex = std::find_if(submesh->m_vertices.begin(), submesh->m_vertices.end(), [&vertex](Vertex v) -> bool
                 {
                     return fabs(v.x) == fabs(vertex.x) && fabs(v.y) == fabs(vertex.y) && fabs(v.z) == fabs(vertex.z);
                 });
@@ -527,7 +527,7 @@ void XCMeshFBX::ParseMesh(FbxNode* pNode)
             XCASSERT(faceValue[0] != -1);
 
             //Add the face to our submesh
-            MeshData::Face face = { (u16)faceValue[0], (u16)faceValue[1], (u16)faceValue[2], (u16)faceValue[3] };
+            Face face = { (u16)faceValue[0], (u16)faceValue[1], (u16)faceValue[2], (u16)faceValue[3] };
             submesh->AddFace(face);
             //Logger("Face : %d %d %d", face.a, face.b, face.c);
         }

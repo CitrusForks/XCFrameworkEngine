@@ -5,13 +5,16 @@
 * For complete license, read License.txt in source root directory. */
 
 
-#include "EnginePrecompiledHeader.h"
+#include "PhysicsPrecompiledHeader.h"
 
 #include "PhysicsPlayground.h"
+#include "PhysicsDesc.h"
 #include "CollisionDetection.h"
 
-//TODO: Remove this thing
-#include "Gameplay/GameActors/Environment/Terrain/Terrain.h"
+#include "Phusike/RigidBody.h"
+#include "Phusike/StaticBody.h"
+
+#include "Graphics/RenderContext.h"
 
 //WorldCollisionTask--------------------------------------
 void PhysicsCollisionResolverTask::Init()
@@ -33,10 +36,28 @@ void PhysicsCollisionResolverTask::Destroy()
 //PhysicsPlayground----------------------------------------
 void PhysicsPlayground::Init(TaskManager& taskMgr)
 {
+    m_taskManager = &taskMgr;
+
     //Initialize the collision thread
     m_collisionResolverTask = XCNEW(PhysicsCollisionResolverTask)(*this);
     m_collisionResolverTask->SetTaskPriority(THREAD_PRIORITY_HIGHEST);
     m_taskManager->RegisterTask(m_collisionResolverTask);
+}
+
+void PhysicsPlayground::Update(float dt)
+{
+    for (auto& phyFeature : m_physicsFeatures)
+    {
+        phyFeature->Update(dt);
+    }
+}
+
+void PhysicsPlayground::Draw(RenderContext& context)
+{
+    for (auto& phyFeature : m_physicsFeatures)
+    {
+        phyFeature->Draw(context);
+    }
 }
 
 void PhysicsPlayground::Destroy()
@@ -46,25 +67,64 @@ void PhysicsPlayground::Destroy()
     XCDELETE(m_collisionResolverTask);
 }
 
-void PhysicsPlayground::AddPhysicsActor(const PhysicsActor& phyActor)
+IPhysicsFeature* PhysicsPlayground::CreatePhysicsFeature(const PhysicsDesc& phydesc)
 {
+    IPhysicsFeature* feature = nullptr;
 
+    //Decide body type
+    switch(phydesc.m_bodyType)
+    {
+        case PhysicsBodyType_RigidDynamic:
+            {
+                feature = XCNEW(RigidBody)();
+                break;
+            }
+
+        case PhysicsBodyType_RigidStatic:
+            {
+                feature = XCNEW(StaticBody)();
+                break;
+            }
+
+        default:
+            XCASSERT(false);
+            break;
+    }
+
+    //Initialize the feature
+    feature->Init(phydesc);
+
+    m_physicsFeatures.push_back(feature);
+    return feature;
 }
 
-void PhysicsPlayground::RemovePhysicsActor(const PhysicsActor& phyActor)
+void PhysicsPlayground::RemovePhysicsFeature(IPhysicsFeature* phyActor)
 {
+    auto& feature = std::find_if(m_physicsFeatures.begin(), m_physicsFeatures.end(), 
+        [phyActor](const IPhysicsFeature* obj) -> bool
+    {
+        return obj == phyActor;
+    });
 
+    if (feature != m_physicsFeatures.end())
+    {
+        m_physicsFeatures.erase(feature);
+    }
+    else
+    {
+        XCASSERT(false);
+    }
 }
 
 void PhysicsPlayground::TestCollision()
 {
-    if (m_physicsObjects.size() > 0)
+    if (m_physicsFeatures.size() > 0)
     {
-        std::vector<PhysicsActor*>::iterator obj1;
-        for (obj1 = m_physicsObjects.begin(); obj1 != m_physicsObjects.end() - 1; ++obj1)
+        std::vector<IPhysicsFeature*>::iterator obj1;
+        for (obj1 = m_physicsFeatures.begin(); obj1 != m_physicsFeatures.end() - 1; ++obj1)
         {
-            std::vector<PhysicsActor*>::iterator obj2;
-            for (obj2 = obj1 + 1; obj2 != m_physicsObjects.end(); ++obj2)
+            std::vector<IPhysicsFeature*>::iterator obj2;
+            for (obj2 = obj1 + 1; obj2 != m_physicsFeatures.end(); ++obj2)
             {
                 if (*obj1 && *obj2 && CheckCollision(*obj1, *obj2))
                 {
@@ -75,11 +135,12 @@ void PhysicsPlayground::TestCollision()
     }
 }
 
-bool PhysicsPlayground::CheckCollision(PhysicsActor* obj1, PhysicsActor* obj2)
+bool PhysicsPlayground::CheckCollision(IPhysicsFeature* obj1, IPhysicsFeature* obj2)
 {
+    /*
     switch (obj1->GetCollisionDetectionType() | obj2->GetCollisionDetectionType())
     {
-    case COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX | COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX:
+    case PhysicsBoundType_Box | PhysicsBoundType_Box:
         if (obj1->GetBoundBox()->m_TransformedBox.Intersects(obj2->GetBoundBox()->m_TransformedBox))
         {
             //Before resolving know which corner point was hit
@@ -96,15 +157,15 @@ bool PhysicsPlayground::CheckCollision(PhysicsActor* obj1, PhysicsActor* obj2)
         }
         break;
 
-    case COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX | COLLISIONDETECTIONTYPE_TRIANGLE:
+    case PhysicsBoundType_Box | PhysicsBoundType_TriangleMesh:
 
         break;
 
-    case COLLISIONDETECTIONTYPE_TERRAIN | COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX:
+    case PhysicsBoundType_HeightField | PhysicsBoundType_Box:
     {
         //Handle terrain and boundbox collision
-        PhysicsActor* bboxActor = obj1->GetCollisionDetectionType() == COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX ? obj1 : obj2;
-        PhysicsActor* terrainActor = obj1->GetCollisionDetectionType() == COLLISIONDETECTIONTYPE_TERRAIN ? obj1 : obj2;
+        IPhysicsFeature* bboxActor = obj1->GetCollisionDetectionType() == PhysicsBoundType_Box ? obj1 : obj2;
+        IPhysicsFeature* terrainActor = obj1->GetCollisionDetectionType() == PhysicsBoundType_Terrain ? obj1 : obj2;
 
         XCVec4 contactPoint = ((Terrain*)terrainActor)->CheckTerrainCollisionFromPoint(bboxActor->GetBoundBox());
 
@@ -126,10 +187,10 @@ bool PhysicsPlayground::CheckCollision(PhysicsActor* obj1, PhysicsActor* obj2)
         break;
     }
 
-    case COLLISIONDETECTIONTYPE_BULLET | COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX:
+    case COLLISIONDETECTIONTYPE_BULLET | PhysicsBoundType_OBB:
     {
-        PhysicsActor* objectActor = obj1->GetCollisionDetectionType() == COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX ? obj1 : obj2;
-        PhysicsActor* bulletActor = obj1->GetCollisionDetectionType() == COLLISIONDETECTIONTYPE_BULLET ? obj1 : obj2;
+        IPhysicsFeature* objectActor = obj1->GetCollisionDetectionType() == PhysicsBoundType_OBB ? obj1 : obj2;
+        IPhysicsFeature* bulletActor = obj1->GetCollisionDetectionType() == COLLISIONDETECTIONTYPE_BULLET ? obj1 : obj2;
 
         DirectX::ContainmentType type = objectActor->GetBoundBox()->m_TransformedBox.Contains(bulletActor->GetBoundBox()->m_TransformedBox);
 
@@ -154,9 +215,10 @@ bool PhysicsPlayground::CheckCollision(PhysicsActor* obj1, PhysicsActor* obj2)
             return true;
         }
     }
+
     default:
         break;
     }
-
+    */
     return false;
 }

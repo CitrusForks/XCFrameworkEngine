@@ -9,9 +9,13 @@
 #include "Bullet.h"
 
 #include "Engine/Resource/ResourceManager.h"
+
 #include "Graphics/XCShaders/XCShaderBufferConstants.h"
 #include "Graphics/XCShaders/XCShaderHandle.h"
 #include "Graphics/XCMesh/XCMesh.h"
+
+#include "Physics/PhysicsPlayground.h"
+#include "Physics/Phusike/RigidBody.h"
 
 Bullet::Bullet(void)
 {
@@ -37,7 +41,6 @@ IActor::ActorReturnState Bullet::LoadMetaData( const void* metaData )
     //m_currentPosition = initialPosition;
 
     m_useShaderType = ShaderType_LightTexture;
-    m_collisionDetectionType = COLLISIONDETECTIONTYPE_BULLET;
 
     //Assign the look
     //m_target = target;
@@ -69,7 +72,14 @@ IActor::ActorReturnState Bullet::Load()
 void Bullet::SetInitialPhysicsProperties()
 {
     PhysicsActor::SetInitialPhysicsProperties();
-    InitXPhysics(m_currentPosition, XCVec4(), XCVec4(), 1, (f32)0.2);
+
+    PhysicsPlayground& playground = SystemLocator::GetInstance()->RequestSystem<PhysicsPlayground>("PhysicsPlayground");
+    m_physicsFeature = playground.CreatePhysicsFeature(
+        PhysicsDesc(PhysicsBodyType_RigidDynamic,
+                    PhysicsBoundType_Box,
+                    m_currentPosition,
+                    1,
+                    0.2));
 
     //Load done. Shoot the bullet
     Shoot(5000.0f);
@@ -77,16 +87,14 @@ void Bullet::SetInitialPhysicsProperties()
 
 void Bullet::Shoot(f32 scalarForce)
 {
-    AddForce(m_look * scalarForce);
+    m_physicsFeature->GetTyped<RigidBody>()->AddForce(m_look * scalarForce);
 }
 
 IActor::ActorReturnState Bullet::Update(f32 dt)
 {
-    Integrator(dt);
+    m_currentPosition = m_physicsFeature->GetTransformedPosition();
 
-    m_MTranslation = MatrixTranslate(m_Position.Get<X>(), m_Position.Get<Y>(), m_Position.Get<Z>());
-
-    m_currentPosition = m_Position;
+    m_MTranslation = MatrixTranslate(m_currentPosition.Get<X>(), m_currentPosition.Get<Y>(), m_currentPosition.Get<Z>());
 
     m_MRotation = m_MInitialRotation * m_transformedRotation;
 

@@ -25,17 +25,17 @@
 #include "Engine/Resource/ResourceManager.h"
 #include "Engine/Event/EventBroadcaster.h"
 
+#include "Physics/PhysicsPlayground.h"
+
 Terrain::Terrain()
     : m_pHeightMapFileName("")
     , m_pBitmapImage(nullptr)
-    , m_OBBHierarchy(nullptr)
 {
     m_material.Ambient = XCVec4Unaligned(0.1f, 0.1f, 0.1f, 1.0f);
     m_material.Diffuse = XCVec4Unaligned(0.48f, 0.77f, 0.46f, 1.0f);
     m_material.Specular = XCVec4Unaligned(0.2f, 0.2f, 0.2f, 16.0f);
 
     m_useShaderType = ShaderType_TerrainMultiTexture;
-    m_collisionDetectionType = COLLISIONDETECTIONTYPE_TERRAIN;
 
     m_textures.clear();
 }
@@ -76,8 +76,13 @@ IActor::ActorReturnState Terrain::Load()
     BuildGeometryBuffer();
     UnloadHeightMap();
 
-    XCVec3 vec = XCVec3(0, 0, 0);
-    InitXPhysics(m_currentPosition, XCVec4(vec), XCVec4(vec), 1000, (f32)0.2); //Immovable
+    PhysicsPlayground& playground = SystemLocator::GetInstance()->RequestSystem<PhysicsPlayground>("PhysicsPlayground");
+    m_physicsFeature = playground.CreatePhysicsFeature(
+        PhysicsDesc(PhysicsBodyType_RigidDynamic,
+                    PhysicsBoundType_HeightField,
+                    m_currentPosition,
+                    1000,
+                    0.2));
 
     return IActor::Load();
 }
@@ -109,8 +114,8 @@ void Terrain::GenerateVertices()
     i32 bitmapRGBIndex = 0;
 
     //Generate the obb tree to optimize terrain - actor collisions.
-    m_OBBHierarchy = XCNEW(TerrainOBBHierarchy)();
-    m_OBBHierarchy->CreateTerrainOBBHierarchy(0, m_rows, 0, m_cols, m_cols);
+    //m_OBBHierarchy = XCNEW(TerrainOBBHierarchy)();
+    //m_OBBHierarchy->CreateTerrainOBBHierarchy(0, m_rows, 0, m_cols, m_cols);
 
     for (i32 rowIndex = 0; rowIndex < m_rows; rowIndex++)
     {
@@ -133,13 +138,13 @@ void Terrain::GenerateVertices()
                     {
                         XCVec3 pos(x, y, z);
                         m_vertexPosNormTexBuffer.m_vertexData[verticesIndex++] = VertexPosNormTex(XCVec3Unaligned(x, y, z), XCVec3Unaligned(0.0f, 1.0f, 0.0f), XCVec2Unaligned(0.0f, 1.0f));
-                        m_OBBHierarchy->ComputeQuad(rowIndex, colIndex, XCVec4(pos));
+                        //m_OBBHierarchy->ComputeQuad(rowIndex, colIndex, XCVec4(pos));
                         break;
                     }
             }
         }
     }
-    m_OBBHierarchy->ComputeOBBForAllQuads();
+    //m_OBBHierarchy->ComputeOBBForAllQuads();
 }
 
 void Terrain::GenerateVerticesNormal()
@@ -166,7 +171,7 @@ void Terrain::GenerateVerticesNormal()
 
 XCVec4 Terrain::CheckTerrainCollisionFromPoint(OrientedBoundingBox* bbox)
 {
-    TerrainQuad* quad = m_OBBHierarchy->GetQuadCollidingWithOBB(bbox);
+    /*TerrainQuad* quad = m_OBBHierarchy->GetQuadCollidingWithOBB(bbox);
     XCVec4 vertexPos;
 
     if (quad != nullptr)
@@ -185,7 +190,7 @@ XCVec4 Terrain::CheckTerrainCollisionFromPoint(OrientedBoundingBox* bbox)
                 }
             }
         }
-    }
+    }*/
 
     //If we come here that means no collision with any terrain vertex. So return nothing
     return XCVec4();
@@ -271,8 +276,8 @@ XCVec4 Terrain::GetPointAtIndex(i32 pointIndex) const
 
 IActor::ActorReturnState Terrain::Update(f32 dt)
 {
-    m_OBBHierarchy->Transform(XCMatrix(), XCMatrix());
-    m_OBBHierarchy->Update(dt);
+    //m_OBBHierarchy->Transform(XCMatrix(), XCMatrix());
+    //m_OBBHierarchy->Update(dt);
 
     return SimpleTerrain::Update(dt);
 }
@@ -320,7 +325,7 @@ bool Terrain::Draw(RenderContext& renderContext)
 
     renderContext.DrawIndexedInstanced(m_indexBuffer.m_indexData.size(), m_indexBuffer.GetIndexBufferInGPUMem());
 
-    m_OBBHierarchy->Draw(renderContext);
+    //m_OBBHierarchy->Draw(renderContext);
 
     return true;
 }
@@ -337,7 +342,7 @@ IActor::ActorReturnState Terrain::Destroy()
     GPUResourceSystem& gpuSys = (GPUResourceSystem&)SystemLocator::GetInstance()->RequestSystem("GPUResourceSystem");
     gpuSys.DestroyResource(m_pCBPerObject);
 
-    XCDELETE(m_OBBHierarchy);
+    //XCDELETE(m_OBBHierarchy);
 
     return SimpleTerrain::Destroy();
 }

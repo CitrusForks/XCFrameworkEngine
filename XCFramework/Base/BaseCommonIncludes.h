@@ -19,6 +19,7 @@
 #include <vector>
 #include <map>
 #include <queue>
+#include <iterator>
 
 //Thread
 #include <future>

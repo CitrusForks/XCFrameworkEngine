@@ -27,6 +27,7 @@ void GameFiniteStateMachine::Init()
     container.RegisterSystem<GameStatesFactory>("GameStatesFactory");
     container.RegisterSystem<GameActorsFactory>("GameActorsFactory");
     container.RegisterSystem<SceneGraph>("SceneGraph");
+    container.RegisterSystem<PhysicsPlayground>("PhysicsPlayground");
 
     m_gameStateFactory = (GameStatesFactory*) &container.CreateNewSystem("GameStatesFactory");
     m_gameStateFactory->InitFactory();
@@ -73,14 +74,15 @@ void GameFiniteStateMachine::Destroy()
 
     m_StateStack.clear();
 
-    SystemContainer& container = SystemLocator::GetInstance()->GetSystemContainer();
-    container.RemoveSystem("GameStatesFactory");
-    container.RemoveSystem("GameActorsFactory");
-    container.RemoveSystem("SceneGraph");
-
     m_worldSystem->Destroy();
     m_gameActorFactory->DestroyFactory();
     m_gameStateFactory->DestroyFactory();
+
+    SystemContainer& container = SystemLocator::GetInstance()->GetSystemContainer();
+    container.RemoveSystem("GameStatesFactory");
+    container.RemoveSystem("GameActorsFactory");
+    container.RemoveSystem("PhysicsPlayground");
+    container.RemoveSystem("SceneGraph");
 }
 
 void GameFiniteStateMachine::OnEvent(IEvent* event)

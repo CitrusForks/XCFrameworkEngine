@@ -38,6 +38,8 @@
 #include "Network/INetPeer.h"
 #include "Network/Clients/LiveDriveVRClient.h"
 
+#include "Physics/PhysicsPlayground.h"
+
 
 GameWin32::GameWin32(HINSTANCE hInstance, std::string winCaption, bool enable4xMsaa)
     : AppFrameworkWin32(hInstance, winCaption, enable4xMsaa)
@@ -111,6 +113,10 @@ i32 GameWin32::Init()
     m_gameFSM = (GameFiniteStateMachine*) &m_systemContainer->CreateNewSystem("GameFSM");
     m_gameFSM->Init();
     m_gameFSM->SetState("IntroState", STATE_NONE);
+
+    //PhysicsPlayground
+    m_physicsPlayground = (PhysicsPlayground*) &m_systemContainer->CreateNewSystem("PhysicsPlayground");
+    m_physicsPlayground->Init(*m_taskManagingSystem);
 
     //Network Manger
     m_networkManagingSystem = (NetworkManager*)&m_systemContainer->CreateNewSystem("NetworkManager");
@@ -222,16 +228,17 @@ void GameWin32::Destroy()
     XCDELETE(m_liveDriveClient);
 #endif
 
-    m_gameFSM->Destroy();
-    m_cameraManagingSystem->Destroy();
-    m_lightsSystem->Destroy();
-    m_directInputSystem->Destroy();
-    m_graphicsSystem->Destroy();
-    m_resourceManagingSystem->Destroy();
-    m_taskManagingSystem->Destroy();
-    m_networkManagingSystem->Destroy();
-    m_eventBroadcaster->Destroy();
-    m_memorySystem->Destroy();
+    m_systemContainer->RemoveSystem("MemorySystem");
+    m_systemContainer->RemoveSystem("EventBroadcaster");
+    m_systemContainer->RemoveSystem("InputSystem");
+    m_systemContainer->RemoveSystem("TaskManager");
+    m_systemContainer->RemoveSystem("GraphicsSystem");
+    m_systemContainer->RemoveSystem("FlatBuffersSystem");
+    m_systemContainer->RemoveSystem("ResourceManager");
+    m_systemContainer->RemoveSystem("CameraManager");
+    m_systemContainer->RemoveSystem("LightsManager");
+    m_systemContainer->RemoveSystem("GameFSM");
+    m_systemContainer->RemoveSystem("NetworkManager");
 
     SystemLocator::GetInstance()->Destroy();
 }

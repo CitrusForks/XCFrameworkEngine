@@ -7,17 +7,21 @@
 #include "GameplayPrecompiledHeader.h"
 
 #include "Door.h"
+
 #include "Engine/Resource/ResourceManager.h"
+
 #include "Graphics/XCShaders/XCShaderHandle.h"
-#include "Gameplay/XCCamera/XCCameraManager.h"
 #include "Graphics/XCMesh/XCMesh.h"
+
+#include "Gameplay/XCCamera/XCCameraManager.h"
+
+#include "Physics/PhysicsPlayground.h"
 
 Door::Door(void)
 {
     m_directInput = (XCInput*) &SystemLocator::GetInstance()->RequestSystem("InputSystem");
 
     m_useShaderType = ShaderType_LightTexture;
-    m_collisionDetectionType = COLLISIONDETECTIONTYPE_ORIENTEDBOUNDINGBOX;
 }
 
 Door::~Door(void)
@@ -44,7 +48,14 @@ IActor::ActorReturnState Door::Load()
 void Door::SetInitialPhysicsProperties()
 {
     PhysicsActor::SetInitialPhysicsProperties();
-    InitXPhysics(XCVec4(m_initialPosition), XCVec4(), XCVec4(), 1000, (f32)0.2);
+
+    PhysicsPlayground& playground = SystemLocator::GetInstance()->RequestSystem<PhysicsPlayground>("PhysicsPlayground");
+    m_physicsFeature = playground.CreatePhysicsFeature(
+        PhysicsDesc(PhysicsBodyType_RigidDynamic,
+                    PhysicsBoundType_Box,
+                    m_currentPosition,
+                    1000,
+                    0.2));
 }
 
 IActor::ActorReturnState Door::Update(f32 dt)
@@ -58,9 +69,6 @@ IActor::ActorReturnState Door::Update(f32 dt)
     {
         //m_initialPosition.z--;
     }
-
-    Integrator(dt);
-    ClearForce();
 
     m_MTranslation = MatrixTranslate(XCVec4(m_initialPosition));
 

@@ -8,14 +8,13 @@
 
 #include "AnimatedActor.h"
 
-#include "Engine/Physics/CollisionDetectionTypes.h"
-#include "Engine/Physics/XPhysics.h"
-
 #include "Engine/AI/INavigator.h"
 
 #include "Graphics/BasicGeometry/RenderableOBB.h"
 
-class PhysicsActor : public AnimatedActor, public IPhysicsFeature, public INavigator
+class IPhysicsFeature;
+
+class PhysicsActor : public AnimatedActor, public INavigator
 {
 public:
     DECLARE_OBJECT_CREATION(PhysicsActor)
@@ -35,22 +34,24 @@ public:
     virtual IActor::ActorReturnState    Unload() override;
     virtual IActor::ActorReturnState    Destroy() override;
     
-    virtual	void                SetInitialPhysicsProperties();
+    virtual void                        SetInitialPhysicsProperties();
 
-    OrientedBoundingBox*        GetBoundBox()                            { return (OrientedBoundingBox*)m_boundBox; }
-    ECollisionDetectionType     GetCollisionDetectionType()              { return m_collisionDetectionType; }
+    OrientedBoundingBox*                GetBoundBox() { return (OrientedBoundingBox*)m_boundBox; }
 
-    void                        SetSecondaryLook(XCVec4& look)   { m_secondaryLookAxis = look; }
-    void                        SetSecondaryUp(XCVec4& up)       { m_secondaryLookAxis = up; }
-    void                        SetSecondaryRight(XCVec4& right) { m_secondaryLookAxis = right; }
+    void                                SetSecondaryLook(XCVec4& look)   { m_secondaryLookAxis = look; }
+    void                                SetSecondaryUp(XCVec4& up)       { m_secondaryLookAxis = up; }
+    void                                SetSecondaryRight(XCVec4& right) { m_secondaryLookAxis = right; }
+
+    //For use with NPC AI
+    void                                AddForce(const XCVec4& force);
 
 protected:
-    ResourceHandle*             m_pMesh;
-    ECollisionDetectionType     m_collisionDetectionType;
+    IPhysicsFeature*                    m_physicsFeature;
+    ResourceHandle*                     m_pMesh;
 
-    RenderableOBB*              m_boundBox;
+    RenderableOBB*                      m_boundBox;
 
-    XCVec4                      m_secondaryLookAxis;
-    XCVec4                      m_secondaryUpAxis;
-    XCVec4                      m_secondaryRightAxis;
+    XCVec4                              m_secondaryLookAxis;
+    XCVec4                              m_secondaryUpAxis;
+    XCVec4                              m_secondaryRightAxis;
 };

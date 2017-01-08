@@ -6,8 +6,7 @@
 
 #pragma once
 
-#include "IFeature.h"
-
+class IFeature;
 class XCGraphics;
 
 //Atom is the basic building block for matter and consists the structural properties of an object placed in Matter

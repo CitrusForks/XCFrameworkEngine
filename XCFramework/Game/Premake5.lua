@@ -20,7 +20,7 @@ print("Building C++ Win32 Project XCGame")
 		excludes { "**/Orbis/**", "**orbis.cpp", "**/Durango/**", "**durango.cpp", "**editor.cpp", "**/Editor/**", "**Editor.cpp", "**Editor**.*", "**/DDSTextureLoader_Legacy/**", "**.pssl", "**/XC_Shaders/src/**"}
 		
 		links { "d3d12", "d2d1", "dwrite", "d3dcompiler", "FlatBuffers", "ws2_32", "DirectXTex", "dxguid", "dinput8", "dxgi", "d3d11", "glut32", "glew32", "assimp.lib","zlibstaticd.lib", "libfbxsdk.lib",
-				"XCBase", "XCEngine", "XCGraphics", "XCNetwork", "XCGameplay" }
+				"XCBase", "XCEngine", "XCGraphics", "XCNetwork", "XCGameplay", "XCPhysics" }
 		
 		entrypoint("")
 		
@@ -43,7 +43,7 @@ print("Building C++ Win32 Project XCGame")
 	    excludes { "**/Orbis/**", "**orbis.cpp", "**/Durango/**", "**durango.cpp", "**editor.cpp", "**/Editor/**", "**Editor.cpp", "**Editor**.*", "**/DDSTextureLoader_Legacy/**", "**.pssl", "**/XC_Shaders/src/**"}
 				
 	  	links { "d3d12", "d2d1", "dwrite", "d3dcompiler", "FlatBuffers", "ws2_32", "DirectXTex", "dxguid", "dinput8", "dxgi", "d3d11", "glut32", "glew32", "assimp.lib","zlibstatic.lib", "libfbxsdk.lib",
-			    "XCBase", "XCEngine", "XCGraphics", "XCNetwork", "XCGameplay" }
+			    "XCBase", "XCEngine", "XCGraphics", "XCNetwork", "XCGameplay",  "XCPhysics" }
 	  
 		entrypoint("")
 			

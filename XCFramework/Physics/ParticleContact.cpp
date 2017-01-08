@@ -4,16 +4,18 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
-#include "EnginePrecompiledHeader.h"
+#include "PhysicsPrecompiledHeader.h"
 
+#include "IPhysicsFeature.h"
 #include "ParticleContact.h"
-#include "Engine/GameplayBase/Actors/PhysicsActor.h"
+
+#include "Phusike/RigidBody.h"
 
 ParticleContact::~ParticleContact(void)
 {
 }
 
-void ParticleContact::ContactResolve(PhysicsActor* p1, PhysicsActor* p2, f32 restitution, f32 penetration, const XCVec4& contactNormal)
+void ParticleContact::ContactResolve(IPhysicsFeature* p1, IPhysicsFeature* p2, f32 restitution, f32 penetration, const XCVec4& contactNormal)
 {
     m_pParticle1 = p1;
     m_pParticle2 = p2;
@@ -26,15 +28,15 @@ void ParticleContact::ContactResolve(PhysicsActor* p1, PhysicsActor* p2, f32 res
 
 f32 ParticleContact::CalculateSeparatingVelocity()
 {
-    XCVec4 relativeVelocity =	m_pParticle1->GetVelocity();
+    XCVec4 relativeVelocity = m_pParticle1->GetTyped<RigidBody>()->GetVelocity();
 
     //This is required, when the particle 1 is stationary and non movable, reverse the particles and calculate separating velocity based on particle 2.
     if (IsVectorEqual(relativeVelocity, XCVec4()) && m_pParticle2 != nullptr)
     {
-        relativeVelocity = m_pParticle2->GetVelocity();
+        relativeVelocity = m_pParticle2->GetTyped<RigidBody>()->GetVelocity();
 
         //Swap the Particles
-        PhysicsActor* temp = m_pParticle1;
+        IPhysicsFeature* temp = m_pParticle1;
         m_pParticle1 = m_pParticle2;
         m_pParticle2 = temp;
     }
@@ -42,7 +44,7 @@ f32 ParticleContact::CalculateSeparatingVelocity()
     return VectorDot(relativeVelocity, m_contactNormal);
 }
 
-void ParticleContact::ApplyImpulse(PhysicsActor* p1, const XCVec4& impulse)
+void ParticleContact::ApplyImpulse(IPhysicsFeature* p1, const XCVec4& impulse)
 {
     XCVec4 currentPos = p1->GetTransformedPosition();
     currentPos.Set<Y>(impulse.Get<Y>());
@@ -78,23 +80,23 @@ void ParticleContact::ResolveVelocity()
 
     XCVec4 impulsePerIMass = m_contactNormal * impulse;
 
-    XCVec4 particle1Velocity = m_pParticle1->GetVelocity();
+    XCVec4 particle1Velocity = m_pParticle1->GetTyped<RigidBody>()->GetVelocity();
 
     XCVec4 particle2Velocity;
     if (m_pParticle2 != nullptr)
     {
-        particle2Velocity = m_pParticle2->GetVelocity();
+        particle2Velocity = m_pParticle2->GetTyped<RigidBody>()->GetVelocity();
     }
 
     particle1Velocity += impulsePerIMass * m_pParticle1->GetInverseMass();
-    m_pParticle1->SetVelocity(particle1Velocity);
+    m_pParticle1->GetTyped<RigidBody>()->SetVelocity(particle1Velocity);
 
     //Logger("[Contact Resolve] Impulse : %f, \n", XMVectorGetY(impulsePerIMass));
 
     if(m_pParticle2 != nullptr)
     {
         particle2Velocity += impulsePerIMass * -m_pParticle2->GetInverseMass();
-        m_pParticle2->SetVelocity(particle2Velocity);
+        m_pParticle2->GetTyped<RigidBody>()->SetVelocity(particle2Velocity);
     }
 }
 
@@ -105,13 +107,13 @@ void ParticleContact::ResolvePenetration()
         return;
 }
 
-void ParticleContact::ResolveDragging(PhysicsActor* p1, PhysicsActor* p2, f32 restitution, f32 penetration, const XCVec4& contactNormal)
+void ParticleContact::ResolveDragging(IPhysicsFeature* p1, IPhysicsFeature* p2, f32 restitution, f32 penetration, const XCVec4& contactNormal)
 {
     m_pParticle1        =   p1;
     m_pParticle2        =   p2;
     m_restitution       =   restitution;
     m_contactNormal     =   contactNormal;
 
-    p1->ClearForce();
-    p1->AddForce(contactNormal * restitution);
+    p1->GetTyped<RigidBody>()->ClearForce();
+    p1->GetTyped<RigidBody>()->AddForce(contactNormal * restitution);
 }

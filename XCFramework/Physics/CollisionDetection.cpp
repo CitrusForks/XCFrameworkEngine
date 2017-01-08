@@ -4,28 +4,22 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
-#include "EnginePrecompiledHeader.h"
+#include "PhysicsPrecompiledHeader.h"
 
 #include "CollisionDetection.h"
+#include "ParticleContact.h"
 
 #include "Engine/GameplayBase/Actors/PhysicsActor.h"
-#include "Engine/Physics/ParticleContact.h"
 
 #include "Graphics/BasicGeometry/Plane.h"
 #include "Graphics/BasicGeometry/OrientedBoundingBox.h"
 
 #include "Gameplay/GameActors/Environment/Terrain/Terrain.h"
 
-CollisionDetection::CollisionDetection()
-{
-}
 
-
-CollisionDetection::~CollisionDetection()
-{
-}
-
-XCVec4 CollisionDetection::GetTerrainPointOfContactWithBoundBox(PhysicsActor* bboxActor, PhysicsActor* terrain)
+/*
+TODO : This algo needs to be generic and be tested against all the points and not just terrain points.
+XCVec4 CollisionDetection::GetTerrainPointOfContactWithBoundBox(IPhysicsFeature* bboxActor, IPhysicsFeature* terrain)
 {
     Terrain* terrainActor = (Terrain*) terrain;
     XCVec4 result(0, 0, 0, 0);
@@ -49,8 +43,9 @@ XCVec4 CollisionDetection::GetTerrainPointOfContactWithBoundBox(PhysicsActor* bb
 
     return result;
 }
+*/
 
-EOrderingType CollisionDetection::DetermineOrderOfTriangle(XCVec4& v1, XCVec4& v2, XCVec4& v3, XCVec4& viewPoint)
+TriangleOrderingType CollisionDetection::DetermineOrderOfTriangle(XCVec4& v1, XCVec4& v2, XCVec4& v3, XCVec4& viewPoint)
 {
     XCMatrix4 detMatrix;
 
@@ -69,15 +64,15 @@ EOrderingType CollisionDetection::DetermineOrderOfTriangle(XCVec4& v1, XCVec4& v
 
     if (det > 0)
     {
-        return OrderingType_AntiClockwise;
+        return TriangleOrderingType_AntiClockwise;
     }
     else if (det < 0)
     {
-        return OrderingType_Clockwise;
+        return TriangleOrderingType_Clockwise;
     }
     else
     {
-        return OrderingType_NotDefined;
+        return TriangleOrderingType_NotDefined;
     }
 }
 
@@ -85,7 +80,7 @@ XCVec4 CollisionDetection::GetContactNormalFromOBBToOBBTriangleTest(OrientedBoun
 {
     XCVec4 contactNormal;
 
-    DirectX::XMFLOAT3 points[OrientedBoundingBox::MAX_OBB_CORNER_POINTS_COUNT];
+    DirectX::XMFLOAT3 points[OrientedBoundingBox::MaxOBBCornerPoints];
     bbox2->m_TransformedBox.GetCorners(&points[0]);
 
     //int val = checkOBBTriangleIntersection(XMLoadFloat3(&points[4]), XMLoadFloat3(&points[5]), XMLoadFloat3(&points[6]), bbox1);
@@ -97,7 +92,7 @@ XCVec4 CollisionDetection::GetContactNormalFromOBBToOBBTriangleTest(OrientedBoun
     {
         contactNormal = GetNormalFromPoints(XCVec4(points[0]), XCVec4(points[2]), XCVec4(points[1]));
 
-        if (DetermineOrderOfTriangle(XCVec4(points[0]), XCVec4(points[2]), XCVec4(points[1]), XCVec4(bbox1->m_TransformedBox.Center)) == OrderingType_Clockwise)
+        if (DetermineOrderOfTriangle(XCVec4(points[0]), XCVec4(points[2]), XCVec4(points[1]), XCVec4(bbox1->m_TransformedBox.Center)) == TriangleOrderingType_Clockwise)
         {
             contactNormal = -contactNormal;
         }
@@ -110,7 +105,7 @@ XCVec4 CollisionDetection::GetContactNormalFromOBBToOBBTriangleTest(OrientedBoun
     if (bbox1->m_TransformedBox.Intersects(XMLoadFloat3(&points[0]), XMLoadFloat3(&points[2]), XMLoadFloat3(&points[3])))
     {
         contactNormal = GetNormalFromPoints(XCVec4(points[0]), XCVec4(points[2]), XCVec4(points[3]));
-        if (DetermineOrderOfTriangle(XCVec4(points[0]), XCVec4(points[2]), XCVec4(points[3]), XCVec4(bbox1->m_TransformedBox.Center)) == OrderingType_Clockwise)
+        if (DetermineOrderOfTriangle(XCVec4(points[0]), XCVec4(points[2]), XCVec4(points[3]), XCVec4(bbox1->m_TransformedBox.Center)) == TriangleOrderingType_Clockwise)
         {
             contactNormal = -contactNormal;
         }
@@ -123,7 +118,7 @@ XCVec4 CollisionDetection::GetContactNormalFromOBBToOBBTriangleTest(OrientedBoun
     if (bbox1->m_TransformedBox.Intersects(XMLoadFloat3(&points[4]), XMLoadFloat3(&points[6]), XMLoadFloat3(&points[5])))
     {
         contactNormal = GetNormalFromPoints(XCVec4(points[4]), XCVec4(points[6]), XCVec4(points[5]));
-        if (DetermineOrderOfTriangle(XCVec4(points[4]), XCVec4(points[6]), XCVec4(points[5]), XCVec4(bbox1->m_TransformedBox.Center)) == OrderingType_Clockwise)
+        if (DetermineOrderOfTriangle(XCVec4(points[4]), XCVec4(points[6]), XCVec4(points[5]), XCVec4(bbox1->m_TransformedBox.Center)) == TriangleOrderingType_Clockwise)
         {
             contactNormal = -contactNormal;
         }
@@ -136,7 +131,7 @@ XCVec4 CollisionDetection::GetContactNormalFromOBBToOBBTriangleTest(OrientedBoun
     if (bbox1->m_TransformedBox.Intersects(XMLoadFloat3(&points[4]), XMLoadFloat3(&points[7]), XMLoadFloat3(&points[6])))
     {
         contactNormal = GetNormalFromPoints(XCVec4(points[4]), XCVec4(points[7]), XCVec4(points[6]));
-        if (DetermineOrderOfTriangle(XCVec4(points[4]), XCVec4(points[7]), XCVec4(points[6]), XCVec4(bbox1->m_TransformedBox.Center)) == OrderingType_Clockwise)
+        if (DetermineOrderOfTriangle(XCVec4(points[4]), XCVec4(points[7]), XCVec4(points[6]), XCVec4(bbox1->m_TransformedBox.Center)) == TriangleOrderingType_Clockwise)
         {
             contactNormal = -contactNormal;
         }
@@ -149,7 +144,7 @@ XCVec4 CollisionDetection::GetContactNormalFromOBBToOBBTriangleTest(OrientedBoun
     if (bbox1->m_TransformedBox.Intersects(XMLoadFloat3(&points[4]), XMLoadFloat3(&points[5]), XMLoadFloat3(&points[1])))
     {
         contactNormal = GetNormalFromPoints(XCVec4(points[4]), XCVec4(points[5]), XCVec4(points[1]));
-        if (DetermineOrderOfTriangle(XCVec4(points[4]), XCVec4(points[5]), XCVec4(points[1]), XCVec4(bbox1->m_TransformedBox.Center)) == OrderingType_Clockwise)
+        if (DetermineOrderOfTriangle(XCVec4(points[4]), XCVec4(points[5]), XCVec4(points[1]), XCVec4(bbox1->m_TransformedBox.Center)) == TriangleOrderingType_Clockwise)
         {
             contactNormal = -contactNormal;
         }
@@ -162,7 +157,7 @@ XCVec4 CollisionDetection::GetContactNormalFromOBBToOBBTriangleTest(OrientedBoun
     if (bbox1->m_TransformedBox.Intersects(XMLoadFloat3(&points[4]), XMLoadFloat3(&points[1]), XMLoadFloat3(&points[0])))
     {
         contactNormal = GetNormalFromPoints(XCVec4(points[4]), XCVec4(points[1]), XCVec4(points[0]));
-        if (DetermineOrderOfTriangle(XCVec4(points[4]), XCVec4(points[1]), XCVec4(points[0]), XCVec4(bbox1->m_TransformedBox.Center)) == OrderingType_Clockwise)
+        if (DetermineOrderOfTriangle(XCVec4(points[4]), XCVec4(points[1]), XCVec4(points[0]), XCVec4(bbox1->m_TransformedBox.Center)) == TriangleOrderingType_Clockwise)
         {
             contactNormal = -contactNormal;
         }
@@ -175,7 +170,7 @@ XCVec4 CollisionDetection::GetContactNormalFromOBBToOBBTriangleTest(OrientedBoun
     if (bbox1->m_TransformedBox.Intersects(XMLoadFloat3(&points[3]), XMLoadFloat3(&points[2]), XMLoadFloat3(&points[6])))
     {
         contactNormal = GetNormalFromPoints(XCVec4(points[3]), XCVec4(points[2]), XCVec4(points[6]));
-        if (DetermineOrderOfTriangle(XCVec4(points[3]), XCVec4(points[2]), XCVec4(points[6]), XCVec4(bbox1->m_TransformedBox.Center)) == OrderingType_Clockwise)
+        if (DetermineOrderOfTriangle(XCVec4(points[3]), XCVec4(points[2]), XCVec4(points[6]), XCVec4(bbox1->m_TransformedBox.Center)) == TriangleOrderingType_Clockwise)
         {
             contactNormal = -contactNormal;
         }
@@ -188,7 +183,7 @@ XCVec4 CollisionDetection::GetContactNormalFromOBBToOBBTriangleTest(OrientedBoun
     if (bbox1->m_TransformedBox.Intersects(XMLoadFloat3(&points[3]), XMLoadFloat3(&points[6]), XMLoadFloat3(&points[7])))
     {
         contactNormal = GetNormalFromPoints(XCVec4(points[3]), XCVec4(points[6]), XCVec4(points[7]));
-        if (DetermineOrderOfTriangle(XCVec4(points[3]), XCVec4(points[6]), XCVec4(points[7]), XCVec4(bbox1->m_TransformedBox.Center)) == OrderingType_Clockwise)
+        if (DetermineOrderOfTriangle(XCVec4(points[3]), XCVec4(points[6]), XCVec4(points[7]), XCVec4(bbox1->m_TransformedBox.Center)) == TriangleOrderingType_Clockwise)
         {
             contactNormal = -contactNormal;
         }
@@ -201,7 +196,7 @@ XCVec4 CollisionDetection::GetContactNormalFromOBBToOBBTriangleTest(OrientedBoun
     if (bbox1->m_TransformedBox.Intersects(XMLoadFloat3(&points[1]), XMLoadFloat3(&points[5]), XMLoadFloat3(&points[6])))
     {
         contactNormal = GetNormalFromPoints(XCVec4(points[1]), XCVec4(points[5]), XCVec4(points[6]));
-        if (DetermineOrderOfTriangle(XCVec4(points[1]), XCVec4(points[5]), XCVec4(points[6]), XCVec4(bbox1->m_TransformedBox.Center)) == OrderingType_Clockwise)
+        if (DetermineOrderOfTriangle(XCVec4(points[1]), XCVec4(points[5]), XCVec4(points[6]), XCVec4(bbox1->m_TransformedBox.Center)) == TriangleOrderingType_Clockwise)
         {
             contactNormal = -contactNormal;
         }
@@ -257,7 +252,7 @@ XCVec4 CollisionDetection::GetContactNormalFromOBBToOBBTriangleTest(OrientedBoun
     if (bbox1->m_TransformedBox.Intersects(XMLoadFloat3(&points[1]), XMLoadFloat3(&points[6]), XMLoadFloat3(&points[2])))
     {
         contactNormal = GetNormalFromPoints(XCVec4(points[1]), XCVec4(points[6]), XCVec4(points[2]));
-        if (DetermineOrderOfTriangle(XCVec4(points[1]), XCVec4(points[6]), XCVec4(points[2]), XCVec4(bbox1->m_TransformedBox.Center)) == OrderingType_Clockwise)
+        if (DetermineOrderOfTriangle(XCVec4(points[1]), XCVec4(points[6]), XCVec4(points[2]), XCVec4(bbox1->m_TransformedBox.Center)) == TriangleOrderingType_Clockwise)
         {
             contactNormal = -contactNormal;
         }
@@ -270,7 +265,7 @@ XCVec4 CollisionDetection::GetContactNormalFromOBBToOBBTriangleTest(OrientedBoun
     if (bbox1->m_TransformedBox.Intersects(XMLoadFloat3(&points[4]), XMLoadFloat3(&points[0]), XMLoadFloat3(&points[3])))
     {
         contactNormal = GetNormalFromPoints(XCVec4(points[4]), XCVec4(points[0]), XCVec4(points[3]));
-        if (DetermineOrderOfTriangle(XCVec4(points[4]), XCVec4(points[0]), XCVec4(points[3]), XCVec4(bbox1->m_TransformedBox.Center)) == OrderingType_Clockwise)
+        if (DetermineOrderOfTriangle(XCVec4(points[4]), XCVec4(points[0]), XCVec4(points[3]), XCVec4(bbox1->m_TransformedBox.Center)) == TriangleOrderingType_Clockwise)
         {
             contactNormal = -contactNormal;
         }
@@ -284,7 +279,7 @@ XCVec4 CollisionDetection::GetContactNormalFromOBBToOBBTriangleTest(OrientedBoun
     if (bbox1->m_TransformedBox.Intersects(XMLoadFloat3(&points[4]), XMLoadFloat3(&points[3]), XMLoadFloat3(&points[7])))
     {
         contactNormal = GetNormalFromPoints(XCVec4(points[4]), XCVec4(points[3]), XCVec4(points[7]));
-        if (DetermineOrderOfTriangle(XCVec4(points[4]), XCVec4(points[3]), XCVec4(points[7]), XCVec4(bbox1->m_TransformedBox.Center)) == OrderingType_Clockwise)
+        if (DetermineOrderOfTriangle(XCVec4(points[4]), XCVec4(points[3]), XCVec4(points[7]), XCVec4(bbox1->m_TransformedBox.Center)) == TriangleOrderingType_Clockwise)
         {
             contactNormal = -contactNormal;
         }
@@ -482,7 +477,7 @@ XCVec4 CollisionDetection::GetContactNormalFromBoundBoxContainedBoundBox(Oriente
     //Face 2 : 0 1 2 3
     XCVec4 contactNormal;
 
-    DirectX::XMFLOAT3 points[OrientedBoundingBox::MAX_OBB_CORNER_POINTS_COUNT];
+    DirectX::XMFLOAT3 points[OrientedBoundingBox::MaxOBBCornerPoints];
     bbox2->m_TransformedBox.GetCorners(&points[0]);
 
     i32 hitCount = 0;

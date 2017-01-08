@@ -9,11 +9,12 @@
 #include "PhysicsActor.h"
 
 #include "Graphics/XCMesh/XCMesh.h"
+#include "Physics/IPhysicsFeature.h"
+#include "Physics/Phusike/RigidBody.h"
 
 PhysicsActor::PhysicsActor()
 {
     m_pMesh = nullptr;
-    m_collisionDetectionType = COLLISIONDETECTIONTYPE_MAX;
 
     m_boundBox = XCNEW(RenderableOBB)();
 }
@@ -71,6 +72,11 @@ void PhysicsActor::SetInitialPhysicsProperties()
         m_boundBox->CreateBoundBox(m_pMesh->GetResource<XCMesh>()->GetAABB());
         m_boundBox->Transform(m_MTranslation, m_MRotation);
     }
+}
+
+void PhysicsActor::AddForce(const XCVec4& force)
+{
+    m_physicsFeature->GetTyped<RigidBody>()->AddForce(force);
 }
 
 IActor::IActor::ActorReturnState PhysicsActor::Update(f32 dt)

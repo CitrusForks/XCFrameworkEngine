@@ -27,7 +27,6 @@ SimpleTerrain::SimpleTerrain(void)
     , m_useShaderType(ShaderType_SolidColor)
     , m_pCBPerObject(nullptr)
 {
-    m_collisionDetectionType = COLLISIONDETECTIONTYPE_TRIANGLE;
 }
 
 SimpleTerrain::~SimpleTerrain(void)

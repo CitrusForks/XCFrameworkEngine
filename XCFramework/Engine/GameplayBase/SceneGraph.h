@@ -13,8 +13,7 @@
 #include "Engine/TaskManager/TaskManager.h"
 #include "Engine/Event/IEventListener.h"
 
-#include "Engine/Physics/ParticleContact.h"
-#include "Engine/Physics/XPhysics.h"
+#include "Physics/ParticleContact.h"
 #include "Engine/FlatBuffersInterface/FlatBuffersSystem.h"
 
 class IActor;

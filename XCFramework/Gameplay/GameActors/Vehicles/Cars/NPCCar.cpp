@@ -25,12 +25,11 @@ IActor::ActorReturnState NPCCar::LoadMetaData( const void* metaData )
 }
 IActor::ActorReturnState NPCCar::Update(f32 dt)
 {
-    Integrator(dt);
-    ClearForce();
-
-    m_MTranslation = MatrixTranslate(m_Position);
-
-    m_currentPosition = m_Position;
+    if(m_physicsFeature->IsDirty())
+    {
+        m_currentPosition = m_physicsFeature->GetTransformedPosition();
+        m_MTranslation = MatrixTranslate(m_currentPosition);
+    }
 
     return Car::Update(dt);
 }

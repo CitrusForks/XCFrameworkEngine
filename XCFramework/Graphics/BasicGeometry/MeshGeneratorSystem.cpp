@@ -47,18 +47,18 @@ void MeshGeneratorSystem::Load()
             meshData->AddVertex(1.0f, -1.0f, 1.0f);
 
             //Add indices
-            meshData->AddFace(MeshData::Face(0, 1, 2));
-            meshData->AddFace(MeshData::Face(4, 6, 5));
-            meshData->AddFace(MeshData::Face(0, 2, 3));
-            meshData->AddFace(MeshData::Face(4, 7, 6));
-            meshData->AddFace(MeshData::Face(4, 5, 1));
-            meshData->AddFace(MeshData::Face(4, 1, 0));
-            meshData->AddFace(MeshData::Face(3, 2, 6));
-            meshData->AddFace(MeshData::Face(1, 5, 6));
-            meshData->AddFace(MeshData::Face(3, 6, 7));
-            meshData->AddFace(MeshData::Face(1, 6, 2));
-            meshData->AddFace(MeshData::Face(4, 0, 3));
-            meshData->AddFace(MeshData::Face(4, 3, 7));
+            meshData->AddFace(Face(0, 1, 2));
+            meshData->AddFace(Face(4, 6, 5));
+            meshData->AddFace(Face(0, 2, 3));
+            meshData->AddFace(Face(4, 7, 6));
+            meshData->AddFace(Face(4, 5, 1));
+            meshData->AddFace(Face(4, 1, 0));
+            meshData->AddFace(Face(3, 2, 6));
+            meshData->AddFace(Face(1, 5, 6));
+            meshData->AddFace(Face(3, 6, 7));
+            meshData->AddFace(Face(1, 6, 2));
+            meshData->AddFace(Face(4, 0, 3));
+            meshData->AddFace(Face(4, 3, 7));
 
             //Add UV's
             meshData->AddMapCoord(0.0f, 1.0f);
@@ -94,8 +94,8 @@ void MeshGeneratorSystem::Load()
             meshData->AddVertex(1.0f, 1.0f, 0.0f);
             
             //Add indices
-            meshData->AddFace(MeshData::Face(0, 1, 2));
-            meshData->AddFace(MeshData::Face(0, 3, 1));
+            meshData->AddFace(Face(0, 1, 2));
+            meshData->AddFace(Face(0, 3, 1));
 
             //Add UV's
             meshData->AddMapCoord(0.0f, 0.0f);

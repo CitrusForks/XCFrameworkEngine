@@ -52,12 +52,11 @@ IActor::ActorReturnState NPCSoldier::Update(f32 dt)
     m_AIBrain->Update(dt);
     m_AINavigator->Update(dt);
 
-    Integrator(dt);
-    ClearForce();
-
-    m_MTranslation = MatrixTranslate(m_Position);
-
-    m_currentPosition = m_Position;
+    if(m_physicsFeature->IsDirty())
+    {
+        m_currentPosition = m_physicsFeature->GetTransformedPosition();
+        m_MTranslation = MatrixTranslate(m_currentPosition);
+    }
 
     return Soldier::Update(dt);
 }

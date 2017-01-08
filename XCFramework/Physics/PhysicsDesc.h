@@ -10,29 +10,29 @@
 
 enum PhysicsBoundType
 {
-    PhysicsBoundType_Sphere,
-    PhysicsBoundType_Plane,
-    PhysicsBoundType_Capsule,
-    PhysicsBoundType_Box,
-    PhysicsBoundType_ConvexMesh,
-    PhysicsBoundType_TriangleMesh,
-    PhysicsBoundType_HeightField,
+    PhysicsBoundType_Sphere         = 1 << 0,
+    PhysicsBoundType_Plane          = 1 << 1,
+    PhysicsBoundType_Capsule        = 1 << 2,
+    PhysicsBoundType_Box            = 1 << 3,
+    PhysicsBoundType_ConvexMesh     = 1 << 4,
+    PhysicsBoundType_TriangleMesh   = 1 << 5,
+    PhysicsBoundType_HeightField    = 1 << 6,
 
-    PhysicsBoundType_Max
+    PhysicsBoundType_Max            = 0xFFFFFFFF
 };
 
-enum PhysicsActorType
+enum PhysicsBodyType
 {
-    PhysicsActorType_RigidDynamic,
-    PhysicsActorType_RigidStatic,
-    PhysicsActorType_RigidPlane,
+    PhysicsBodyType_RigidDynamic,
+    PhysicsBodyType_RigidStatic,
+    PhysicsBodyType_RigidPlane,
 
-    PhysicsActorType_Max
+    PhysicsBodyType_Max
 };
 
 struct PhysicsDesc
 {
-    //Required if m_actorType = PhysicsActorType_RigidStatic & m_boundType = PhysicsBoundType_TriangleMesh
+    //Required if m_bodyType = PhysicsBodyType_RigidStatic & m_boundType = PhysicsBoundType_TriangleMesh
     struct PhysicsMeshDesc
     {
         PhysicsMeshDesc()
@@ -72,19 +72,50 @@ struct PhysicsDesc
         f32                                 m_sphereRadius;
     };
 
-    PhysicsDesc(PhysicsActorType actorType, PhysicsBoundType boundType, const XCVec4& pos, f32 density)
-        : m_actorType(actorType)
-        , m_boundType(boundType)
+    //Required if m_bodyType = PhysicsBodyType_RigidStatic & m_boundType = PhysicsBoundType_HeightField
+    struct PhysicsHeightFieldDesc
+    {
+        PhysicsHeightFieldDesc()
+            : m_meshInfo(nullptr)
+        {}
+        PhysicsHeightFieldDesc(std::vector<MeshInfo>& meshInfo, u32 rows, u32 cols)
+            : m_meshInfo(&meshInfo)
+            , m_rows(rows)
+            , m_cols(cols)
+        {}
+
+        std::vector<MeshInfo>&        GetMeshInfo() const { return *m_meshInfo; }
+
+        std::vector<MeshInfo>*        m_meshInfo;
+        u32                           m_rows;
+        u32                           m_cols;
+    };
+
+    //Fill the BoundType desc
+    union BoundTypeDesc
+    {
+        BoundTypeDesc(PhysicsBoundType type)
+            : m_boundType(type)
+        {}
+
+        PhysicsBoundType                        m_boundType;
+        PhysicsBoundBoxDesc                     m_boundBoxDesc;
+        PhysicsBoundSphereDesc                  m_boundSphereDesc;
+        PhysicsMeshDesc                         m_meshDesc;
+        PhysicsHeightFieldDesc                  m_heightFieldDesc;
+    };
+
+    PhysicsDesc(PhysicsBodyType actorType, PhysicsBoundType boundType, const XCVec4& pos, f32 mass, f32 dampForce)
+        : m_bodyType(actorType)
+        , m_boundBoxDesc(boundType)
         , m_position(pos)
-        , m_density(density)
+        , m_mass(mass)
+        , m_dampForce(dampForce)
     {}
 
-    PhysicsActorType                        m_actorType;
-    PhysicsBoundType                        m_boundType;
+    PhysicsBodyType                         m_bodyType;
+    BoundTypeDesc                           m_boundBoxDesc;
     XCVec4                                  m_position;
-    f32                                     m_density;
-
-    PhysicsBoundBoxDesc                     m_boundBoxDesc;
-    PhysicsBoundSphereDesc                  m_boundSphereDesc;
-    PhysicsMeshDesc                         m_meshDesc;
+    f32                                     m_mass;
+    f32                                     m_dampForce;
 };

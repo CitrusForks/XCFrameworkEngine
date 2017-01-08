@@ -9,7 +9,7 @@
 #include "Gameplay/GameActors/Environment/Terrain/SimpleTerrain.h"
 #include "Graphics/XCMaterials/MaterialTypes.h"
 
-class TerrainOBBHierarchy;
+class IPhysicsFeature;
 
 class Terrain : public SimpleTerrain
 {
@@ -46,6 +46,5 @@ private:
 
     //MultiTex
     std::vector<ResourceHandle*>        m_textures;
-
-    TerrainOBBHierarchy*                m_OBBHierarchy;
+    IPhysicsFeature*                    m_physicsFeature;
 };

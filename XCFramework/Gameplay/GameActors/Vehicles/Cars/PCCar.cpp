@@ -9,6 +9,9 @@
 #include "PCCar.h"
 #include "Engine/Input/XCInput.h"
 
+#include "Physics/IPhysicsFeature.h"
+#include "Physics/Phusike/RigidBody.h"
+
 PCCar::PCCar(void)
 {
 }
@@ -45,12 +48,12 @@ IActor::ActorReturnState PCCar::Update(f32 dt)
     {
         if (m_directInput->KeyDown(INPUT_UP))
         {
-            AddForce(IActor::m_look * 100);
+            m_physicsFeature->GetTyped<RigidBody>()->AddForce(IActor::m_look * 100);
         }
 
         if (m_directInput->KeyDown(INPUT_DOWN))
         {
-            AddForce(IActor::m_look * -20);
+            m_physicsFeature->GetTyped<RigidBody>()->AddForce(IActor::m_look * -20);
         }
 
         if (m_directInput->KeyDown(INPUT_LEFT))
@@ -64,12 +67,10 @@ IActor::ActorReturnState PCCar::Update(f32 dt)
         }
     }
 
-    Integrator(dt);
-    ClearForce();
+    m_currentPosition = m_physicsFeature->GetTransformedPosition();
 
-    m_MTranslation = MatrixTranslate(m_Position);
+    m_MTranslation = MatrixTranslate(m_currentPosition);
 
-    m_currentPosition = m_Position;
 
     return Car::Update(dt);
 }

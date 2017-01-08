@@ -10,32 +10,29 @@
 #include <DirectXCollision.h>
 #endif
 
-enum EOrderingType
+enum TriangleOrderingType
 {
-    OrderingType_Clockwise,
-    OrderingType_AntiClockwise,
-    OrderingType_NotDefined
+    TriangleOrderingType_Clockwise,
+    TriangleOrderingType_AntiClockwise,
+    TriangleOrderingType_NotDefined
 };
 
-class PhysicsActor;
 class Plane;
 class OrientedBoundingBox;
 
 class CollisionDetection
 {
 public:
-    CollisionDetection();
-    ~CollisionDetection();
 
     static XCVec4                     GetContactNormalFromBoundBoxContainedPoints(OrientedBoundingBox* bbox, XCVec4* points, i32 noOfPoints);
     static XCVec4                     GetContactNormalFromBoundBoxContainedBoundBox(OrientedBoundingBox* bbox1, OrientedBoundingBox* bbox2);
     static XCVec4                     GetContactNormalFromBoundBoxContainedPlane(OrientedBoundingBox* bbox1, OrientedBoundingBox* bbox2);
-    static XCVec4                     GetTerrainPointOfContactWithBoundBox(PhysicsActor* bboxActor, PhysicsActor* terrain);
+    //static XCVec4                     GetTerrainPointOfContactWithBoundBox(IPhysicsFeature* bboxActor, IPhysicsFeature* terrain);
     static XCVec4                     GetContactNormalFromOBBToOBBTriangleTest(OrientedBoundingBox* bbox1, OrientedBoundingBox* bbox2);
     
     //Primitive Intersection tests
     static i32                        CheckOBBTriangleIntersection(XCVec4& v1, XCVec4& v2, XCVec4& v3, OrientedBoundingBox* bbox);
     static i32                        CheckOBBPlaneIntersection(OrientedBoundingBox* bbox, Plane* p);
 
-    static EOrderingType              DetermineOrderOfTriangle(XCVec4& v1, XCVec4& v2, XCVec4& v3, XCVec4& viewPoint);
+    static TriangleOrderingType       DetermineOrderOfTriangle(XCVec4& v1, XCVec4& v2, XCVec4& v3, XCVec4& viewPoint);
 };

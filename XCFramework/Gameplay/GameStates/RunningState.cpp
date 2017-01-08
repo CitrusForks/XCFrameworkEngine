@@ -15,6 +15,8 @@
 #include "Gameplay/GameActors/GameActorsFactory.h"
 #endif
 
+#include "Physics/PhysicsPlayground.h"
+
 using namespace GameState;
 
 RunningState::RunningState(void)
@@ -35,9 +37,10 @@ void RunningState::Init()
     m_cameraSystem = &SystemLocator::GetInstance()->RequestSystem<XCCameraManager>("CameraManager");
     m_directInput = &SystemLocator::GetInstance()->RequestSystem<XCInput>("InputSystem");
     m_worldSystem = &SystemLocator::GetInstance()->RequestSystem<SceneGraph>("SceneGraph");
-
-    ResourceManager& resMgr         = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
-    XCGraphics& graphicsSystem     = SystemLocator::GetInstance()->RequestSystem<XCGraphics>("GraphicsSystem");
+    m_physicsPlayground = &SystemLocator::GetInstance()->RequestSystem<PhysicsPlayground>("PhysicsPlayground");
+    
+    ResourceManager& resMgr = SystemLocator::GetInstance()->RequestSystem<ResourceManager>("ResourceManager");
+    XCGraphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XCGraphics>("GraphicsSystem");
 
     //Set the camera to FPS mode
     m_cameraSystem->SetCameraType(CAMERATYPE_FPS);
@@ -180,6 +183,7 @@ void RunningState::Update(f32 dt)
         }
     }
 
+    m_physicsPlayground->Update(dt);
     m_worldSystem->Update(dt);
 
     if (m_directInput->KeyDown(INPUT_KEY_ESCAPE))

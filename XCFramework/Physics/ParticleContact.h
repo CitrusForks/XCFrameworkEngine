@@ -6,25 +6,24 @@
 
 #pragma once
 
-class PhysicsActor;
+class IPhysicsFeature;
 
 class ParticleContact
 {
-
 public:
     ParticleContact() {}
     ~ParticleContact(void);
 
-    void                        ContactResolve(PhysicsActor* p1, PhysicsActor* p2, f32 restitution, f32 penetration, const XCVec4& contactNormal);
+    void                        ContactResolve(IPhysicsFeature* p1, IPhysicsFeature* p2, f32 restitution, f32 penetration, const XCVec4& contactNormal);
     f32                         CalculateSeparatingVelocity();
     void                        ResolveVelocity();
     void                        ResolvePenetration();
-    void                        ResolveDragging(PhysicsActor* p1, PhysicsActor* p2, f32 restitution, f32 penetration, const XCVec4& contactNormal);
-    void                        ApplyImpulse(PhysicsActor* p1, const XCVec4& units);
+    void                        ResolveDragging(IPhysicsFeature* p1, IPhysicsFeature* p2, f32 restitution, f32 penetration, const XCVec4& contactNormal);
+    void                        ApplyImpulse(IPhysicsFeature* p1, const XCVec4& units);
 
 private:
 
-    PhysicsActor                *m_pParticle1, *m_pParticle2;
+    IPhysicsFeature             *m_pParticle1, *m_pParticle2;
     f32                         m_restitution;
     f32                         m_penetration;
     XCVec4                      m_contactNormal;
