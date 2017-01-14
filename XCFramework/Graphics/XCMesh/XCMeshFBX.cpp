@@ -499,7 +499,7 @@ void XCMeshFBX::ParseMesh(FbxNode* pNode)
                 i32 vIndex = lMesh->GetPolygonVertex(polygonIndex, faceVertexIndex);
 
                 FbxVector4 v1Data = lControlPoints[vIndex];
-                Vertex vertex = { v1Data[0], v1Data[1], v1Data[2] };
+                Vertex vertex = { (f32)v1Data[0], (f32) v1Data[1], (f32) v1Data[2] };
 
                 //Logger("Polygon : %f %f %f ", vertex.x, vertex.y, vertex.z);
 

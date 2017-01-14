@@ -6,11 +6,11 @@
 
 #pragma once
 
-#include "IPhysicsFeature.h"
-
-class StaticBody : public IPhysicsFeature
+class PhysicsBoundVolumeGenerator
 {
 public:
-    void                Init(const PhysicsDesc& desc) override;
-    void                Update(f32 dtS) override;
+    virtual ~PhysicsBoundVolumeGenerator() {}
+
+    virtual IPhysicsBoundVolume*    GenerateBoundVolume(const PhysicsDesc::BoundTypeDesc& desc) = 0;
+
 };

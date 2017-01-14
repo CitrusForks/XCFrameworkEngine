@@ -16,7 +16,6 @@ public:
 
     void                Init(const PhysicsDesc& desc) override;
     void                Update(f32 dtS) override;
-    void                Draw(RenderContext& context) override;
 
     void                ClearForce();
     void                ClearVelocity();

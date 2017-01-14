@@ -22,7 +22,6 @@
 #endif
 
 class XCShaderHandle;
-class OrientedBoundingBox;
 
 class XCMesh : public IResource
 {
@@ -54,7 +53,6 @@ public:
 
     //This returns the initial transform state from data multiplied by the root transform of the mesh
     XCMatrix4Unaligned                      GetRootTransform();
-    OrientedBoundingBox*                    GetAABB() { return m_computedBoundBox.get(); }
 
     bool                                    IsSkinnedMesh() { return m_isSkinnedMesh; }
 
@@ -66,6 +64,7 @@ public:
 
     void                                    GetMeshInfo(MeshInfo& meshInfo, u32 meshIndex) const;
 
+    void                                    GetBounds(XCVec4& min, XCVec4& max) { min = m_minBound; max = m_maxBound; }
 protected:
 
     virtual bool                            LoadMesh();
@@ -90,9 +89,8 @@ protected:
     XCShaderHandle*                         m_shaderHandler;
     ResourceHandle*                         m_texture;
 
-    //This is computed in the object space. Every actor having this mesh should maintain a clone of this and update that and set this every frame
-    std::unique_ptr<OrientedBoundingBox>    m_computedBoundBox; 
-    
+    XCVec4                                  m_minBound, m_maxBound;
+
     //Skinned mesh members
     bool                                    m_isSkinnedMesh;
     const aiScene*                          m_scene;

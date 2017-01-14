@@ -14,25 +14,27 @@ enum TriangleOrderingType
 {
     TriangleOrderingType_Clockwise,
     TriangleOrderingType_AntiClockwise,
-    TriangleOrderingType_NotDefined
+    TriangleOrderingType_Undefined
 };
 
 class Plane;
-class OrientedBoundingBox;
+class IPhysicsBoundVolume;
 
 class CollisionDetection
 {
 public:
 
-    static XCVec4                     GetContactNormalFromBoundBoxContainedPoints(OrientedBoundingBox* bbox, XCVec4* points, i32 noOfPoints);
-    static XCVec4                     GetContactNormalFromBoundBoxContainedBoundBox(OrientedBoundingBox* bbox1, OrientedBoundingBox* bbox2);
-    static XCVec4                     GetContactNormalFromBoundBoxContainedPlane(OrientedBoundingBox* bbox1, OrientedBoundingBox* bbox2);
-    //static XCVec4                     GetTerrainPointOfContactWithBoundBox(IPhysicsFeature* bboxActor, IPhysicsFeature* terrain);
-    static XCVec4                     GetContactNormalFromOBBToOBBTriangleTest(OrientedBoundingBox* bbox1, OrientedBoundingBox* bbox2);
-    
-    //Primitive Intersection tests
-    static i32                        CheckOBBTriangleIntersection(XCVec4& v1, XCVec4& v2, XCVec4& v3, OrientedBoundingBox* bbox);
-    static i32                        CheckOBBPlaneIntersection(OrientedBoundingBox* bbox, Plane* p);
+    static XCVec4                     GetHeightfieldPointOfContactWithBoundBox(const IPhysicsBoundVolume* bboxActor, const IPhysicsBoundVolume* terrain);
+    static XCVec4                     GetContactNormalFromOBBToOBBTriangleTest(const IPhysicsBoundVolume* bbox1, const IPhysicsBoundVolume* bbox2);
 
+    static DirectX::ContainmentType   CheckObbObbContainment(const IPhysicsBoundVolume* obb1, const IPhysicsBoundVolume* obb2);
     static TriangleOrderingType       DetermineOrderOfTriangle(XCVec4& v1, XCVec4& v2, XCVec4& v3, XCVec4& viewPoint);
+
+#if defined(RESEARCH_IN_PROGRESS)
+    static XCVec4                     GetContactNormalFromBoundBoxContainedPoints(IPhysicsBoundVolume* bbox, XCVec4* points, i32 noOfPoints);
+    static XCVec4                     GetContactNormalFromBoundBoxContainedBoundBox(IPhysicsBoundVolume* bbox1, IPhysicsBoundVolume* bbox2);
+    static XCVec4                     GetContactNormalFromBoundBoxContainedPlane(IPhysicsBoundVolume* bbox1, IPhysicsBoundVolume* bbox2);
+    static i32                        CheckOBBTriangleIntersection(XCVec4& v1, XCVec4& v2, XCVec4& v3, IPhysicsBoundVolume* bbox);
+    static i32                        CheckOBBPlaneIntersection(IPhysicsBoundVolume* bbox, Plane* p);
+#endif
 };

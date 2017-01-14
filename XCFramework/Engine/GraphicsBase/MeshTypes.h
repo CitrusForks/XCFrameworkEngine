@@ -8,6 +8,12 @@
 
 struct Vertex
 {
+    Vertex(f32 x1, f32 y1, f32 z1)
+        : x(x1)
+        , y(y1)
+        , z(z1)
+    { }
+
     f32 x;
     f32 y;
     f32 z;

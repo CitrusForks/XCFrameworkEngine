@@ -8,7 +8,7 @@
 
 #include "SceneGraph.h"
 
-#include "Physics/CollisionDetection.h"
+#include "Physics/PhysicsPlayground.h"
 
 #include "Engine/Event/EventBroadcaster.h"
 
@@ -246,8 +246,8 @@ void SceneGraph::OnEvent(IEvent* evt)
         }
         else if (evtWorld->GetEventType() == EventType_TerrainLoaded)
         {
-            //TODO: First enable physics playground then enable gravity.
-            XCASSERT(false);
+            PhysicsPlayground& plygrd = SystemLocator::GetInstance()->RequestSystem<PhysicsPlayground>("PhysicsPlayground");
+            plygrd.SetGravity(true);
         }
     }
 }
@@ -278,8 +278,6 @@ void SceneGraph::AddActor(IActor* actor)
         m_NonPlayableCharacterActors.push_back(actorId);
     }
 
-    m_GameObjects[actorId] = actor;
-
     //Register it for rendering
     XCGraphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XCGraphics>("GraphicsSystem");
     graphicsSystem.GetRenderingPool().AddRenderableObject((IRenderableObject*)actor, actor->GetBaseObjectId());
@@ -294,15 +292,9 @@ void SceneGraph::RequestRemoveActor(IActor* actor)
 void SceneGraph::RemoveActor(IActor* actor)
 {
     i32 key = actor->GetBaseObjectId();
-    std::map<i32, IActor*>::iterator it;
-    it = m_GameObjects.find(key);
-
-    if ( it != m_GameObjects.end())
-    {
-        //Remove from the filtering vectors
-        RemoveKey(m_PlayableCharacterActors, key);
-        RemoveKey(m_NonPlayableCharacterActors, key);
-    }
+    //Remove from the filtering vectors
+    RemoveKey(m_PlayableCharacterActors, key);
+    RemoveKey(m_NonPlayableCharacterActors, key);
 
     Logger("[SCENE] Removing actor id : %d", actor->GetBaseObjectId());
 
@@ -313,9 +305,12 @@ void SceneGraph::RemoveActor(IActor* actor)
 
 bool SceneGraph::IsActorReady(i32 actorId)
 {
-    if (m_GameObjects.find(actorId) != m_GameObjects.end())
+    for(auto& sceneNode : m_sceneGraph->GetRootNode()->GetNodes())
     {
-       return m_GameObjects[actorId]->IsActorLoaded();
+        if(sceneNode->GetBaseObjectId() == actorId)
+        {
+            return sceneNode->IsActorLoaded();
+        }
     }
     
     //Not ready yet. So just return false.
@@ -340,7 +335,6 @@ void SceneGraph::Destroy()
 
     m_PlayableCharacterActors.clear();
     m_NonPlayableCharacterActors.clear();
-    m_GameObjects.clear();
 
     m_scenePendingTasks->Destroy();
     m_taskManager->UnregisterTask(m_scenePendingTasks->GetThreadId());
@@ -356,17 +350,27 @@ void SceneGraph::Destroy()
     XCDELETE(m_sceneGraph);
 }
 
-IActor* SceneGraph::GetActor(i32 _InstanceID)
+IActor* SceneGraph::GetActor(i32 instanceID)
 {
-    return m_GameObjects[_InstanceID];
+    for(auto& sceneNode : m_sceneGraph->GetRootNode()->GetNodes())
+    {
+        if(sceneNode->GetBaseObjectId() == instanceID)
+        {
+            return sceneNode;
+        }
+    }
+
+    return nullptr;
 }
 
 void SceneGraph::SetMainPlayableCharacter(i32 instanceId)
 { 
-    if (m_GameObjects[instanceId] != nullptr)
+    IActor* actor = GetActor(instanceId);
+    if (actor != nullptr)
     {
-        //First disable current main playable character,
-        PlayableCharacterActor* pcActor = dynamic_cast<PlayableCharacterActor*>(m_GameObjects[m_currentMainPlayableCharacter]);
+        //First disable current main playable character.
+        IActor* currentActor = GetActor(m_currentMainPlayableCharacter);
+        PlayableCharacterActor* pcActor = dynamic_cast<PlayableCharacterActor*>(currentActor);
         if (pcActor != nullptr)
         {
             pcActor->setControl(false);
@@ -374,7 +378,7 @@ void SceneGraph::SetMainPlayableCharacter(i32 instanceId)
 
         //Next set the new playable character
         m_currentMainPlayableCharacter = instanceId;
-        pcActor = dynamic_cast<PlayableCharacterActor*>(m_GameObjects[m_currentMainPlayableCharacter]);
+        pcActor = dynamic_cast<PlayableCharacterActor*>(actor);
         if (pcActor != nullptr)
         {
             pcActor->setControl(true);

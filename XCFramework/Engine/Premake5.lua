@@ -14,10 +14,12 @@ print("Building C++ Win32 Project XCEngine")
 	filter "configurations:Debug"
 		sysincludedirs {"$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir);$(ProjectDir)Engine;" }
 		
-		includedirs { "$(ProjectDir)Libs", "$(ProjectDir)Libs/flatbuffers", "$(ProjectDir)Libs/assimp/include/", "$(ProjectDir)Libs/AdobeFBX/include/" }
-		libdirs { "$(ProjectDir)Libs", "$(ProjectDir)bin/$(Configuration)/", "$(ProjectDir)Libs/flatbuffers/$(Configuration)", "$(ProjectDir)Libs/Assimp/$(Configuration)", "$(ProjectDir)Libs/AdobeFBX/x86/$(Configuration)/" }
+		includedirs { "$(ProjectDir)Libs", "$(ProjectDir)Libs/flatbuffers", "$(ProjectDir)Libs/assimp/include/", "$(ProjectDir)Libs/AutodeskFBX/include/" }
+		libdirs { "$(ProjectDir)Libs", "$(ProjectDir)bin/$(Configuration)/", "$(ProjectDir)Libs/flatbuffers/$(Configuration)", 
+		"$(ProjectDir)Libs/Assimp/$(Configuration)", "$(ProjectDir)Libs/AutodeskFBX/x86/$(Configuration)/" }
 
-		excludes { "**/Orbis/**", "**orbis.cpp", "**/Durango/**", "**durango.cpp", "**editor.cpp", "**/Editor/**", "**Editor.cpp", "**Editor**.*", "**/DDSTextureLoader_Legacy/**", "**.pssl", "**/XC_Shaders/src/**"}
+		excludes { "**/Orbis/**", "**orbis.cpp", "**/Durango/**", "**durango.cpp", "**editor.cpp", "**/Editor/**", 
+		"**Editor.cpp", "**Editor**.*", "**/DDSTextureLoader_Legacy/**", "**.pssl", "**/XC_Shaders/src/**"}
 		
 		links { "FlatBuffers", "ws2_32", "dinput8", "XCGraphics", "XCPhysics" }
 		
@@ -34,10 +36,12 @@ print("Building C++ Win32 Project XCEngine")
 	filter "configurations:Release"
 		sysincludedirs {"$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir);$(ProjectDir)Engine;" }
 		
-		includedirs { "$(ProjectDir)Libs", "$(ProjectDir)Libs/flatbuffers", "$(ProjectDir)Libs/assimp/include/", "$(ProjectDir)Libs/AdobeFBX/include/" }
-		libdirs { "$(ProjectDir)Libs", "$(ProjectDir)bin/$(Configuration)/", "$(ProjectDir)Libs/flatbuffers/$(Configuration)", "$(ProjectDir)Libs/Assimp/$(Configuration)", "$(ProjectDir)Libs/AdobeFBX/x86/$(Configuration)/" }
+		includedirs { "$(ProjectDir)Libs", "$(ProjectDir)Libs/flatbuffers", "$(ProjectDir)Libs/assimp/include/", "$(ProjectDir)Libs/AutodeskFBX/include/" }
+		libdirs { "$(ProjectDir)Libs", "$(ProjectDir)bin/$(Configuration)/", "$(ProjectDir)Libs/flatbuffers/$(Configuration)", 
+		"$(ProjectDir)Libs/Assimp/$(Configuration)", "$(ProjectDir)Libs/AutodeskFBX/x86/$(Configuration)/" }
 
-		excludes { "**/Orbis/**", "**orbis.cpp", "**/Durango/**", "**durango.cpp", "**editor.cpp", "**/Editor/**", "**Editor.cpp", "**Editor**.*", "**/DDSTextureLoader_Legacy/**", "**.pssl", "**/XC_Shaders/src/**"}
+		excludes { "**/Orbis/**", "**orbis.cpp", "**/Durango/**", "**durango.cpp", "**editor.cpp", 
+		"**/Editor/**", "**Editor.cpp", "**Editor**.*", "**/DDSTextureLoader_Legacy/**", "**.pssl", "**/XC_Shaders/src/**"}
 		
 		links { "FlatBuffers", "ws2_32", "dinput8", "XCGraphics", "XCPhysics" }
 		

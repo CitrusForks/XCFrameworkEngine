@@ -10,11 +10,16 @@
 #include "PhysicsPlayground.h"
 #include "PhysicsDesc.h"
 #include "CollisionDetection.h"
+#include "ParticleContact.h"
 
+#include "PhysicsBoundVolumeGenerator.h"
+#include "IPhysicsBoundVolume.h"
+
+#include "Phusike/BoundVolumeGenerator.h"
 #include "Phusike/RigidBody.h"
 #include "Phusike/StaticBody.h"
-
-#include "Graphics/RenderContext.h"
+#include "Phusike/OBBBoundVolume.h"
+#include "Phusike/HeightfieldBoundVolume.h"
 
 //WorldCollisionTask--------------------------------------
 void PhysicsCollisionResolverTask::Init()
@@ -25,6 +30,8 @@ void PhysicsCollisionResolverTask::Init()
 void PhysicsCollisionResolverTask::Run()
 {
     AsyncTask::Run();
+
+    m_physicsPlayground.TestCollision();
 }
 
 void PhysicsCollisionResolverTask::Destroy()
@@ -34,14 +41,40 @@ void PhysicsCollisionResolverTask::Destroy()
 
 
 //PhysicsPlayground----------------------------------------
-void PhysicsPlayground::Init(TaskManager& taskMgr)
+PhysicsPlayground::PhysicsPlayground()
+    : m_collisionResolverTask(nullptr)
+    , m_taskManager(nullptr)
+    , m_particleContact(nullptr)
+    , m_boundVolumeGenerator(nullptr)
+    , m_enableCollisionDetection(false)
+    , m_threadedCollisionTest(false)
+    , m_gravityEnabled(false)
+{
+}
+
+PhysicsPlayground::~PhysicsPlayground()
+{
+}
+
+void PhysicsPlayground::Init(PhysicsPlaygroundDesc& playgroundDesc, TaskManager& taskMgr)
 {
     m_taskManager = &taskMgr;
 
-    //Initialize the collision thread
-    m_collisionResolverTask = XCNEW(PhysicsCollisionResolverTask)(*this);
-    m_collisionResolverTask->SetTaskPriority(THREAD_PRIORITY_HIGHEST);
-    m_taskManager->RegisterTask(m_collisionResolverTask);
+    m_GAcceleration = playgroundDesc.m_gravity;
+    m_enableCollisionDetection = playgroundDesc.m_enableCollision;
+    m_threadedCollisionTest = playgroundDesc.m_threadedCollisionTest;
+
+    //Initialize the particle contact resolver and the bound volume generator
+    m_particleContact = XCNEW(ParticleContact)();
+    m_boundVolumeGenerator = XCNEW(BoundVolumeGenerator)();
+
+    if(playgroundDesc.m_threadedCollisionTest)
+    {
+        //Initialize the collision thread
+        m_collisionResolverTask = XCNEW(PhysicsCollisionResolverTask)(*this);
+        m_collisionResolverTask->SetTaskPriority(THREAD_PRIORITY_HIGHEST);
+        m_taskManager->RegisterTask(m_collisionResolverTask);
+    }
 }
 
 void PhysicsPlayground::Update(float dt)
@@ -50,21 +83,31 @@ void PhysicsPlayground::Update(float dt)
     {
         phyFeature->Update(dt);
     }
-}
 
-void PhysicsPlayground::Draw(RenderContext& context)
-{
-    for (auto& phyFeature : m_physicsFeatures)
+    if(m_enableCollisionDetection)
     {
-        phyFeature->Draw(context);
+        if(!m_threadedCollisionTest)
+        {
+            TestCollision();
+        }
+        else
+        {
+            //Signal the collision resolver thread.
+        }
     }
 }
 
 void PhysicsPlayground::Destroy()
 {
-    m_collisionResolverTask->Destroy();
-    m_taskManager->UnregisterTask(m_collisionResolverTask->GetThreadId());
-    XCDELETE(m_collisionResolverTask);
+    if(m_threadedCollisionTest)
+    {
+        m_collisionResolverTask->Destroy();
+        m_taskManager->UnregisterTask(m_collisionResolverTask->GetThreadId());
+        XCDELETE(m_collisionResolverTask);
+    }
+
+    XCDELETE(m_boundVolumeGenerator);
+    XCDELETE(m_particleContact);
 }
 
 IPhysicsFeature* PhysicsPlayground::CreatePhysicsFeature(const PhysicsDesc& phydesc)
@@ -91,6 +134,10 @@ IPhysicsFeature* PhysicsPlayground::CreatePhysicsFeature(const PhysicsDesc& phyd
             break;
     }
 
+    //Create the bound volume and assign it to the feature.
+    IPhysicsBoundVolume* boundVolume = m_boundVolumeGenerator->GenerateBoundVolume(phydesc.m_boundVolumeDesc);
+    feature->SetBoundType(boundVolume);
+
     //Initialize the feature
     feature->Init(phydesc);
 
@@ -98,7 +145,7 @@ IPhysicsFeature* PhysicsPlayground::CreatePhysicsFeature(const PhysicsDesc& phyd
     return feature;
 }
 
-void PhysicsPlayground::RemovePhysicsFeature(IPhysicsFeature* phyActor)
+void PhysicsPlayground::DestroyPhysicsFeature(IPhysicsFeature* phyActor)
 {
     auto& feature = std::find_if(m_physicsFeatures.begin(), m_physicsFeatures.end(), 
         [phyActor](const IPhysicsFeature* obj) -> bool
@@ -108,6 +155,7 @@ void PhysicsPlayground::RemovePhysicsFeature(IPhysicsFeature* phyActor)
 
     if (feature != m_physicsFeatures.end())
     {
+        XCDELETE(*feature);
         m_physicsFeatures.erase(feature);
     }
     else
@@ -137,60 +185,74 @@ void PhysicsPlayground::TestCollision()
 
 bool PhysicsPlayground::CheckCollision(IPhysicsFeature* obj1, IPhysicsFeature* obj2)
 {
-    /*
-    switch (obj1->GetCollisionDetectionType() | obj2->GetCollisionDetectionType())
+    switch (obj1->GetBoundType() | obj2->GetBoundType())
     {
     case PhysicsBoundType_Box | PhysicsBoundType_Box:
-        if (obj1->GetBoundBox()->m_TransformedBox.Intersects(obj2->GetBoundBox()->m_TransformedBox))
         {
-            //Before resolving know which corner point was hit
-            DirectX::XMFLOAT3 points[8];
-            obj1->GetBoundBox()->m_TransformedBox.GetCorners(points);
+            const OBBBoundVolume* obb1 = obj1->GetBoundVolume()->GetTyped<OBBBoundVolume>();
+            const OBBBoundVolume* obb2 = obj2->GetBoundVolume()->GetTyped<OBBBoundVolume>();
 
-            XCVec4 contactNormal;
+            if(obb1->Intersects(obb2))
+            {
+                //Before resolving know which corner point was hit
+                DirectX::XMFLOAT3 points[8];
+                obb1->GetTransformedBox().GetCorners(points);
 
-            contactNormal = CollisionDetection::GetContactNormalFromOBBToOBBTriangleTest(obj1->GetBoundBox(), obj2->GetBoundBox());
-            //contactNormal = getContactNormalFromBoundBoxContainedPlane(obj2->getMesh()->getAABoundBox(), obj1->getMesh()->getAABoundBox());
-            //Resolve the collision
-            m_particleContact.ContactResolve(obj1, obj2, 1.0f, 0.0f, contactNormal);
-            return true;
+                XCVec4 contactNormal;
+
+                contactNormal = CollisionDetection::GetContactNormalFromOBBToOBBTriangleTest(obb1, obb2);
+                //contactNormal = getContactNormalFromBoundBoxContainedPlane(obj2->getMesh()->getAABoundBox(), obj1->getMesh()->getAABoundBox());
+                //Resolve the collision
+                m_particleContact->ContactResolve(obj1, obj2, 1.0f, 0.0f, contactNormal);
+                return true;
+            }
+            break;
         }
-        break;
-
-    case PhysicsBoundType_Box | PhysicsBoundType_TriangleMesh:
-
-        break;
 
     case PhysicsBoundType_HeightField | PhysicsBoundType_Box:
-    {
-        //Handle terrain and boundbox collision
-        IPhysicsFeature* bboxActor = obj1->GetCollisionDetectionType() == PhysicsBoundType_Box ? obj1 : obj2;
-        IPhysicsFeature* terrainActor = obj1->GetCollisionDetectionType() == PhysicsBoundType_Terrain ? obj1 : obj2;
-
-        XCVec4 contactPoint = ((Terrain*)terrainActor)->CheckTerrainCollisionFromPoint(bboxActor->GetBoundBox());
-
-        //Resolve the collision
-        if (!IsVectorEqual(contactPoint, XCVec4::XCFloat4ZeroVector))
         {
-            //This is a impulse particle contact resolver, it actually first puts an object on a vertex
-            XCVec4 direction = XCVec4(0.0f, (f32)(contactPoint.Get<Y>()) + (f32)0.1, 0.0f, 0.0f);
-            m_particleContact.ApplyImpulse(bboxActor, direction);
+            // Handle terrain and boundbox collision
+            IPhysicsFeature* bboxActor = nullptr;
+            IPhysicsFeature* terrainActor = nullptr;
 
-            //This I am trying now to make it work with existing collision resolver, works perfectly.
-            XCVec4 up = XCVec4(0.0f, 1.0f, 0.0f, 0.0f);
-            m_particleContact.ContactResolve(bboxActor, terrainActor, 1.0f, 0.2f, up);
+            if(obj1->GetBoundType() == PhysicsBoundType_Box)
+            {
+                bboxActor = obj1;
+                terrainActor = obj2;
+            }
+            else
+            {
+                terrainActor = obj1;
+                bboxActor = obj2;
+            }
 
-            //Logger("[Terrain Collision] Hit with %s with contact point %f \n", bboxActor->getMesh()->getUserFriendlyName().c_str(), XMVectorGetY(contactPoint));
+            XCVec4 contactPoint = CollisionDetection::GetHeightfieldPointOfContactWithBoundBox(
+                bboxActor->GetBoundVolume()->GetTyped<IPhysicsBoundVolume>(),
+                terrainActor->GetBoundVolume()->GetTyped<IPhysicsBoundVolume>());
+
+            // Resolve the collision
+            if(!IsVectorEqual(contactPoint, XCVec4::XCFloat4ZeroVector))
+            {
+                // This is a impulse particle contact resolver, it actually first puts an object on a vertex
+                XCVec4 direction = XCVec4(0.0f, (f32) (contactPoint.Get<Y>()) + (f32)0.1, 0.0f, 0.0f);
+                m_particleContact->ApplyImpulse(bboxActor, direction);
+
+                // This I am trying now to make it work with existing collision resolver, works perfectly.
+                XCVec4 up = XCVec4(0.0f, 1.0f, 0.0f, 0.0f);
+                m_particleContact->ContactResolve(bboxActor, terrainActor, 1.0f, 0.2f, up);
+
+                // Logger("[Terrain Collision] Hit with %s with contact point %f \n", bboxActor->getMesh()->getUserFriendlyName().c_str(),
+                // XMVectorGetY(contactPoint));
+            }
+            return true;
+
+            break;
         }
-        return true;
-
-        break;
-    }
-
+    /*
     case COLLISIONDETECTIONTYPE_BULLET | PhysicsBoundType_OBB:
     {
-        IPhysicsFeature* objectActor = obj1->GetCollisionDetectionType() == PhysicsBoundType_OBB ? obj1 : obj2;
-        IPhysicsFeature* bulletActor = obj1->GetCollisionDetectionType() == COLLISIONDETECTIONTYPE_BULLET ? obj1 : obj2;
+        IPhysicsFeature* objectActor = obj1->GetBoundType() == PhysicsBoundType_OBB ? obj1 : obj2;
+        IPhysicsFeature* bulletActor = obj1->GetBoundType() == COLLISIONDETECTIONTYPE_BULLET ? obj1 : obj2;
 
         DirectX::ContainmentType type = objectActor->GetBoundBox()->m_TransformedBox.Contains(bulletActor->GetBoundBox()->m_TransformedBox);
 
@@ -210,15 +272,15 @@ bool PhysicsPlayground::CheckCollision(IPhysicsFeature* obj1, IPhysicsFeature* o
             objectActor->Invalidate();
             bulletActor->Invalidate();
 
-            Logger("[BULLET HIT] Hit Obj1 : %d Obj 2: %d", obj1->GetCollisionDetectionType(), obj2->GetCollisionDetectionType());
+            Logger("[BULLET HIT] Hit Obj1 : %d Obj 2: %d", obj1->GetBoundType(), obj2->GetBoundType());
 
             return true;
         }
     }
-
+    */
     default:
         break;
     }
-    */
+
     return false;
 }

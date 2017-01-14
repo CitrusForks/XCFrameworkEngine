@@ -33,6 +33,7 @@ public:
 
     const T                          Get() const         { return (const T)(this); }
     T                                GetMutable()        { return static_cast<T>(this); }
+    const std::vector<T>&            GetNodes() const    { return m_childNodes; }
     std::vector<T>&                  GetNodesMutable()   { return m_childNodes; }
 
     bool                             HasChildNodes()     { m_childNodes.size() > 0; }

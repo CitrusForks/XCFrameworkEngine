@@ -11,7 +11,9 @@
 #endif
 
 #include <assert.h>
+
 #define XCASSERT(x) assert(x)
+#define XCASSERTMSG(x, ...) assert(x); Logger(__VA_ARGS__)
 
 static void Logger(const c8* format, ...)
 {

@@ -116,7 +116,7 @@ i32 GameWin32::Init()
 
     //PhysicsPlayground
     m_physicsPlayground = (PhysicsPlayground*) &m_systemContainer->CreateNewSystem("PhysicsPlayground");
-    m_physicsPlayground->Init(*m_taskManagingSystem);
+    m_physicsPlayground->Init(PhysicsPlayground::PhysicsPlaygroundDesc(true, false, XCVec4(0.0f, -9.4f, 0.0f, 0.0f)), *m_taskManagingSystem);
 
     //Network Manger
     m_networkManagingSystem = (NetworkManager*)&m_systemContainer->CreateNewSystem("NetworkManager");

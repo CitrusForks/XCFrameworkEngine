@@ -20,11 +20,12 @@ public:
     SimpleTerrain(void);
     virtual ~SimpleTerrain(void);
  
-    virtual IActor::ActorReturnState LoadMetaData(const void* metaData) override;
-    virtual IActor::ActorReturnState Load() override;
-    virtual IActor::ActorReturnState Update(f32 dt) override;
-    virtual bool                     Draw(RenderContext& renderContext) override;
-    virtual IActor::ActorReturnState Destroy() override;
+    virtual IActor::ActorReturnState    LoadMetaData(const void* metaData) override;
+    virtual IActor::ActorReturnState    Load() override;
+    virtual void                        SetInitialPhysicsProperties() override {};
+    virtual IActor::ActorReturnState    Update(f32 dt) override;
+    virtual bool                        Draw(RenderContext& renderContext) override;
+    virtual IActor::ActorReturnState    Destroy() override;
 
     i32                                 GetNoOfVertices() const { return m_totalVertices; }
 

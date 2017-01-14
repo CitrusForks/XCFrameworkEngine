@@ -10,9 +10,8 @@
 
 #include "Engine/AI/INavigator.h"
 
-#include "Graphics/BasicGeometry/RenderableOBB.h"
-
 class IPhysicsFeature;
+class ResourceHandle;
 
 class PhysicsActor : public AnimatedActor, public INavigator
 {
@@ -36,8 +35,6 @@ public:
     
     virtual void                        SetInitialPhysicsProperties();
 
-    OrientedBoundingBox*                GetBoundBox() { return (OrientedBoundingBox*)m_boundBox; }
-
     void                                SetSecondaryLook(XCVec4& look)   { m_secondaryLookAxis = look; }
     void                                SetSecondaryUp(XCVec4& up)       { m_secondaryLookAxis = up; }
     void                                SetSecondaryRight(XCVec4& right) { m_secondaryLookAxis = right; }
@@ -48,8 +45,6 @@ public:
 protected:
     IPhysicsFeature*                    m_physicsFeature;
     ResourceHandle*                     m_pMesh;
-
-    RenderableOBB*                      m_boundBox;
 
     XCVec4                              m_secondaryLookAxis;
     XCVec4                              m_secondaryUpAxis;

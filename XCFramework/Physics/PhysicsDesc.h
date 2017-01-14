@@ -7,6 +7,7 @@
 #pragma once
 
 #include "Engine/GraphicsBase/MeshTypes.h"
+#include "Graphics/XCShaders/XCVertexFormat.h"
 
 enum PhysicsBoundType
 {
@@ -52,11 +53,13 @@ struct PhysicsDesc
     {
         PhysicsBoundBoxDesc()
         {}
-        PhysicsBoundBoxDesc(const XCVec4& dimensions)
-            : m_dimensions(dimensions)
+        PhysicsBoundBoxDesc(const XCVec4& min, const XCVec4& max)
+            : m_min(min)
+            , m_max(max)
         {}
 
-        XCVec4                              m_dimensions;
+        XCVec4                              m_min;
+        XCVec4                              m_max;
     };
 
     //Required if m_boundType = PhysicsBoundType_Sphere
@@ -76,45 +79,56 @@ struct PhysicsDesc
     struct PhysicsHeightFieldDesc
     {
         PhysicsHeightFieldDesc()
-            : m_meshInfo(nullptr)
+            : m_rows(0)
+            , m_cols(0)
+            , m_vertexBuffer(nullptr)
+            , m_vertexFormat(VertexFormat_Invalid)
         {}
-        PhysicsHeightFieldDesc(std::vector<MeshInfo>& meshInfo, u32 rows, u32 cols)
-            : m_meshInfo(&meshInfo)
-            , m_rows(rows)
+        PhysicsHeightFieldDesc(u32 rows, u32 cols, void* vertexBuffer, VertexFormat format)
+            : m_rows(rows)
             , m_cols(cols)
+            , m_vertexBuffer(vertexBuffer)
+            , m_vertexFormat(format)
         {}
 
-        std::vector<MeshInfo>&        GetMeshInfo() const { return *m_meshInfo; }
-
-        std::vector<MeshInfo>*        m_meshInfo;
         u32                           m_rows;
         u32                           m_cols;
+
+        void*                         m_vertexBuffer;
+        VertexFormat                  m_vertexFormat;
     };
 
     //Fill the BoundType desc
-    union BoundTypeDesc
+    struct BoundTypeDesc
     {
-        BoundTypeDesc(PhysicsBoundType type)
-            : m_boundType(type)
+        BoundTypeDesc(PhysicsBoundType boundType)
+            : m_boundType(boundType)
         {}
+        
+        union BoundDesc
+        {
+            BoundDesc() {}
 
-        PhysicsBoundType                        m_boundType;
-        PhysicsBoundBoxDesc                     m_boundBoxDesc;
-        PhysicsBoundSphereDesc                  m_boundSphereDesc;
-        PhysicsMeshDesc                         m_meshDesc;
-        PhysicsHeightFieldDesc                  m_heightFieldDesc;
+            PhysicsBoundBoxDesc        m_boundBoxDesc;
+            PhysicsBoundSphereDesc     m_boundSphereDesc;
+            PhysicsMeshDesc            m_meshDesc;
+            PhysicsHeightFieldDesc     m_heightFieldDesc;
+        };
+
+        BoundDesc                      m_boundDesc;
+        PhysicsBoundType               m_boundType;
     };
 
     PhysicsDesc(PhysicsBodyType actorType, PhysicsBoundType boundType, const XCVec4& pos, f32 mass, f32 dampForce)
         : m_bodyType(actorType)
-        , m_boundBoxDesc(boundType)
+        , m_boundVolumeDesc(boundType)
         , m_position(pos)
         , m_mass(mass)
         , m_dampForce(dampForce)
     {}
 
     PhysicsBodyType                         m_bodyType;
-    BoundTypeDesc                           m_boundBoxDesc;
+    BoundTypeDesc                           m_boundVolumeDesc;
     XCVec4                                  m_position;
     f32                                     m_mass;
     f32                                     m_dampForce;

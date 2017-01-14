@@ -17,7 +17,8 @@ print("Building C++ Win32 Project XCBase")
 		includedirs { "$(ProjectDir)Libs/" }
 		libdirs { }
 
-		excludes { "**/Orbis/**", "**orbis.cpp", "**/Durango/**", "**durango.cpp", "**editor.cpp", "**/Editor/**", "**Editor.cpp", "**Editor**.*", "**/DDSTextureLoader_Legacy/**", "**.pssl", "**/XC_Shaders/src/**"}
+		excludes { "**/Orbis/**", "**orbis.cpp", "**/Durango/**", "**durango.cpp", "**editor.cpp", 
+		"**/Editor/**", "**Editor.cpp", "**Editor**.*", "**/DDSTextureLoader_Legacy/**", "**.pssl", "**/XC_Shaders/src/**"}
 		
 		links { "d3d12", "ws2_32", "dxgi", "d3d11" }
 		
@@ -37,7 +38,8 @@ print("Building C++ Win32 Project XCBase")
 		includedirs { "$(ProjectDir)Libs/" }
 		libdirs { }
 
-		excludes { "**/Orbis/**", "**orbis.cpp", "**/Durango/**", "**durango.cpp", "**editor.cpp", "**/Editor/**", "**Editor.cpp", "**Editor**.*", "**/DDSTextureLoader_Legacy/**", "**.pssl", "**/XC_Shaders/src/**"}
+		excludes { "**/Orbis/**", "**orbis.cpp", "**/Durango/**", "**durango.cpp", "**editor.cpp", 
+		"**/Editor/**", "**Editor.cpp", "**Editor**.*", "**/DDSTextureLoader_Legacy/**", "**.pssl", "**/XC_Shaders/src/**"}
 		
 		links { "d3d12", "ws2_32", "DirectXTex", "dxgi", "d3d11" }
 		

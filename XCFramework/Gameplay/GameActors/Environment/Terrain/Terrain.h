@@ -22,13 +22,11 @@ public:
  
     IActor::ActorReturnState            LoadMetaData(const void* metaData) override;
     IActor::ActorReturnState            Load() override;
+    void                                SetInitialPhysicsProperties() override;
     IActor::ActorReturnState            OnLoaded() override;
     IActor::ActorReturnState            Update(f32 dt) override;
     bool                                Draw(RenderContext& renderContext) override;
     IActor::ActorReturnState            Destroy() override;
-
-    XCVec4                              CheckTerrainCollisionFromPoint(OrientedBoundingBox* bbox);
-    XCVec4                              GetPointAtIndex(i32 pointIndex) const;
 
 protected:
     void                                LoadHeightMap();

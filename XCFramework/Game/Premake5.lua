@@ -14,12 +14,15 @@ print("Building C++ Win32 Project XCGame")
 	filter "configurations:Debug"
 		sysincludedirs {"$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir);$(ProjectDir)Game;" }
 		
-		includedirs { "$(ProjectDir)", "$(ProjectDir)bin/$(Configuration)/", "$(ProjectDir)Libs", "$(ProjectDir)Libs/flatbuffers", "$(ProjectDir)Libs/assimp/include/", "$(ProjectDir)Libs/AdobeFBX/include/" }
-		libdirs { "$(ProjectDir)Libs", "$(ProjectDir)Libs/DirectXTex/$(Configuration)/", "$(ProjectDir)Libs/flatbuffers/$(Configuration)/", "$(ProjectDir)Libs/Assimp/$(Configuration)/", "$(ProjectDir)Libs/AdobeFBX/x86/$(Configuration)/" }
+		includedirs { "$(ProjectDir)", "$(ProjectDir)bin/$(Configuration)/", "$(ProjectDir)Libs", 
+		"$(ProjectDir)Libs/flatbuffers", "$(ProjectDir)Libs/assimp/include/", "$(ProjectDir)Libs/AdutodeskFBX/include/" }
+		libdirs { "$(ProjectDir)Libs", "$(ProjectDir)Libs/DirectXTex/$(Configuration)/", 
+		"$(ProjectDir)Libs/flatbuffers/$(Configuration)/", "$(ProjectDir)Libs/Assimp/$(Configuration)/", "$(ProjectDir)Libs/AutodeskFBX/x86/$(Configuration)/" }
 
 		excludes { "**/Orbis/**", "**orbis.cpp", "**/Durango/**", "**durango.cpp", "**editor.cpp", "**/Editor/**", "**Editor.cpp", "**Editor**.*", "**/DDSTextureLoader_Legacy/**", "**.pssl", "**/XC_Shaders/src/**"}
 		
-		links { "d3d12", "d2d1", "dwrite", "d3dcompiler", "FlatBuffers", "ws2_32", "DirectXTex", "dxguid", "dinput8", "dxgi", "d3d11", "glut32", "glew32", "assimp.lib","zlibstaticd.lib", "libfbxsdk.lib",
+		links { "d3d12", "d2d1", "dwrite", "d3dcompiler", "FlatBuffers", "ws2_32", "DirectXTex", "dxguid", 
+		"dinput8", "dxgi", "d3d11", "glut32", "glew32", "assimp.lib","zlibstaticd.lib", "libfbxsdk.lib",
 				"XCBase", "XCEngine", "XCGraphics", "XCNetwork", "XCGameplay", "XCPhysics" }
 		
 		entrypoint("")
@@ -37,12 +40,16 @@ print("Building C++ Win32 Project XCGame")
 	filter "configurations:Release"
 		sysincludedirs {"$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir);$(ProjectDir)Game;" }
 		
-	    includedirs { "$(ProjectDir)", "$(ProjectDir)bin/$(Configuration)/", "$(ProjectDir)Libs", "$(ProjectDir)Libs/flatbuffers", "$(ProjectDir)Libs/assimp/include/", "$(ProjectDir)Libs/AdobeFBX/include/" }
-	    libdirs { "$(ProjectDir)Libs", "$(ProjectDir)Libs/DirectXTex/$(Configuration)/", "$(ProjectDir)Libs/flatbuffers/$(Configuration)/", "$(ProjectDir)Libs/Assimp/$(Configuration)/", "$(ProjectDir)Libs/AdobeFBX/x86/$(Configuration)/" }
+	    includedirs { "$(ProjectDir)", "$(ProjectDir)bin/$(Configuration)/", "$(ProjectDir)Libs", "$(ProjectDir)Libs/flatbuffers", 
+		"$(ProjectDir)Libs/assimp/include/", "$(ProjectDir)Libs/AdutodeskFBX/include/" }
+	    libdirs { "$(ProjectDir)Libs", "$(ProjectDir)Libs/DirectXTex/$(Configuration)/", "$(ProjectDir)Libs/flatbuffers/$(Configuration)/", 
+		"$(ProjectDir)Libs/Assimp/$(Configuration)/", "$(ProjectDir)Libs/AutodeskFBX/x86/$(Configuration)/" }
 	  
-	    excludes { "**/Orbis/**", "**orbis.cpp", "**/Durango/**", "**durango.cpp", "**editor.cpp", "**/Editor/**", "**Editor.cpp", "**Editor**.*", "**/DDSTextureLoader_Legacy/**", "**.pssl", "**/XC_Shaders/src/**"}
+	    excludes { "**/Orbis/**", "**orbis.cpp", "**/Durango/**", "**durango.cpp", "**editor.cpp", "**/Editor/**", 
+		"**Editor.cpp", "**Editor**.*", "**/DDSTextureLoader_Legacy/**", "**.pssl", "**/XC_Shaders/src/**"}
 				
-	  	links { "d3d12", "d2d1", "dwrite", "d3dcompiler", "FlatBuffers", "ws2_32", "DirectXTex", "dxguid", "dinput8", "dxgi", "d3d11", "glut32", "glew32", "assimp.lib","zlibstatic.lib", "libfbxsdk.lib",
+	  	links { "d3d12", "d2d1", "dwrite", "d3dcompiler", "FlatBuffers", "ws2_32", "DirectXTex", "dxguid", 
+		  "dinput8", "dxgi", "d3d11", "glut32", "glew32", "assimp.lib","zlibstatic.lib", "libfbxsdk.lib",
 			    "XCBase", "XCEngine", "XCGraphics", "XCNetwork", "XCGameplay",  "XCPhysics" }
 	  
 		entrypoint("")

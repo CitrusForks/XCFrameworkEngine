@@ -17,8 +17,3 @@ void StaticBody::Update(f32 dt)
 {
 
 }
-
-void StaticBody::Draw(RenderContext& context)
-{
-
-}

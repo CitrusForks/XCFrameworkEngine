@@ -96,11 +96,10 @@ public:
 
     XCTree<IActor*>&                                 GetSceneGraphTree() { return *m_sceneGraph; }
     IActor*                                          GetActor(i32 _instanceId);
-    i32                                              GetNumOfActors() { return m_GameObjects.size(); }
 
     void                                             SetMainPlayableCharacter(i32 instanceId);
     i32                                              GetMainPlayableCharacter() { return m_currentMainPlayableCharacter; }
-    IActor*                                          GetMainPlayableActor() { return m_GameObjects[m_currentMainPlayableCharacter]; }
+    IActor*                                          GetMainPlayableActor() { return GetActor(m_currentMainPlayableCharacter); }
     i32                                              GetNextPlayableActor(i32 instanceId);
 
     bool                                             IsWorldReady() { return m_sceneReady; }
@@ -123,8 +122,6 @@ private:
     void                                             RemoveKey(std::vector<i32>& list, i32 key);
 
     XCTree<IActor*>*                                 m_sceneGraph;
-    std::map<i32, IActor*>                           m_GameObjects;
-
     std::vector<i32>                                 m_PlayableCharacterActors;
     std::vector<i32>                                 m_NonPlayableCharacterActors;
     

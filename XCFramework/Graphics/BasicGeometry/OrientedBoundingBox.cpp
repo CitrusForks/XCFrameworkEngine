@@ -20,7 +20,7 @@ void OrientedBoundingBox::Init()
 {
 }
 
-void OrientedBoundingBox::CreateBoundBox()
+void OrientedBoundingBox::GenerateBoundBox()
 {
     XCVec4 orientation = QuaternionRotationMatrix(XCMatrix());
     m_bBox = DirectX::BoundingOrientedBox(DirectX::XMFLOAT3(m_boxCenter.Get<X>(), m_boxCenter.Get<Y>(), m_boxCenter.Get<Z>()),
@@ -28,18 +28,18 @@ void OrientedBoundingBox::CreateBoundBox()
         DirectX::XMFLOAT4(orientation.Get<X>(), orientation.Get<Y>(), orientation.Get<Z>(), orientation.Get<W>()));
 }
 
-void OrientedBoundingBox::CreateBoundBox(XCVec4& min, XCVec4& max)
+void OrientedBoundingBox::GenerateBoundBox(XCVec4& min, XCVec4& max)
 {
     m_boxCenter = 0.5f * (min + max);
     m_boxExtends = 0.5f * (max - min);
-    CreateBoundBox();
+    GenerateBoundBox();
 }
 
-void OrientedBoundingBox::CreateBoundBox(OrientedBoundingBox* const boundBox)
+void OrientedBoundingBox::GenerateBoundBox(OrientedBoundingBox* const boundBox)
 {
     m_boxCenter = XMLoadFloat3(&boundBox->m_bBox.Center);
     m_boxExtends = XMLoadFloat3(&boundBox->m_bBox.Extents);
-    CreateBoundBox();
+    GenerateBoundBox();
 }
 
 void OrientedBoundingBox::Transform(XCMatrix4& translateMat, XCMatrix4& rotateMatrix)

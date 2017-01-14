@@ -35,9 +35,9 @@ void GameFiniteStateMachine::Init()
     m_gameActorFactory = (GameActorsFactory*) &container.CreateNewSystem("GameActorsFactory");
     m_gameActorFactory->InitFactory();
 
-    m_worldSystem = (SceneGraph*)&container.CreateNewSystem("SceneGraph");
+    m_sceneGraphSystem = (SceneGraph*)&container.CreateNewSystem("SceneGraph");
     TaskManager* taskMgr = &SystemLocator::GetInstance()->RequestSystem<TaskManager>("TaskManager");
-    m_worldSystem->Init(*taskMgr);
+    m_sceneGraphSystem->Init(*taskMgr);
 
     m_IsGameExit = false;
 
@@ -74,7 +74,7 @@ void GameFiniteStateMachine::Destroy()
 
     m_StateStack.clear();
 
-    m_worldSystem->Destroy();
+    m_sceneGraphSystem->Destroy();
     m_gameActorFactory->DestroyFactory();
     m_gameStateFactory->DestroyFactory();
 

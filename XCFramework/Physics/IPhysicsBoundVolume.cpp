@@ -4,13 +4,7 @@
 * This program is complaint with GNU General Public License, version 3.
 * For complete license, read License.txt in source root directory. */
 
-#pragma once
+#include "PhysicsPrecompiledHeader.h"
 
-#include "IPhysicsFeature.h"
+#include "IPhysicsBoundVolume.h"
 
-class StaticBody : public IPhysicsFeature
-{
-public:
-    void                Init(const PhysicsDesc& desc) override;
-    void                Update(f32 dtS) override;
-};

@@ -43,7 +43,7 @@ public:
 
     GameStatesFactory&          GetGameStateFactory() { return *m_gameStateFactory; }
     GameActorsFactory&          GetGameActorsFactory() { return *m_gameActorFactory; }
-    SceneGraph&                 GetWorldSystem() { return *m_worldSystem; }
+    SceneGraph&                 GetWorldSystem() { return *m_sceneGraphSystem; }
     
     virtual void                OnEvent(IEvent* event);
 
@@ -59,6 +59,6 @@ private:
 
     GameStatesFactory*          m_gameStateFactory;
     GameActorsFactory*          m_gameActorFactory;
-    SceneGraph*                 m_worldSystem;
+    SceneGraph*                 m_sceneGraphSystem;
     PhysicsPlayground*          m_physicsPlayground;
 };

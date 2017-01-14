@@ -56,12 +56,13 @@ void Car::SetInitialPhysicsProperties()
     PhysicsActor::SetInitialPhysicsProperties();
 
     PhysicsPlayground& playground = SystemLocator::GetInstance()->RequestSystem<PhysicsPlayground>("PhysicsPlayground");
-    m_physicsFeature = playground.CreatePhysicsFeature(
-        PhysicsDesc(PhysicsBodyType_RigidDynamic,
-                    PhysicsBoundType_Box,
-                    m_currentPosition,
-                    10,
-                    (f32) 0.8));
+    PhysicsDesc desc(PhysicsBodyType_RigidDynamic,
+                     PhysicsBoundType_Box,
+                     m_currentPosition,
+                     500,
+                     0.8);
+    m_pMesh->GetResource<XCMesh>()->GetBounds(desc.m_boundVolumeDesc.m_boundDesc.m_boundBoxDesc.m_min, desc.m_boundVolumeDesc.m_boundDesc.m_boundBoxDesc.m_max);
+    m_physicsFeature = playground.CreatePhysicsFeature(desc);
 }
 
 IActor::ActorReturnState Car::Update(f32 dt)

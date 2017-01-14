@@ -8,36 +8,34 @@
 
 #include "PhysicsActor.h"
 
+#include "Engine/Resource/ResourceHandle.h"
+
 #include "Graphics/XCMesh/XCMesh.h"
+
 #include "Physics/IPhysicsFeature.h"
 #include "Physics/Phusike/RigidBody.h"
 
 PhysicsActor::PhysicsActor()
+    : m_physicsFeature(nullptr)
+    , m_pMesh(nullptr)
 {
-    m_pMesh = nullptr;
-
-    m_boundBox = XCNEW(RenderableOBB)();
 }
 
 PhysicsActor::~PhysicsActor(void)
 {
-    XCDELETE(m_boundBox);
 }
 
 IActor::IActor::ActorReturnState PhysicsActor::Init()
 {
     IActor::IActor::ActorReturnState result = AnimatedActor::Init();
 
-    m_look = XCVec4(0, 0, 1, 0);
-    XCVec3 up(0, 1, 0);
-    m_up = XCVec4(0, 1, 0, 0);
+    m_look  = XCVec4(0, 0, 1, 0);
+    m_up    = XCVec4(0, 1, 0, 0);
     m_right = VectorCross(m_up, m_look);
 
     m_transformedRotation = m_MRotation;
 
     m_World = m_MScaling * m_MRotation * m_MTranslation;
-
-    m_boundBox->Init();
 
     return result;
 }
@@ -67,11 +65,6 @@ IActor::IActor::ActorReturnState PhysicsActor::OnLoaded()
 
 void PhysicsActor::SetInitialPhysicsProperties()
 {
-    if (m_pMesh)
-    {
-        m_boundBox->CreateBoundBox(m_pMesh->GetResource<XCMesh>()->GetAABB());
-        m_boundBox->Transform(m_MTranslation, m_MRotation);
-    }
 }
 
 void PhysicsActor::AddForce(const XCVec4& force)
@@ -81,27 +74,12 @@ void PhysicsActor::AddForce(const XCVec4& force)
 
 IActor::IActor::ActorReturnState PhysicsActor::Update(f32 dt)
 {
-    IActor::IActor::ActorReturnState result = IActor::Update(dt);
-
-    if (m_pMesh)
-    {
-        m_boundBox->Transform(m_MTranslation, m_MRotation);
-        m_boundBox->Update(dt);
-    }
-
-    return result;
+    return IActor::Update(dt);
 }
 
 bool PhysicsActor::Draw(RenderContext& renderContext)
 {
-    bool result = IActor::Draw(renderContext);
-
-    if (m_pMesh)
-    {
-        m_boundBox->Draw(renderContext);
-    }
-
-    return result;
+    return IActor::Draw(renderContext);
 }
 
 IActor::IActor::ActorReturnState PhysicsActor::Unload()
@@ -111,10 +89,7 @@ IActor::IActor::ActorReturnState PhysicsActor::Unload()
 
 IActor::IActor::ActorReturnState PhysicsActor::Destroy()
 {
-    if (m_pMesh)
-    {
-        m_boundBox->Destroy();
-    }
+    XCDELETE(m_physicsFeature);
 
     return IActor::Destroy();
 }

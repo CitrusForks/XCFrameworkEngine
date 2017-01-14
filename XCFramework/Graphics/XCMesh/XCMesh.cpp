@@ -14,7 +14,6 @@
 #include "Graphics/XCShaders/XCShaderHandle.h"
 #include "Graphics/XCMesh/XC3DSMeshLoader.h"
 #include "Graphics/XCLighting/XCLightManager.h"
-#include "Graphics/BasicGeometry/OrientedBoundingBox.h"
 
 XCMesh::XCMesh()
     : m_shaderType(ShaderType_Default)
@@ -36,9 +35,6 @@ XCMesh::XCMesh()
 void XCMesh::Init(std::string userFriendlyName)
 {
     IResource::Init(userFriendlyName);
-
-    m_computedBoundBox = std::make_unique<OrientedBoundingBox>();
-    m_computedBoundBox->Init();
 }
 
 XCMesh::~XCMesh(void)
@@ -143,9 +139,6 @@ void XCMesh::Load(const void* buffer)
 void XCMesh::InitDynamic(std::string resPath, ShaderType shaderUsage, std::string textureName, XCVec3Unaligned scaling, XCVec3Unaligned rotation)
 {
     m_resourcePath = resPath;
-
-    m_computedBoundBox = std::make_unique<OrientedBoundingBox>();
-    m_computedBoundBox->Init();
 
     m_shaderType = shaderUsage;
 
@@ -494,9 +487,8 @@ void XCMesh::CreateBuffers()
         vMax = VectorTransformMatrix(vMax, transform);
     }
 
-    m_computedBoundBox->m_boxCenter  = 0.5f * (vMin + vMax);
-    m_computedBoundBox->m_boxExtends = 0.5f * (vMax - vMin);
-    m_computedBoundBox->CreateBoundBox();
+    m_minBound = vMin;
+    m_maxBound = vMax;
 
     Logger("[XCMesh] Created buffer for Resource : %s", m_resourcePath.c_str());
 }
@@ -702,8 +694,6 @@ void XCMesh::DrawSubMeshes(RenderContext& renderContext)
             DrawSubMesh(renderContext, index);
         }
     }
-    //Need not draw. Draw the clone of this in every actor
-    //m_computedBoundBox.Draw();
 }
 
 void XCMesh::DrawInstanced(PerObjectBuffer& objectBuffer)

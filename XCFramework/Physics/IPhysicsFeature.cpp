@@ -7,11 +7,14 @@
 #include "PhysicsPrecompiledHeader.h"
 
 #include "IPhysicsFeature.h"
+#include "IPhysicsBoundVolume.h"
 
 IPhysicsFeature::IPhysicsFeature()
     : m_damping(0.0f)
     , m_inverseMass(0.0f)
     , m_mass(0.0f)
+    , m_isDirty(false)
+    , m_physicsBoundVolume(nullptr)
 {
 }
 
@@ -20,9 +23,8 @@ void IPhysicsFeature::Init(const PhysicsDesc& desc)
     m_position = desc.m_position;
     m_mass = desc.m_mass;
     m_damping = desc.m_dampForce;
-    m_physicsBoundType = desc.m_boundBoxDesc.m_boundType;
 
-    if(m_mass >= 999)
+    if(m_mass >= InfiniteMass)
     {
         SetInverseMass(0);
         m_mass = 1;
@@ -33,15 +35,22 @@ void IPhysicsFeature::Init(const PhysicsDesc& desc)
     }
 }
 
+PhysicsBoundType IPhysicsFeature::GetBoundType() const
+{ 
+    return m_physicsBoundVolume->GetBoundType();
+}
+
+void IPhysicsFeature::SetBoundType(IPhysicsBoundVolume* bound)
+{
+    m_physicsBoundVolume = bound;
+}
+
 IPhysicsFeature::~IPhysicsFeature()
 {
+    XCDELETE(m_physicsBoundVolume);
 }
 
 void IPhysicsFeature::Update(f32 dt)
-{
-}
-
-void IPhysicsFeature::Draw(RenderContext& context)
 {
 }
 

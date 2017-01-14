@@ -35,7 +35,7 @@ namespace GameState
 
         XCCameraManager*       m_cameraSystem;
         XCInput*               m_directInput;
-        SceneGraph*            m_worldSystem;
+        SceneGraph*            m_sceneGraphSystem;
         PhysicsPlayground*     m_physicsPlayground;
     };
 }

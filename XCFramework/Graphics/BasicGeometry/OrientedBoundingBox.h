@@ -18,9 +18,9 @@ public:
 
     virtual void               Init();
 
-    void                       CreateBoundBox();
-    void                       CreateBoundBox(XCVec4& min, XCVec4& max);
-    void                       CreateBoundBox(OrientedBoundingBox* const boundBox);
+    void                       GenerateBoundBox();
+    void                       GenerateBoundBox(XCVec4& min, XCVec4& max);
+    void                       GenerateBoundBox(OrientedBoundingBox* const boundBox);
     void                       Transform(XCMatrix4& translateMat, XCMatrix4& rotateMatrix);
 
     //Oriented Bounding Box

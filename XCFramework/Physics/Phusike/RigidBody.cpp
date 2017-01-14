@@ -8,6 +8,7 @@
 
 #include "RigidBody.h"
 #include "PhysicsPlayground.h"
+#include "IPhysicsBoundVolume.h"
 
 void RigidBody::Init(const PhysicsDesc& desc)
 {
@@ -23,6 +24,7 @@ RigidBody::~RigidBody()
 
 void RigidBody::AddForce(const XCVec4& _newForce)
 {
+    m_isDirty = true;
     m_ForceAccumulator += _newForce;
 }
 
@@ -31,7 +33,10 @@ void RigidBody::Update(f32 dt)
     PhysicsPlayground& playground = SystemLocator::GetInstance()->RequestSystem<PhysicsPlayground>("PhysicsPlayground");
 
     //Add gravity to force accumulator
-    m_ForceAccumulator += playground.GetAcceleratedGravity();
+    if(playground.IsGravityEnabled())
+    {
+        m_ForceAccumulator += playground.GetAcceleratedGravity();
+    }
 
     XCVec4 currentAcceleration = m_Acceleration;
 
@@ -46,10 +51,11 @@ void RigidBody::Update(f32 dt)
 
     //Impose Draging force
     m_velocity *= (f32)pow(m_damping, dt);
-}
 
-void RigidBody::Draw(RenderContext& context)
-{
+    ClearForce();
+
+    //Update the bound volume
+    m_physicsBoundVolume->Transform(m_position, m_orientation);
 }
 
 void RigidBody::ClearForce()

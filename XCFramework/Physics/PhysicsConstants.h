@@ -6,11 +6,5 @@
 
 #pragma once
 
-#include "IPhysicsFeature.h"
-
-class StaticBody : public IPhysicsFeature
-{
-public:
-    void                Init(const PhysicsDesc& desc) override;
-    void                Update(f32 dtS) override;
-};
+//This is the max mass which an object can attain. This also means that the object is immovable.
+static const float InfiniteMass = 1000.0f;

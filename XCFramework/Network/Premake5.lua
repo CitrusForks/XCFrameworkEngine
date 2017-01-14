@@ -17,7 +17,8 @@ print("Building C++ Win32 Project XCNetwork")
 		includedirs { "$(ProjectDir)Libs", "$(ProjectDir)Libs/flatbuffers" }
 		libdirs { "$(ProjectDir)Libs" }
 
-		excludes { "**/Orbis/**", "**orbis.cpp", "**/Durango/**", "**durango.cpp", "**editor.cpp", "**/Editor/**", "**Editor.cpp", "**Editor**.*", "**/DDSTextureLoader_Legacy/**", "**.pssl", "**/XC_Shaders/src/**"}
+		excludes { "**/Orbis/**", "**orbis.cpp", "**/Durango/**", "**durango.cpp", "**editor.cpp", "**/Editor/**", "**Editor.cpp", "**Editor**.*", 
+		"**/DDSTextureLoader_Legacy/**", "**.pssl", "**/XC_Shaders/src/**"}
 		
 		links { "ws2_32" }
 		
@@ -37,7 +38,8 @@ print("Building C++ Win32 Project XCNetwork")
 		includedirs { "$(ProjectDir)Libs","$(ProjectDir)Libs/flatbuffers" }
 		libdirs { "$(ProjectDir)Libs" }
 
-		excludes { "**/Orbis/**", "**orbis.cpp", "**/Durango/**", "**durango.cpp", "**editor.cpp", "**/Editor/**", "**Editor.cpp", "**Editor**.*", "**/DDSTextureLoader_Legacy/**", "**.pssl", "**/XC_Shaders/src/**"}
+		excludes { "**/Orbis/**", "**orbis.cpp", "**/Durango/**", "**durango.cpp", "**editor.cpp", "**/Editor/**", "**Editor.cpp", 
+		"**Editor**.*", "**/DDSTextureLoader_Legacy/**", "**.pssl", "**/XC_Shaders/src/**"}
 		
 		links { "ws2_32" }
 		

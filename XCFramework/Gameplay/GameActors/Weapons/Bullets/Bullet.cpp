@@ -74,12 +74,13 @@ void Bullet::SetInitialPhysicsProperties()
     PhysicsActor::SetInitialPhysicsProperties();
 
     PhysicsPlayground& playground = SystemLocator::GetInstance()->RequestSystem<PhysicsPlayground>("PhysicsPlayground");
-    m_physicsFeature = playground.CreatePhysicsFeature(
-        PhysicsDesc(PhysicsBodyType_RigidDynamic,
-                    PhysicsBoundType_Box,
-                    m_currentPosition,
-                    1,
-                    0.2));
+    PhysicsDesc desc(PhysicsBodyType_RigidDynamic,
+                     PhysicsBoundType_Box,
+                     m_currentPosition,
+                     1,
+                     0.2);
+    m_pMesh->GetResource<XCMesh>()->GetBounds(desc.m_boundVolumeDesc.m_boundDesc.m_boundBoxDesc.m_min, desc.m_boundVolumeDesc.m_boundDesc.m_boundBoxDesc.m_max);
+    m_physicsFeature = playground.CreatePhysicsFeature(desc);
 
     //Load done. Shoot the bullet
     Shoot(5000.0f);
