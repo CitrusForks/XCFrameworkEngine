@@ -589,7 +589,7 @@ void XCMesh::RegisterDrawable()
 {
     //Register with the rendering pool that this is drawable
     XCGraphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XCGraphics>("GraphicsSystem");
-    graphicsSystem.GetRenderingPool().AddResourceDrawable((IResource*) this);
+    graphicsSystem.GetRenderingPool().AddRenderableObject(this, GetBaseObjectId());
 }
 
 void XCMesh::UnregisterDrawable()
@@ -597,7 +597,7 @@ void XCMesh::UnregisterDrawable()
     //UnRegister with the rendering pool that this is no more drawable
     XCGraphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XCGraphics>("GraphicsSystem");
     RenderingPool& renderPool = graphicsSystem.GetRenderingPool();
-    renderPool.RemoveResourceDrawable(this);
+    renderPool.RemoveRenderableObject(this, GetBaseObjectId());
 }
 
 bool XCMesh::Draw(RenderContext& context)

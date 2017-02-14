@@ -28,7 +28,7 @@ public:
         = 255;
 #endif
 
-    void                 Init(ID3DDevice& device);
+    void                 Init();
     void                 Destroy();
 
     //Constant Buffers
@@ -52,7 +52,4 @@ public:
 
     //Destruction of resources
     void                 DestroyResource(GPUResource* buffer);
-
-private:
-    ID3DDevice*          m_device;
 };

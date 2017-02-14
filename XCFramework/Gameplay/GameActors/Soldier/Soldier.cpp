@@ -81,7 +81,7 @@ void Soldier::SetInitialPhysicsProperties()
                         PhysicsBoundType_Box,
                         m_currentPosition,
                         10,
-                        0.8);
+                        0.8f);
     m_pMesh->GetResource<XCMesh>()->GetBounds(desc.m_boundVolumeDesc.m_boundDesc.m_boundBoxDesc.m_min, desc.m_boundVolumeDesc.m_boundDesc.m_boundBoxDesc.m_max);
     m_physicsFeature = playground.CreatePhysicsFeature(desc);
 }
@@ -152,6 +152,7 @@ void Soldier::Yaw(f32 angle, f32 scalarForce)
 
     //Rotate the soldier with it's initial rotations.
     m_transformedRotation *= rotation;
+    AddRotationalForce(QuaternionRotationMatrix(m_transformedRotation));
 
     //Set the offset gun rotation too
     //m_gun->SetOffsetLook(m_secondaryLookAxis);

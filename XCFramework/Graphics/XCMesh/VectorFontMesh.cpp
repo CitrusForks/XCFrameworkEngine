@@ -28,7 +28,6 @@ void VectorFontMesh::Init(std::string userFriendlyName)
 
     //Register with the rendering pool that this is drawable
     XCGraphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XCGraphics>("GraphicsSystem");
-    graphicsSystem.GetRenderingPool().AddResourceDrawable((IResource*) this);
 }
 
 void VectorFontMesh::DrawText(std::string text, XCVec3Unaligned& position, RenderContext& context)
@@ -94,9 +93,6 @@ void VectorFontMesh::DrawText(std::string text, XCVec3Unaligned& position, Rende
 void VectorFontMesh::Destroy()
 {
     XCMeshFBX::Destroy();
-
-    XCGraphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XCGraphics>("GraphicsSystem");
-    graphicsSystem.GetRenderingPool().RemoveResourceDrawable((IResource*) this);
 
     for (auto instanceBuffer : m_vectorFontInstanceBuffers)
     {

@@ -20,7 +20,7 @@ class RenderContext
 public:
     RenderContext();
 
-    void                                Init(ID3DDevice* device, XCShaderContainer* shaderMgr);
+    void                                Init(XCShaderContainer* shaderMgr);
     void                                Reset();
     void                                BeginRender(std::vector<RenderTargetsType>& targetType);
     void                                FinishRender();
@@ -37,13 +37,13 @@ public:
     void                                DrawIndexedInstanced(u32 _indexCount, void* indexGpuAddr = nullptr, u32 instanceCount = 1);
 
 private:
-    XCShaderContainer*                 m_shaderContainer;
+    XCShaderContainer*                  m_shaderContainer;
     ID3DDeviceContext*                  m_deviceContext;
 
 #if defined(XCGRAPHICS_DX12)
     ID3DCommandAllocator*               m_commandAllocator;
 #endif
 
-    XCGraphics*                        m_graphicsSystem;
+    XCGraphics*                         m_graphicsSystem;
     XCVec4                              m_clearColor;
 };

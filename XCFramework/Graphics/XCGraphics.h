@@ -7,6 +7,8 @@
 #pragma once
 
 #include "Base/System/ISystem.h"
+#include "Base/Thread/CriticalSectionRecursive.h"
+
 #include "Graphics/XCShaders/XCShaderContainer.h"
 #include "Graphics/RenderingPool.h"
 #include "Graphics/XCTextures/RenderableTexture.h"
@@ -18,6 +20,9 @@ class SharedDescriptorHeap;
 class XCGraphics : public ISystem
 {
 public:
+    static const u32                WindowWidth = 1024;
+    static const u32                WindowHeight = 768;
+
     XCGraphics(void);
     virtual ~XCGraphics(void);
     
@@ -43,8 +48,7 @@ public:
     virtual void                    ClearRTVAndDSVs(ID3DDeviceContext& context, std::vector<RenderTargetsType>& type, XCVec4& clearColor) = 0;
 
     u32                             GetCurrentRTVFrameIndex() const { return m_frameIndex; }
-    ID3DDevice*                     GetDevice() { return m_pD3DDevice; }
-    XCShaderContainer&             GetShaderContainer() { return *m_XCShaderSystem; }
+    XCShaderContainer&              GetShaderContainer() { return *m_xcShaderSystem; }
     RenderingPool&                  GetRenderingPool() { return *m_renderingPool; }
     RenderableTexture&              GetRenderTexture(RenderTargetsType type) { return *m_renderTargets[type]; }
 
@@ -57,6 +61,8 @@ public:
 
     bool                            IsSecondaryDrawCall() { return m_secondaryDrawCall; }
     void                            SetSecondaryDrawCall(bool isSecondary) { m_secondaryDrawCall = isSecondary; }
+
+    ID3DDevice*                     GetDevice();
 
 protected:
     virtual void                    CreateDescriptorHeaps() = 0;
@@ -74,7 +80,7 @@ protected:
 
 protected:
     ID3DDevice*                     m_pD3DDevice;
-    XCShaderContainer*             m_XCShaderSystem;
+    XCShaderContainer*              m_xcShaderSystem;
 
     RenderingPool*                  m_renderingPool;
     SharedDescriptorHeap*           m_sharedDescriptorHeap;
@@ -92,10 +98,10 @@ protected:
     u32                             m_frameIndex;
 
     u32                             m_4xMsaaQuality;
-    bool                            m_Enable4xMsaa;
+    bool                            m_enable4xMsaa;
 
-    i32                             m_ClientWidth;
-    i32                             m_ClientHeight;
+    i32                             m_clientWidth;
+    i32                             m_clientHeight;
     
     HWND                            m_hMainWnd;
     bool                            m_initDone;

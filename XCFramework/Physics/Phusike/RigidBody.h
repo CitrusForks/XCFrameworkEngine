@@ -21,7 +21,8 @@ public:
     void                ClearVelocity();
 
     void                AddForce(const XCVec4& newForce);
-    
+    void                AddRotationalForce(const XCVec4& newForce);
+
     XCVec4              GetVelocity() { return m_velocity; }
     void                SetVelocity(const XCVec4& vel) { m_velocity = vel; }
 

@@ -21,8 +21,7 @@ class IShader
 public:
     static const u32 NbOfDescriptors = 3;
 
-    IShader(ID3DDevice& device)
-        : m_device(device)
+    IShader()
     {}
 
     virtual ~IShader() 
@@ -47,15 +46,13 @@ public:
     GPUResource*                     CreateBuffer(GPUResourceType bufferType, i32 sizeOfType = 0);
                                      
 protected:                           
-    ID3DDevice&                      m_device;
-
     UINT8*                           m_pVS;
     UINT8*                           m_pPS;
     u32                              m_vsSize;
     u32                              m_psSize;
 
 #if defined(XCGRAPHICS_DX12)
-    PSODx12*                        m_pso;
+    PSODx12*                         m_pso;
 #elif defined(XCGRAPHICS_DX11)
     ID3DVertexShader*                m_compiledVS;
     ID3DPixelShader*                 m_compiledPS;

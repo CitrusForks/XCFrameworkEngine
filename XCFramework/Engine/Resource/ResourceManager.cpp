@@ -27,6 +27,7 @@ ResourceManager::~ResourceManager(void)
 
 void ResourceManager::Init(TaskManager& taskManger)
 {
+    //TODO : This shouldn't be here.
     HMODULE module = LoadLibrary("assimp.dll");
     XCASSERT(module != nullptr);
 
@@ -74,7 +75,7 @@ void ResourceManager::Update()
         else if(resource->GetResourceState() == IResource::ResourceState_Loading 
             || resource->GetResourceState() == IResource::ResourceState_UnLoading)
         {
-            //Update the reosurce, they might be waiting for other resources to be loaded.
+            //Update the resource, they might be waiting for other resources to be loaded.
             resource->UpdateState();
         }
     }

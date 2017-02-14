@@ -16,13 +16,14 @@ RenderContext::RenderContext()
 {
 }
 
-void RenderContext::Init(ID3DDevice* device, XCShaderContainer* shaderMgr)
+void RenderContext::Init(XCShaderContainer* shaderMgr)
 {
     m_clearColor = XCVec4(1.0f, 1.0f, 1.0f, 1.0f);
 
     m_shaderContainer = shaderMgr;
 
     m_graphicsSystem = &SystemLocator::GetInstance()->RequestSystem<XCGraphics>("GraphicsSystem");
+    ID3DDevice* device = m_graphicsSystem->GetDevice();
 
 #if defined(USE_IMMEDIATE_CONTEXT)
     m_deviceContext = m_graphicsSystem->GetDeviceContext();
@@ -42,6 +43,7 @@ void RenderContext::Init(ID3DDevice* device, XCShaderContainer* shaderMgr)
         device->CreateDeferredContext(0, &m_deviceContext);
     #endif
 #endif
+
 }
 
 void RenderContext::Destroy()

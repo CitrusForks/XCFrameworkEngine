@@ -95,12 +95,13 @@ template<class T>
 void VertexBuffer<T>::BuildVertexBuffer(ID3DDeviceContext* context)
 {
     XCGraphics& graphicsSystem = (XCGraphics&)SystemLocator::GetInstance()->RequestSystem("GraphicsSystem");
+    ID3DDevice* device = graphicsSystem.GetDevice();
 
 #if defined(XCGRAPHICS_DX12)
     //Create VB
     i32 vbSize = sizeof(T) * m_vertexData.size();
 
-    ValidateResult(graphicsSystem.GetDevice()->CreateCommittedResource(
+    ValidateResult(device->CreateCommittedResource(
         &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
         D3D12_HEAP_FLAG_NONE,
         &CD3DX12_RESOURCE_DESC::Buffer(vbSize),
@@ -110,7 +111,7 @@ void VertexBuffer<T>::BuildVertexBuffer(ID3DDeviceContext* context)
 
     XCASSERT(m_pVertexBufferResource != nullptr);
 
-    ValidateResult(graphicsSystem.GetDevice()->CreateCommittedResource(
+    ValidateResult(device->CreateCommittedResource(
         &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
         D3D12_HEAP_FLAG_NONE,
         &CD3DX12_RESOURCE_DESC::Buffer(vbSize),

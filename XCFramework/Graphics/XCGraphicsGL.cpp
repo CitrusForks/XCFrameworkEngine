@@ -22,16 +22,16 @@ XCGraphicsGL::~XCGraphicsGL(void)
 
 void XCGraphicsGL::Destroy()
 {
-    m_XCShaderSystem->Destroy();
+    m_xcShaderSystem->Destroy();
     m_renderingPool->Destroy();
 }
 
 void XCGraphicsGL::Init(HWND _mainWnd, i32 _width, i32 _height, bool _enable4xMsaa)
 {
     m_hMainWnd = _mainWnd;
-    m_ClientWidth = _width;
-    m_ClientHeight = _height;
-    m_Enable4xMsaa = _enable4xMsaa;
+    m_clientWidth = _width;
+    m_clientHeight = _height;
+    m_enable4xMsaa = _enable4xMsaa;
 
     SetupPipeline();
 }

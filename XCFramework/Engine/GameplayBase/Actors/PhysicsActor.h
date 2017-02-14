@@ -39,8 +39,9 @@ public:
     void                                SetSecondaryUp(XCVec4& up)       { m_secondaryLookAxis = up; }
     void                                SetSecondaryRight(XCVec4& right) { m_secondaryLookAxis = right; }
 
-    //For use with NPC AI
+    //Adds into the physics feature
     void                                AddForce(const XCVec4& force);
+    void                                AddRotationalForce(const XCVec4& force);
 
 protected:
     IPhysicsFeature*                    m_physicsFeature;

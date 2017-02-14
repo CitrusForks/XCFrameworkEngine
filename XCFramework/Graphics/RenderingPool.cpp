@@ -9,10 +9,6 @@
 #include "Graphics/RenderingPool.h"
 #include "Graphics/XCGraphics.h"
 
-#if defined(XCGRAPHICS_DX12)
-#include "Graphics/XCGraphicsDx12.h"
-#endif
-
 const u32 RenderingPool::RenderWorkerTypeMaskMap[] = { WorkerMask_None,
                                                        WorkerMask_None,
                                                        WorkerMask_None };
@@ -27,7 +23,7 @@ void RenderingPool::Init()
 
     //Initialize the staged render contexts
     //These staging render context are used per frame states which are common and not be deferred. Such as clear rtv, execute deferred contexts...
-    m_FrameCommandList[0].Init(m_graphicsSystem->GetDevice(), &m_graphicsSystem->GetShaderContainer());
+    m_FrameCommandList[0].Init(&m_graphicsSystem->GetShaderContainer());
 
 #if defined(XCGRAPHICS_DX12)
     m_ppCmdList[0] = &m_FrameCommandList[0].GetDeviceContext();
@@ -39,7 +35,7 @@ void RenderingPool::Init()
         m_renderWorkers[workerIndex].Init();
         m_renderWorkers[workerIndex].m_workerId = workerIndex;
         m_renderWorkers[workerIndex].m_running = true;
-        m_renderWorkers[workerIndex].m_renderContext.Init(m_graphicsSystem->GetDevice(), &m_graphicsSystem->GetShaderContainer());
+        m_renderWorkers[workerIndex].m_renderContext.Init(&m_graphicsSystem->GetShaderContainer());
 
 #if !defined(SINGLE_THREAD_RENDER)
         m_renderWorkers[workerIndex].m_workerThread.CreateThread(m_renderWorkers[workerIndex].WorkerThreadFunc, &m_renderWorkers[workerIndex]);
@@ -50,10 +46,14 @@ void RenderingPool::Init()
         m_ppCmdList[workerIndex + NbFrameCommandList] = &m_renderWorkers[workerIndex].m_renderContext.GetDeviceContext();
 #endif
     }
+
+    m_addRemoveLock.Create(true);
 }
 
 void RenderingPool::Destroy()
 {
+    m_addRemoveLock.Release();
+
     //Destroy the worker threads
     for (auto& workers : m_renderWorkers)
     {
@@ -63,6 +63,8 @@ void RenderingPool::Destroy()
 
 void RenderingPool::AddRenderableObject(IRenderableObject* obj, i32 baseObjId)
 {
+    m_addRemoveLock.Enter();
+
     //Add from main thread only.
     u32 workerMask = obj->GetRenderWorkerMask();
     RenderWorkerType workerType = obj->GetRenderWorkerType();
@@ -75,10 +77,14 @@ void RenderingPool::AddRenderableObject(IRenderableObject* obj, i32 baseObjId)
             Logger("[Rendering Pool] Added Renderable object on worker id : %d Base Obj id : %d", maskIndex, baseObjId);
         }
     }
+
+    m_addRemoveLock.Exit();
 }
 
 void RenderingPool::RemoveRenderableObject(IRenderableObject* obj, i32 baseObjId)
 {
+    m_addRemoveLock.Enter();
+
     u32 workerMask = obj->GetRenderWorkerMask();
     RenderWorkerType workerType = obj->GetRenderWorkerType();
 
@@ -94,54 +100,23 @@ void RenderingPool::RemoveRenderableObject(IRenderableObject* obj, i32 baseObjId
             }
         }
     }
+
+    m_addRemoveLock.Exit();
 }
 
-void RenderingPool::AddResourceDrawable(IRenderableObject* obj)
+void RenderingPool::RequestResourceDeviceContext(IRenderableObject* obj)
 {
-    u32 workerMask = obj->GetRenderWorkerMask();
-    RenderWorkerType workerType = obj->GetRenderWorkerType();
-
-    for (u32 maskIndex = 0; maskIndex < WorkerType_Max; ++maskIndex)
-    {
-        if (maskIndex == workerType || (workerMask != WorkerMask_None && workerMask & RenderWorkerTypeMaskMap[maskIndex]))
-        {
-            m_renderWorkers[maskIndex].m_resourceRefList.push_back(obj);
-            Logger("[Rendering Pool] Added Resource Drawable on worker id : %d ", maskIndex);
-        }
-    }
-}
-
-void RenderingPool::RemoveResourceDrawable(IRenderableObject* obj)
-{
-    u32 workerMask = obj->GetRenderWorkerMask();
-    RenderWorkerType workerType = obj->GetRenderWorkerType();
-
-    for (u32 maskIndex = 0; maskIndex < WorkerType_Max; ++maskIndex)
-    {
-        if (maskIndex == workerType || (workerMask != WorkerMask_None && workerMask & RenderWorkerTypeMaskMap[maskIndex]))
-        {
-            auto refList = m_renderWorkers[maskIndex].m_resourceRefList;
-            auto objRef = std::find_if(refList.begin(), refList.end(), [obj](IRenderableObject* resource) -> bool
-            {
-                return obj == resource;
-            });
-
-            if (objRef != refList.end())
-            {
-                Logger("[Rendering Pool] Removing Resource Drawable on worker id : %d ", maskIndex);
-                m_renderWorkers[maskIndex].m_resourceRefList.erase(objRef);
-            }
-        }
-    }
-}
-
-void RenderingPool::RequestResourceDeviceContext(IRenderableObject* graphicsBuffer)
-{
-    m_renderWorkers[WorkerType_ResourceLoader].m_resourceRefList.push_back(graphicsBuffer);
+    m_addRemoveLock.Enter();
+    m_renderWorkers[WorkerType_ResourceLoader].m_resourceRefList.push_back(obj);
+    m_addRemoveLock.Exit();
 }
 
 void RenderingPool::Begin(std::vector<RenderTargetsType>& targetTypes)
 {
+    //Don't allow any objects to be entered, while beginning to render.
+    //The lock will be released in End()
+    m_addRemoveLock.Enter();
+
     m_FrameCommandList[0].Reset();
 
     //Clear the rtv and dsv
@@ -171,7 +146,7 @@ void RenderingPool::Render()
 #if defined(XCGRAPHICS_DX12)
         while (workers.m_resourceRefList.size() > 0)
         {
-            workers.m_resourceRefList.back()->RenderContextCallback(workers.m_renderContext);
+            workers.m_resourceRefList.back()->RenderContextCallback(workers.m_renderContext.GetDeviceContext());
             workers.m_resourceRefList.pop_back();
         }
 #endif
@@ -220,6 +195,8 @@ void RenderingPool::End()
             }
         }
     }
+
+    m_addRemoveLock.Exit();
 }
 
 void RenderingPool::Execute(ID3DCommandQueue* cmdQueue)
@@ -246,28 +223,17 @@ i32 RenderingPool::RenderWorker::WorkerThreadFunc(void* param)
 
         //if (worker->m_workerId != WorkerType_Lighting)
         {
-            if (worker->m_workerId != WorkerType_ResourceLoader)
+            //Call Render
+            //In the case of instancing mesh rendering. The WorkerType_XCMesh renders all actors first which will accumulate all instance 
+            //data and then we render the actual mesh resource.
+            for (auto& obj : worker->m_renderableObjectRefList)
             {
-                //Call Render
-                for (auto& obj : worker->m_renderableObjectRefList)
+                if (obj.second->IsRenderable())
                 {
-                    if (obj.second->IsRenderable())
-                    {
-                        obj.second->Draw(worker->m_renderContext);
-                    }
-                }
-
-                //In the case of instancing mesh rendering. The WorkerType_XCMesh renders all actors first which will accumulate all instance 
-                //data and then we render the actual mesh resource.
-                for (auto& obj : worker->m_resourceRefList)
-                {
-                    if (obj->IsRenderable())
-                    {
-                        obj->Draw(worker->m_renderContext);
-                    }
+                    obj.second->Draw(worker->m_renderContext);
                 }
             }
-
+            
             if (worker->m_workerId == WorkerType_ResourceLoader)
             {
                 IRenderableObject* res = nullptr;

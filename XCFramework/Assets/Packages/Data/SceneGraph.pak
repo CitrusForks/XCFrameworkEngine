@@ -7,6 +7,22 @@
 	"SceneNodes":
 	[
 		{
+			"NodeInstance_type":"FBSimpleSkyBox",
+			"NodeInstance":
+			{
+				"Base":
+				{
+					"Position":{ "x":0, "y":0, "z":0, "w":0 },
+					"Rotation":{ "x":0, "y":0, "z":0, "w":0 },
+					"Scaling":{ "x":1000, "y":1000, "z":1000, "w":0 },
+					"Material":{ "Ambient":{"x":1, "y":1, "z":1, "w":1}, "Diffuse":{"x":0.5, "y":0.8, "z":0, "w":1}, "Specular":{"x":0.5, "y":0.5, "z":0.5, "w":20} },
+					"RasterizerType":"FillSolid"
+				},
+				"CubeTexture3DResourceName":"cubemap_bright"
+			}
+		},
+
+		{
 			"NodeInstance_type":"FBFont",
 			"NodeInstance":
 			{
@@ -239,21 +255,5 @@
 		 		"Texture2DBlendResourceName3":"multi_blend"
 			}
 		},
-		
-		{
-			"NodeInstance_type":"FBSimpleSkyBox",
-			"NodeInstance":
-			{
-				"Base":
-				{
-					"Position":{ "x":0, "y":0, "z":0, "w":0 },
-					"Rotation":{ "x":0, "y":0, "z":0, "w":0 },
-					"Scaling":{ "x":1000, "y":1000, "z":1000, "w":0 },
-					"Material":{ "Ambient":{"x":1, "y":1, "z":1, "w":1}, "Diffuse":{"x":0.5, "y":0.8, "z":0, "w":1}, "Specular":{"x":0.5, "y":0.5, "z":0.5, "w":20} },
-					"RasterizerType":"FillSolid"
-				},
-				"CubeTexture3DResourceName":"cubemap_bright"
-			}
-		}
 	]
 }

@@ -10,6 +10,7 @@
 
 #include "Graphics/GPUResourceView.h"
 #include "Graphics/GPUResource.h"
+#include "Graphics/XCGraphics.h"
 
 SharedDescriptorHeap::SharedDescriptorHeap()
 #if defined(XCGRAPHICS_DX12)
@@ -19,9 +20,8 @@ SharedDescriptorHeap::SharedDescriptorHeap()
     m_cs.Create(true, "SharedDescLock");
 }
 
-void SharedDescriptorHeap::Init(ID3DDevice& device, u32 nbOfRTVDesc, u32 nbOfDSVDesc, u32 nbOfSamplerDesc, u32 nbOfCBVDesc)
+void SharedDescriptorHeap::Init(u32 nbOfRTVDesc, u32 nbOfDSVDesc, u32 nbOfSamplerDesc, u32 nbOfCBVDesc)
 {
-    m_device = &device;
 
 #if defined(XCGRAPHICS_DX12)
     //Create render targets. Acts like swapping render targets.
@@ -30,7 +30,10 @@ void SharedDescriptorHeap::Init(ID3DDevice& device, u32 nbOfRTVDesc, u32 nbOfDSV
     rtvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
     rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
     m_heapDesc[D3D12_DESCRIPTOR_HEAP_TYPE_RTV] = CreateHeapDesc(rtvHeapDesc);
-    m_rtvDescriptorSize = m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+
+    XCGraphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XCGraphics>("GraphicsSystem");
+    ID3DDevice* device = graphicsSystem.GetDevice();
+    m_rtvDescriptorSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
     //Create descriptor heap for Depth Shader View
     //Allocate on heap
@@ -60,7 +63,10 @@ void SharedDescriptorHeap::Init(ID3DDevice& device, u32 nbOfRTVDesc, u32 nbOfDSV
 SharedDescriptorHeap::HeapDesc* SharedDescriptorHeap::CreateHeapDesc(D3D12_DESCRIPTOR_HEAP_DESC heapDesc)
 {
     HeapDesc* desc = XCNEW(HeapDesc)(heapDesc.Type);
-    ValidateResult(m_device->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&desc->m_heapDesc)));
+
+    XCGraphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XCGraphics>("GraphicsSystem");
+    ID3DDevice* device = graphicsSystem.GetDevice();
+    ValidateResult(device->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&desc->m_heapDesc)));
 
     desc->m_cbvCPUOffsetHandle = CD3DX12_CPU_DESCRIPTOR_HANDLE(desc->m_heapDesc->GetCPUDescriptorHandleForHeapStart());
     desc->m_cbvGPUOffsetHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(desc->m_heapDesc->GetGPUDescriptorHandleForHeapStart());

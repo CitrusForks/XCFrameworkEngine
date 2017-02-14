@@ -89,6 +89,7 @@ void Car::Steer(f32 angle, f32 scalarForce)
 
     //Rotate the car with it's initial rotations.
     m_MRotation *= rotation;
+    m_physicsFeature->GetTyped<RigidBody>()->AddRotationalForce(QuaternionRotationMatrix(m_MRotation));
 
     m_physicsFeature->GetTyped<RigidBody>()->AddForce(m_look * scalarForce);
 }

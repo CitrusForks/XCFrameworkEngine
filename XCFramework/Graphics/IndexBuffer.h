@@ -75,13 +75,14 @@ public:
 template<class T>
 void IndexBuffer<T>::BuildIndexBuffer(ID3DDeviceContext* context)
 {
-    XCGraphics& graphicsSystem = (XCGraphics&)SystemLocator::GetInstance()->RequestSystem("GraphicsSystem");
+    XCGraphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XCGraphics>("GraphicsSystem");
+    ID3DDevice* device = graphicsSystem.GetDevice();
 
 #if defined(XCGRAPHICS_DX12)
     //Create IB
     i32 ibSize = sizeof(u32) * m_indexData.size();
 
-    ValidateResult(graphicsSystem.GetDevice()->CreateCommittedResource(
+    ValidateResult(device->CreateCommittedResource(
         &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
         D3D12_HEAP_FLAG_NONE,
         &CD3DX12_RESOURCE_DESC::Buffer(ibSize),
@@ -89,7 +90,7 @@ void IndexBuffer<T>::BuildIndexBuffer(ID3DDeviceContext* context)
         nullptr,
         IID_PPV_ARGS(&m_pIndexBufferResource)));
 
-    ValidateResult(graphicsSystem.GetDevice()->CreateCommittedResource(
+    ValidateResult(device->CreateCommittedResource(
         &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
         D3D12_HEAP_FLAG_NONE,
         &CD3DX12_RESOURCE_DESC::Buffer(ibSize),
@@ -124,7 +125,7 @@ void IndexBuffer<T>::BuildIndexBuffer(ID3DDeviceContext* context)
     D3D11_SUBRESOURCE_DATA iInitData;
     iInitData.pSysMem = &m_indexData[0];
 
-    ValidateResult(graphicsSystem.GetDevice()->CreateBuffer(&ibd, &iInitData, &m_pIB));
+    ValidateResult(device->CreateBuffer(&ibd, &iInitData, &m_pIB));
 
     m_resourceUpdated = true;
 #endif

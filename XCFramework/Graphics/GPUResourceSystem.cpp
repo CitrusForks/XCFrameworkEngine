@@ -9,12 +9,13 @@
 #include "GPUResourceSystem.h"
 #include "GPUResource.h"
 #include "GPUResourceView.h"
+#include "XCGraphics.h"
+
 #include "SharedDescriptorHeap.h"
 
 
-void GPUResourceSystem::Init(ID3DDevice& device)
+void GPUResourceSystem::Init()
 {
-    m_device = &device;
 }
 
 GPUResource* GPUResourceSystem::CreateConstantBufferResource(GPUResourceDesc& desc)
@@ -33,13 +34,16 @@ GPUResource* GPUResourceSystem::CreateConstantBufferResource(GPUResourceDesc& de
         {
             resource->SetResourceSize(desc.m_bufferSize);
 
+            XCGraphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XCGraphics>("GraphicsSystem");
+            ID3DDevice* device = graphicsSystem.GetDevice();
+
 #if defined(XCGRAPHICS_DX12)
             D3D12_HEAP_PROPERTIES heapDesc = {};
             heapDesc.Type = D3D12_HEAP_TYPE_UPLOAD;
             heapDesc.CreationNodeMask = 1;
             heapDesc.VisibleNodeMask = 1;
 
-            ValidateResult(m_device->CreateCommittedResource(&heapDesc,
+            ValidateResult(device->CreateCommittedResource(&heapDesc,
                 D3D12_HEAP_FLAG_NONE,
                 &CD3DX12_RESOURCE_DESC::Buffer(resource->GetResourceSize()),
                 D3D12_RESOURCE_STATE_GENERIC_READ,
@@ -85,15 +89,18 @@ void GPUResourceSystem::CreateConstantBufferView(GPUResource* res)
             cbDesc.BufferLocation = res->GetResource<ID3D12Resource*>()->GetGPUVirtualAddress();
             cbDesc.SizeInBytes = res->GetResourceSize();
 
+            XCGraphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XCGraphics>("GraphicsSystem");
+            ID3DDevice* device = graphicsSystem.GetDevice();
+
             SharedDescriptorHeap::HeapDesc& desc = heap.GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-            m_device->CreateConstantBufferView(&cbDesc, desc.m_cbvCPUOffsetHandle);
+            device->CreateConstantBufferView(&cbDesc, desc.m_cbvCPUOffsetHandle);
 
             resourceView->SetCPUResourceViewHandle(desc.m_cbvCPUOffsetHandle);
             resourceView->SetGPUResourceViewHandle(desc.m_cbvGPUOffsetHandle);
 
             //Inc the offsets
-            desc.m_cbvCPUOffsetHandle.Offset(m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
-            desc.m_cbvGPUOffsetHandle.Offset(m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
+            desc.m_cbvCPUOffsetHandle.Offset(device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
+            desc.m_cbvGPUOffsetHandle.Offset(device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
 
 #endif
         }
@@ -160,6 +167,9 @@ GPUResource* GPUResourceSystem::CreateTextureResource(D3D_TEXTURE2D_DESC& textur
 
     if (resource != nullptr && !resource->IsValid())
     {
+        XCGraphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XCGraphics>("GraphicsSystem");
+        ID3DDevice* device = graphicsSystem.GetDevice();
+
 #if defined(XCGRAPHICS_DX12)
         D3D12_HEAP_PROPERTIES heapProps = {};
         heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
@@ -187,7 +197,7 @@ GPUResource* GPUResourceSystem::CreateTextureResource(D3D_TEXTURE2D_DESC& textur
             state = D3D12_RESOURCE_STATE_DEPTH_WRITE;
         }
 
-        ValidateResult(m_device->CreateCommittedResource(
+        ValidateResult(device->CreateCommittedResource(
             &heapProps,
             D3D12_HEAP_FLAG_NONE,
             &textureDesc,
@@ -196,7 +206,7 @@ GPUResource* GPUResourceSystem::CreateTextureResource(D3D_TEXTURE2D_DESC& textur
             IID_PPV_ARGS(&resource->GetPointerToResource<ID3DResource*>())));
 
 #elif defined(XCGRAPHICS_DX11)
-        ValidateResult(m_device->CreateTexture2D(&textureDesc, subResourceData, &resource->GetPointerToResource<ID3D11Texture2D*>()));
+        ValidateResult(device->CreateTexture2D(&textureDesc, subResourceData, &resource->GetPointerToResource<ID3D11Texture2D*>()));
 #endif
     }
 
@@ -210,22 +220,26 @@ void GPUResourceSystem::CreateShaderResourceView(D3D_SHADER_RESOURCE_VIEW_DESC& 
 
     if (resourceView != nullptr && !resourceView->IsValid())
     {
+        XCGraphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XCGraphics>("GraphicsSystem");
+        ID3DDevice* device = graphicsSystem.GetDevice();
+
 #if defined(XCGRAPHICS_DX12)
         SharedDescriptorHeap::HeapDesc& desc = heap.GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-        m_device->CreateShaderResourceView(gpuResource->GetResource<ID3DResource*>(), &viewDesc, desc.m_cbvCPUOffsetHandle);
+        device->CreateShaderResourceView(gpuResource->GetResource<ID3DResource*>(), &viewDesc, desc.m_cbvCPUOffsetHandle);
 
         resourceView->SetCPUResourceViewHandle(desc.m_cbvCPUOffsetHandle);
         resourceView->SetGPUResourceViewHandle(desc.m_cbvGPUOffsetHandle);
 
         //Inc the offsets
-        desc.m_cbvCPUOffsetHandle.Offset(m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
-        desc.m_cbvGPUOffsetHandle.Offset(m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
+        desc.m_cbvCPUOffsetHandle.Offset(device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
+        desc.m_cbvGPUOffsetHandle.Offset(device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
 
 #elif defined(XCGRAPHICS_DX11)
         // Create srv
-        m_device->CreateShaderResourceView(gpuResource->GetResource<ID3DResource*>(), &viewDesc, &resourceView->GetPointerToResourceView<ID3D11ShaderResourceView*>());
+        device->CreateShaderResourceView(gpuResource->GetResource<ID3DResource*>(), &viewDesc, &resourceView->GetPointerToResourceView<ID3D11ShaderResourceView*>());
 #endif
+
     }
     else
     {
@@ -242,6 +256,9 @@ void GPUResourceSystem::CreateRenderTargetView(GPUResource* gpuResource)
 
     if (resourceView != nullptr && !resourceView->IsValid())
     {
+        XCGraphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XCGraphics>("GraphicsSystem");
+        ID3DDevice* device = graphicsSystem.GetDevice();
+
 #if defined(XCGRAPHICS_DX12)
 
         //Create Desc heap for shader specific.
@@ -258,14 +275,14 @@ void GPUResourceSystem::CreateRenderTargetView(GPUResource* gpuResource)
 
         SharedDescriptorHeap::HeapDesc& desc = heap.GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
-        m_device->CreateRenderTargetView(gpuResource->GetResource<ID3DResource*>(), &renderTargetViewDesc, desc.m_cbvCPUOffsetHandle);
+        device->CreateRenderTargetView(gpuResource->GetResource<ID3DResource*>(), &renderTargetViewDesc, desc.m_cbvCPUOffsetHandle);
 
         resourceView->SetCPUResourceViewHandle(desc.m_cbvCPUOffsetHandle);
         resourceView->SetGPUResourceViewHandle(desc.m_cbvGPUOffsetHandle);
 
         //Inc the offsets
-        desc.m_cbvCPUOffsetHandle.Offset(m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV));
-        desc.m_cbvGPUOffsetHandle.Offset(m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV));
+        desc.m_cbvCPUOffsetHandle.Offset(device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV));
+        desc.m_cbvGPUOffsetHandle.Offset(device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV));
 
 #elif defined(XCGRAPHICS_DX11)
         //Extract the desc of texture
@@ -278,7 +295,7 @@ void GPUResourceSystem::CreateRenderTargetView(GPUResource* gpuResource)
         renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;
         renderTargetViewDesc.Texture2D.MipSlice = 0;
 
-        ValidateResult(m_device->CreateRenderTargetView(gpuResource->GetResource<ID3DResource*>(), &renderTargetViewDesc, &resourceView->GetPointerToResourceView<ID3D11RenderTargetView*>()));
+        ValidateResult(device->CreateRenderTargetView(gpuResource->GetResource<ID3DResource*>(), &renderTargetViewDesc, &resourceView->GetPointerToResourceView<ID3D11RenderTargetView*>()));
 #endif
     }
 
@@ -292,20 +309,23 @@ void GPUResourceSystem::CreateDepthStencilView(GPUResource* gpuResource)
 
     if (resourceView != nullptr && !resourceView->IsValid())
     {
+        XCGraphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XCGraphics>("GraphicsSystem");
+        ID3DDevice* device = graphicsSystem.GetDevice();
+
 #if defined(XCGRAPHICS_DX12)
 
         //Create Desc heap for shader specific.
         //Create descriptor heap for constant buffers
         SharedDescriptorHeap::HeapDesc& desc = heap.GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
-        m_device->CreateDepthStencilView(gpuResource->GetResource<ID3DResource*>(), nullptr, desc.m_cbvCPUOffsetHandle);
+        device->CreateDepthStencilView(gpuResource->GetResource<ID3DResource*>(), nullptr, desc.m_cbvCPUOffsetHandle);
 
         resourceView->SetCPUResourceViewHandle(desc.m_cbvCPUOffsetHandle);
         resourceView->SetGPUResourceViewHandle(desc.m_cbvGPUOffsetHandle);
 
         //Inc the offsets
-        desc.m_cbvCPUOffsetHandle.Offset(m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV));
-        desc.m_cbvGPUOffsetHandle.Offset(m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV));
+        desc.m_cbvCPUOffsetHandle.Offset(device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV));
+        desc.m_cbvGPUOffsetHandle.Offset(device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV));
 
 #elif defined(XCGRAPHICS_DX11)
         // Set up the depth stencil view description.
@@ -317,7 +337,7 @@ void GPUResourceSystem::CreateDepthStencilView(GPUResource* gpuResource)
         depthStencilViewDesc.Texture2D.MipSlice = 0;
 
         // Create the depth stencil view.
-        ValidateResult(m_device->CreateDepthStencilView(gpuResource->GetResource<ID3DResource*>(), &depthStencilViewDesc, &resourceView->GetPointerToResourceView<ID3D11DepthStencilView*>()));
+        ValidateResult(device->CreateDepthStencilView(gpuResource->GetResource<ID3DResource*>(), &depthStencilViewDesc, &resourceView->GetPointerToResourceView<ID3D11DepthStencilView*>()));
 #endif
     }
 

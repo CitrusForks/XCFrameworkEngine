@@ -18,8 +18,7 @@
 
 //#define LOG_SHADER_SLOTS 1
 
-XCShaderHandle::XCShaderHandle(ID3DDevice& device) 
-    : IShader(device)
+XCShaderHandle::XCShaderHandle() 
 {
 #if defined(XCGRAPHICS_DX12)
     m_pso = XCNEW(PSODx12);
@@ -88,8 +87,10 @@ void XCShaderHandle::LoadShader()
 
 #if defined(XCGRAPHICS_DX11)
     //Create the shaders
-    ValidateResult(m_device.CreateVertexShader(m_pVS, m_vsSize, nullptr, &m_compiledVS));
-    ValidateResult(m_device.CreatePixelShader(m_pPS, m_psSize, nullptr, &m_compiledPS));
+    XCGraphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XCGraphics>("GraphicsSystem");
+    ID3DDevice* device = graphicsSystem.GetDevice();
+    ValidateResult(device->CreateVertexShader(m_pVS, m_vsSize, nullptr, &m_compiledVS));
+    ValidateResult(device->CreatePixelShader(m_pPS, m_psSize, nullptr, &m_compiledPS));
 
     XCASSERT(m_compiledVS || m_compiledPS);
 #endif
@@ -291,8 +292,10 @@ void XCShaderHandle::GenerateRootSignature()
 
     ValidateResult(D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signature, &errors));
     
-    m_pso->CreateRootSignature(m_device, signature->GetBufferPointer(), signature->GetBufferSize(), RasterType_FillSolid);
-    m_pso->CreateRootSignature(m_device, signature->GetBufferPointer(), signature->GetBufferSize(), RasterType_FillWireframe);
+    XCGraphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XCGraphics>("GraphicsSystem");
+    ID3DDevice* device = graphicsSystem.GetDevice();
+    m_pso->CreateRootSignature(*device, signature->GetBufferPointer(), signature->GetBufferSize(), RasterType_FillSolid);
+    m_pso->CreateRootSignature(*device, signature->GetBufferPointer(), signature->GetBufferSize(), RasterType_FillWireframe);
 
     ReleaseCOM(signature);
     ReleaseCOM(errors);
@@ -333,8 +336,10 @@ void XCShaderHandle::GeneratePSO()
     m_pso->m_psos[RasterType_FillSolid].m_psoDesc.DepthStencilState.DepthEnable     = m_enableDepth;
     m_pso->m_psos[RasterType_FillWireframe].m_psoDesc.DepthStencilState.DepthEnable = m_enableDepth;
 
-    m_pso->CreateGraphicPSO(m_device, RasterType_FillSolid);
-    m_pso->CreateGraphicPSO(m_device, RasterType_FillWireframe);
+    XCGraphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XCGraphics>("GraphicsSystem");
+    ID3DDevice* device = graphicsSystem.GetDevice();
+    m_pso->CreateGraphicPSO(*device, RasterType_FillSolid);
+    m_pso->CreateGraphicPSO(*device, RasterType_FillWireframe);
 
 #elif defined(XCGRAPHICS_DX11)
     ValidateResult(m_device.CreateInputLayout(m_inputLayoutDesc.pInputElementDescs, m_inputLayoutDesc.NumElements, m_pVS, m_vsSize, &m_inputLayout));

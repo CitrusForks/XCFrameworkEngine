@@ -11,16 +11,16 @@
 
 XCGraphics::XCGraphics(void)
     : m_pD3DDevice(nullptr)
-    , m_XCShaderSystem(nullptr)
+    , m_xcShaderSystem(nullptr)
     , m_renderingPool(nullptr)
     , m_sharedDescriptorHeap(nullptr)
     , m_gpuResourceSystem(nullptr)
     , m_secondaryDrawCall(false)
     , m_frameIndex(0)
     , m_4xMsaaQuality(false)
-    , m_Enable4xMsaa(false)
-    , m_ClientWidth(1024)
-    , m_ClientHeight(768)
+    , m_enable4xMsaa(false)
+    , m_clientWidth(WindowWidth)
+    , m_clientHeight(WindowHeight)
     , m_initDone(false)
 {
     ZeroMemory(&m_ScreenViewPort, sizeof(D3D_VIEWPORT));
@@ -32,10 +32,10 @@ XCGraphics::~XCGraphics(void)
 
 void XCGraphics::Destroy()
 {
-    if (m_XCShaderSystem)
+    if (m_xcShaderSystem)
     {
-        m_XCShaderSystem->Destroy();
-        XCDELETE(m_XCShaderSystem);
+        m_xcShaderSystem->Destroy();
+        XCDELETE(m_xcShaderSystem);
     }
 
     if (m_renderingPool)
@@ -64,11 +64,16 @@ void XCGraphics::Destroy()
 void XCGraphics::Init(HWND _mainWnd, i32 _width, i32 _height, bool _enable4xMsaa)
 {
     m_hMainWnd = _mainWnd;
-    m_ClientWidth = _width;
-    m_ClientHeight = _height;
-    m_Enable4xMsaa = _enable4xMsaa;
+    m_clientWidth = _width;
+    m_clientHeight = _height;
+    m_enable4xMsaa = _enable4xMsaa;
 
     ISystem::Init();
+}
+
+ID3DDevice * XCGraphics::GetDevice()
+{
+    return m_pD3DDevice;
 }
 
 void XCGraphics::SetupPipeline()
@@ -78,8 +83,8 @@ void XCGraphics::SetupPipeline()
 void XCGraphics::SetupShadersAndRenderPool()
 {
     //Initialize Shader System
-    m_XCShaderSystem = XCNEW(XCShaderContainer)(*m_pD3DDevice);
-    m_XCShaderSystem->Init();
+    m_xcShaderSystem = XCNEW(XCShaderContainer)(*m_pD3DDevice);
+    m_xcShaderSystem->Init();
 
     //Initialize the rendering pool
     m_renderingPool = XCNEW(RenderingPool)();
@@ -116,8 +121,8 @@ void XCGraphics::SetupViewPort()
     //Set the Viewport
     m_ScreenViewPort[RenderTargetType_Main_0].TopLeftX  = 0.0f;
     m_ScreenViewPort[RenderTargetType_Main_0].TopLeftY  = 0.0f;
-    m_ScreenViewPort[RenderTargetType_Main_0].Width     = (f32)m_ClientWidth;
-    m_ScreenViewPort[RenderTargetType_Main_0].Height    = (f32)m_ClientHeight;
+    m_ScreenViewPort[RenderTargetType_Main_0].Width     = f32(m_clientWidth);
+    m_ScreenViewPort[RenderTargetType_Main_0].Height    = f32(m_clientHeight);
     m_ScreenViewPort[RenderTargetType_Main_0].MinDepth  = 0.0f;
     m_ScreenViewPort[RenderTargetType_Main_0].MaxDepth  = 1.0f;
 
@@ -133,12 +138,12 @@ void XCGraphics::SetupViewPort()
 
     //Set the Viewport Live Drive
     m_ScreenViewPort[RenderTargetType_LiveDrive]        = m_ScreenViewPort[RenderTargetType_Main_0];
-    m_ScreenViewPort[RenderTargetType_LiveDrive].Width  = (f32)256;
-    m_ScreenViewPort[RenderTargetType_LiveDrive].Height = (f32)256;
+    m_ScreenViewPort[RenderTargetType_LiveDrive].Width  = f32(256);
+    m_ScreenViewPort[RenderTargetType_LiveDrive].Height = f32(256);
 
     //And its scissor
-    m_scissorRect.right = static_cast<LONG>(m_ClientWidth);
-    m_scissorRect.bottom = static_cast<LONG>(m_ClientHeight);
+    m_scissorRect.right = static_cast<LONG>(m_clientWidth);
+    m_scissorRect.bottom = static_cast<LONG>(m_clientHeight);
 #endif
 }
 

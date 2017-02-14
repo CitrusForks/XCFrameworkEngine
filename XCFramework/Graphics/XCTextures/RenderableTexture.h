@@ -24,7 +24,7 @@ public:
         u32     m_texSize;
     };
 
-    RenderableTexture(RenderTargetsType type, DXGI_FORMAT format, ID3DDevice& device, ID3DDeviceContext& context);
+    RenderableTexture(RenderTargetsType type, DXGI_FORMAT format, ID3DDeviceContext& context);
     virtual ~RenderableTexture();
 
     bool                             PreLoad(i32 msaaQuality, i32 texWidth, i32 texHeight);
@@ -54,7 +54,6 @@ private:
                                      
     RenderedTextureInfo*             m_renderableTexture;
                                      
-    ID3DDevice&                      m_device;
     ID3DDeviceContext&               m_deviceContext;
     RenderTargetsType                m_renderTargetType;
     DXGI_FORMAT                      m_format;

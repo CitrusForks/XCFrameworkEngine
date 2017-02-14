@@ -48,7 +48,7 @@ public:
     SharedDescriptorHeap();
     ~SharedDescriptorHeap()    {}
 
-    void                            Init(ID3DDevice& device, u32 nbOfRTVDesc, u32 nbOfDSVDesc, u32 nbOfSamplerDesc, u32 nbOfCBVDesc);
+    void                            Init(u32 nbOfRTVDesc, u32 nbOfDSVDesc, u32 nbOfSamplerDesc, u32 nbOfCBVDesc);
 
 #if defined(XCGRAPHICS_DX12)
     HeapDesc&                       GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE type) { return *m_heapDesc[type]; }
@@ -74,7 +74,6 @@ private:
     u32                             m_rtvDescriptorSize;
 #endif
 
-    ID3DDevice*                     m_device;
     std::vector<GPUResource*>       m_gpuResources;
     std::vector<GPUResourceView*>   m_gpuResourcesView;
     CriticalSection                 m_cs;

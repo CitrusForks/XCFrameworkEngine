@@ -67,10 +67,12 @@ IActor::ActorReturnState PCCar::Update(f32 dt)
         }
     }
 
-    m_currentPosition = m_physicsFeature->GetTransformedPosition();
+    if(m_physicsFeature->IsDirty())
+    {
+        m_currentPosition = m_physicsFeature->GetTransformedPosition();
 
-    m_MTranslation = MatrixTranslate(m_currentPosition);
-
+        m_MTranslation = MatrixTranslate(m_currentPosition);
+    }
 
     return Car::Update(dt);
 }

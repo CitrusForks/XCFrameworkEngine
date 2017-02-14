@@ -69,5 +69,5 @@ private:
 
 uintptr_t MemorySystemWin32::AlignPointer(u32 alignSize, uintptr_t** ptr)
 {
-    return (uintptr_t)(ptr) + (alignSize - 1) & ~(alignSize - 1);
+    return uintptr_t(ptr) + (alignSize - 1) & ~(alignSize - 1);
 }

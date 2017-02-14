@@ -14,6 +14,7 @@
 #include "Engine/Resource/IResource.h"
 #include "Base/Thread/Thread.h"
 #include "Base/Thread/XCSyncEvent.h"
+#include "Base/Thread/CriticalSection.h"
 
 class XCGraphics;
 
@@ -68,6 +69,7 @@ public:
     RenderWorker*       GetRenderWorkers() { return m_renderWorkers; }
 
 private:
+    CriticalSection     m_addRemoveLock;
     RenderWorker        m_renderWorkers[NbRenderWorkerThreads];
     RenderContext       m_FrameCommandList[NbFrameCommandList];
 

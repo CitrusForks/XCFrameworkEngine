@@ -75,7 +75,7 @@ void XCShaderContainer::LoadShaders()
 
     for (auto it = FBShadersRoot->FBShaders()->begin(); it != FBShadersRoot->FBShaders()->end(); ++it)
     {
-        binShader = XCNEW(XCShaderHandle)(m_device);
+        binShader = XCNEW(XCShaderHandle)();
         binShader->Load((void*) *it);
         m_Shaders[it->ShaderUsage()] = binShader;
     }

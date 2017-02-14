@@ -28,6 +28,12 @@ void RigidBody::AddForce(const XCVec4& _newForce)
     m_ForceAccumulator += _newForce;
 }
 
+void RigidBody::AddRotationalForce(const XCVec4& newForce)
+{
+    m_isDirty = true;
+    m_orientation = newForce;
+}
+
 void RigidBody::Update(f32 dt)
 {
     PhysicsPlayground& playground = SystemLocator::GetInstance()->RequestSystem<PhysicsPlayground>("PhysicsPlayground");

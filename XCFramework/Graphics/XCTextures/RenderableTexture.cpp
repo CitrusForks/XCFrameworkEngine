@@ -17,11 +17,10 @@
 #include "Libs/DirectXTex/DirectXTex.h"
 #endif
 
-RenderableTexture::RenderableTexture(RenderTargetsType type, DXGI_FORMAT format, ID3DDevice& device, ID3DDeviceContext& context)
+RenderableTexture::RenderableTexture(RenderTargetsType type, DXGI_FORMAT format, ID3DDeviceContext& context)
     : m_pRenderTargetResource(nullptr)
     , m_pRenderTargetTextureStaged(nullptr)
     , m_pSingleSampledTex(nullptr)
-    , m_device(device)
     , m_deviceContext(context)
     , m_renderTargetType(type)
     , m_format(format)

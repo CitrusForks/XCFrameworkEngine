@@ -77,7 +77,7 @@ class XCShaderHandle : public IShader
 {
 public:
 
-    XCShaderHandle(ID3DDevice& device);
+    XCShaderHandle();
     ~XCShaderHandle();
 
     void            Load(const void* fbBuffer);

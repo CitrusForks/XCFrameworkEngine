@@ -19,14 +19,14 @@
 #endif
 
 Texture2D::Texture2D()
+    : m_diffuseMapTextureSRV(nullptr)
 {
     m_resourceType = RESOURCETYPE_TEXTURE2D;
-    m_diffuseMapTextureSRV = nullptr;
 }
 
 Texture2D::Texture2D(GPUResource* srv)
+    : m_diffuseMapTextureSRV(srv)
 {
-    m_diffuseMapTextureSRV = srv;
     m_resourceType = RESOURCETYPE_TEXTURE2D;
 }
 
@@ -36,6 +36,8 @@ Texture2D::~Texture2D()
 
 void Texture2D::LoadTexture()
 {
+    Logger("[TEXTURE 2D] Loading %s %s", m_resourcePath.c_str(), m_userFriendlyName.c_str());
+
     XCGraphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XCGraphics>("GraphicsSystem");
 
     size_t cSize = strlen(m_resourcePath.c_str()) + 1;
@@ -46,6 +48,8 @@ void Texture2D::LoadTexture()
     ValidateResult(LoadFromDDSFile(str, 0, &m_texMetaData, m_scratchImage));
 
 #if defined(XCGRAPHICS_DX12)
+    XCASSERT(m_diffuseMapTextureSRV == nullptr && m_diffuseMapTextureSRVUpload == nullptr);
+
     SharedDescriptorHeap& descHeap = (SharedDescriptorHeap&) SystemLocator::GetInstance()->RequestSystem("SharedDescriptorHeap");
     m_diffuseMapTextureSRVUpload = descHeap.AllocateGPUResource(GPUResourceType_SRV, 0);
 
@@ -74,11 +78,14 @@ void Texture2D::LoadTexture()
 
     GPUResourceSystem& gpuSys = (GPUResourceSystem&)SystemLocator::GetInstance()->RequestSystem("GPUResourceSystem");
     m_diffuseMapTextureSRV = gpuSys.CreateTextureResource(texDesc, nullptr);
+
     gpuSys.CreateShaderResourceView(desc, m_diffuseMapTextureSRV);
 
     const u32 subResCount = texDesc.DepthOrArraySize * texDesc.MipLevels;
     UINT64 intermediateUploadBufferSize = GetRequiredIntermediateSize(m_diffuseMapTextureSRV->GetResource<ID3D12Resource*>(), 0, subResCount);
-    ValidateResult(graphicsSystem.GetDevice()->CreateCommittedResource(
+
+    ID3DDevice* device = graphicsSystem.GetDevice();
+    ValidateResult(device->CreateCommittedResource(
         &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
         D3D12_HEAP_FLAG_NONE,
         &CD3DX12_RESOURCE_DESC::Buffer(intermediateUploadBufferSize),
@@ -131,12 +138,14 @@ void Texture2D::LoadTexture()
     m_resourceUpdated = true;
 #endif
 
-    Logger("[TEXTURE 2D] Texture %s Loaded", wc.c_str());
+    Logger("[TEXTURE 2D] Texture %s %s Loaded", m_resourcePath.c_str(), m_userFriendlyName.c_str());
 }
 
 void Texture2D::RenderContextCallback(ID3DDeviceContext& context)
 {
 #if defined(XCGRAPHICS_DX12)
+    XCASSERT(m_resourceUpdated == false);
+
     D3D12_SUBRESOURCE_DATA textureData[6];  //Max 6 subResources counts required by cube maps.
 
     for (u32 imageIndex = 0; imageIndex < m_scratchImage.GetImageCount(); ++imageIndex)
@@ -149,9 +158,11 @@ void Texture2D::RenderContextCallback(ID3DDeviceContext& context)
     }
 
     const u32 subResCount = m_scratchImage.GetMetadata().arraySize;
-    UpdateSubresources(&context, m_diffuseMapTextureSRV->GetResource<ID3DResource*>(), m_diffuseMapTextureSRVUpload->GetResource<ID3DResource*>(), 0, 0, subResCount, &textureData[0]);
+    u64 retVal = UpdateSubresources(&context, m_diffuseMapTextureSRV->GetResource<ID3DResource*>(), m_diffuseMapTextureSRVUpload->GetResource<ID3DResource*>(), 0, 0, subResCount, &textureData[0]);
+    XCASSERT(retVal > 0);
 
     context.ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(m_diffuseMapTextureSRV->GetResource<ID3DResource*>(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE));
+
 #endif
 
     IResource::RenderContextCallback(context);
