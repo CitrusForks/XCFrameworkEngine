@@ -27,6 +27,7 @@ print("Building C++ Win32 Project XCBase")
 		pchsource "BasePrecompiledHeader.cpp"
 		
 		symbols "On"
+		buildoptions { "/Zo" }
 		
 		targetdir "$(ProjectDir)bin/$(Configuration)/"
 		
@@ -50,6 +51,7 @@ print("Building C++ Win32 Project XCBase")
 		symbols "On"
       	
 		optimize "On"
+		buildoptions { "/Zo" }
 				
 		targetdir "$(ProjectDir)bin/$(Configuration)/"
 		

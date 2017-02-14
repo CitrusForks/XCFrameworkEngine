@@ -28,6 +28,7 @@ print("Building C++ Win32 Project XCEngine")
 		pchsource "EnginePrecompiledHeader.cpp"
 		
 		symbols "On"
+		buildoptions { "/Zo" }
 		
 		targetdir "$(ProjectDir)bin/$(Configuration)/"
 		
@@ -52,6 +53,7 @@ print("Building C++ Win32 Project XCEngine")
 		symbols "On"
       	
 		optimize "On"
+		buildoptions { "/Zo" }
 		
 		targetdir "$(ProjectDir)bin/$(Configuration)/"
 				

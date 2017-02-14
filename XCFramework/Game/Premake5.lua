@@ -15,7 +15,7 @@ print("Building C++ Win32 Project XCGame")
 		sysincludedirs {"$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir);$(ProjectDir)Game;" }
 		
 		includedirs { "$(ProjectDir)", "$(ProjectDir)bin/$(Configuration)/", "$(ProjectDir)Libs", 
-		"$(ProjectDir)Libs/flatbuffers", "$(ProjectDir)Libs/assimp/include/", "$(ProjectDir)Libs/AdutodeskFBX/include/" }
+		"$(ProjectDir)Libs/flatbuffers", "$(ProjectDir)Libs/assimp/include/", "$(ProjectDir)Libs/AutodeskFBX/include/" }
 		libdirs { "$(ProjectDir)Libs", "$(ProjectDir)Libs/DirectXTex/$(Configuration)/", 
 		"$(ProjectDir)Libs/flatbuffers/$(Configuration)/", "$(ProjectDir)Libs/Assimp/$(Configuration)/", "$(ProjectDir)Libs/AutodeskFBX/x86/$(Configuration)/" }
 
@@ -32,8 +32,11 @@ print("Building C++ Win32 Project XCGame")
 		pchsource "GamePrecompiledHeader.cpp"
 		
 		symbols "On"
+		buildoptions { "/Zo" }
 		
 		targetdir "$(ProjectDir)bin/$(Configuration)/"
+
+		postbuildcommands { "PostBuildProject.bat $(Configuration)"}
 		
 	--Configuration Release
 	print("Building Release")
@@ -41,7 +44,7 @@ print("Building C++ Win32 Project XCGame")
 		sysincludedirs {"$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir);$(ProjectDir)Game;" }
 		
 	    includedirs { "$(ProjectDir)", "$(ProjectDir)bin/$(Configuration)/", "$(ProjectDir)Libs", "$(ProjectDir)Libs/flatbuffers", 
-		"$(ProjectDir)Libs/assimp/include/", "$(ProjectDir)Libs/AdutodeskFBX/include/" }
+		"$(ProjectDir)Libs/assimp/include/", "$(ProjectDir)Libs/AutodeskFBX/include/" }
 	    libdirs { "$(ProjectDir)Libs", "$(ProjectDir)Libs/DirectXTex/$(Configuration)/", "$(ProjectDir)Libs/flatbuffers/$(Configuration)/", 
 		"$(ProjectDir)Libs/Assimp/$(Configuration)/", "$(ProjectDir)Libs/AutodeskFBX/x86/$(Configuration)/" }
 	  
@@ -61,7 +64,10 @@ print("Building C++ Win32 Project XCGame")
 		symbols "On"
 		
 		optimize "On"
+		buildoptions { "/Zo" }
 				
 		targetdir "$(ProjectDir)bin/$(Configuration)/"
 				
+		postbuildcommands { "PostBuildProject.bat $(Configuration)"}
+
 print("Project Generation done...")

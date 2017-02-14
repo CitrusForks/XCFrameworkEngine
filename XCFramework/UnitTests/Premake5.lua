@@ -32,6 +32,7 @@ print("Building C++ Win32 Project XCUnitTest")
 		pchsource "UnitTestPrecompiledHeader.cpp"
 		
 		symbols "On"
+		buildoptions { "/Zo" }
 		
 		targetdir "$(ProjectDir)bin/$(Configuration)/"
 		
@@ -60,6 +61,7 @@ print("Building C++ Win32 Project XCUnitTest")
 		symbols "On"
       	
 		optimize "On"
+		buildoptions { "/Zo" }
 		
 		targetdir "$(ProjectDir)bin/$(Configuration)/"
 				
