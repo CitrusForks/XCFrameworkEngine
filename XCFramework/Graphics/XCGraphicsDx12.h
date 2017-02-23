@@ -38,7 +38,7 @@ public:
     void                        Destroy();
 
     ID3DDevice*                 GetDevice()                     { return m_pD3DDevice; }
-    ID3DDeviceContext*          GetDeviceContext()              { return m_graphicsCommandList; }
+    ID3DDeviceContext*          GetDeviceContext()              { return m_pD3DDeviceContext; }
 
     void                        OnResize(i32 _width, i32 _height);
 
@@ -71,7 +71,6 @@ private:
 
     ID3DCommandAllocator*       m_pCommandAllocator;
     ID3D12CommandQueue*         m_pCommandQueue;
-    ID3D12GraphicsCommandList*  m_graphicsCommandList;
 
     //Fencing
     HANDLE                      m_fenceEvent;

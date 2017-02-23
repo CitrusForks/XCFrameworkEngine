@@ -58,6 +58,8 @@ PhysicsPlayground::~PhysicsPlayground()
 
 void PhysicsPlayground::Init(PhysicsPlaygroundDesc& playgroundDesc, TaskManager& taskMgr)
 {
+    m_addRemoveLock.Create();
+
     m_taskManager = &taskMgr;
 
     m_GAcceleration = playgroundDesc.m_gravity;
@@ -106,6 +108,8 @@ void PhysicsPlayground::Destroy()
         XCDELETE(m_collisionResolverTask);
     }
 
+    m_addRemoveLock.Release();
+
     XCDELETE(m_boundVolumeGenerator);
     XCDELETE(m_particleContact);
 }
@@ -141,12 +145,17 @@ IPhysicsFeature* PhysicsPlayground::CreatePhysicsFeature(const PhysicsDesc& phyd
     //Initialize the feature
     feature->Init(phydesc);
 
+    m_addRemoveLock.Enter();
     m_physicsFeatures.push_back(feature);
+    m_addRemoveLock.Exit();
+
     return feature;
 }
 
 void PhysicsPlayground::DestroyPhysicsFeature(IPhysicsFeature* phyActor)
 {
+    m_addRemoveLock.Enter();
+
     auto& feature = std::find_if(m_physicsFeatures.begin(), m_physicsFeatures.end(), 
         [phyActor](const IPhysicsFeature* obj) -> bool
     {
@@ -162,12 +171,16 @@ void PhysicsPlayground::DestroyPhysicsFeature(IPhysicsFeature* phyActor)
     {
         XCASSERT(false);
     }
+
+    m_addRemoveLock.Exit();
 }
 
 void PhysicsPlayground::TestCollision()
 {
     if (m_physicsFeatures.size() > 0)
     {
+        m_addRemoveLock.Enter();
+
         std::vector<IPhysicsFeature*>::iterator obj1;
         for (obj1 = m_physicsFeatures.begin(); obj1 != m_physicsFeatures.end() - 1; ++obj1)
         {
@@ -180,12 +193,17 @@ void PhysicsPlayground::TestCollision()
                 }
             }
         }
+
+        m_addRemoveLock.Exit();
+        
+        Thread::ThreadSleep(1);
     }
 }
 
 bool PhysicsPlayground::CheckCollision(IPhysicsFeature* obj1, IPhysicsFeature* obj2)
 {
-    switch (obj1->GetBoundType() | obj2->GetBoundType())
+    u32 mask = obj1->GetBoundType() | obj2->GetBoundType();
+    switch (mask)
     {
     case PhysicsBoundType_Box | PhysicsBoundType_Box:
         {
@@ -284,3 +302,13 @@ bool PhysicsPlayground::CheckCollision(IPhysicsFeature* obj1, IPhysicsFeature* o
 
     return false;
 }
+
+#if defined(DEBUG_PHYSICS_OBB)
+void PhysicsPlayground::GetOBBInfo(std::vector<OBBInfo>& outInfo)
+{
+    for(auto& physicsFeature : m_physicsFeatures)
+    {
+        physicsFeature->GetBoundVolume()->GetOBBInfo(outInfo);
+    }
+}
+#endif

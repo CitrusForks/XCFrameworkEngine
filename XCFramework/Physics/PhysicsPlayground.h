@@ -10,6 +10,7 @@
 
 #include "Engine/TaskManager/Task/AsyncTask.h"
 #include "Engine/TaskManager/TaskManager.h"
+#include "Base/Thread/CriticalSection.h"
 
 class PhysicsPlayground;
 class ParticleContact;
@@ -70,10 +71,22 @@ public:
     void                              SetCollisionDetection(bool enable) { m_enableCollisionDetection = enable; }
     void                              TestCollision();
 
+#if defined(DEBUG_PHYSICS_OBB)
+    struct OBBInfo
+    {
+        XCVec4      m_extends;
+        XCVec4      m_center;
+        XCVec4      m_orientation;
+    };
+
+    void                              GetOBBInfo(std::vector<OBBInfo>& outInfo);
+#endif
+
 protected:
     bool                              CheckCollision(IPhysicsFeature* obj1, IPhysicsFeature* obj2);
 
 private:
+    CriticalSection                   m_addRemoveLock;
     std::vector<IPhysicsFeature*>     m_physicsFeatures;
     PhysicsCollisionResolverTask*     m_collisionResolverTask;
     TaskManager*                      m_taskManager;

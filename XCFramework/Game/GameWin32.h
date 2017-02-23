@@ -23,6 +23,8 @@ class GameFiniteStateMachine;
 class PhysicsPlayground;
 class NetworkManager;
 class INetPeer;
+class DebugInterface;
+class BaseIDGenerator;
 
 class GameWin32 : public AppFrameworkWin32
 {
@@ -57,4 +59,6 @@ private:
     PhysicsPlayground*           m_physicsPlayground;
     NetworkManager*              m_networkManagingSystem;
     INetPeer*                    m_liveDriveClient;
+    DebugInterface*              m_debugInterface;
+    BaseIDGenerator*             m_baseIDGenerator;
 };

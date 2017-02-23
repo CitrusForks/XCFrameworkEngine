@@ -6,6 +6,8 @@
 
 #include "GameplayPrecompiledHeader.h"
 
+#include "Base/Serializer/BaseIDGenerator.h"
+
 #include "GameStatesFactory.h"
 
 #include "Gameplay/GameStates/EditorStates/EditorLoadingState.h"
@@ -21,13 +23,11 @@
 #include "Gameplay/GameStates/LoadingWorldState.h"
 
 GameStatesFactory::GameStatesFactory()
-    : m_statesCount(0)
 {
 }
 
 GameStatesFactory::~GameStatesFactory()
 {
-    m_statesCount = 0;
 }
 
 void GameStatesFactory::InitFactory()
@@ -54,10 +54,13 @@ void GameStatesFactory::RegisterStates()
 
 IGameState* GameStatesFactory::CreateState(std::string stateName)
 {
-    IGameState* state = (IGameState*) CreateObject(stateName);
-    state->SetBaseObjectId(++m_statesCount);
+    BaseIDGenerator& baseIdGen = SystemLocator::GetInstance()->RequestSystem<BaseIDGenerator>("BaseIDGenerator");
+    u32 baseId = baseIdGen.GetNextBaseObjectId();
 
-    Logger("[GAME STATES FACTORY] State : %s  ID : %d created", stateName.c_str(), m_statesCount);
+    IGameState* state = (IGameState*) CreateObject(stateName);
+    state->SetBaseObjectId(baseId);
+
+    Logger("[GAME STATES FACTORY] State : %s  ID : %d created", stateName.c_str(), baseId);
 
     return state;
 }

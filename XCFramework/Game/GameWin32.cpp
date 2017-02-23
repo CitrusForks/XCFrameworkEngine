@@ -13,6 +13,7 @@
 #include "Base/Memory/MemoryOverrides.h"
 #include "Base/Memory/MemorySystem.h"
 #include "Base/Memory/MemorySystemWin32.h"
+#include "Base/Serializer/BaseIDGenerator.h"
 
 #include "Engine/Event/EventBroadcaster.h"
 #include "Engine/TaskManager/TaskManager.h"
@@ -20,6 +21,7 @@
 #include "Engine/FlatBuffersInterface/FlatBuffersSystem.h"
 #include "Engine/Resource/ResourceManager.h"
 #include "Engine/Input/XCInputWin32.h"
+#include "Engine/DebugInterface/DebugInterface.h"
 
 #include "Graphics/XCGraphics.h"
 #if defined(XCGRAPHICS_DX12)
@@ -40,7 +42,6 @@
 
 #include "Physics/PhysicsPlayground.h"
 
-
 GameWin32::GameWin32(HINSTANCE hInstance, std::string winCaption, bool enable4xMsaa)
     : AppFrameworkWin32(hInstance, winCaption, enable4xMsaa)
     , m_systemContainer(nullptr)
@@ -56,6 +57,8 @@ GameWin32::GameWin32(HINSTANCE hInstance, std::string winCaption, bool enable4xM
     , m_gameFSM(nullptr)
     , m_networkManagingSystem(nullptr)
     , m_liveDriveClient(nullptr)
+    , m_debugInterface(nullptr)
+    , m_baseIDGenerator(nullptr)
 {
     srand(time_t(0));
     Logger("[GAME MAIN]");
@@ -75,6 +78,10 @@ i32 GameWin32::Init()
     //Initialize memory System
     m_memorySystem = (MemorySystem*)&m_systemContainer->CreateNewSystem("MemorySystem");
     m_memorySystem->Init(MemoryHeapSize);
+
+    //Initialize Base Object Id generator
+    m_baseIDGenerator = (BaseIDGenerator*) &m_systemContainer->CreateNewSystem("BaseIDGenerator");
+    m_baseIDGenerator->Init();
 
     //Event Broadcaster
     m_eventBroadcaster = (EventBroadcaster*)&m_systemContainer->CreateNewSystem("EventBroadcaster");
@@ -116,11 +123,15 @@ i32 GameWin32::Init()
 
     //PhysicsPlayground
     m_physicsPlayground = (PhysicsPlayground*) &m_systemContainer->CreateNewSystem("PhysicsPlayground");
-    m_physicsPlayground->Init(PhysicsPlayground::PhysicsPlaygroundDesc(true, false, XCVec4(0.0f, -9.4f, 0.0f, 0.0f)), *m_taskManagingSystem);
+    m_physicsPlayground->Init(PhysicsPlayground::PhysicsPlaygroundDesc(true, true, XCVec4(0.0f, -9.4f, 0.0f, 0.0f)), *m_taskManagingSystem);
 
     //Network Manger
     m_networkManagingSystem = (NetworkManager*)&m_systemContainer->CreateNewSystem("NetworkManager");
     m_networkManagingSystem->Init();
+
+    //Debug Interface
+    m_debugInterface = (DebugInterface*) &m_systemContainer->CreateNewSystem("DebugInterface");
+    m_debugInterface->Init();
 
 #if defined(LIVE_DRIVE_ENABLED)
     //Initalize the network clients
@@ -143,6 +154,7 @@ void GameWin32::RegisterSystems()
     m_systemContainer = &SystemLocator::GetInstance()->GetSystemContainer();
 
     m_systemContainer->RegisterSystem<MemorySystemWin32>("MemorySystem");
+    m_systemContainer->RegisterSystem<BaseIDGenerator>("BaseIDGenerator");
     m_systemContainer->RegisterSystem<EventBroadcaster>("EventBroadcaster");
     m_systemContainer->RegisterSystem<XCInputWin32>("InputSystem");
     m_systemContainer->RegisterSystem<TaskManager>("TaskManager");
@@ -161,6 +173,7 @@ void GameWin32::RegisterSystems()
     m_systemContainer->RegisterSystem<XCLightManager>("LightsManager");
     m_systemContainer->RegisterSystem<GameFiniteStateMachine>("GameFSM");
     m_systemContainer->RegisterSystem<NetworkManager>("NetworkManager");
+    m_systemContainer->RegisterSystem<DebugInterface>("DebugInterface");
 }
 
 void GameWin32::OnResize()
@@ -185,6 +198,8 @@ void GameWin32::Update(f32 dt)
 
     m_gameFSM->Update(dt);
 
+    m_debugInterface->Update(dt);
+
     m_taskManagingSystem->Update();
 
     m_graphicsSystem->Update(dt);
@@ -205,14 +220,17 @@ void GameWin32::Draw()
     m_graphicsSystem->GetShaderContainer().ClearShaderAndRenderStates(*m_graphicsSystem->GetDeviceContext());
 #endif
 
-    //draw every other object
+    //Begin Draw
     m_graphicsSystem->BeginScene();
+
+    //Draw engine/game specifics
     m_lightsSystem->Draw(*m_graphicsSystem);
     m_cameraManagingSystem->Draw();
     m_gameFSM->Draw(*m_graphicsSystem);
-    m_graphicsSystem->GetRenderingPool().Render();
-    
+
+    m_graphicsSystem->Render();
     m_graphicsSystem->EndScene();
+    //End Draw
 
     m_graphicsSystem->GetShaderContainer().ClearShaderAndRenderStates(*m_graphicsSystem->GetDeviceContext());
 }
@@ -228,17 +246,18 @@ void GameWin32::Destroy()
     XCDELETE(m_liveDriveClient);
 #endif
 
-    m_systemContainer->RemoveSystem("MemorySystem");
-    m_systemContainer->RemoveSystem("EventBroadcaster");
-    m_systemContainer->RemoveSystem("InputSystem");
-    m_systemContainer->RemoveSystem("TaskManager");
-    m_systemContainer->RemoveSystem("GraphicsSystem");
-    m_systemContainer->RemoveSystem("FlatBuffersSystem");
-    m_systemContainer->RemoveSystem("ResourceManager");
-    m_systemContainer->RemoveSystem("CameraManager");
-    m_systemContainer->RemoveSystem("LightsManager");
-    m_systemContainer->RemoveSystem("GameFSM");
     m_systemContainer->RemoveSystem("NetworkManager");
+    m_systemContainer->RemoveSystem("GameFSM");
+    m_systemContainer->RemoveSystem("LightsManager");
+    m_systemContainer->RemoveSystem("CameraManager");
+    m_systemContainer->RemoveSystem("ResourceManager");
+    m_systemContainer->RemoveSystem("FlatBuffersSystem");
+    m_systemContainer->RemoveSystem("GraphicsSystem");
+    m_systemContainer->RemoveSystem("TaskManager");
+    m_systemContainer->RemoveSystem("InputSystem");
+    m_systemContainer->RemoveSystem("EventBroadcaster");
+    m_systemContainer->RemoveSystem("BaseIDGenerator");
+    m_systemContainer->RemoveSystem("MemorySystem");
 
     SystemLocator::GetInstance()->Destroy();
 }

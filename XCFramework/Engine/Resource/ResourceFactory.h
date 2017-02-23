@@ -24,7 +24,4 @@ public:
 
     IResource*                      CreateResource(std::string classKey, std::string userFriendlyName);
     IResource*                      CreateResource(std::string classKey);
-
-private:
-    i32                             m_resourceCount;
 };

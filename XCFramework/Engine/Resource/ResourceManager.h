@@ -51,7 +51,8 @@ public:
     void                                   Destroy();
 
 private:
-    
+
+    CriticalSection                        m_addRemoveLock;
     std::map<std::string, ResourceHandle>  m_ResourcePool;
     std::vector<u64>                       m_PackagePoolTaskThreadId;
                                            

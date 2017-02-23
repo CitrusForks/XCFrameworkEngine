@@ -19,6 +19,7 @@ ResourceManager::ResourceManager()
     : m_packageLoaded(false)
 {
     m_PackagePoolTaskThreadId.resize(1);
+    m_addRemoveLock.Create();
 }
 
 ResourceManager::~ResourceManager(void)
@@ -48,6 +49,8 @@ void ResourceManager::Init(TaskManager& taskManger)
 
 void ResourceManager::Update()
 {
+    m_addRemoveLock.Enter();
+
     for (auto& resHandle : m_ResourcePool)
     {
         IResource* resource = resHandle.second.m_Resource;
@@ -79,6 +82,8 @@ void ResourceManager::Update()
             resource->UpdateState();
         }
     }
+
+    m_addRemoveLock.Exit();
 }
 
 ResourceHandle& ResourceManager::AcquireResource(const char* userFriendlyName)
@@ -138,6 +143,8 @@ void ResourceManager::AddResource(ResourceHandle& resource)
 {
     if (resource.m_Resource)
     {
+        m_addRemoveLock.Enter();
+
         auto exists = std::find_if(m_ResourcePool.begin(), m_ResourcePool.end(), [&resource](std::pair<std::string, ResourceHandle> res) -> bool
         {
             return strcmp(res.first.c_str(), resource.m_Resource->GetUserFriendlyName().c_str()) == 0;
@@ -152,6 +159,8 @@ void ResourceManager::AddResource(ResourceHandle& resource)
             XCASSERT(false);
             Logger("[ResourceManager] Adding a resource with same userfriendly name %s. Is it intended? ", resource.m_Resource->GetUserFriendlyName().c_str());
         }
+
+        m_addRemoveLock.Exit();
     }
 }
 

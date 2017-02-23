@@ -8,6 +8,7 @@
 
 #include "Base/Serializer/ObjectFactory.h"
 #include "Base/System/ISystem.h"
+#include "Base/Serializer/BaseIDGenerator.h"
 
 #include "Gameplay/GameActors/GameActorDefines.h"
 
@@ -39,22 +40,23 @@ public:
 
 private:
     std::map<EGameActorType, std::string>       m_registeredActors;
-    std::mutex                                  m_gameActorsFactoryLock;
-
-    i32                                         m_actorsCount;
+    CriticalSection                             m_gameActorsFactoryLock;
 };
 
 template<class T>
 T* GameActorsFactory::CreateActor(std::string actorName)
 {
-    std::unique_lock<std::mutex> m(m_gameActorsFactoryLock);
+    BaseIDGenerator& baseIdGen = SystemLocator::GetInstance()->RequestSystem<BaseIDGenerator>("BaseIDGenerator");
+    u32 baseId = baseIdGen.GetNextBaseObjectId();
+    
+    m_gameActorsFactoryLock.Enter();
 
     IActor* actor = (IActor*)CreateObject(actorName);
-    actor->Init(++m_actorsCount);
+    actor->Init(baseId);
+    
+    m_gameActorsFactoryLock.Exit();
 
-    Logger("[GAME ACTORS FACTORY] Actor : %s  ID : %d", actorName.c_str(), m_actorsCount);
-
-    m.unlock();
+    Logger("[GAME ACTORS FACTORY] Actor : %s  ID : %d", actorName.c_str(), baseId);
 
     return (T*)actor;
 }

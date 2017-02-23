@@ -21,6 +21,8 @@ public:
     void          SetThreadPriority(u32 priority);
     void          SetThreadIdentifier(std::string threadName);
 
+    static void   ThreadYield();
+    static void   ThreadSleep(f32 ms);
 private:
     HANDLE        m_threadHandle;
     DWORD         m_threadId;

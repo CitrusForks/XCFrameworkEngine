@@ -56,7 +56,7 @@ DirectX::ContainmentType CollisionDetection::CheckObbObbContainment(const IPhysi
 
 XCVec4 CollisionDetection::GetHeightfieldPointOfContactWithBoundBox(const IPhysicsBoundVolume* bboxActor, const IPhysicsBoundVolume* terrain)
 {
-    return static_cast<const HeightfieldBoundVolume*>(terrain)->GetPositionOfObject(bboxActor);
+    return static_cast<const HeightfieldBoundVolume*>(terrain)->GetPositionOfContact(bboxActor);
 }
 
 XCVec4 CollisionDetection::GetContactNormalFromOBBToOBBTriangleTest(const IPhysicsBoundVolume* bboxVolume1, const IPhysicsBoundVolume* bboxVolume2)

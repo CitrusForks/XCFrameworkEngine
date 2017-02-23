@@ -6,7 +6,15 @@
 
 #pragma once
 
-#include "Base/BaseCommonIncludes.h"
-#include "EngineCommonIncludes.h"
-#include "Graphics/GraphicsCommonIncludes.h"
-#include "Physics/PhysicsCommonIncludes.h"
+#include "Base/Serializer/IBase.h"
+
+class IDebugFeature : public IBase
+{
+public:
+    DECLARE_OBJECT_CREATION(IDebugFeature);
+
+    virtual void Init() {};
+    virtual void Update(float dt) {};
+    virtual void Destroy() {};
+
+};

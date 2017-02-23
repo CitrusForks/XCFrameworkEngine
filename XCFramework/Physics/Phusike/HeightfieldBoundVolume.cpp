@@ -31,7 +31,14 @@ void HeightfieldBoundVolume::Transform(const XCVec4& translate, const XCVec4& or
     m_OBBHierarchy->Transform(translate, orientation);
 }
 
-XCVec4 HeightfieldBoundVolume::GetPositionOfObject(const IPhysicsBoundVolume* volume) const
+XCVec4 HeightfieldBoundVolume::GetPositionOfContact(const IPhysicsBoundVolume* volume) const
 {
     return m_OBBHierarchy->GetPointOfContactWithOBB(volume);
 }
+
+#if defined(DEBUG_PHYSICS_OBB)
+void HeightfieldBoundVolume::GetOBBInfo(std::vector<PhysicsPlayground::OBBInfo>& outInfo) const
+{
+    m_OBBHierarchy->GetAllOBBInfo(outInfo);
+}
+#endif

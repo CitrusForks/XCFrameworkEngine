@@ -28,6 +28,7 @@ public:
     
     virtual void                    Init(HWND _mainWnd, i32 _width, i32 _height, bool _enable4xMsaa);
     virtual void                    BeginScene();
+    virtual void                    Render();
     virtual void                    EndScene();
     virtual void                    BeginSecondaryScene();
     virtual void                    EndSecondaryScene();
@@ -76,10 +77,13 @@ protected:
     virtual void                    SetupViewPort();
     virtual void                    SetupShadersAndRenderPool();
 
+    void                            OnRenderComplete();
     void                            PresentRenderTarget(ID3D12GraphicsCommandList* cmdList) {}
 
 protected:
     ID3DDevice*                     m_pD3DDevice;
+    ID3DDeviceContext*              m_pD3DDeviceContext;
+
     XCShaderContainer*              m_xcShaderSystem;
 
     RenderingPool*                  m_renderingPool;

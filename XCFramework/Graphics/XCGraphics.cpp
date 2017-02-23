@@ -11,6 +11,7 @@
 
 XCGraphics::XCGraphics(void)
     : m_pD3DDevice(nullptr)
+    , m_pD3DDeviceContext(nullptr)
     , m_xcShaderSystem(nullptr)
     , m_renderingPool(nullptr)
     , m_sharedDescriptorHeap(nullptr)
@@ -91,6 +92,11 @@ void XCGraphics::SetupShadersAndRenderPool()
     m_renderingPool->Init();
 }
 
+void XCGraphics::OnRenderComplete()
+{
+    m_renderingPool->OnRenderComplete();
+}
+
 void XCGraphics::SetupDevice()
 {
 }
@@ -153,6 +159,23 @@ void XCGraphics::Update(f32 dt)
 
 void XCGraphics::BeginScene()
 {
+    //On immediate context, we only want to work on current frame render target, so set and clear
+    std::vector<RenderTargetsType> rtvs = { (RenderTargetsType) m_frameIndex };
+
+    SetRenderableTargets(*m_pD3DDeviceContext, rtvs);
+    ClearRTVAndDSVs(*m_pD3DDeviceContext, rtvs, XCVec4(1.0f, 1.0f, 1.0f, 1.0f));
+
+    //On deferred context, we work on multiple render targets for deferred lighting. So work on them.
+    rtvs.push_back(RenderTargetType_GBuffer_Diffuse);
+    rtvs.push_back(RenderTargetType_GBuffer_Position);
+    rtvs.push_back(RenderTargetType_GBuffer_Normal);
+
+    m_renderingPool->Begin(rtvs);
+}
+
+void XCGraphics::Render()
+{
+    m_renderingPool->Render();
 }
 
 void XCGraphics::BeginSecondaryScene()
@@ -165,6 +188,7 @@ void XCGraphics::EndSecondaryScene()
 
 void XCGraphics::EndScene()
 {
+    m_renderingPool->End();
 }
 
 void XCGraphics::TurnOnZ()

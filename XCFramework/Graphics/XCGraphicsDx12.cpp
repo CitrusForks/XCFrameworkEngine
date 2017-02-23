@@ -28,7 +28,6 @@ XCGraphicsDx12::XCGraphicsDx12(void)
     , m_pdxgiFactory(nullptr)
     , m_pCommandAllocator(nullptr)
     , m_pCommandQueue(nullptr)
-    , m_graphicsCommandList(nullptr)
     , m_pFence(nullptr)
     , m_rootSignature(nullptr)
     , m_pipelineState(nullptr)
@@ -153,7 +152,7 @@ void XCGraphicsDx12::Init(HWND _mainWnd, i32 _width, i32 _height, bool _enable4x
         D3D12_COMMAND_LIST_TYPE_DIRECT,
         m_pCommandAllocator,
         m_pipelineState,
-        IID_PPV_ARGS(&m_graphicsCommandList));
+        IID_PPV_ARGS(&m_pD3DDeviceContext));
 
     //Setup the PipelineStateObjects
     SetupShadersAndRenderPool();
@@ -162,10 +161,10 @@ void XCGraphicsDx12::Init(HWND _mainWnd, i32 _width, i32 _height, bool _enable4x
     SetupRenderQuad();
 
     //Need to close the cmmd list as nothing is to be recorded now.
-    ValidateResult(m_graphicsCommandList->Close());
+    ValidateResult(m_pD3DDeviceContext->Close());
 
-    //Execute any pending work on m_graphicsCommandList.
-    ID3D12CommandList* ppCmdList[] = { m_graphicsCommandList };
+    //Execute any pending work on m_pD3DDeviceContext.
+    ID3D12CommandList* ppCmdList[] = { m_pD3DDeviceContext };
     m_pCommandQueue->ExecuteCommandLists(_countof(ppCmdList), ppCmdList);
 
     //Create fencing for sync each frame
@@ -196,7 +195,7 @@ void XCGraphicsDx12::Destroy()
 
     ReleaseCOM(m_pCommandAllocator);
     ReleaseCOM(m_pCommandQueue);
-    ReleaseCOM(m_graphicsCommandList);
+    ReleaseCOM(m_pD3DDeviceContext);
     ReleaseCOM(m_rootSignature);
     ReleaseCOM(m_pipelineState);
 
@@ -318,27 +317,27 @@ void XCGraphicsDx12::DebugTestGraphicsPipeline()
 void XCGraphicsDx12::SetupRenderTargets()
 {
     //Initiate RenderableTextures
-    m_renderTargets[RenderTargetType_Main_0] = XCNEW(RenderableTexture)(RenderTargetType_Main_0, DXGI_FORMAT_R8G8B8A8_UNORM, *m_graphicsCommandList);
+    m_renderTargets[RenderTargetType_Main_0] = XCNEW(RenderableTexture)(RenderTargetType_Main_0, DXGI_FORMAT_R8G8B8A8_UNORM, *m_pD3DDeviceContext);
     m_renderTargets[RenderTargetType_Main_0]->PreLoad(m_pSwapChain);
 
-    m_renderTargets[RenderTargetType_Main_1] = XCNEW(RenderableTexture)(RenderTargetType_Main_1, DXGI_FORMAT_R8G8B8A8_UNORM, *m_graphicsCommandList);
+    m_renderTargets[RenderTargetType_Main_1] = XCNEW(RenderableTexture)(RenderTargetType_Main_1, DXGI_FORMAT_R8G8B8A8_UNORM, *m_pD3DDeviceContext);
     m_renderTargets[RenderTargetType_Main_1]->PreLoad(m_pSwapChain);
 
-    m_renderTargets[RenderTargetType_GBuffer_Diffuse] = XCNEW(RenderableTexture)(RenderTargetType_GBuffer_Diffuse, DXGI_FORMAT_R8G8B8A8_UNORM, *m_graphicsCommandList);
+    m_renderTargets[RenderTargetType_GBuffer_Diffuse] = XCNEW(RenderableTexture)(RenderTargetType_GBuffer_Diffuse, DXGI_FORMAT_R8G8B8A8_UNORM, *m_pD3DDeviceContext);
     m_renderTargets[RenderTargetType_GBuffer_Diffuse]->PreLoad(m_enable4xMsaa & m_4xMsaaQuality, m_clientWidth, m_clientHeight);
 
-    m_renderTargets[RenderTargetType_GBuffer_Position] = XCNEW(RenderableTexture)(RenderTargetType_GBuffer_Position, DXGI_FORMAT_R32G32B32A32_FLOAT, *m_graphicsCommandList);
+    m_renderTargets[RenderTargetType_GBuffer_Position] = XCNEW(RenderableTexture)(RenderTargetType_GBuffer_Position, DXGI_FORMAT_R32G32B32A32_FLOAT, *m_pD3DDeviceContext);
     m_renderTargets[RenderTargetType_GBuffer_Position]->PreLoad(m_enable4xMsaa & m_4xMsaaQuality, m_clientWidth, m_clientHeight);
 
-    m_renderTargets[RenderTargetType_GBuffer_Normal] = XCNEW(RenderableTexture)(RenderTargetType_GBuffer_Normal, DXGI_FORMAT_R8G8B8A8_UNORM, *m_graphicsCommandList);
+    m_renderTargets[RenderTargetType_GBuffer_Normal] = XCNEW(RenderableTexture)(RenderTargetType_GBuffer_Normal, DXGI_FORMAT_R8G8B8A8_UNORM, *m_pD3DDeviceContext);
     m_renderTargets[RenderTargetType_GBuffer_Normal]->PreLoad(m_enable4xMsaa & m_4xMsaaQuality, m_clientWidth, m_clientHeight);
 
 #if defined(DEBUG_DEFERRED_LIGHTING)
-    m_renderTargets[RenderTargetType_Debug] = XCNEW(RenderableTexture)(RenderTargetType_Debug, DXGI_FORMAT_R8G8B8A8_UNORM, *m_graphicsCommandList);
+    m_renderTargets[RenderTargetType_Debug] = XCNEW(RenderableTexture)(RenderTargetType_Debug, DXGI_FORMAT_R8G8B8A8_UNORM, *m_pD3DDeviceContext);
     m_renderTargets[RenderTargetType_Debug]->PreLoad(m_enable4xMsaa & m_4xMsaaQuality, m_clientWidth, m_clientHeight);
 #endif
 
-    m_renderTargets[RenderTargetType_LiveDrive] = XCNEW(RenderableTexture)(RenderTargetType_LiveDrive, DXGI_FORMAT_R8G8B8A8_UNORM, *m_graphicsCommandList);
+    m_renderTargets[RenderTargetType_LiveDrive] = XCNEW(RenderableTexture)(RenderTargetType_LiveDrive, DXGI_FORMAT_R8G8B8A8_UNORM, *m_pD3DDeviceContext);
     m_renderTargets[RenderTargetType_LiveDrive]->PreLoad(m_enable4xMsaa & m_4xMsaaQuality, 256, 256);
 }
 
@@ -435,7 +434,7 @@ void XCGraphicsDx12::SetupRenderQuad()
     m_renderQuadVB->m_vertexData.push_back(VertexPosTex(XCVec3Unaligned(-1.0f, -1.0f, 0.0f), XCVec2Unaligned(0.0f, 1.0f)));
     m_renderQuadVB->m_vertexData.push_back(VertexPosTex(XCVec3Unaligned(1.0f, 1.0f, 0.0f), XCVec2Unaligned(1.0f, 0.0f)));
 
-    m_renderQuadVB->BuildVertexBuffer(m_graphicsCommandList);
+    m_renderQuadVB->BuildVertexBuffer(m_pD3DDeviceContext);
 
     //Set up index buffer
     m_renderQuadIB->AddIndicesVA
@@ -444,7 +443,7 @@ void XCGraphicsDx12::SetupRenderQuad()
         0, 3, 1,
     });
 
-    m_renderQuadIB->BuildIndexBuffer(m_graphicsCommandList);
+    m_renderQuadIB->BuildIndexBuffer(m_pD3DDeviceContext);
 }
 
 void XCGraphicsDx12::SetResourceBarrier(ID3D12GraphicsCommandList* commandList, ID3D12Resource* resource, D3D12_RESOURCE_STATES StateBefore, D3D12_RESOURCE_STATES StateAfter)
@@ -467,86 +466,75 @@ void XCGraphicsDx12::Update(f32 dt)
 void XCGraphicsDx12::BeginScene()
 {
     ValidateResult(m_pCommandAllocator->Reset());
-    ValidateResult(m_graphicsCommandList->Reset(m_pCommandAllocator, m_pipelineState));
+    ValidateResult(m_pD3DDeviceContext->Reset(m_pCommandAllocator, m_pipelineState));
 
-    m_graphicsCommandList->SetGraphicsRootSignature(m_rootSignature);
-    m_graphicsCommandList->RSSetViewports(1, &m_ScreenViewPort[m_frameIndex]);
-    m_graphicsCommandList->RSSetScissorRects(1, &m_scissorRect);
+    m_pD3DDeviceContext->SetGraphicsRootSignature(m_rootSignature);
+    m_pD3DDeviceContext->RSSetViewports(1, &m_ScreenViewPort[m_frameIndex]);
+    m_pD3DDeviceContext->RSSetScissorRects(1, &m_scissorRect);
 
-    SetResourceBarrier(m_graphicsCommandList, m_renderTargets[m_frameIndex]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
-    SetResourceBarrier(m_graphicsCommandList, m_renderTargets[RenderTargetType_GBuffer_Diffuse]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
-    SetResourceBarrier(m_graphicsCommandList, m_renderTargets[RenderTargetType_GBuffer_Position]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
-    SetResourceBarrier(m_graphicsCommandList, m_renderTargets[RenderTargetType_GBuffer_Normal]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
+    SetResourceBarrier(m_pD3DDeviceContext, m_renderTargets[m_frameIndex]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+    SetResourceBarrier(m_pD3DDeviceContext, m_renderTargets[RenderTargetType_GBuffer_Diffuse]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
+    SetResourceBarrier(m_pD3DDeviceContext, m_renderTargets[RenderTargetType_GBuffer_Position]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
+    SetResourceBarrier(m_pD3DDeviceContext, m_renderTargets[RenderTargetType_GBuffer_Normal]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 #if defined(DEBUG_DEFERRED_LIGHTING)
-    SetResourceBarrier(m_graphicsCommandList, m_renderTargets[RenderTargetType_Debug]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
+    SetResourceBarrier(m_pD3DDeviceContext, m_renderTargets[RenderTargetType_Debug]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
 #endif
-
-    //On immediate context, we only want to work on current frame render target, so set and clear
-    std::vector<RenderTargetsType> rtvs = { (RenderTargetsType) m_frameIndex };
-
-    SetRenderableTargets(*m_graphicsCommandList, rtvs);
-    ClearRTVAndDSVs(*m_graphicsCommandList, rtvs, XCVec4(1.0f, 1.0f, 1.0f, 1.0f));
 
     //Set descriptor heaps
     ID3D12DescriptorHeap* ppHeaps[] = { m_sharedDescriptorHeap->GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV).m_heapDesc,
     m_sharedDescriptorHeap->GetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER).m_heapDesc};
-    m_graphicsCommandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
+    m_pD3DDeviceContext->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 
 #if defined(DEBUG_GRAPHICS_PIPELINE)
     //Record ur cmds
-    m_graphicsCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    m_graphicsCommandList->IASetVertexBuffers(0, 1, &m_vertexBufferView);
-    m_graphicsCommandList->DrawInstanced(3, 1, 0, 0);
+    m_pD3DDeviceContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    m_pD3DDeviceContext->IASetVertexBuffers(0, 1, &m_vertexBufferView);
+    m_pD3DDeviceContext->DrawInstanced(3, 1, 0, 0);
 #endif
 
-    //On deferred context, we work on multiple render targets for deferred lighting. So work on them.
-    rtvs.push_back(RenderTargetType_GBuffer_Diffuse);
-    rtvs.push_back(RenderTargetType_GBuffer_Position);
-    rtvs.push_back(RenderTargetType_GBuffer_Normal);
-
-    m_renderingPool->Begin(rtvs);
+    XCGraphics::BeginScene();
 }
 
 void XCGraphicsDx12::EndScene()
 {
-    PIXSetMarker(m_pCommandQueue, 0, L"Scene End.");
+    XCGraphics::EndScene();
 
-    m_renderingPool->End();
+    PIXSetMarker(m_pCommandQueue, 0, L"Scene End.");
 
     //Execute rendering pool context's
     m_renderingPool->Execute(m_pCommandQueue);
 
     //Draw post processed render target
-    SetResourceBarrier(m_graphicsCommandList, m_renderTargets[RenderTargetType_GBuffer_Diffuse]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-    SetResourceBarrier(m_graphicsCommandList, m_renderTargets[RenderTargetType_GBuffer_Position]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-    SetResourceBarrier(m_graphicsCommandList, m_renderTargets[RenderTargetType_GBuffer_Normal]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+    SetResourceBarrier(m_pD3DDeviceContext, m_renderTargets[RenderTargetType_GBuffer_Diffuse]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+    SetResourceBarrier(m_pD3DDeviceContext, m_renderTargets[RenderTargetType_GBuffer_Position]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+    SetResourceBarrier(m_pD3DDeviceContext, m_renderTargets[RenderTargetType_GBuffer_Normal]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
 #if defined(DEBUG_DEFERRED_LIGHTING)
-    SetResourceBarrier(m_graphicsCommandList, m_renderTargets[RenderTargetType_Debug]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+    SetResourceBarrier(m_pD3DDeviceContext, m_renderTargets[RenderTargetType_Debug]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 #endif
 
-    m_xcShaderSystem->ApplyShader(*m_graphicsCommandList, ShaderType_DeferredLighting);
+    m_xcShaderSystem->ApplyShader(*m_pD3DDeviceContext, ShaderType_DeferredLighting);
 
     XCShaderHandle* shaderHandle = (XCShaderHandle*)m_xcShaderSystem->GetShader(ShaderType_DeferredLighting);
-    shaderHandle->SetResource("gGBufferDiffuse", *m_graphicsCommandList, m_renderTargets[RenderTargetType_GBuffer_Diffuse]->GetRenderTargetResource());
-    shaderHandle->SetResource("gGBufferPosition", *m_graphicsCommandList, m_renderTargets[RenderTargetType_GBuffer_Position]->GetRenderTargetResource());
-    shaderHandle->SetResource("gGBufferNormal", *m_graphicsCommandList, m_renderTargets[RenderTargetType_GBuffer_Normal]->GetRenderTargetResource());
+    shaderHandle->SetResource("gGBufferDiffuse", *m_pD3DDeviceContext, m_renderTargets[RenderTargetType_GBuffer_Diffuse]->GetRenderTargetResource());
+    shaderHandle->SetResource("gGBufferPosition", *m_pD3DDeviceContext, m_renderTargets[RenderTargetType_GBuffer_Position]->GetRenderTargetResource());
+    shaderHandle->SetResource("gGBufferNormal", *m_pD3DDeviceContext, m_renderTargets[RenderTargetType_GBuffer_Normal]->GetRenderTargetResource());
 
-    shaderHandle->SetVertexBuffer(*m_graphicsCommandList, m_renderQuadVB);
-    shaderHandle->SetIndexBuffer(*m_graphicsCommandList, *m_renderQuadIB);
+    shaderHandle->SetVertexBuffer(*m_pD3DDeviceContext, m_renderQuadVB);
+    shaderHandle->SetIndexBuffer(*m_pD3DDeviceContext, *m_renderQuadIB);
 
     XCLightManager* lightMgr = (XCLightManager*)&SystemLocator::GetInstance()->RequestSystem("LightsManager");
-    shaderHandle->SetConstantBuffer("cbLightsPerFrame", *m_graphicsCommandList, lightMgr->GetLightConstantBuffer());
+    shaderHandle->SetConstantBuffer("cbLightsPerFrame", *m_pD3DDeviceContext, lightMgr->GetLightConstantBuffer());
 
-    m_graphicsCommandList->DrawIndexedInstanced(m_renderQuadIB->m_indexData.size(), 1, 0, 0, 0);;
+    m_pD3DDeviceContext->DrawIndexedInstanced(m_renderQuadIB->m_indexData.size(), 1, 0, 0, 0);
 
     //Present
-    SetResourceBarrier(m_graphicsCommandList, m_renderTargets[m_frameIndex]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
-    ValidateResult(m_graphicsCommandList->Close());
+    SetResourceBarrier(m_pD3DDeviceContext, m_renderTargets[m_frameIndex]->GetRenderTargetResource()->GetResource<ID3D12Resource*>(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+    ValidateResult(m_pD3DDeviceContext->Close());
 
     //Execute the cmd list
-    ID3D12CommandList* ppCmdList[] = { m_graphicsCommandList };
+    ID3D12CommandList* ppCmdList[] = { m_pD3DDeviceContext };
     m_pCommandQueue->ExecuteCommandLists(_countof(ppCmdList), ppCmdList);
 
     PIXBeginEvent(m_pCommandQueue, 0, L"Presenting to screen");
@@ -554,6 +542,8 @@ void XCGraphicsDx12::EndScene()
     PIXEndEvent(m_pCommandQueue);
 
     WaitForPreviousFrameCompletion();
+
+    OnRenderComplete();
 }
 
 void XCGraphicsDx12::ClearRTVAndDSVs(ID3DDeviceContext& context, std::vector<RenderTargetsType>& type, XCVec4& clearColor)

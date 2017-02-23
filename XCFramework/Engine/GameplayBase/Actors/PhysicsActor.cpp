@@ -74,7 +74,7 @@ void PhysicsActor::AddForce(const XCVec4& force)
 
 void PhysicsActor::AddRotationalForce(const XCVec4& force)
 {
-
+    m_physicsFeature->GetTyped<RigidBody>()->AddRotationalForce(force);
 }
 
 IActor::IActor::ActorReturnState PhysicsActor::Update(f32 dt)

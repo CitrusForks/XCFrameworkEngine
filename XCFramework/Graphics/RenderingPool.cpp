@@ -73,8 +73,22 @@ void RenderingPool::AddRenderableObject(IRenderableObject* obj, i32 baseObjId)
     {
         if (maskIndex == workerType || (workerMask != WorkerMask_None && workerMask & RenderWorkerTypeMaskMap[maskIndex]))
         {
-            m_renderWorkers[maskIndex].m_renderableObjectRefList[baseObjId] = obj;
-            Logger("[Rendering Pool] Added Renderable object on worker id : %d Base Obj id : %d", maskIndex, baseObjId);
+            auto& renderObject = std::find_if(m_renderWorkers[maskIndex].m_renderableObjectRefList.begin(),
+                                              m_renderWorkers[maskIndex].m_renderableObjectRefList.end(),
+                                              [baseObjId](const std::pair<u32, IRenderableObject*>& obj) -> bool
+            {
+                return baseObjId == obj.first;
+            });
+
+            if(renderObject == m_renderWorkers[maskIndex].m_renderableObjectRefList.end())
+            {
+                m_renderWorkers[maskIndex].m_renderableObjectRefList[baseObjId] = obj;
+                Logger("[Rendering Pool] Added Renderable object on worker id : %d Base Obj id : %d", maskIndex, baseObjId);
+            }
+            else
+            {
+                XCASSERTMSG("[Rendering Pool] Cannot add Renderable Object, since it already exists in the pool.", false);
+            }
         }
     }
 
@@ -97,6 +111,10 @@ void RenderingPool::RemoveRenderableObject(IRenderableObject* obj, i32 baseObjId
             {
                 Logger("[Rendering Pool] Removing Renderable object on worker id : %d ", maskIndex);
                 m_renderWorkers[maskIndex].m_renderableObjectRefList.erase(objRef);
+            }
+            else
+            {
+                XCASSERTMSG("[Rendering Pool] Cannot remove Renderable Object, since it does not exist in the pool.", false);
             }
         }
     }
@@ -177,33 +195,38 @@ void RenderingPool::End()
     {
         //Finish cmdlist
         worker.m_renderContext.FinishRender();
+    }
+}
 
-        //Call render complete on all the objects
-        for (auto& obj : worker.m_renderableObjectRefList)
+void RenderingPool::OnRenderComplete()
+{
+    //Call render complete on all the objects
+    for(auto& worker : m_renderWorkers)
+    {
+        for(auto& obj : worker.m_renderableObjectRefList)
         {
-            if (obj.second->IsRenderable())
+            if(obj.second->IsRenderable())
             {
                 obj.second->OnRenderComplete();
             }
         }
 
-        for (auto& obj : worker.m_resourceRefList)
+        for(auto& obj : worker.m_resourceRefList)
         {
-            if (obj->IsRenderable())
+            if(obj->IsRenderable())
             {
                 obj->OnRenderComplete();
             }
         }
     }
 
+    //Finish the rendering, and allow modification of renderable objects.
     m_addRemoveLock.Exit();
 }
 
 void RenderingPool::Execute(ID3DCommandQueue* cmdQueue)
 {
-#if defined(XCGRAPHICS_DX12)
     cmdQueue->ExecuteCommandLists(_countof(m_ppCmdList), m_ppCmdList);
-#endif
 }
 
 void RenderingPool::RenderWorker::Init()
@@ -223,15 +246,30 @@ i32 RenderingPool::RenderWorker::WorkerThreadFunc(void* param)
 
         //if (worker->m_workerId != WorkerType_Lighting)
         {
+            //Accumulate the objects having mask WorkerType_InstancedDraw .
+            std::vector<IRenderableObject*> instancedObj;
+
             //Call Render
-            //In the case of instancing mesh rendering. The WorkerType_XCMesh renders all actors first which will accumulate all instance 
-            //data and then we render the actual mesh resource.
-            for (auto& obj : worker->m_renderableObjectRefList)
+            for(auto& obj : worker->m_renderableObjectRefList)
             {
-                if (obj.second->IsRenderable())
+                if(obj.second->IsRenderable())
                 {
-                    obj.second->Draw(worker->m_renderContext);
+                    if(obj.second->GetRenderWorkerMask() & WorkerMask_InstancedDraw)
+                    {
+                        instancedObj.push_back(obj.second);
+                    }
+                    else
+                    {
+                        obj.second->Draw(worker->m_renderContext);
+                    }
                 }
+            }
+
+            //The WorkerType_InstancedDraw allows rendering of actors first which will accumulate all instance 
+            //data and then we render the actual resource here.
+            for (auto& obj : instancedObj)
+            {
+                obj->Draw(worker->m_renderContext);
             }
             
             if (worker->m_workerId == WorkerType_ResourceLoader)

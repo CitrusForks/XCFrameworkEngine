@@ -31,6 +31,5 @@ public:
 
 private:
 
-    i32                                  m_statesCount;
     std::map<EGameState, std::string>    m_registeredStates;
 };

@@ -74,6 +74,7 @@ IActor::ActorReturnState Terrain::Load()
     GenerateVerticesNormal();
     BuildGeometryBuffer();
     UnloadHeightMap();
+    SetInitialPhysicsProperties();
 
     return IActor::Load();
 }
@@ -81,7 +82,8 @@ IActor::ActorReturnState Terrain::Load()
 void Terrain::SetInitialPhysicsProperties()
 {
     //Generate the obb tree to optimize terrain - actor collisions.
-    PhysicsDesc desc = { PhysicsBodyType_RigidDynamic, PhysicsBoundType_HeightField, m_currentPosition, 1000, (f32)1.0f };
+    //DO NOT PASS THE CURRENT POSITION, since the vertices are already moved to the current position.
+    PhysicsDesc desc = { PhysicsBodyType_RigidDynamic, PhysicsBoundType_HeightField, XCVec4(), 1000, (f32)1.0f };
     desc.m_boundVolumeDesc.m_boundDesc.m_heightFieldDesc.m_rows = m_rows;
     desc.m_boundVolumeDesc.m_boundDesc.m_heightFieldDesc.m_cols = m_cols;
     desc.m_boundVolumeDesc.m_boundDesc.m_heightFieldDesc.m_vertexBuffer = &m_vertexPosNormTexBuffer;
@@ -89,7 +91,6 @@ void Terrain::SetInitialPhysicsProperties()
 
     PhysicsPlayground& playground = SystemLocator::GetInstance()->RequestSystem<PhysicsPlayground>("PhysicsPlayground");
     m_physicsFeature = playground.CreatePhysicsFeature(desc);
-
 }
 
 IActor::ActorReturnState Terrain::OnLoaded()

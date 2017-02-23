@@ -336,20 +336,9 @@ void XCGraphicsDx11::Update(f32 dt)
 
 void XCGraphicsDx11::BeginScene()
 {
+    XCGraphics::BeginScene();
+
     m_pD3DDeviceContext->RSSetViewports(1, &m_ScreenViewPort[RenderTargetType_Main_0]);
-
-    //On immediate context, we only want to work on current frame render target, so set and clear
-    std::vector<RenderTargetsType> rtvs = { (RenderTargetsType)m_frameIndex };
-
-    SetRenderableTargets(*m_pD3DDeviceContext, rtvs);
-    ClearRTVAndDSVs(*m_pD3DDeviceContext, rtvs, XCVec4(1.0f, 1.0f, 1.0f, 1.0f));
-
-    //On deferred context, we work on multiple render targets for deferred lighting. So work on them.
-    rtvs.push_back(RenderTargetType_GBuffer_Diffuse);
-    rtvs.push_back(RenderTargetType_GBuffer_Position);
-    rtvs.push_back(RenderTargetType_GBuffer_Normal);
-
-    m_renderingPool->Begin(rtvs);
 }
 
 #pragma region LiveDriveRendering
@@ -372,7 +361,7 @@ void XCGraphicsDx11::EndSecondaryScene()
 
 void XCGraphicsDx11::EndScene()
 {
-    m_renderingPool->End();
+    XCGraphics::EndScene();
 
     //Draw post processed render target
     m_xcShaderSystem->ApplyShader(*m_pD3DDeviceContext, ShaderType_DeferredLighting);
@@ -390,9 +379,10 @@ void XCGraphicsDx11::EndScene()
 
     m_pD3DDeviceContext->DrawIndexedInstanced(m_renderQuadIB->m_indexData.size(), 1, 0, 0, 0);
 
-
     //Present
     ValidateResult(m_pSwapChain->Present(1, 0));
+
+    OnRenderComplete();
 }
 
 void XCGraphicsDx11::SetRenderableTargets(ID3DDeviceContext& context, const std::vector<RenderTargetsType>& types)

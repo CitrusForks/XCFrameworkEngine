@@ -61,8 +61,6 @@ private:
     DXGI_SWAP_CHAIN_DESC        m_SwapChainDesc;
     IDXGIFactory*               m_pdxgiFactory;
 
-    ID3DDeviceContext*          m_pD3DDeviceContext;
-
     ID3DRenderTargetView*       m_pRenderTargetView;
     VertexBuffer<VertexPosTex>* m_renderQuadVB;
     IndexBuffer<u32>*           m_renderQuadIB;

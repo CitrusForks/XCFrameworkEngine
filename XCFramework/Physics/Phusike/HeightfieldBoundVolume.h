@@ -16,10 +16,14 @@ public:
     HeightfieldBoundVolume(const PhysicsDesc::PhysicsHeightFieldDesc& heightfieldDesc);
     ~HeightfieldBoundVolume();
 
-    void        Update(f32 dt) override;
-    void        Transform(const XCVec4& translate, const XCVec4& orientation) override;
+    void         Update(f32 dt) override;
+    void         Transform(const XCVec4& translate, const XCVec4& orientation) override;
 
-    XCVec4      GetPositionOfObject(const IPhysicsBoundVolume* volume) const;
+    XCVec4       GetPositionOfContact(const IPhysicsBoundVolume* volume) const;
+
+#if defined(DEBUG_PHYSICS_OBB)
+    virtual void GetOBBInfo(std::vector<PhysicsPlayground::OBBInfo>& outInfo) const override;
+#endif
 
 private:
     HeightfieldOBBHierarchy*    m_OBBHierarchy;

@@ -61,6 +61,7 @@ void RigidBody::Update(f32 dt)
     ClearForce();
 
     //Update the bound volume
+    m_orientation.Set<W>(1.0f);
     m_physicsBoundVolume->Transform(m_position, m_orientation);
 }
 

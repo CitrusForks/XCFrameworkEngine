@@ -14,8 +14,12 @@ public:
     {}
     virtual ~IPhysicsBoundVolume() {}
 
-    virtual void Update(float dt) {};
-    virtual void Transform(const XCVec4& translate, const XCVec4& orientation) {};
+    virtual void     Update(float dt) {};
+    virtual void     Transform(const XCVec4& translate, const XCVec4& orientation) {};
+    
+#if defined(DEBUG_PHYSICS_OBB)
+    virtual void     GetOBBInfo(std::vector<PhysicsPlayground::OBBInfo>& outInfo) const {}
+#endif
 
     PhysicsBoundType GetBoundType() const { return m_boundType; }
 

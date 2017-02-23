@@ -13,7 +13,7 @@
 class OBBBoundVolume : public IPhysicsBoundVolume
 {
 public:
-    static const i32            MaxOBBCornerPoints = 8;
+    static const u32              MaxOBBCornerPoints = 8;
 
     OBBBoundVolume(const PhysicsDesc::PhysicsBoundBoxDesc& obbDesc);
     ~OBBBoundVolume();
@@ -28,6 +28,9 @@ public:
     
     DirectX::BoundingOrientedBox  GetTransformedBox() const { return m_TransformedBox; }
 
+#if defined(DEBUG_PHYSICS_OBB)
+    void GetOBBInfo(std::vector<PhysicsPlayground::OBBInfo>& outInfo) const override;
+#endif
 
 protected:
     void                          CreateBoundBox();

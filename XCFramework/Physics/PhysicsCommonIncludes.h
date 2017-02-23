@@ -6,6 +6,10 @@
 
 #pragma once
 
+#if defined(DEBUG)
+    #define DEBUG_PHYSICS_OBB 1
+#endif
+
 #include "PhysicsConstants.h"
 #include "PhysicsDesc.h"
 #include "IPhysicsFeature.h"

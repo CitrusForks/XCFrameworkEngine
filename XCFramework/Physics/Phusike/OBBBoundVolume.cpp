@@ -68,5 +68,17 @@ bool OBBBoundVolume::Intersects(const OBBBoundVolume* obb) const
 
 void OBBBoundVolume::Transform(const XCVec4& translate, const XCVec4& orientation)
 {
-    //m_bBox.Transform(m_TransformedBox, 1.0f, orientation.GetPlatformIntrinsic(), translate.GetPlatformIntrinsic());
+    m_bBox.Transform(m_TransformedBox, 1.0f, XCVec4(0, 0, 0, 1).GetPlatformIntrinsic(), translate.GetPlatformIntrinsic());
 }
+
+#if defined(DEBUG_PHYSICS_OBB)
+void OBBBoundVolume::GetOBBInfo(std::vector<PhysicsPlayground::OBBInfo>& outInfo) const
+{
+    PhysicsPlayground::OBBInfo info = {
+        XCVec4(m_TransformedBox.Extents),
+        XCVec4(m_TransformedBox.Center),
+        XCVec4(m_TransformedBox.Orientation),
+    };
+    outInfo.push_back(info);
+}
+#endif

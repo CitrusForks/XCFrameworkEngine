@@ -53,3 +53,13 @@ void Thread::SetThreadIdentifier(std::string threadName)
 {
     SetThreadName(m_threadId, threadName.c_str());
 }
+
+void Thread::ThreadYield()
+{
+    SwitchToThread();
+}
+
+void Thread::ThreadSleep(f32 ms)
+{
+    Sleep(ms);
+}

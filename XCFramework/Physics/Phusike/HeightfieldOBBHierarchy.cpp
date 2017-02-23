@@ -64,13 +64,13 @@ void HeightfieldOBBHierarchy::Transform(const XCVec4& translate, const XCVec4& o
 
 void HeightfieldOBBHierarchy::CreateHeightfieldOBBHierarchy()
 {
-    i32 rowStart = 0;
-    i32 totalRows = m_rows;
-    i32 colStart = 0;
-    i32 totalColumns = m_cols;
-    i32 totalWidth = m_cols;
+    u32 rowStart = 0;
+    u32 totalRows = m_rows;
+    u32 colStart = 0;
+    u32 totalColumns = m_cols;
+    u32 totalWidth = m_cols;
 
-    i32 noOfQuads = 4;
+    static const u32 noOfQuads = 4;
 
     XCVec4 vMin(Infinity, Infinity, Infinity, 1);
     XCVec4 vMax(-Infinity, -Infinity, -Infinity, 1);
@@ -105,7 +105,7 @@ void HeightfieldOBBHierarchy::CreateHeightfieldOBBHierarchy()
     ComputeQuads();
 }
 
-void HeightfieldOBBHierarchy::CreateHeightfieldOBBHierarchy(i32 levels)
+void HeightfieldOBBHierarchy::CreateHeightfieldOBBHierarchy(u32 levels)
 {
 #if defined(UNUSED)
     //Base condition to return from here, if this is the 0th level.
@@ -174,7 +174,7 @@ void HeightfieldOBBHierarchy::CreateHeightfieldOBBHierarchy(i32 levels)
 #endif
 }
 
-bool HeightfieldQuad::ComputeQuad(i32 row, i32 col, XCVec4& pos)
+bool HeightfieldQuad::ComputeQuad(u32 row, u32 col, XCVec4& pos)
 {
     bool retVal = false;
 
@@ -207,9 +207,9 @@ void HeightfieldOBBHierarchy::ComputeQuads()
                 VertexBuffer<VertexPosNormTex>* vertexBuffer = static_cast<VertexBuffer<VertexPosNormTex>*>(m_vertexBuffer);
 
                 u32 vertCount = 0;
-                for(i32 rowIndex = 0; rowIndex < m_rows; rowIndex++)
+                for(u32 rowIndex = 0; rowIndex < m_rows; rowIndex++)
                 {
-                    for(i32 colIndex = 0; colIndex < m_cols; colIndex++)
+                    for(u32 colIndex = 0; colIndex < m_cols; colIndex++)
                     {
                         const VertexPosNormTex& vertex = vertexBuffer->m_vertexData[vertCount++];
                         rootNode->GetMutable()->ComputeQuad(rowIndex, colIndex, XCVec4(vertex.Pos));
@@ -280,9 +280,9 @@ XCVec4 HeightfieldOBBHierarchy::GetPointOfContactWithOBB(const IPhysicsBoundVolu
         VertexBuffer<VertexPosNormTex>* vertexBuffer = static_cast<VertexBuffer<VertexPosNormTex>*>(m_vertexBuffer);
 
         //Find the vertex within the terrain quad
-        for(i32 rowIndex = quad->m_rowStart; rowIndex < quad->m_rowEnd; rowIndex++)
+        for(u32 rowIndex = quad->m_rowStart; rowIndex < quad->m_rowEnd; rowIndex++)
         {
-            for(i32 colIndex = quad->m_colStart; colIndex < quad->m_colEnd; colIndex++)
+            for(u32 colIndex = quad->m_colStart; colIndex < quad->m_colEnd; colIndex++)
             {
                 vertexPos = XCVec4(vertexBuffer->m_vertexData[quad->m_totalWidth * rowIndex + colIndex].Pos);
 
@@ -297,4 +297,20 @@ XCVec4 HeightfieldOBBHierarchy::GetPointOfContactWithOBB(const IPhysicsBoundVolu
 
     //If we come here that means no collision with any terrain vertex. So return nothing
     return XCVec4();
+}
+
+void HeightfieldOBBHierarchy::GetAllOBBInfo(std::vector<PhysicsPlayground::OBBInfo>& outInfo) const
+{
+    m_heightfieldQuadTree->GetRootNode()->GetOBBInfo(outInfo);
+}
+
+void HeightfieldQuad::GetOBBInfo(std::vector<PhysicsPlayground::OBBInfo>& outInfo) const
+{
+    m_bbox->GetOBBInfo(outInfo);
+
+    //Get info from all child nodes
+    for(auto& list : GetNodes())
+    {
+        return list->Get()->GetOBBInfo(outInfo);
+    }
 }

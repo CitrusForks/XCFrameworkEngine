@@ -27,5 +27,7 @@ public:
     }
 
 private:
+    //System factory needs to maintain it's own unique id, since it cannot request from 
+    //BaseIDGenerator, because BaseIDGenerator itself implements ISystem.
     i32                             m_systemInstanceCount;
 };

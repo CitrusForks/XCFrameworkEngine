@@ -27,8 +27,9 @@ enum RenderWorkerMask
     WorkerMask_None                = 1,
     WorkerMask_PosDiffuseTex_Pass1 = 1 << 1,
     WorkerMask_Lighting_Pass2      = 1 << 2,
+    WorkerMask_InstancedDraw       = 1 << 3,
 
-    WorkerMask_Max                 = WorkerMask_Lighting_Pass2 << 1
+    WorkerMask_Max                 = WorkerMask_InstancedDraw << 1
 };
 
 #if defined(UNUSED)

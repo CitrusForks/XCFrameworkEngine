@@ -6,7 +6,10 @@
 
 #include "EnginePrecompiledHeader.h"
 
+#include "Base/Serializer/BaseIDGenerator.h"
+
 #include "Engine/Resource/ResourceFactory.h"
+
 #include "Graphics/XCTextures/Texture2D.h"
 #include "Graphics/XCTextures/CubeTexture3D.h"
 #include "Graphics/XCMesh/XCMesh.h"
@@ -15,7 +18,6 @@
 #include "Graphics/XCMesh/VectorFontMesh.h"
 
 ResourceFactory::ResourceFactory()
-    : m_resourceCount(0)
 {
 }
 
@@ -35,13 +37,13 @@ void ResourceFactory::InitFactory()
 
 void ResourceFactory::DestroyFactory()
 {
-    m_resourceCount = 0;
 }
 
 IResource* ResourceFactory::CreateResource(std::string classKey, std::string userFriendlyName)
 {
+    BaseIDGenerator& baseIdGen = SystemLocator::GetInstance()->RequestSystem<BaseIDGenerator>("BaseIDGenerator");
     IResource* outResource = (IResource*) CreateObject(classKey);
-    outResource->SetBaseObjectId(++m_resourceCount);
+    outResource->SetBaseObjectId(baseIdGen.GetNextBaseObjectId());
     outResource->Init(userFriendlyName);
 
     return outResource;
@@ -50,11 +52,14 @@ IResource* ResourceFactory::CreateResource(std::string classKey, std::string use
 IResource* ResourceFactory::CreateResource(std::string classKey)
 {
     //Use this for Flatbuffers
+    BaseIDGenerator& baseIdGen = SystemLocator::GetInstance()->RequestSystem<BaseIDGenerator>("BaseIDGenerator");
+    u32 baseId = baseIdGen.GetNextBaseObjectId();
+    
     IResource* outResource = (IResource*) CreateObject(classKey);
-    outResource->SetBaseObjectId(++m_resourceCount);
+    outResource->SetBaseObjectId(baseId);
 
     char usrFrndName[1024];
-    sprintf(usrFrndName, "%s+%d", classKey, m_resourceCount);
+    sprintf(usrFrndName, "%s+%d", classKey, baseId);
     outResource->Init(usrFrndName);
 
     return outResource;

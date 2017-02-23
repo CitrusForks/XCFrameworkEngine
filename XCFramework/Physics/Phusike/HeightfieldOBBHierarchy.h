@@ -23,7 +23,7 @@ public:
         m_vMax = XCVec4(-Infinity, -Infinity, -Infinity, 1);
     }
 
-    HeightfieldQuad(i32 rowStart, i32 rowEnd, i32 colStart, i32 colEnd, i32 width, XCVec4& min, XCVec4& max)
+    HeightfieldQuad(u32 rowStart, u32 rowEnd, u32 colStart, u32 colEnd, u32 width, XCVec4& min, XCVec4& max)
     {
         m_rowStart = rowStart;
         m_rowEnd = rowEnd;
@@ -40,7 +40,7 @@ public:
     {
     }
 
-    bool                   ComputeQuad(i32 row, i32 col, XCVec4& pos);
+    bool                   ComputeQuad(u32 row, u32 col, XCVec4& pos);
     void                   ComputeOBBForAllQuads();
     const HeightfieldQuad* GetQuadCollidingWithOBB(const OBBBoundVolume* bbox) const;
 
@@ -48,14 +48,18 @@ public:
 
     void                   Update(f32 dt);
 
+#if defined(DEBUG_PHYSICS_OBB)
+    void                   GetOBBInfo(std::vector<PhysicsPlayground::OBBInfo>& outInfo) const;
+#endif
+
     XCVec4                 m_vMin;
     XCVec4                 m_vMax;
 
-    i32                    m_totalWidth;
-    i32                    m_rowStart;
-    i32                    m_rowEnd;
-    i32                    m_colStart;
-    i32                    m_colEnd;
+    u32                    m_totalWidth;
+    u32                    m_rowStart;
+    u32                    m_rowEnd;
+    u32                    m_colStart;
+    u32                    m_colEnd;
 
     IPhysicsBoundVolume*   m_bbox;
 };
@@ -63,19 +67,23 @@ public:
 class HeightfieldOBBHierarchy
 {
 public:
-    static const i32            NO_OF_QUADS_EACH_LEVEL = 4;
+    static const u32            NO_OF_QUADS_EACH_LEVEL = 4;
 
     HeightfieldOBBHierarchy(const PhysicsDesc::PhysicsHeightFieldDesc& heightfieldDesc);
     ~HeightfieldOBBHierarchy();
 
     void                        CreateHeightfieldOBBHierarchy();
-    void                        CreateHeightfieldOBBHierarchy(i32 levels);
+    void                        CreateHeightfieldOBBHierarchy(u32 levels);
 
     void                        Transform(const XCVec4& translate, const XCVec4& orientation);
 
     void                        Update(f32 dt);
 
     XCVec4                      GetPointOfContactWithOBB(const IPhysicsBoundVolume* bboxActor) const;
+
+#if defined(DEBUG_PHYSICS_OBB)
+    void                        GetAllOBBInfo(std::vector<PhysicsPlayground::OBBInfo>& outInfo) const;
+#endif
 
 protected:
     void                        ComputeQuads();

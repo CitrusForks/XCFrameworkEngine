@@ -27,7 +27,7 @@ XCMesh::XCMesh()
     , m_instanceCount(0)
 {
     m_workerType = WorkerType_PosDiffuseTex;
-    m_renderWorkerMask = WorkerMask_PosDiffuseTex_Pass1 | WorkerMask_Lighting_Pass2;
+    m_renderWorkerMask = WorkerMask_PosDiffuseTex_Pass1 | WorkerMask_Lighting_Pass2 | WorkerMask_InstancedDraw;
 
     m_resourceType = RESOURCETYPE_MESH;
 }
@@ -706,7 +706,7 @@ void XCMesh::DrawInstanced(PerObjectBuffer& objectBuffer)
 
 void XCMesh::OnRenderComplete()
 {
-    m_instanceCount = 0;
+        m_instanceCount = 0;
 }
 
 void XCMesh::Destroy()

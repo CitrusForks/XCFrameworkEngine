@@ -4,9 +4,6 @@
  * This program is complaint with GNU General Public License, version 3.
  * For complete license, read License.txt in source root directory. */
 
-#pragma once
+#include "EnginePrecompiledHeader.h"
 
-#include "Base/BaseCommonIncludes.h"
-#include "EngineCommonIncludes.h"
-#include "Graphics/GraphicsCommonIncludes.h"
-#include "Physics/PhysicsCommonIncludes.h"
+#include "IDebugFeature.h"

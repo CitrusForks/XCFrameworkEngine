@@ -9,17 +9,17 @@
 #include "GameActorsFactory.h"
 
 GameActorsFactory::GameActorsFactory()
-    : m_actorsCount(0)
 {
 }
 
 GameActorsFactory::~GameActorsFactory()
 {
-    m_actorsCount = 0;
 }
 
 void GameActorsFactory::InitFactory()
 {
+    m_gameActorsFactoryLock.Create();
+
     RegisterActors();
 }
 
@@ -51,14 +51,17 @@ void GameActorsFactory::RegisterActors()
 
 IActor* GameActorsFactory::CreateActor(std::string actorName)
 {
-    std::unique_lock<std::mutex> m(m_gameActorsFactoryLock);
+    BaseIDGenerator& baseIdGen = SystemLocator::GetInstance()->RequestSystem<BaseIDGenerator>("BaseIDGenerator");
+    u32 baseId = baseIdGen.GetNextBaseObjectId();
+
+    m_gameActorsFactoryLock.Enter();
 
     IActor* actor = (IActor*) CreateObject(actorName);
-    actor->SetBaseObjectId(++m_actorsCount);
+    actor->SetBaseObjectId(baseId);
 
-    Logger("[GAME ACTORS FACTORY] Actor : %s  ID : %d", actorName.c_str(), m_actorsCount);
+    Logger("[GAME ACTORS FACTORY] Actor : %s  ID : %d", actorName.c_str(), baseId);
 
-    m.unlock();
+    m_gameActorsFactoryLock.Exit();
 
     return actor;
 }
@@ -66,6 +69,8 @@ IActor* GameActorsFactory::CreateActor(std::string actorName)
 void GameActorsFactory::DestroyFactory()
 {
     m_registeredActors.clear();
+
+    m_gameActorsFactoryLock.Release();
 }
 
 void GameActorsFactory::GetAllActorTypes(GameActorsInfo* actorTypes)
