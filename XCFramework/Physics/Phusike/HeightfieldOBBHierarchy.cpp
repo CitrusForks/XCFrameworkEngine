@@ -299,6 +299,8 @@ XCVec4 HeightfieldOBBHierarchy::GetPointOfContactWithOBB(const IPhysicsBoundVolu
     return XCVec4();
 }
 
+#if defined(DEBUG_PHYSICS_OBB)
+
 void HeightfieldOBBHierarchy::GetAllOBBInfo(std::vector<PhysicsPlayground::OBBInfo>& outInfo) const
 {
     m_heightfieldQuadTree->GetRootNode()->GetOBBInfo(outInfo);
@@ -314,3 +316,5 @@ void HeightfieldQuad::GetOBBInfo(std::vector<PhysicsPlayground::OBBInfo>& outInf
         return list->Get()->GetOBBInfo(outInfo);
     }
 }
+
+#endif

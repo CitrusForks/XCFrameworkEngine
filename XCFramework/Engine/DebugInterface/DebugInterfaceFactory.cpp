@@ -7,6 +7,8 @@
 #include "EnginePrecompiledHeader.h"
 
 #include "DebugInterfaceFactory.h"
+
+#include "IDebugFeature.h"
 #include "DebugPhysics/DebugPhysicsOBB.h"
 
 #include "Base/Serializer/BaseIDGenerator.h"

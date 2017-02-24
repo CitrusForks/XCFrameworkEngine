@@ -6,6 +6,8 @@
 
 #pragma once
 
+#if defined(DEBUG_PHYSICS_OBB)
+
 #include "DebugInterface/IDebugFeature.h"
 #include "Graphics/IRenderableObject.h"
 #include "Graphics/XCMaterials/MaterialTypes.h"
@@ -36,3 +38,5 @@ private:
     Material                        m_material;
     std::vector<OBBWorldInfo>       m_renderableOBBs;
 };
+
+#endif

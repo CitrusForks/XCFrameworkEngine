@@ -6,6 +6,8 @@
 
 #include "EnginePrecompiledHeader.h"
 
+#if defined(DEBUG_PHYSICS_OBB)
+
 #include "DebugPhysicsOBB.h"
 
 #include "Engine/Resource/ResourceManager.h"
@@ -100,3 +102,5 @@ void DebugPhysicsOBB::Destroy()
         m_cubeMesh = nullptr;
     }
 }
+
+#endif
