@@ -287,8 +287,8 @@ void XCShaderHandle::GenerateRootSignature()
         | D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS
         | D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS;
 
-    ID3DBlob* signature;
-    ID3DBlob* errors;
+    ID3DBlob* signature = nullptr;
+    ID3DBlob* errors = nullptr;
 
     ValidateResult(D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signature, &errors));
     
@@ -304,6 +304,9 @@ void XCShaderHandle::GenerateRootSignature()
 
 void XCShaderHandle::GeneratePSO()
 {
+    XCGraphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XCGraphics>("GraphicsSystem");
+    ID3DDevice* device = graphicsSystem.GetDevice();
+
 #if defined(XCGRAPHICS_DX12)
     //Fetch the output parameters of the pixel shader for MRT mapping.
     D3D_SHADER_DESC desc = {};
@@ -336,13 +339,11 @@ void XCShaderHandle::GeneratePSO()
     m_pso->m_psos[RasterType_FillSolid].m_psoDesc.DepthStencilState.DepthEnable     = m_enableDepth;
     m_pso->m_psos[RasterType_FillWireframe].m_psoDesc.DepthStencilState.DepthEnable = m_enableDepth;
 
-    XCGraphics& graphicsSystem = SystemLocator::GetInstance()->RequestSystem<XCGraphics>("GraphicsSystem");
-    ID3DDevice* device = graphicsSystem.GetDevice();
     m_pso->CreateGraphicPSO(*device, RasterType_FillSolid);
     m_pso->CreateGraphicPSO(*device, RasterType_FillWireframe);
 
 #elif defined(XCGRAPHICS_DX11)
-    ValidateResult(m_device.CreateInputLayout(m_inputLayoutDesc.pInputElementDescs, m_inputLayoutDesc.NumElements, m_pVS, m_vsSize, &m_inputLayout));
+    ValidateResult(device->CreateInputLayout(m_inputLayoutDesc.pInputElementDescs, m_inputLayoutDesc.NumElements, m_pVS, m_vsSize, &m_inputLayout));
 #endif
 }
 

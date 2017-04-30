@@ -1,11 +1,11 @@
 project "XCGame"
 print("Building C++ Win32 Project XCGame")
 	kind "WindowedApp"
-	language "C++"
-	architecture "x86"
-	targetdir "bin/%{cfg.buildcfg}"
-	systemversion "10.0.10586.0"
-	characterset "MBCS"
+	language (Language)
+	architecture (Architecture)
+	targetdir (Targetdir)
+	systemversion (PlatformVersion)
+	characterset (Characterset)
 	
 	files { "**.h", "**.cpp", "**.hlsl", "**.licenseheader" }
 	
@@ -21,13 +21,12 @@ print("Building C++ Win32 Project XCGame")
 
 		excludes { "**/Orbis/**", "**orbis.cpp", "**/Durango/**", "**durango.cpp", "**editor.cpp", "**/Editor/**", "**Editor.cpp", "**Editor**.*", "**/DDSTextureLoader_Legacy/**", "**.pssl", "**/XC_Shaders/src/**"}
 		
-		links { "d3d12", "d2d1", "dwrite", "d3dcompiler", "FlatBuffers", "ws2_32", "DirectXTex", "dxguid", 
-		"dinput8", "dxgi", "d3d11", "glut32", "glew32", "assimp.lib","zlibstaticd.lib", "libfbxsdk.lib",
+		links { (GraphicsLibs), "FlatBuffers", "ws2_32", "dinput8", "assimp.lib","zlibstaticd.lib", "libfbxsdk.lib",
 				"XCBase", "XCEngine", "XCGraphics", "XCNetwork", "XCGameplay", "XCPhysics" }
 		
 		entrypoint("")
 		
-		defines { "DEBUG", "WIN_32", "WIN32", "_DEBUG", "_WINDOWS" }
+		defines { "DEBUG", "WIN_32", "WIN32", "_DEBUG", "_WINDOWS", (GraphicsDefines) }
 		pchheader "GamePrecompiledHeader.h"
 		pchsource "GamePrecompiledHeader.cpp"
 		
@@ -51,13 +50,12 @@ print("Building C++ Win32 Project XCGame")
 	    excludes { "**/Orbis/**", "**orbis.cpp", "**/Durango/**", "**durango.cpp", "**editor.cpp", "**/Editor/**", 
 		"**Editor.cpp", "**Editor**.*", "**/DDSTextureLoader_Legacy/**", "**.pssl", "**/XC_Shaders/src/**"}
 				
-	  	links { "d3d12", "d2d1", "dwrite", "d3dcompiler", "FlatBuffers", "ws2_32", "DirectXTex", "dxguid", 
-		  "dinput8", "dxgi", "d3d11", "glut32", "glew32", "assimp.lib","zlibstatic.lib", "libfbxsdk.lib",
+	  	links { (GraphicsLibs), "FlatBuffers", "ws2_32", "dinput8", "assimp.lib","zlibstatic.lib", "libfbxsdk.lib",
 			    "XCBase", "XCEngine", "XCGraphics", "XCNetwork", "XCGameplay",  "XCPhysics" }
 	  
 		entrypoint("")
 			
-      	defines { "NDEBUG", "WIN_32", "WIN32", "_WINDOWS" }
+      	defines { "NDEBUG", "WIN_32", "WIN32", "_WINDOWS", (GraphicsDefines) }
 	  	pchheader "GamePrecompiledHeader.h"
 		pchsource "GamePrecompiledHeader.cpp"
       	

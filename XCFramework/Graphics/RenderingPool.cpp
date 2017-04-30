@@ -224,10 +224,12 @@ void RenderingPool::OnRenderComplete()
     m_addRemoveLock.Exit();
 }
 
+#if defined(XCGRAPHICS_DX12)
 void RenderingPool::Execute(ID3DCommandQueue* cmdQueue)
 {
     cmdQueue->ExecuteCommandLists(_countof(m_ppCmdList), m_ppCmdList);
 }
+#endif
 
 void RenderingPool::RenderWorker::Init()
 {

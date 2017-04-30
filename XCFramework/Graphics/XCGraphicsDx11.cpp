@@ -23,7 +23,6 @@
 XCGraphicsDx11::XCGraphicsDx11(void)
     : m_pSwapChain(nullptr)
     , m_pdxgiFactory(nullptr)
-    , m_pD3DDeviceContext(nullptr)
     , m_pRenderTargetView(nullptr)
     , m_renderQuadVB(nullptr)
     , m_renderQuadIB(nullptr)
@@ -179,19 +178,19 @@ void XCGraphicsDx11::SetupSwapChain()
 void XCGraphicsDx11::SetupRenderTargets()
 {
     //Initiate RenderableTextures
-    m_renderTargets[RenderTargetType_Main_0] = XCNEW(RenderableTexture)(RenderTargetType_Main_0, DXGI_FORMAT_R8G8B8A8_UNORM, *m_pD3DDevice, *m_pD3DDeviceContext);
+    m_renderTargets[RenderTargetType_Main_0] = XCNEW(RenderableTexture)(RenderTargetType_Main_0, DXGI_FORMAT_R8G8B8A8_UNORM, *m_pD3DDeviceContext);
     m_renderTargets[RenderTargetType_Main_0]->PreLoad(m_pSwapChain);
 
-    m_renderTargets[RenderTargetType_GBuffer_Diffuse] = XCNEW(RenderableTexture)(RenderTargetType_GBuffer_Diffuse, DXGI_FORMAT_R8G8B8A8_UNORM, *m_pD3DDevice, *m_pD3DDeviceContext);
+    m_renderTargets[RenderTargetType_GBuffer_Diffuse] = XCNEW(RenderableTexture)(RenderTargetType_GBuffer_Diffuse, DXGI_FORMAT_R8G8B8A8_UNORM, *m_pD3DDeviceContext);
     m_renderTargets[RenderTargetType_GBuffer_Diffuse]->PreLoad(m_enable4xMsaa && m_4xMsaaQuality, m_clientWidth, m_clientHeight);
 
-    m_renderTargets[RenderTargetType_GBuffer_Position] = XCNEW(RenderableTexture)(RenderTargetType_GBuffer_Position, DXGI_FORMAT_R32G32B32A32_FLOAT, *m_pD3DDevice, *m_pD3DDeviceContext);
+    m_renderTargets[RenderTargetType_GBuffer_Position] = XCNEW(RenderableTexture)(RenderTargetType_GBuffer_Position, DXGI_FORMAT_R32G32B32A32_FLOAT, *m_pD3DDeviceContext);
     m_renderTargets[RenderTargetType_GBuffer_Position]->PreLoad(m_enable4xMsaa && m_4xMsaaQuality, m_clientWidth, m_clientHeight);
 
-    m_renderTargets[RenderTargetType_GBuffer_Normal] = XCNEW(RenderableTexture)(RenderTargetType_GBuffer_Normal, DXGI_FORMAT_R8G8B8A8_UNORM, *m_pD3DDevice, *m_pD3DDeviceContext);
+    m_renderTargets[RenderTargetType_GBuffer_Normal] = XCNEW(RenderableTexture)(RenderTargetType_GBuffer_Normal, DXGI_FORMAT_R8G8B8A8_UNORM, *m_pD3DDeviceContext);
     m_renderTargets[RenderTargetType_GBuffer_Normal]->PreLoad(m_enable4xMsaa && m_4xMsaaQuality, m_clientWidth, m_clientHeight);
 
-    m_renderTargets[RenderTargetType_LiveDrive] = XCNEW(RenderableTexture)(RenderTargetType_LiveDrive, DXGI_FORMAT_R8G8B8A8_UNORM, *m_pD3DDevice, *m_pD3DDeviceContext);
+    m_renderTargets[RenderTargetType_LiveDrive] = XCNEW(RenderableTexture)(RenderTargetType_LiveDrive, DXGI_FORMAT_R8G8B8A8_UNORM, *m_pD3DDeviceContext);
     m_renderTargets[RenderTargetType_LiveDrive]->PreLoad(m_enable4xMsaa && m_4xMsaaQuality, 256, 256);
 }
 

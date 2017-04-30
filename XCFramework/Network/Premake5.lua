@@ -1,11 +1,11 @@
 project "XCNetwork"
 print("Building C++ Win32 Project XCNetwork")
 	kind "StaticLib"
-	language "C++"
-	architecture "x86"
-	targetdir "bin/%{cfg.buildcfg}"
-	systemversion "10.0.10586.0"
-	characterset "MBCS"
+	language (Language)
+	architecture (Architecture)
+	targetdir (Targetdir)
+	systemversion (PlatformVersion)
+	characterset (Characterset)
 	
 	files { "**.h", "**.cpp", "**.hlsl", "**.licenseheader" }
 	

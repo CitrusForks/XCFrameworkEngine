@@ -63,7 +63,7 @@ GPUResource* GPUResourceSystem::CreateConstantBufferResource(GPUResourceDesc& de
             bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
             bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
-            ValidateResult(m_device->CreateBuffer(&bd, nullptr, &resource->GetPointerToResource<ID3D11Buffer*>()));
+            ValidateResult(device->CreateBuffer(&bd, nullptr, &resource->GetPointerToResource<ID3D11Buffer*>()));
 #endif
         }
     }

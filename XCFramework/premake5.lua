@@ -1,8 +1,21 @@
 print("XC Framework Premake(Lua) Project Generation")
 
+newoption {
+   trigger     = "gfxapi",
+   value       = "API",
+   description = "Choose a particular 3D API for rendering",
+   allowed = {
+      { "opengl",    "OpenGL" },
+      { "dx11",  "Direct3D 11 (Windows only)" },
+      { "dx12",  "Direct3D 12 (Windows only)" }
+   }
+}
+
 workspace "XCFramework"
 	configurations { "Debug", "Release" }
 	
+include "CommonCfg"
+
 group("Engine")
 print("Building C++ Win32 Project XCBase")
 include "Base"

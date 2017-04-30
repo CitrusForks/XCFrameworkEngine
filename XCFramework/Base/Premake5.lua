@@ -1,11 +1,11 @@
 project "XCBase"
 print("Building C++ Win32 Project XCBase")
 	kind "StaticLib"
-	language "C++"
-	architecture "x86"
-	targetdir "bin/%{cfg.buildcfg}"
-	systemversion "10.0.10586.0"
-	characterset "MBCS"
+	language (Language)
+	architecture (Architecture)
+	targetdir (Targetdir)
+	systemversion (PlatformVersion)
+	characterset (Characterset)
 	
 	files { "**.h", "**.cpp", "**.licenseheader" }
 	
@@ -20,7 +20,7 @@ print("Building C++ Win32 Project XCBase")
 		excludes { "**/Orbis/**", "**orbis.cpp", "**/Durango/**", "**durango.cpp", "**editor.cpp", 
 		"**/Editor/**", "**Editor.cpp", "**Editor**.*", "**/DDSTextureLoader_Legacy/**", "**.pssl", "**/XC_Shaders/src/**"}
 		
-		links { "d3d12", "ws2_32", "dxgi", "d3d11" }
+		links { "ws2_32" }
 		
 		defines { "DEBUG", "WIN_32", "WIN32", "_DEBUG", "_WINDOWS" }
 		pchheader "BasePrecompiledHeader.h"
@@ -42,7 +42,7 @@ print("Building C++ Win32 Project XCBase")
 		excludes { "**/Orbis/**", "**orbis.cpp", "**/Durango/**", "**durango.cpp", "**editor.cpp", 
 		"**/Editor/**", "**Editor.cpp", "**Editor**.*", "**/DDSTextureLoader_Legacy/**", "**.pssl", "**/XC_Shaders/src/**"}
 		
-		links { "d3d12", "ws2_32", "DirectXTex", "dxgi", "d3d11" }
+		links { "ws2_32" }
 		
 		defines { "NDEBUG", "WIN_32", "WIN32", "_WINDOWS" }
 		pchheader "BasePrecompiledHeader.h"

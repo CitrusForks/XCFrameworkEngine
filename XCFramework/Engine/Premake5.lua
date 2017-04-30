@@ -1,11 +1,11 @@
 project "XCEngine"
 print("Building C++ Win32 Project XCEngine")
 	kind "StaticLib"
-	language "C++"
-	architecture "x86"
-	targetdir "bin/%{cfg.buildcfg}"
-	systemversion "10.0.10586.0"
-	characterset "MBCS"
+	language (Language)
+	architecture (Architecture)
+	targetdir (Targetdir)
+	systemversion (PlatformVersion)
+	characterset (Characterset)
 	
 	files { "**.h", "**.cpp", "**.hlsl", "**.licenseheader" }
 	
@@ -23,7 +23,7 @@ print("Building C++ Win32 Project XCEngine")
 		
 		links { "FlatBuffers", "ws2_32", "dinput8", "XCGraphics", "XCPhysics" }
 		
-		defines { "DEBUG", "WIN_32", "WIN32", "_DEBUG", "_WINDOWS" }
+		defines { "DEBUG", "WIN_32", "WIN32", "_DEBUG", "_WINDOWS", (GraphicsDefines) }
 		pchheader "EnginePrecompiledHeader.h"
 		pchsource "EnginePrecompiledHeader.cpp"
 		
@@ -46,7 +46,7 @@ print("Building C++ Win32 Project XCEngine")
 		
 		links { "FlatBuffers", "ws2_32", "dinput8", "XCGraphics", "XCPhysics" }
 		
-		defines { "NDEBUG", "WIN_32", "WIN32", "_WINDOWS" }
+		defines { "NDEBUG", "WIN_32", "WIN32", "_WINDOWS", (GraphicsDefines) }
 		pchheader "EnginePrecompiledHeader.h"
 		pchsource "EnginePrecompiledHeader.cpp"
 		

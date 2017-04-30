@@ -34,12 +34,12 @@ XCFramework is a cross platform Game engine written in C++ with DirectX12, Direc
 - AI - Integrated basic AI system to Non Playable Characters.
 
 # Dev Requirements
-Windows 10 SDK 10.0.10586.0 
+Windows 10 SDK 10.0.10586.0/10.0.15063.0
 Directx12 supported hardware (If not, Warp will be enabled automatically by engine. But it might crash and is unstable).
 Directx11 supported hardware.
 
 # How to build the engine and run a 3D game?
-Run "Premake5.exe vs2015" through commandline.
+Run "Premake5.exe vs2017 --gfxapi="dx12" " through commandline.
 Launch the solution and build it.
 
 # How to launch the game?

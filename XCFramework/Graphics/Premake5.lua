@@ -1,11 +1,11 @@
 project "XCGraphics"
 print("Building C++ Win32 Project XCGraphics")
 	kind "StaticLib"
-	language "C++"
-	architecture "x86"
-	targetdir "bin/%{cfg.buildcfg}"
-	systemversion "10.0.10586.0"
-	characterset "MBCS"
+	language (Language)
+	architecture (Architecture)
+	targetdir (Targetdir)
+	systemversion (PlatformVersion)
+	characterset (Characterset)
 	
 	files { "**.h", "**.cpp", "**.hlsl", "**.licenseheader" }
 	
@@ -22,9 +22,9 @@ print("Building C++ Win32 Project XCGraphics")
 		excludes { "**/Orbis/**", "**orbis.cpp", "**/Durango/**", "**durango.cpp", "**editor.cpp", "**/Editor/**", 
 		"**Editor.cpp", "**Editor**.*", "**/DDSTextureLoader_Legacy/**", "**.pssl", "**/src/**", "**Graphics/XC_Shaders/src/**"}
 		
-		links { "d3d12", "d2d1", "dwrite", "d3dcompiler", "FlatBuffers", "DirectXTex", "dxguid", "dxgi", "d3d11", "glut32", "glew32" }
+		links { (GraphicsLibs), "FlatBuffers" }
 		
-		defines { "DEBUG", "WIN_32", "WIN32", "_DEBUG", "_WINDOWS" }
+		defines { "DEBUG", "WIN_32", "WIN32", "_DEBUG", "_WINDOWS", (GraphicsDefines) }
 		pchheader "GraphicsPrecompiledHeader.h"
 		pchsource "GraphicsPrecompiledHeader.cpp"
 		
@@ -47,9 +47,9 @@ print("Building C++ Win32 Project XCGraphics")
 		excludes { "**/Orbis/**", "**orbis.cpp", "**/Durango/**", "**durango.cpp", "**editor.cpp", "**/Editor/**", "**Editor.cpp", "**Editor**.*", 
 		"**/DDSTextureLoader_Legacy/**", "**.pssl", "**/src/**", "**Graphics/XC_Shaders/src/**"}
 		
-		links { "d3d12", "d2d1", "dwrite", "d3dcompiler", "FlatBuffers", "DirectXTex", "dxguid", "dxgi", "d3d11", "glut32", "glew32" }
+		links { (GraphicsLibs), "FlatBuffers" }
 		
-		defines { "NDEBUG", "WIN_32", "WIN32", "_WINDOWS" }
+		defines { "NDEBUG", "WIN_32", "WIN32", "_WINDOWS", (GraphicsDefines) }
 		pchheader "GraphicsPrecompiledHeader.h"
 		pchsource "GraphicsPrecompiledHeader.cpp"
 		
