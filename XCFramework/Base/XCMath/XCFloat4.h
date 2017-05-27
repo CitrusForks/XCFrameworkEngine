@@ -24,7 +24,10 @@ namespace XCMath
     class XCFloat4 : public XCFloat3
     {
     public:
-        static XCFloat4 XCFloat4ZeroVector;
+
+        //Constants
+        static const XCFloat4 XCQuaternionIdentity;
+        static const XCFloat4 XCFloat4ZeroVector;
 
         XCFloat4()
         {
@@ -164,6 +167,7 @@ namespace XCMath
         {
             return DirectX::XMFLOAT4(Get<X>(), Get<Y>(), Get<Z>(), Get<W>());
         }
+
     };
 
     inline const XCFloat4 operator *(f32 value, const XCFloat4& obj)

@@ -16,6 +16,8 @@ void RigidBody::Init(const PhysicsDesc& desc)
 
     m_ForceAccumulator = XCVec3(0, 0, 0);
     m_ContactNormal = XCVec3(0, 0, 0);
+
+    m_orientation = XCVec4::XCQuaternionIdentity;
 }
 
 RigidBody::~RigidBody()
@@ -61,7 +63,6 @@ void RigidBody::Update(f32 dt)
     ClearForce();
 
     //Update the bound volume
-    m_orientation.Set<W>(1.0f);
     m_physicsBoundVolume->Transform(m_position, m_orientation);
 }
 

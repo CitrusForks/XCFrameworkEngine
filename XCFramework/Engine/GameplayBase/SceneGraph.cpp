@@ -159,7 +159,7 @@ void SceneGraph::Update(f32 dt)
         case IActor::ActorState_MetaDataLoad:
             returnState = sceneNode->LoadMetaData(sceneNode->GetMetaData());
 
-            if (returnState == IActor::IActor::ActorReturnState_Success)
+            if (returnState == IActor::ActorReturnState_Success)
             {
                 //Request a load here.
                 sceneNode->SetActorState(IActor::ActorState_Loading);
@@ -178,7 +178,7 @@ void SceneGraph::Update(f32 dt)
         case IActor::ActorState_Loaded:
             returnState = sceneNode->OnLoaded();
 
-            if (returnState == IActor::IActor::ActorReturnState_Success)
+            if (returnState == IActor::ActorReturnState_Success)
             {
                 sceneNode->SetActorState(IActor::ActorState_Ready);
             }
@@ -193,7 +193,7 @@ void SceneGraph::Update(f32 dt)
             else
             {
                 returnState = sceneNode->Update(dt);
-                XCASSERT(returnState == IActor::IActor::ActorReturnState_Success);
+                XCASSERT(returnState == IActor::ActorReturnState_Success);
             }
             break;
 
@@ -207,15 +207,16 @@ void SceneGraph::Update(f32 dt)
         case IActor::ActorState_Unloaded:
             returnState = sceneNode->OnUnloaded();
 
-            if (returnState == IActor::IActor::ActorReturnState_Success)
+            if (returnState == IActor::ActorReturnState_Success)
             {
                 sceneNode->SetActorState(IActor::ActorState_Destroy);
             }
             break;
+
         case IActor::ActorState_Destroy:
             returnState = sceneNode->Destroy();
 
-            if (returnState == IActor::IActor::ActorReturnState_Success)
+            if (returnState == IActor::ActorReturnState_Success)
             {
                 //Remove it from the scene graph
                 m_sceneGraph->RemoveNode(sceneNode);

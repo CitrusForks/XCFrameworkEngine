@@ -47,7 +47,6 @@ void OBBBoundVolume::GenerateBoundBox(const OBBBoundVolume* boundBox)
 void OBBBoundVolume::Transform(XCMatrix4& translateMat, XCMatrix4& rotateMatrix)
 {
     XCVec4 rotate = QuaternionRotationMatrix(rotateMatrix);
-
     m_bBox.Transform(m_TransformedBox, 1.0f, rotate.GetPlatformIntrinsic(), translateMat[3].GetPlatformIntrinsic());
 }
 
@@ -68,7 +67,9 @@ bool OBBBoundVolume::Intersects(const OBBBoundVolume* obb) const
 
 void OBBBoundVolume::Transform(const XCVec4& translate, const XCVec4& orientation)
 {
-    m_bBox.Transform(m_TransformedBox, 1.0f, /*XCVec4(0, 0, 0, 1)*/orientation.GetPlatformIntrinsic(), translate.GetPlatformIntrinsic());
+    XCFloat4 normalized = VectorNormalize<4>(orientation);
+    normalized = DirectX::XMQuaternionNormalize(orientation.GetPlatformIntrinsic());
+    m_bBox.Transform(m_TransformedBox, 1.0f, normalized.GetPlatformIntrinsic(), translate.GetPlatformIntrinsic());
 }
 
 #if defined(DEBUG_PHYSICS_OBB)

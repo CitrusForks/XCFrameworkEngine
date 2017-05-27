@@ -10,5 +10,6 @@
 
 namespace XCMath
 {
-    XCFloat4 XCFloat4::XCFloat4ZeroVector = XCVec4(0.0f, 0.0f, 0.0f, 0.0f);
+    const XCFloat4 XCFloat4::XCFloat4ZeroVector = XCVec4(0.0f, 0.0f, 0.0f, 0.0f);
+    const XCFloat4 XCFloat4::XCQuaternionIdentity = XCVec4(DirectX::XMQuaternionIdentity());
 }

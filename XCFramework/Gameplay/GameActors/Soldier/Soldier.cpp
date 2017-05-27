@@ -153,7 +153,6 @@ void Soldier::Yaw(f32 angle, f32 scalarForce)
     //Rotate the soldier with it's initial rotations.
     m_transformedRotation *= rotation;
     XCVec4 rotvec = QuaternionRotationMatrix(m_transformedRotation);
-    rotvec.Set<W>(1.0f);
     AddRotationalForce(rotvec);
 
     //Set the offset gun rotation too
